@@ -62,8 +62,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 <span
                     className="text-3xl font-black text-white tracking-tight whitespace-nowrap relative z-0"
                     style={{
-                        opacity: sliding ? 1 : 0,
-                        transition: 'opacity 0.5s ease-out 0.15s',
+                        opacity: sliding ? 1 : 0, transform: sliding ? 'translateX(0)' : 'translateX(-60px)', transition: 'opacity 0.4s ease-out, transform 1s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
                 >
                     Dribly<span className="text-[#7C3AED]">.</span>
