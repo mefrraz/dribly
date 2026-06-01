@@ -12,7 +12,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
     doneRef.current = onDone
 
     useEffect(() => {
-        const t1 = setTimeout(() => setPhase('slide'), 700)
+        const t1 = setTimeout(() => setPhase('slide'), 800)
         const t2 = setTimeout(() => setPhase('done'), 2000)
         const t3 = setTimeout(() => setFadeOut(true), 2500)
         const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 2900)
@@ -35,9 +35,9 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 className="absolute flex items-center gap-2.5"
                 style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
             >
-                {/* Logo — moves LEFT */}
+                {/* Logo — starts at center, slides LEFT to reveal text behind it */}
                 <div
-                    className="relative shrink-0"
+                    className="relative shrink-0 z-10"
                     style={{
                         transform: sliding ? 'translateX(-30px)' : 'translateX(0)',
                         transition: 'transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -46,7 +46,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     <img
                         src="/logo.svg"
                         alt=""
-                        className="w-16 h-16 object-contain relative z-10"
+                        className="w-16 h-16 object-contain"
                         style={{
                             animation: phase === 'pop' ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none',
                         }}
@@ -59,17 +59,17 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     )}
                 </div>
 
-                {/* Text — letter by letter, emerges from BEHIND the logo */}
-                <span className="text-3xl font-black text-white tracking-tight whitespace-nowrap relative z-0">
+                {/* Text — sits in its final position, hidden behind the logo until it slides away */}
+                {/* Each letter fades in as the logo reveals it */}
+                <span className="text-3xl font-black tracking-tight whitespace-nowrap relative z-0">
                     {letters.map((letter, i) => (
                         <span
                             key={i}
+                            className="text-white"
                             style={{
                                 display: 'inline-block',
                                 opacity: sliding ? 1 : 0,
-                                transform: sliding ? 'translateX(0)' : 'translateX(-50px)',
-                                transition: `opacity 0.3s ease-out ${0.8 + i * 0.08}s, transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)`,
-                                filter: sliding ? 'blur(0)' : 'blur(6px)',
+                                transition: `opacity 0.25s ease-out ${0.9 + i * 0.07}s`,
                             }}
                         >
                             {letter}
@@ -80,9 +80,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                         style={{
                             display: 'inline-block',
                             opacity: sliding ? 1 : 0,
-                            transform: sliding ? 'translateX(0)' : 'translateX(-50px)',
-                            transition: `opacity 0.3s ease-out ${0.8 + letters.length * 0.08}s, transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)`,
-                            filter: sliding ? 'blur(0)' : 'blur(6px)',
+                            transition: `opacity 0.25s ease-out ${0.9 + letters.length * 0.07}s`,
                         }}
                     >
                         .
