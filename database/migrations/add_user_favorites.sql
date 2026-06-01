@@ -1,5 +1,6 @@
 -- Store user's favorite club (syncs across devices)
-CREATE TABLE IF NOT EXISTS public.user_favorites (
+DROP TABLE IF EXISTS public.user_favorites;
+CREATE TABLE public.user_favorites (
     user_id TEXT PRIMARY KEY,
     club_id INTEGER NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
