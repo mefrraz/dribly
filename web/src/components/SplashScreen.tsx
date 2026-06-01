@@ -67,7 +67,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                         className="w-16 h-16 object-contain relative z-10"
                         style={{
                             opacity: !ready ? 0 : popping ? 0 : 1,
-                            animation: popping ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none',
+                            animation: popping ? 'splashLogoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none',
                         }}
                     />
                     {/* Glow — always visible during pop, fades during slide */}
@@ -75,9 +75,9 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                         className={`absolute -inset-8 rounded-full ${glowColor} blur-3xl`}
                         style={{
                             animation: popping
-                                ? 'glowPop 0.5s ease-out both'
+                                ? 'splashGlowPop 0.5s ease-out both'
                                 : sliding
-                                    ? 'fadeOut 0.6s ease-out forwards'
+                                    ? 'splashGlowFadeOut 0.6s ease-out forwards'
                                     : 'none',
                         }}
                     />
@@ -89,7 +89,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     style={{
                         animation: popping
                             ? 'none'
-                            : 'textSlideIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                            : 'splashTextSlideIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards',
                         opacity: popping ? 0 : undefined,
                     }}
                 >
@@ -97,27 +97,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 </span>
             </div>
 
-            <style>{`
-                @keyframes logoPop {
-                    0% { opacity: 0; transform: scale(0); }
-                    100% { opacity: 1; transform: scale(1); }
-                }
-                @keyframes textSlideIn {
-                    0% { opacity: 0; transform: translateX(-30px); }
-                    30% { opacity: 0; transform: translateX(-30px); }
-                    65% { opacity: 1; transform: translateX(0); }
-                    100% { opacity: 1; transform: translateX(0); }
-                }
-                @keyframes glowPop {
-                    0% { opacity: 0; transform: scale(0.3); }
-                    50% { opacity: 0.6; }
-                    100% { opacity: 0.4; transform: scale(1.4); }
-                }
-                @keyframes fadeOut {
-                    0% { opacity: 0.4; }
-                    100% { opacity: 0; }
-                }
-            `}</style>
+            
         </div>
     )
 }

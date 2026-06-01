@@ -55,3 +55,24 @@
 .match-gradient {
   background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
 }
+
+/* Splash screen animations */
+@keyframes splashLogoPop {
+  0% { opacity: 0; transform: scale(0); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes splashTextSlideIn {
+  0% { opacity: 0; transform: translateX(-30px); }
+  30% { opacity: 0; transform: translateX(-30px); }
+  65% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes splashGlowPop {
+  0% { opacity: 0; transform: scale(0.3); }
+  50% { opacity: 0.6; }
+  100% { opacity: 0.4; transform: scale(1.4); }
+}
+@keyframes splashGlowFadeOut {
+  0% { opacity: 0.4; }
+  100% { opacity: 0; }
+}
