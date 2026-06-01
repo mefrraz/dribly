@@ -26,8 +26,6 @@ const COMP_NAMES: Record<number, string> = {
 }
 
 type Tab = 'geral' | 'classificacao' | 'resultados' | 'calendario' | 'equipas' | 'estatisticas'
-const TOP_LEAGUES = [10902, 10906]
-
 const TAB_CONFIG = [
     { value: 'geral' as Tab, label: 'Vista Geral', icon: LayoutDashboard, color: 'from-dribly-purple to-purple-600' },
     { value: 'classificacao' as Tab, label: 'Classificação', icon: ListOrdered, color: 'from-violet-500 to-purple-600' },
@@ -37,10 +35,8 @@ const TAB_CONFIG = [
     { value: 'estatisticas' as Tab, label: 'Estatísticas', icon: BarChart4, color: 'from-pink-500 to-rose-600' },
 ]
 
-function getTabsFor(provaId: number) {
-    return TOP_LEAGUES.includes(provaId)
-        ? TAB_CONFIG
-        : TAB_CONFIG.filter(t => t.value !== 'estatisticas')
+function getTabsFor() {
+    return TAB_CONFIG
 }
 
 function normalize(s: string): string {
@@ -188,7 +184,7 @@ export default function CompetitionDetail() {
                     fetchStandings(provaId),
                     Promise.all([fetchSchedule(provaId), fetchResults(provaId)]),
                     fetchTeams(provaId),
-                    TOP_LEAGUES.includes(provaId) ? fetchPlayerStats(provaId, 'val') : Promise.resolve([]),
+                    fetchPlayerStats(provaId, 'val'),
                 ])
                 const fetchStart = lastFetchMapRef.current.get(provaId) || 0
                 if (Date.now() - fetchStart >= CACHE_TTL + 5000) return // stale (fetch took > 5s past TTL)
@@ -307,7 +303,7 @@ export default function CompetitionDetail() {
                 {/* Tab bar */}
                 <div className="sticky top-16 z-40 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl -mx-3 sm:-mx-5 px-3 sm:px-5 pb-2 mb-5 border-b border-zinc-100 dark:border-white/5 overflow-x-auto">
                     <div className="flex gap-1.5 min-w-max">
-                        {getTabsFor(provaId).map(t => {
+                        {getTabsFor().map(t => {
                             const active = tab === t.value
                             const Icon = t.icon
                             return (
