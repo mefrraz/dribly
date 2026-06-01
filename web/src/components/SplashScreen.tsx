@@ -6,126 +6,81 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onDone }: SplashScreenProps) {
     const [fadeOut, setFadeOut] = useState(false)
-    const [visible, setVisible] = useState(true)
+    const [hidden, setHidden] = useState(false)
     const doneRef = useRef(onDone)
     doneRef.current = onDone
 
     useEffect(() => {
-        const t1 = setTimeout(() => setFadeOut(true), 2500)
+        const t1 = setTimeout(() => setFadeOut(true), 2000)
         const t2 = setTimeout(() => {
-            setVisible(false)
+            setHidden(true)
             doneRef.current()
-        }, 3000)
-
+        }, 2500)
         return () => { clearTimeout(t1); clearTimeout(t2) }
-    }, []) // no deps — runs once, ref stays fresh
+    }, [])
 
-    if (!visible) return null
+    if (hidden) return null
 
     return (
         <div
-            className={`fixed inset-0 z-[9999] bg-zinc-50 dark:bg-[#0D0D14] flex items-center justify-center transition-opacity duration-500 ${
+            className={`fixed inset-0 z-[9999] bg-[#0D0D14] flex items-center justify-center transition-opacity duration-500 ${
                 fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
             }`}
         >
-            <svg
-                viewBox="0 0 400 400"
-                className="w-64 h-64 sm:w-80 sm:h-80"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                {/* --- Curved trajectory lines (2D bezier animations) --- */}
+            <div className="relative w-56 h-56 sm:w-72 sm:h-72">
+                {/* Sweeping line — draws an arc across the logo area */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 400" fill="none">
+                    <path
+                        d="M 20 300 C 60 140, 160 60, 320 120 C 380 140, 390 220, 370 300"
+                        stroke="#7C3AED"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        style={{
+                            strokeDasharray: 600,
+                            strokeDashoffset: 600,
+                            animation: 'drawArc 1.5s ease-in-out 0.1s forwards',
+                            opacity: 0.5,
+                        }}
+                    />
+                    <path
+                        d="M 30 320 C 80 180, 200 100, 300 160 C 360 200, 370 280, 340 340"
+                        stroke="#A78BFA"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        style={{
+                            strokeDasharray: 500,
+                            strokeDashoffset: 500,
+                            animation: 'drawArc 1.8s ease-in-out 0.4s forwards',
+                            opacity: 0.3,
+                        }}
+                    />
+                </svg>
 
-                {/* Line 1: top-left arc */}
-                <path
-                    d="M 60 120 C 100 30, 160 40, 200 80 C 240 120, 230 170, 200 200"
-                    stroke="#7C3AED"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    fill="none"
+                {/* Logo — reveal with scale + fade */}
+                <img
+                    src="/logo.svg"
+                    alt="Dribly"
+                    className="w-full h-full object-contain"
                     style={{
-                        strokeDasharray: 300,
-                        strokeDashoffset: 300,
-                        animation: 'drawLine 1.5s ease-in-out 0.1s forwards',
-                        opacity: 0.6,
+                        animation: 'logoIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both',
                     }}
                 />
-
-                {/* Line 2: sweeping right-side curve */}
-                <path
-                    d="M 340 100 C 300 30, 230 70, 220 130 C 210 190, 270 180, 300 140"
-                    stroke="#8B5CF6"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    fill="none"
-                    style={{
-                        strokeDasharray: 280,
-                        strokeDashoffset: 280,
-                        animation: 'drawLine 1.4s ease-in-out 0.3s forwards',
-                        opacity: 0.45,
-                    }}
-                />
-
-                {/* Line 3: bottom sweeping curve */}
-                <path
-                    d="M 80 280 C 100 230, 180 250, 220 270 C 260 290, 310 260, 350 300"
-                    stroke="#A78BFA"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    fill="none"
-                    style={{
-                        strokeDasharray: 350,
-                        strokeDashoffset: 350,
-                        animation: 'drawLine 1.6s ease-in-out 0.5s forwards',
-                        opacity: 0.35,
-                    }}
-                />
-
-                {/* Line 4: basketball bounce trajectory */}
-                <path
-                    d="M 50 300 C 80 200, 130 350, 180 250 C 230 150, 280 380, 320 280 C 350 200, 370 240, 380 220"
-                    stroke="#7C3AED"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    fill="none"
-                    style={{
-                        strokeDasharray: 500,
-                        strokeDashoffset: 500,
-                        animation: 'drawLine 2s ease-in-out 0.7s forwards',
-                        opacity: 0.25,
-                    }}
-                />
-
-                {/* --- Real Dribly logo — revealed with expanding circle --- */}
-                <g
-                    style={{
-                        animation: 'revealLogo 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both',
-                    }}
-                >
-                    <foreignObject x="100" y="100" width="200" height="200">
-                        <img
-                            src="/logo.svg"
-                            alt="Dribly"
-                            className="w-full h-full object-contain"
-                        />
-                    </foreignObject>
-                </g>
-            </svg>
+            </div>
 
             <style>{`
-                @keyframes drawLine {
+                @keyframes drawArc {
                     to { stroke-dashoffset: 0; }
                 }
-                @keyframes revealLogo {
+                @keyframes logoIn {
                     from {
-                        clip-path: circle(0% at 50% 50%);
                         opacity: 0;
-                        transform: scale(0.5);
+                        transform: scale(0.7);
+                        filter: blur(8px);
                     }
                     to {
-                        clip-path: circle(50% at 50% 50%);
                         opacity: 1;
                         transform: scale(1);
+                        filter: blur(0);
                     }
                 }
             `}</style>
