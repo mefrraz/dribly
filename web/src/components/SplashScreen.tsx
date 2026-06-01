@@ -8,15 +8,11 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
     const [phase, setPhase] = useState<'pop' | 'slide' | 'done'>('pop')
     const [fadeOut, setFadeOut] = useState(false)
     const [hidden, setHidden] = useState(false)
-    const [ready, setReady] = useState(false)
     const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
     const doneRef = useRef(onDone)
     doneRef.current = onDone
 
-    // Block first paint — prevent flash before CSS animations start
-    useEffect(() => { requestAnimationFrame(() => setReady(true)) }, [])
-
-    // Listen for theme changes (user toggles dark/light)
+// Listen for theme changes (user toggles dark/light)
     useEffect(() => {
         const observer = new MutationObserver(() => {
             setIsDark(document.documentElement.classList.contains('dark'))
@@ -66,8 +62,8 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                         alt=""
                         className="w-16 h-16 object-contain relative z-10"
                         style={{
-                            opacity: !ready ? 0 : popping ? 0 : 1,
-                            animation: popping ? 'splashLogoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none',
+                            opacity: popping ? undefined : 1,
+                            animation: popping ? 'splashLogoPop 0.6s ease-out both' : 'none',
                         }}
                     />
                     {/* Glow — always visible during pop, fades during slide */}
