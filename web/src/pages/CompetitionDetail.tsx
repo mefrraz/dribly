@@ -7,7 +7,7 @@ import { useClub } from '../lib/ClubContext'
 import { supabase } from '../lib/supabase'
 import {
     fetchStandings, fetchSchedule, fetchResults, fetchTeams, fetchPlayerStats,
-    type FPBStandingPhase, type FPBGame, type FPBTeam, type FPBPlayerStat
+    type FPBStandingPhase, type FPBGame, type FPBTeam, type FPBPlayerStat, type FPBStandingTeam
 } from '../lib/fpbCompetitionsApi'
 import { GameCard } from '../components/GameCard'
 import { type Match } from '../components/types'
@@ -145,16 +145,26 @@ function findTopTeam(standings: FPBStandingPhase[]): { name: string; label: stri
             return { name: t.equipa, label: 'Líder', j: t.j, v: t.v, d: t.d, pts: t.pts }
         }
     }
-    // Second: look for game phases — find the last game (likely the final) and its winner
+    // Second: look for game phases — find the most recent game by date (likely the final)
+    let bestGame: FPBStandingTeam | null = null
+    let bestDate = ''
     for (const phase of standings) {
-        if (phase.type === 'games' && phase.teams.length > 0) {
-            const last = phase.teams[phase.teams.length - 1]
-            if (last.score_casa !== undefined && last.score_fora !== undefined) {
-                const winner = (last.score_casa ?? 0) > (last.score_fora ?? 0) ? last.casa : last.fora
-                const score = (last.score_casa ?? 0) > (last.score_fora ?? 0) ? last.score_casa + '-' + last.score_fora : last.score_fora + '-' + last.score_casa
-                return { name: winner || '', label: 'Vencedor'  + (score ? ' (' + score + ')' : '') }
+        if (phase.type === 'games') {
+            for (const game of phase.teams) {
+                if (game.data && game.data >= bestDate && game.score_casa !== undefined && game.score_fora !== undefined) {
+                    bestDate = game.data
+                    bestGame = game
+                }
             }
         }
+    }
+    if (bestGame && bestGame.score_casa !== undefined && bestGame.score_fora !== undefined && (bestGame.casa || bestGame.fora)) {
+        const scores = [bestGame.score_casa ?? 0, bestGame.score_fora ?? 0]
+        const isCasaWinner = scores[0] > scores[1]
+        const winner = isCasaWinner ? (bestGame.casa || '') : (bestGame.fora || '')
+        const loser = isCasaWinner ? (bestGame.fora || '') : (bestGame.casa || '')
+        const score = isCasaWinner ? scores[0] + '-' + scores[1] : scores[1] + '-' + scores[0]
+        return { name: winner, label: 'Vencedor' + (score ? ' · ' + score : '') + (loser ? ' vs ' + loser : '') }
     }
     // Third: just use any team from any phase
     for (const phase of standings) {
