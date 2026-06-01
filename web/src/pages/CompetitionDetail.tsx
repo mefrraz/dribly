@@ -7,7 +7,7 @@ import { useClub } from '../lib/ClubContext'
 import { supabase } from '../lib/supabase'
 import {
     fetchStandings, fetchSchedule, fetchResults, fetchTeams, fetchPlayerStats,
-    type FPBStandingPhase, type FPBGame, type FPBTeam, type FPBPlayerStat, type FPBStandingTeam
+    type FPBStandingPhase, type FPBGame, type FPBTeam, type FPBPlayerStat
 } from '../lib/fpbCompetitionsApi'
 import { GameCard } from '../components/GameCard'
 import { type Match } from '../components/types'
@@ -146,34 +146,21 @@ function findTopTeam(standings: FPBStandingPhase[]): { name: string; label: stri
         }
     }
     // Second: look for game phases — find the most recent game by date (likely the final)
-    let bestGame: FPBStandingTeam | null = null
-    let bestDateNum = 0
-    for (const phase of standings) {
-        if (phase.type === 'games') {
-            for (const game of phase.teams) {
-                if (game.data && game.score_casa !== undefined && game.score_fora !== undefined) {
-                    // Parse PT date like "30 MAI 2026" to YYYYMMDD for comparison
-                    const parts = game.data.split(/s+/)
-                    const MONTHS_PT: Record<string,number> = {JAN:1,FEV:2,MAR:3,ABR:4,MAI:5,JUN:6,JUL:7,AGO:8,SET:9,OUT:10,NOV:11,DEZ:12}
-                    const d = parseInt(parts[0]) || 0
-                    const m = MONTHS_PT[parts[1]?.toUpperCase()] || 0
-                    const y = parseInt(parts[2]) || 0
-                    const num = y * 10000 + m * 100 + d
-                    if (num > bestDateNum) {
-                        bestDateNum = num
-                        bestGame = game
-                    }
-                }
-            }
+        // Second: look for game phases — the LAST phase is typically the final
+    // Find the last phase that has games with scores
+    for (let i = standings.length - 1; i >= 0; i--) {
+        const phase = standings[i]
+        if (phase.type !== 'games' || phase.teams.length === 0) continue
+        // Take the last game in this phase (the final match)
+        const finalGame = phase.teams[phase.teams.length - 1]
+        if (finalGame.score_casa !== undefined && finalGame.score_fora !== undefined && (finalGame.casa || finalGame.fora)) {
+            const sc = [finalGame.score_casa ?? 0, finalGame.score_fora ?? 0]
+            const isCasaWinner = sc[0] > sc[1]
+            const winner = isCasaWinner ? (finalGame.casa || '') : (finalGame.fora || '')
+            const loser = isCasaWinner ? (finalGame.fora || '') : (finalGame.casa || '')
+            const score = isCasaWinner ? sc[0] + '-' + sc[1] : sc[1] + '-' + sc[0]
+            return { name: winner, label: 'Vencedor' + (score ? ' · ' + score : '') + (loser ? ' vs ' + loser : '') }
         }
-    }
-    if (bestGame && bestGame.score_casa !== undefined && bestGame.score_fora !== undefined && (bestGame.casa || bestGame.fora)) {
-        const scores = [bestGame.score_casa ?? 0, bestGame.score_fora ?? 0]
-        const isCasaWinner = scores[0] > scores[1]
-        const winner = isCasaWinner ? (bestGame.casa || '') : (bestGame.fora || '')
-        const loser = isCasaWinner ? (bestGame.fora || '') : (bestGame.casa || '')
-        const score = isCasaWinner ? scores[0] + '-' + scores[1] : scores[1] + '-' + scores[0]
-        return { name: winner, label: 'Vencedor' + (score ? ' · ' + score : '') + (loser ? ' vs ' + loser : '') }
     }
     // Third: just use any team from any phase
     for (const phase of standings) {
