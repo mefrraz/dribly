@@ -60,7 +60,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     <img
                         src="/logo.svg"
                         alt=""
-                        className="w-16 h-16 object-contain relative z-10" style={{ opacity: 0, animation: popping ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none' }}
+                        className="w-16 h-16 object-contain relative z-10" style={{ opacity: popping ? 0 : 1, animation: popping ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none' }}
                         
                     />
                     {/* Glow — always visible during pop, fades during slide */}
