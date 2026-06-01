@@ -4,6 +4,14 @@
 
 ---
 
+## [v5.13] — 2026-05-31
+
+### Feat
+- **Modo escuro automático:** se o utilizador nunca escolheu manualmente claro/escuro, o Dribly segue a preferência do sistema (`prefers-color-scheme`). Quando o sistema muda, o Dribly acompanha automaticamente. Se o utilizador escolher manualmente (botão lua/sol), essa escolha é respeitada e o sistema automático é ignorado.
+- **Transição suave entre modos:** adicionada transição CSS de 0.3s em `background-color` e `color` no `<html>` — a mudança entre claro e escuro é agora suave e animada
+
+---
+
 ## [v5.12] — 2026-05-31
 
 ### Fix

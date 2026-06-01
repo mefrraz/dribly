@@ -11,7 +11,7 @@ import { useClub, displayName } from './lib/ClubContext'
 import { useAuth } from './lib/AuthContext'
 
 function Layout() {
-    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light')
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
     const [searchOpen, setSearchOpen] = useState(false)
     const [authOpen, setAuthOpen] = useState(false)
     const [onboardingTrigger, setOnboardingTrigger] = useState<TourTrigger | null>(null)
@@ -41,6 +41,16 @@ function Layout() {
         }
         localStorage.setItem('theme', theme)
     }, [theme])
+    // Follow system preference when user hasn't set a preference
+    useEffect(() => {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)')
+        const handler = (e: MediaQueryListEvent) => {
+            const saved = localStorage.getItem('theme')
+            if (!saved) setTheme(e.matches ? 'dark' : 'light')
+        }
+        mq.addEventListener('change', handler)
+        return () => mq.removeEventListener('change', handler)
+    }, [])
 
     const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
 

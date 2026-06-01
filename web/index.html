@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt">
   <head>
-    <script>!function(){var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.classList.add('dark')}()</script>
+    <script>!function(){var t=localStorage.getItem('theme'),m=window.matchMedia('(prefers-color-scheme:dark)');if(t==='dark'||(!t&&m.matches))document.documentElement.classList.add('dark')}()</script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="apple-touch-icon" href="/logo.png" />
