@@ -116,7 +116,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             navigate(`/clube/${club.slug}/home`)
         } else {
             const comp = compResults[index - clubResults.length]
-            navigate(`/standings/${comp.association_id}/${comp.competition_id}`)
+            navigate(`/competicao/${comp.competition_id}`)
         }
         onClose()
     }

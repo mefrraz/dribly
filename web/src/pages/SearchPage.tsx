@@ -145,7 +145,7 @@ function SearchPage() {
                                 {compResults.map(comp => (
                                     <button
                                         key={comp.competition_id}
-                                        onClick={() => navigate('/standings/' + comp.association_id + '/' + comp.competition_id)}
+                                        onClick={() => navigate('/competicao/' + comp.competition_id)}
                                         className="w-full text-left glass-card p-4 flex items-center gap-3 hover:border-dribly-purple/20 group transition-colors"
                                     >
                                         <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
