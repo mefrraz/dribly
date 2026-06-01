@@ -38,7 +38,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 <div
                     className="relative shrink-0"
                     style={{
-                        transform: sliding ? 'translateX(-75px)' : 'translateX(0)',
+                        transform: sliding ? 'translateX(-30px)' : 'translateX(0)',
                         transition: 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
                 >
@@ -63,7 +63,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     className="text-3xl font-black text-white tracking-tight whitespace-nowrap relative z-0"
                     style={{
                         opacity: sliding ? 1 : 0,
-                        transform: sliding ? 'translateX(0)' : 'translateX(-80px)',
+                        transform: sliding ? 'translateX(0)' : 'translateX(-40px)',
                         transition: 'opacity 0.6s ease-out, transform 1s cubic-bezier(0.4, 0, 0.2, 1)',
                         filter: sliding ? 'blur(0)' : 'blur(4px)',
                     }}
