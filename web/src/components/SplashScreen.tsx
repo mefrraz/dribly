@@ -8,9 +8,13 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
     const [phase, setPhase] = useState<'pop' | 'slide' | 'done'>('pop')
     const [fadeOut, setFadeOut] = useState(false)
     const [hidden, setHidden] = useState(false)
+    const [ready, setReady] = useState(false)
     const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
     const doneRef = useRef(onDone)
     doneRef.current = onDone
+
+    // Block first paint — prevent flash before CSS animations start
+    useEffect(() => { requestAnimationFrame(() => setReady(true)) }, [])
 
     // Listen for theme changes (user toggles dark/light)
     useEffect(() => {
@@ -60,8 +64,11 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     <img
                         src="/logo.svg"
                         alt=""
-                        className="w-16 h-16 object-contain relative z-10" style={{ opacity: popping ? 0 : 1, animation: popping ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none' }}
-                        
+                        className="w-16 h-16 object-contain relative z-10"
+                        style={{
+                            opacity: !ready ? 0 : popping ? 0 : 1,
+                            animation: popping ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none',
+                        }}
                     />
                     {/* Glow — always visible during pop, fades during slide */}
                     <div
@@ -97,7 +104,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 }
                 @keyframes textSlideIn {
                     0% { opacity: 0; transform: translateX(-30px); }
-                    30% { opacity: 0; transform: translateX(-50px); }
+                    30% { opacity: 0; transform: translateX(-30px); }
                     65% { opacity: 1; transform: translateX(0); }
                     100% { opacity: 1; transform: translateX(0); }
                 }
