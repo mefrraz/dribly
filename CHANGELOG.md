@@ -4,6 +4,13 @@
 
 ---
 
+## [v5.14] — 2026-05-31
+
+### Feat
+- **Splash screen animada:** ao abrir o site pela primeira vez na sessão, aparece uma animação de ~2.5s com curvas 2D fluidas (trajetórias de bola de basquetebol) e o logo Dribly com scale-in. As curvas são desenhadas com `stroke-dashoffset` animado. Só aparece na 1ª visita por sessão (`sessionStorage`)
+
+---
+
 ## [v5.13] — 2026-05-31
 
 ### Feat

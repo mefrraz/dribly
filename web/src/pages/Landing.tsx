@@ -10,6 +10,7 @@ import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { useAuth } from '../lib/AuthContext'
 import { type Match } from '../components/types'
 import { normalize, buildSearchText } from '../lib/clubSearch'
+import SplashScreen from '../components/SplashScreen'
 
 const FEATURED_CLUBS = [
     { name: 'FC Porto', slug: 'fc-porto' },
@@ -56,6 +57,7 @@ function Landing() {
     const navigate = useNavigate()
     const { clubs, loadClubs, favoriteClub } = useClub()
     const { user } = useAuth()
+    const [splashDone, setSplashDone] = useState(false)
 
     const normalizedClubs = useMemo(() => clubs.map(c => ({ ...c, _n: buildSearchText(c) })), [clubs])
 
@@ -103,7 +105,9 @@ function Landing() {
     const selectClub = (club: Club) => { navigate('/clube/' + club.slug + '/home'); setQuery(''); setShowDropdown(false) }
     const scrollCarousel = (dir: number) => { if (!carouselRef.current) return; const el = carouselRef.current; const max = el.scrollWidth - el.clientWidth; if (dir > 0 && el.scrollLeft >= max - 10) { el.scrollTo({ left: 0, behavior: 'smooth' }) } else if (dir < 0 && el.scrollLeft <= 10) { el.scrollTo({ left: max, behavior: 'smooth' }) } else { el.scrollBy({ left: dir * 312, behavior: 'smooth' }) } }
     return (
-        <div className="pb-24">
+        <>
+            {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} />}
+            <div className="pb-24">
             {/* Hero */}
             <div className="relative z-30 bg-gradient-to-b from-dribly-purple/5 via-transparent to-transparent dark:from-dribly-purple/10 dark:via-transparent dark:to-transparent -mt-4 md:-mt-6">
                 <div className="max-w-2xl mx-auto px-4 pt-20 md:pt-36 pb-14 md:pb-20 text-center relative">
@@ -304,6 +308,7 @@ function Landing() {
                 </div>
             </div>
         </div>
+        </>
     )
 }
 
