@@ -5,7 +5,7 @@ interface SplashScreenProps {
 }
 
 export default function SplashScreen({ onDone }: SplashScreenProps) {
-    const [phase, setPhase] = useState<'pop' | 'slide' | 'text' | 'done'>('pop')
+    const [phase, setPhase] = useState<'pop' | 'slide' | 'done'>('pop')
     const [fadeOut, setFadeOut] = useState(false)
     const [hidden, setHidden] = useState(false)
     const doneRef = useRef(onDone)
@@ -13,16 +13,15 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
 
     useEffect(() => {
         const t1 = setTimeout(() => setPhase('slide'), 700)
-        const t2 = setTimeout(() => setPhase('text'), 1500)
-        const t3 = setTimeout(() => setPhase('done'), 2200)
-        const t4 = setTimeout(() => setFadeOut(true), 2700)
-        const t5 = setTimeout(() => { setHidden(true); doneRef.current() }, 3100)
-        return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5) }
+        const t2 = setTimeout(() => setPhase('done'), 1700)
+        const t3 = setTimeout(() => setFadeOut(true), 2300)
+        const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 2700)
+        return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
     }, [])
 
     if (hidden) return null
 
-    const xOffset = phase === 'pop' ? 0 : -75
+    const sliding = phase === 'slide' || phase === 'done'
 
     return (
         <div
@@ -30,18 +29,19 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
             }`}
         >
-            {/* Centered wrapper — always at 50% left, 50% top */}
+            {/* Wrapper — centered on screen */}
             <div
                 className="absolute flex items-center gap-2.5"
-                style={{
-                    left: '50%',
-                    top: '50%',
-                    transform: `translate(calc(-50% + ${xOffset}px), -50%)`,
-                    transition: 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)',
-                }}
+                style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
             >
-                {/* Logo */}
-                <div className="relative shrink-0">
+                {/* 📦 Logo — moves LEFT */}
+                <div
+                    className="relative shrink-0"
+                    style={{
+                        transform: sliding ? 'translateX(-75px)' : 'translateX(0)',
+                        transition: 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                >
                     <img
                         src="/logo.svg"
                         alt=""
@@ -50,7 +50,6 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                             animation: phase === 'pop' ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none',
                         }}
                     />
-                    {/* Glow */}
                     {phase === 'pop' && (
                         <div
                             className="absolute -inset-8 rounded-full bg-[#7C3AED]/15 blur-3xl"
@@ -59,13 +58,14 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     )}
                 </div>
 
-                {/* Text */}
+                {/* 📝 Text — moves RIGHT (from behind logo) */}
                 <span
                     className="text-3xl font-black text-white tracking-tight whitespace-nowrap relative z-0"
                     style={{
-                        opacity: phase === 'text' || phase === 'done' ? 1 : 0,
-                        transform: phase === 'text' || phase === 'done' ? 'translateX(0)' : 'translateX(-20px)',
-                        transition: 'opacity 0.4s ease-out, transform 0.4s ease-out',
+                        opacity: sliding ? 1 : 0,
+                        transform: sliding ? 'translateX(0)' : 'translateX(-80px)',
+                        transition: 'opacity 0.6s ease-out, transform 1s cubic-bezier(0.4, 0, 0.2, 1)',
+                        filter: sliding ? 'blur(0)' : 'blur(4px)',
                     }}
                 >
                     Dribly<span className="text-[#7C3AED]">.</span>
