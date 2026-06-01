@@ -57,7 +57,7 @@ function Landing() {
     const navigate = useNavigate()
     const { clubs, loadClubs, favoriteClub } = useClub()
     const { user } = useAuth()
-    const [splashDone, setSplashDone] = useState(false)
+    const [splashDone, setSplashDone] = useState(() => sessionStorage.getItem("dribly_splash_shown") === "1")
 
     const normalizedClubs = useMemo(() => clubs.map(c => ({ ...c, _n: buildSearchText(c) })), [clubs])
 
@@ -106,7 +106,7 @@ function Landing() {
     const scrollCarousel = (dir: number) => { if (!carouselRef.current) return; const el = carouselRef.current; const max = el.scrollWidth - el.clientWidth; if (dir > 0 && el.scrollLeft >= max - 10) { el.scrollTo({ left: 0, behavior: 'smooth' }) } else if (dir < 0 && el.scrollLeft <= 10) { el.scrollTo({ left: max, behavior: 'smooth' }) } else { el.scrollBy({ left: dir * 312, behavior: 'smooth' }) } }
     return (
         <>
-            {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} />}
+            {!splashDone && <SplashScreen onDone={() => { sessionStorage.setItem("dribly_splash_shown", "1"); setSplashDone(true) }} />}
             <div className="pb-24">
             {/* Hero */}
             <div className="relative z-30 bg-gradient-to-b from-dribly-purple/5 via-transparent to-transparent dark:from-dribly-purple/10 dark:via-transparent dark:to-transparent -mt-4 md:-mt-6">
