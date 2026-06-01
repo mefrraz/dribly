@@ -12,10 +12,10 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
     doneRef.current = onDone
 
     useEffect(() => {
-        const t1 = setTimeout(() => setPhase('slide'), 800)
-        const t2 = setTimeout(() => setPhase('done'), 1800)
-        const t3 = setTimeout(() => setFadeOut(true), 2300)
-        const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 2700)
+        const t1 = setTimeout(() => setPhase('slide'), 600)
+        const t2 = setTimeout(() => setPhase('done'), 1600)
+        const t3 = setTimeout(() => setFadeOut(true), 2500)
+        const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 2900)
         return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
     }, [])
 
