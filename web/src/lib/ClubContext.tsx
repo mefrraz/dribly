@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import { supabase } from './supabase'
+import { useAuth } from './AuthContext'
 
 export interface Club {
     id: number
@@ -79,24 +80,52 @@ export function ClubProvider({ children }: { children: ReactNode }) {
         return null
     }, [clubs])
 
+    const { user } = useAuth()
     const setFavoriteClub = useCallback((club: Club | null) => {
         setFavoriteClubState(club)
         if (club) {
             localStorage.setItem(FAVORITE_KEY, JSON.stringify(club))
+            if (user) {
+                supabase.from('user_favorites').upsert({ user_id: user.id, club_id: club.id }, { onConflict: 'user_id' }).then(()=>{}, ()=>{})
+            }
         } else {
             localStorage.removeItem(FAVORITE_KEY)
-        }
-    }, [])
-
-    useEffect(() => {
-        try {
-            const stored = localStorage.getItem(FAVORITE_KEY)
-            if (stored) {
-                const parsed = JSON.parse(stored) as Club
-                setFavoriteClubState(parsed)
+            if (user) {
+                supabase.from('user_favorites').delete().eq('user_id', user.id).then(()=>{}, ()=>{})
             }
-        } catch { /* ignore */ }
-    }, [])
+        }
+    }, [user])
+
+    // Load favorite: Supabase first (if logged in), then localStorage
+    useEffect(() => {
+        if (user) {
+            supabase.from('user_favorites').select('club_id').eq('user_id', user.id).single().then(({data}) => {
+                if (data?.club_id) {
+                    // Find club in already-loaded clubs or fetch it
+                    const found = clubs.find(c => c.id === data.club_id)
+                    if (found) {
+                        setFavoriteClubState(found)
+                        localStorage.setItem(FAVORITE_KEY, JSON.stringify(found))
+                    } else {
+                        supabase.from('clubs').select('*').eq('id', data.club_id).single().then(({data:cd}) => {
+                            if (cd) { setFavoriteClubState(cd as Club); localStorage.setItem(FAVORITE_KEY, JSON.stringify(cd)) }
+                        }, ()=>{})
+                    }
+                }
+            }, () => {
+                // Fallback to localStorage
+                try {
+                    const stored = localStorage.getItem(FAVORITE_KEY)
+                    if (stored) setFavoriteClubState(JSON.parse(stored) as Club)
+                } catch {}
+            })
+        } else {
+            try {
+                const stored = localStorage.getItem(FAVORITE_KEY)
+                if (stored) setFavoriteClubState(JSON.parse(stored) as Club)
+            } catch {}
+        }
+    }, [user, clubs])
 
     return (
         <ClubContext.Provider value={{
