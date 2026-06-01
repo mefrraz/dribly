@@ -32,6 +32,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     const { isFollowing, toggleFollow } = useFollows()
     const [allComps, setAllComps] = useState<CompetitionResult[]>([])
     const [compLogoMap, setCompLogoMap] = useState<Map<number, string>>(new Map())
+    const [compNameMap, setCompNameMap] = useState<Map<number, string>>(new Map())
 
     const normalizedClubs = useMemo(() =>
         clubs.map(c => ({
@@ -43,11 +44,14 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     useEffect(() => {
         supabase.from('competitions').select('competition_id, competition_name, association_id, association_name').eq('season','2025/2026').then(({data}) => { if (data) { const seen: Record<number, CompetitionResult> = {}; (data as CompetitionResult[]).forEach(c => { if (!seen[c.competition_id]) seen[c.competition_id] = c }); setAllComps(Object.values(seen)) } })
         // Fetch competition logos
-        supabase.from('competitions_meta').select('id, logo_url').then(({ data }) => {
+        supabase.from('competitions_meta').select('id, name, logo_url, abrev, gradient_from, gradient_to').then(({ data }) => {
             if (data) {
                 const m = new Map<number, string>()
-                ;(data as { id: number; logo_url: string | null }[]).forEach(r => { if (r.logo_url) m.set(r.id, r.logo_url) })
+                ;(data as { id: number; name: string; logo_url: string | null }[]).forEach(r => { if (r.logo_url) m.set(r.id, r.logo_url) })
                 setCompLogoMap(m)
+                const nm = new Map<number, string>()
+                ;(data as { id: number; name: string }[]).forEach(r => { nm.set(r.id, r.name) })
+                setCompNameMap(nm)
             }
         }, () => {})
     }, [])
@@ -224,7 +228,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                     )}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <span className="text-sm font-medium text-zinc-900 dark:text-white truncate block">{comp.competition_name}</span>
+                                                    <span className="text-sm font-medium text-zinc-900 dark:text-white truncate block">{compNameMap.get(comp.competition_id) || comp.competition_name}</span>
                                                     <span className="text-[10px] text-zinc-400">{comp.association_name}</span>
                                                 </div>
                                             </div>

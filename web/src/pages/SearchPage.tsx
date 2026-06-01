@@ -21,6 +21,7 @@ function SearchPage() {
     const [compResults, setCompResults] = useState<CompetitionResult[]>([])
     const [allComps, setAllComps] = useState<CompetitionResult[]>([])
     const [compLogoMap, setCompLogoMap] = useState<Map<number, string>>(new Map())
+    const [compNameMap, setCompNameMap] = useState<Map<number, string>>(new Map())
     const inputRef = useRef<HTMLInputElement>(null)
     const navigate = useNavigate()
     const { clubs, loadClubs } = useClub()
@@ -50,11 +51,14 @@ function SearchPage() {
                 }
             })
         // Fetch competition logos
-        supabase.from('competitions_meta').select('id, logo_url').then(({ data }) => {
+        supabase.from('competitions_meta').select('id, name, logo_url').then(({ data }) => {
             if (data) {
                 const m = new Map<number, string>()
-                ;(data as { id: number; logo_url: string | null }[]).forEach(r => { if (r.logo_url) m.set(r.id, r.logo_url) })
+                ;(data as { id: number; name: string; logo_url: string | null }[]).forEach(r => { if (r.logo_url) m.set(r.id, r.logo_url) })
                 setCompLogoMap(m)
+                const nm = new Map<number, string>()
+                ;(data as { id: number; name: string }[]).forEach(r => { nm.set(r.id, r.name) })
+                setCompNameMap(nm)
             }
         }, () => {})
     }, [])
@@ -154,7 +158,7 @@ function SearchPage() {
                                             )}
                                         </div>
                                         <div className="min-w-0">
-                                            <span className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-[var(--club-color)] transition-colors truncate block">{comp.competition_name}</span>
+                                            <span className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-[var(--club-color)] transition-colors truncate block">{compNameMap.get(comp.competition_id) || comp.competition_name}</span>
                                             <span className="text-[10px] text-zinc-400">{comp.association_name}</span>
                                         </div>
                                     </button>
