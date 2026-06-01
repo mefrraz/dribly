@@ -12,10 +12,10 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
     doneRef.current = onDone
 
     useEffect(() => {
-        const t1 = setTimeout(() => setPhase('slide'), 600)
-        const t2 = setTimeout(() => setPhase('done'), 1600)
-        const t3 = setTimeout(() => setFadeOut(true), 2500)
-        const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 2900)
+        const t1 = setTimeout(() => setPhase('slide'), 500)
+        const t2 = setTimeout(() => setPhase('done'), 1500)
+        const t3 = setTimeout(() => setFadeOut(true), 2400)
+        const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 2800)
         return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
     }, [])
 
@@ -50,7 +50,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
             {/* Phase 2+3: Logo + text in flex row, logo slides left, text slides right */}
             {sliding && (
                 <div
-                    className="absolute flex items-center gap-2.5"
+                    className="absolute flex items-center gap-1.5"
                     style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
                 >
                     {/* Logo — slides LEFT */}
