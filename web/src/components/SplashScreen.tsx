@@ -45,14 +45,11 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 <div
                     className="relative shrink-0 z-10"
                     style={{
-                        animation: popping
-                            ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both'
-                            : sliding
-                                ? 'logoSlide 1s cubic-bezier(0.4, 0, 0.2, 1) forwards'
-                                : 'none',
+                        transform: popping ? 'translateX(70px)' : sliding ? 'translateX(-30px)' : 'translateX(70px)',
+                        transition: sliding ? 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
                     }}
                 >
-                    <img src="/logo.svg" alt="" className="w-16 h-16 object-contain relative z-10" />
+                    <img src="/logo.svg" alt="" className="w-16 h-16 object-contain relative z-10" style={{ animation: popping ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none' }} />
                     {/* Glow — ALWAYS visible during pop, fades during slide */}
                     <div
                         className="absolute -inset-8 rounded-full bg-[#7C3AED]/10 blur-3xl"
@@ -84,10 +81,6 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 @keyframes logoPop {
                     0% { opacity: 0; transform: scale(0); }
                     100% { opacity: 1; transform: scale(1); }
-                }
-                @keyframes logoSlide {
-                    0% { transform: translateX(0) scale(1); }
-                    100% { transform: translateX(-30px) scale(1); }
                 }
                 @keyframes textSlideIn {
                     0% { opacity: 0; transform: translateX(-50px); }
