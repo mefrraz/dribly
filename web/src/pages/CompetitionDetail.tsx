@@ -135,6 +135,38 @@ function fpbGameToMatch(g: FPBGame, logoMaps: LogoMaps): Match {
     }
 }
 
+
+/** Find the best team across all standings phases — leader, winner, or any available */
+function findTopTeam(standings: FPBStandingPhase[]): { name: string; label: string; j?: number; v?: number; d?: number; pts?: number } | null {
+    // First: look for a table leader
+    for (const phase of standings) {
+        if (phase.type === 'table' && phase.teams.length > 0) {
+            const t = phase.teams[0]
+            return { name: t.equipa, label: 'Líder', j: t.j, v: t.v, d: t.d, pts: t.pts }
+        }
+    }
+    // Second: look for game phases — find the last game (likely the final) and its winner
+    for (const phase of standings) {
+        if (phase.type === 'games' && phase.teams.length > 0) {
+            const last = phase.teams[phase.teams.length - 1]
+            if (last.score_casa !== undefined && last.score_fora !== undefined) {
+                const winner = (last.score_casa ?? 0) > (last.score_fora ?? 0) ? last.casa : last.fora
+                const score = (last.score_casa ?? 0) > (last.score_fora ?? 0) ? last.score_casa + '-' + last.score_fora : last.score_fora + '-' + last.score_casa
+                return { name: winner || '', label: 'Vencedor'  + (score ? ' (' + score + ')' : '') }
+            }
+        }
+    }
+    // Third: just use any team from any phase
+    for (const phase of standings) {
+        if (phase.teams.length > 0) {
+            const t = phase.teams[0]
+            const name = t.equipa || t.casa || t.fora || ''
+            if (name) return { name, label: 'Destaque' }
+        }
+    }
+    return null
+}
+
 export default function CompetitionDetail() {
     const { competitionId } = useParams<{ competitionId: string }>()
     const provaId = parseInt(competitionId || '0')
@@ -338,40 +370,42 @@ export default function CompetitionDetail() {
                                     {/* Row 1 — Leader + Stat Leaders (3:4 ratio) */}
                                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                                         {/* Leader card */}
-                                        {standings[0] && standings[0].type === 'table' && standings[0].teams[0] ? (() => {
-                                            const leader = standings[0].teams[0]
-                                            const leaderLogo = findLogo(leader.equipa, logoMaps)
+                                        {(() => {
+                                            const top = findTopTeam(standings)
+                                            if (!top) return (
+                                                <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center justify-center">
+                                                    <p className="text-xs text-zinc-400">Sem classificação disponível.</p>
+                                                </div>
+                                            )
+                                            const topLogo = findLogo(top.name, logoMaps)
                                             return (
                                                 <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center gap-4">
                                                     <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-700/50">
-                                                        {leaderLogo ? (
-                                                            <img src={leaderLogo} alt="" className="w-14 h-14 sm:w-[72px] sm:h-[72px] object-contain" />
+                                                        {topLogo ? (
+                                                            <img src={topLogo} alt="" className="w-14 h-14 sm:w-[72px] sm:h-[72px] object-contain" />
                                                         ) : (
-                                                            <span className="text-2xl font-bold text-zinc-500">{leader.equipa.charAt(0)}</span>
+                                                            <span className="text-2xl font-bold text-zinc-500">{top.name.charAt(0)}</span>
                                                         )}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <div className="flex items-center gap-2 mb-0.5">
-                                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Líder</span>
+                                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{top.label}</span>
                                                             <span className="px-1.5 py-0.5 rounded-md bg-dribly-purple/10 text-[9px] font-black text-dribly-purple tabular-nums">#1</span>
                                                         </div>
-                                                        <p className="text-sm sm:text-base font-black text-zinc-900 dark:text-white truncate leading-tight">{leader.equipa}</p>
-                                                        <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1.5 flex-wrap">
-                                                            <span className="tabular-nums">{leader.j} jogos</span>
-                                                            <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
-                                                            <span className="text-emerald-600 dark:text-emerald-400 tabular-nums font-bold">{leader.v}V</span>
-                                                            <span className="text-red-500 dark:text-red-400 tabular-nums font-bold">{leader.d}D</span>
-                                                            <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
-                                                            <span className="font-black text-zinc-900 dark:text-white tabular-nums">{leader.pts} pts</span>
-                                                        </p>
+                                                        <p className="text-sm sm:text-base font-black text-zinc-900 dark:text-white truncate leading-tight">{top.name}</p>
+                                                        {top.j !== undefined && (
+                                                            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                                                                <span className="tabular-nums">{top.j} jogos</span>
+                                                                <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+                                                                <span className="text-emerald-600 dark:text-emerald-400 tabular-nums font-bold">{top.v}V</span>
+                                                                <span className="text-red-500 dark:text-red-400 tabular-nums font-bold">{top.d}D</span>
+                                                                {top.pts !== undefined && (<><span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" /><span className="font-black text-zinc-900 dark:text-white tabular-nums">{top.pts} pts</span></>)}
+                                                            </p>
+                                                        )}
                                                     </div>
                                                 </div>
                                             )
-                                        })() : (
-                                            <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center justify-center">
-                                                <p className="text-xs text-zinc-400">Sem classificação disponível.</p>
-                                            </div>
-                                        )}
+                                        })()}
 
                                         {/* Stat leaders */}
                                         <div className="lg:col-span-7 grid grid-cols-2 gap-2.5">
