@@ -57,7 +57,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 <div
                     className="relative shrink-0 z-10"
                     style={{
-                        transform: popping ? 'translateX(70px)' : sliding ? 'translateX(-30px)' : 'translateX(70px)',
+                        transform: popping ? 'translateX(0px)' : sliding ? 'translateX(-30px)' : 'translateX(0px)',
                         transition: sliding ? 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
                     }}
                 >
