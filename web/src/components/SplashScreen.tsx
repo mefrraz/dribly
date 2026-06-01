@@ -6,7 +6,8 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onDone }: SplashScreenProps) {
     const [phase, setPhase] = useState<'pop' | 'slide' | 'done'>('pop')
-    const [fadeOut, setFadeOut] = useState(false)
+    const [contentOut, setContentOut] = useState(false)
+    const [bgOut, setBgOut] = useState(false)
     const [hidden, setHidden] = useState(false)
     const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
     const doneRef = useRef(onDone)
@@ -24,7 +25,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
     useEffect(() => {
         const t1 = setTimeout(() => setPhase('slide'), 500)
         const t2 = setTimeout(() => setPhase('done'), 1600)
-        const t3 = setTimeout(() => setFadeOut(true), 2800)
+        const t3 = setTimeout(() => setContentOut(true), 2800); setTimeout(() => setBgOut(true), 3000)
         const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 3500)
         return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
     }, [])
@@ -41,12 +42,12 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
     return (
         <div
             className={`fixed inset-0 z-[9999] ${bg} transition-opacity duration-700 ${
-                fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                bgOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
             }`}
         >
             {/* Single DOM — CSS handles both phases */}
             <div
-                className="absolute flex items-center gap-0.5"
+                className={`absolute flex items-center gap-0.5 transition-opacity duration-400 ${contentOut ? 'opacity-0' : 'opacity-100'}`}
                 style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
             >
                 {/* Logo container — with persistent glow */}
