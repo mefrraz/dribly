@@ -13,7 +13,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
 
     useEffect(() => {
         const t1 = setTimeout(() => setPhase('slide'), 500)
-        const t2 = setTimeout(() => setPhase('done'), 1500)
+        const t2 = setTimeout(() => setPhase('done'), 1600)
         const t3 = setTimeout(() => setFadeOut(true), 2400)
         const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 2800)
         return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
@@ -21,6 +21,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
 
     if (hidden) return null
 
+    const popping = phase === 'pop'
     const sliding = phase === 'slide' || phase === 'done'
 
     return (
@@ -29,49 +30,55 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
             }`}
         >
-            {/* Phase 1: Logo centered absolutely */}
-            {phase === 'pop' && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="relative">
-                        <img
-                            src="/logo.svg"
-                            alt=""
-                            className="w-16 h-16 object-contain"
-                            style={{ animation: 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' }}
-                        />
-                        <div
-                            className="absolute -inset-8 rounded-full bg-[#7C3AED]/15 blur-3xl"
-                            style={{ animation: 'glowPop 0.6s ease-out both' }}
-                        />
-                    </div>
-                </div>
-            )}
-
-            {/* Phase 2+3: Logo + text in flex row, logo slides left, text slides right */}
-            {sliding && (
+            {/* Single DOM — CSS handles both phases */}
+            <div
+                className="absolute flex items-center gap-1.5"
+                style={{
+                    left: '50%',
+                    top: '50%',
+                    transform: popping
+                        ? 'translate(-50%, -50%)'
+                        : 'translate(-50%, -50%)',
+                }}
+            >
+                {/* Logo container — with persistent glow */}
                 <div
-                    className="absolute flex items-center gap-1.5"
-                    style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+                    className="relative shrink-0 z-10"
+                    style={{
+                        animation: popping
+                            ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both'
+                            : sliding
+                                ? 'logoSlide 1s cubic-bezier(0.4, 0, 0.2, 1) forwards'
+                                : 'none',
+                    }}
                 >
-                    {/* Logo — slides LEFT */}
+                    <img src="/logo.svg" alt="" className="w-16 h-16 object-contain relative z-10" />
+                    {/* Glow — ALWAYS visible during pop, fades during slide */}
                     <div
-                        className="relative shrink-0 z-10"
+                        className="absolute -inset-8 rounded-full bg-[#7C3AED]/10 blur-3xl"
                         style={{
-                            animation: 'logoSlide 1s cubic-bezier(0.4, 0, 0.2, 1) both',
+                            animation: popping
+                                ? 'glowPop 0.5s ease-out both'
+                                : sliding
+                                    ? 'fadeOut 0.6s ease-out forwards'
+                                    : 'none',
                         }}
-                    >
-                        <img src="/logo.svg" alt="" className="w-16 h-16 object-contain" />
-                    </div>
-
-                    {/* Text — slides RIGHT from behind logo */}
-                    <span
-                        className="text-3xl font-black text-white tracking-tight whitespace-nowrap relative z-0"
-                        style={{ animation: 'textSlideIn 1s cubic-bezier(0.4, 0, 0.2, 1) both' }}
-                    >
-                        Dribly<span className="text-[#7C3AED]">.</span>
-                    </span>
+                    />
                 </div>
-            )}
+
+                {/* Text — hidden during pop, slides in from behind logo */}
+                <span
+                    className="text-3xl font-black text-white tracking-tight whitespace-nowrap relative z-0"
+                    style={{
+                        animation: popping
+                            ? 'none'
+                            : 'textSlideIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                        opacity: popping ? 0 : undefined,
+                    }}
+                >
+                    Dribly<span className="text-[#7C3AED]">.</span>
+                </span>
+            </div>
 
             <style>{`
                 @keyframes logoPop {
@@ -79,19 +86,23 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     100% { opacity: 1; transform: scale(1); }
                 }
                 @keyframes logoSlide {
-                    0% { transform: translateX(20px); }
-                    100% { transform: translateX(-30px); }
+                    0% { transform: translateX(0) scale(1); }
+                    100% { transform: translateX(-30px) scale(1); }
                 }
                 @keyframes textSlideIn {
-                    0% { opacity: 0; transform: translateX(-60px); }
-                    20% { opacity: 0; }
-                    60% { opacity: 1; }
+                    0% { opacity: 0; transform: translateX(-50px); }
+                    30% { opacity: 0; transform: translateX(-50px); }
+                    65% { opacity: 1; transform: translateX(0); }
                     100% { opacity: 1; transform: translateX(0); }
                 }
                 @keyframes glowPop {
                     0% { opacity: 0; transform: scale(0.3); }
-                    50% { opacity: 0.5; }
-                    100% { opacity: 0; transform: scale(1.6); }
+                    50% { opacity: 0.6; }
+                    100% { opacity: 0.4; transform: scale(1.4); }
+                }
+                @keyframes fadeOut {
+                    0% { opacity: 0.4; }
+                    100% { opacity: 0; }
                 }
             `}</style>
         </div>
