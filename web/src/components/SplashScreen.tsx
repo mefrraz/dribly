@@ -14,8 +14,8 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
     useEffect(() => {
         const t1 = setTimeout(() => setPhase('slide'), 500)
         const t2 = setTimeout(() => setPhase('done'), 1600)
-        const t3 = setTimeout(() => setFadeOut(true), 2400)
-        const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 2800)
+        const t3 = setTimeout(() => setFadeOut(true), 2800)
+        const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 3500)
         return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
     }, [])
 
@@ -26,7 +26,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
 
     return (
         <div
-            className={`fixed inset-0 z-[9999] bg-[#0D0D14] transition-opacity duration-400 ${
+            className={`fixed inset-0 z-[9999] bg-[#0D0D14] transition-opacity duration-700 ${
                 fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
             }`}
         >
