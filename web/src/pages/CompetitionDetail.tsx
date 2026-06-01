@@ -147,13 +147,22 @@ function findTopTeam(standings: FPBStandingPhase[]): { name: string; label: stri
     }
     // Second: look for game phases — find the most recent game by date (likely the final)
     let bestGame: FPBStandingTeam | null = null
-    let bestDate = ''
+    let bestDateNum = 0
     for (const phase of standings) {
         if (phase.type === 'games') {
             for (const game of phase.teams) {
-                if (game.data && game.data >= bestDate && game.score_casa !== undefined && game.score_fora !== undefined) {
-                    bestDate = game.data
-                    bestGame = game
+                if (game.data && game.score_casa !== undefined && game.score_fora !== undefined) {
+                    // Parse PT date like "30 MAI 2026" to YYYYMMDD for comparison
+                    const parts = game.data.split(/s+/)
+                    const MONTHS_PT: Record<string,number> = {JAN:1,FEV:2,MAR:3,ABR:4,MAI:5,JUN:6,JUL:7,AGO:8,SET:9,OUT:10,NOV:11,DEZ:12}
+                    const d = parseInt(parts[0]) || 0
+                    const m = MONTHS_PT[parts[1]?.toUpperCase()] || 0
+                    const y = parseInt(parts[2]) || 0
+                    const num = y * 10000 + m * 100 + d
+                    if (num > bestDateNum) {
+                        bestDateNum = num
+                        bestGame = game
+                    }
                 }
             }
         }
