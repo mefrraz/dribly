@@ -27,115 +27,118 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
             }`}
         >
-            <div className="relative" style={{ width: '280px', height: '80px' }}>
-                {/* Logo — starts centered, slides left */}
+            {/* Container — animates position from center to final spot */}
+            <div
+                className="flex items-center gap-2.5"
+                style={{
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -50%) scale(1.5)',
+                    animation: 'splashV7Wrap 2.2s cubic-bezier(0.4, 0, 0.2, 1) both',
+                }}
+            >
+                {/* Logo — z-10 so it's on top of text */}
                 <img
                     src="/logo.svg"
                     alt=""
-                    className="absolute w-16 h-16 sm:w-20 sm:h-20 object-contain"
+                    className="w-10 h-10 sm:w-12 sm:h-12 object-contain relative z-10"
                     style={{
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        left: '50%',
-                        marginLeft: '-40px',
-                        animation: 'splashV6Logo 2s cubic-bezier(0.4, 0, 0.2, 1) both',
+                        animation: 'splashV7Logo 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both',
                     }}
                 />
-                {/* Text — emerges from under the logo as it slides left */}
+                {/* Text — behind logo (z-0), slides out to right */}
                 <span
-                    className="absolute text-3xl sm:text-4xl font-black text-white tracking-tight whitespace-nowrap"
+                    className="text-2xl sm:text-3xl font-black text-white tracking-tight whitespace-nowrap relative z-0"
                     style={{
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        left: '120px',
-                        opacity: 0,
-                        animation: 'splashV6Text 2s cubic-bezier(0.4, 0, 0.2, 1) 0.05s both',
+                        animation: 'splashV7Text 2.2s cubic-bezier(0.4, 0, 0.2, 1) both',
                     }}
                 >
                     Dribly<span className="text-[#7C3AED]">.</span>
                 </span>
             </div>
 
-            {/* Purple pulse behind logo on pop */}
+            {/* Purple pulse on pop */}
             <div
-                className="absolute rounded-full bg-[#7C3AED]/20 blur-3xl"
+                className="absolute rounded-full bg-[#7C3AED]/15 blur-3xl"
                 style={{
-                    width: '200px',
-                    height: '200px',
-                    animation: 'splashV6Pulse 1s ease-out both',
+                    width: '180px',
+                    height: '180px',
+                    animation: 'splashV7Pulse 0.8s ease-out both',
                 }}
             />
 
             <style>{`
-                @keyframes splashV6Logo {
+                @keyframes splashV7Wrap {
                     0% {
-                        opacity: 0;
-                        transform: scale(0) translateY(-50%);
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%) scale(1.5);
                     }
-                    15% {
-                        opacity: 1;
-                        transform: scale(1.12) translateY(-50%);
-                    }
-                    25% {
-                        transform: scale(1) translateY(-50%);
+                    35% {
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%) scale(1.5);
                     }
                     50% {
                         left: 50%;
-                        margin-left: -40px;
-                        opacity: 1;
-                    }
-                    85% {
-                        left: 0;
-                        margin-left: 0;
-                        opacity: 1;
+                        top: 50%;
+                        transform: translate(-50%, -50%) scale(1.2);
                     }
                     100% {
-                        left: 0;
-                        margin-left: 0;
-                        opacity: 1;
+                        left: calc(50% - 60px);
+                        top: 50%;
+                        transform: translate(0, -50%) scale(1);
                     }
                 }
-                @keyframes splashV6Text {
+                @keyframes splashV7Logo {
                     0% {
                         opacity: 0;
-                        transform: translateY(-50%) translateX(-30px);
-                        filter: blur(4px);
+                        transform: scale(0);
                     }
-                    45% {
+                    100% {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+                @keyframes splashV7Text {
+                    0% {
                         opacity: 0;
-                        transform: translateY(-50%) translateX(-30px);
-                        filter: blur(4px);
+                        transform: translateX(-60px);
+                        filter: blur(6px);
+                    }
+                    40% {
+                        opacity: 0;
+                        transform: translateX(-60px);
+                        filter: blur(6px);
                     }
                     55% {
-                        opacity: 0.3;
-                        transform: translateY(-50%) translateX(-15px);
-                        filter: blur(0);
+                        opacity: 0.4;
+                        transform: translateX(-30px);
+                        filter: blur(2px);
                     }
-                    85% {
+                    75% {
                         opacity: 1;
-                        transform: translateY(-50%) translateX(0);
+                        transform: translateX(0);
                         filter: blur(0);
                     }
                     100% {
                         opacity: 1;
-                        transform: translateY(-50%) translateX(0);
+                        transform: translateX(0);
+                        filter: blur(0);
                     }
                 }
-                @keyframes splashV6Pulse {
+                @keyframes splashV7Pulse {
                     0% {
                         opacity: 0;
                         transform: scale(0.3);
                     }
-                    30% {
-                        opacity: 0.5;
-                    }
-                    70% {
-                        opacity: 0;
-                        transform: scale(1.6);
+                    50% {
+                        opacity: 0.6;
                     }
                     100% {
                         opacity: 0;
-                        transform: scale(2);
+                        transform: scale(1.8);
                     }
                 }
             `}</style>
