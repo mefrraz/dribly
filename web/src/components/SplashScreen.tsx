@@ -46,7 +46,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
         >
             {/* Single DOM — CSS handles both phases */}
             <div
-                className="absolute flex items-center gap-1.5"
+                className="absolute flex items-center gap-0.5"
                 style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
             >
                 {/* Logo container — with persistent glow */}
@@ -60,10 +60,8 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     <img
                         src="/logo.svg"
                         alt=""
-                        className="w-16 h-16 object-contain relative z-10"
-                        style={{
-                            animation: popping ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none',
-                        }}
+                        className="w-16 h-16 object-contain relative z-10" style={{ opacity: 0, animation: popping ? 'logoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both' : 'none' }}
+                        
                     />
                     {/* Glow — always visible during pop, fades during slide */}
                     <div
@@ -98,7 +96,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     100% { opacity: 1; transform: scale(1); }
                 }
                 @keyframes textSlideIn {
-                    0% { opacity: 0; transform: translateX(-50px); }
+                    0% { opacity: 0; transform: translateX(-30px); }
                     30% { opacity: 0; transform: translateX(-50px); }
                     65% { opacity: 1; transform: translateX(0); }
                     100% { opacity: 1; transform: translateX(0); }
