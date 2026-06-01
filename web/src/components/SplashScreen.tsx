@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react'
-
-const SPLASH_SHOWN_KEY = 'dribly_splash_shown'
+import { useState, useEffect, useRef } from 'react'
 
 interface SplashScreenProps {
     onDone: () => void
@@ -8,24 +6,21 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onDone }: SplashScreenProps) {
     const [fadeOut, setFadeOut] = useState(false)
+    const [visible, setVisible] = useState(true)
+    const doneRef = useRef(onDone)
+    doneRef.current = onDone
 
     useEffect(() => {
-        // Skip if already shown this session
-        if (sessionStorage.getItem(SPLASH_SHOWN_KEY)) {
-            onDone()
-            return
-        }
-
-        // Start fade-out after 2.5s
         const t1 = setTimeout(() => setFadeOut(true), 2500)
-        // Remove after fade completes (500ms)
         const t2 = setTimeout(() => {
-            sessionStorage.setItem(SPLASH_SHOWN_KEY, '1')
-            onDone()
+            setVisible(false)
+            doneRef.current()
         }, 3000)
 
         return () => { clearTimeout(t1); clearTimeout(t2) }
-    }, [onDone])
+    }, []) // no deps — runs once, ref stays fresh
+
+    if (!visible) return null
 
     return (
         <div
@@ -41,14 +36,13 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
             >
                 {/* --- Curved trajectory lines (2D bezier animations) --- */}
 
-                {/* Line 1: top-left arc — drawn with stroke-dasharray */}
+                {/* Line 1: top-left arc */}
                 <path
                     d="M 60 120 C 100 30, 160 40, 200 80 C 240 120, 230 170, 200 200"
                     stroke="#7C3AED"
                     strokeWidth="2.5"
                     strokeLinecap="round"
                     fill="none"
-                    className="splash-line"
                     style={{
                         strokeDasharray: 300,
                         strokeDashoffset: 300,
@@ -64,7 +58,6 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     strokeWidth="2"
                     strokeLinecap="round"
                     fill="none"
-                    className="splash-line"
                     style={{
                         strokeDasharray: 280,
                         strokeDashoffset: 280,
@@ -80,7 +73,6 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     strokeWidth="1.8"
                     strokeLinecap="round"
                     fill="none"
-                    className="splash-line"
                     style={{
                         strokeDasharray: 350,
                         strokeDashoffset: 350,
@@ -96,7 +88,6 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     fill="none"
-                    className="splash-line"
                     style={{
                         strokeDasharray: 500,
                         strokeDashoffset: 500,
@@ -105,29 +96,22 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     }}
                 />
 
-                {/* --- Logo: Dribly "D" — scale-in animation --- */}
+                {/* --- Real Dribly logo — revealed with expanding circle --- */}
                 <g
-                    className="splash-logo"
                     style={{
-                        animation: 'scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both',
+                        animation: 'revealLogo 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both',
                     }}
                 >
-                    {/* Real Dribly logo — revealed with expanding circle */}
-                <foreignObject x="100" y="100" width="200" height="200">
-                    <img
-                        src="/logo.svg"
-                        alt="Dribly"
-                        className="w-full h-full object-contain"
-                        style={{
-                            clipPath: 'circle(50% at 50% 50%)',
-                            animation: 'revealLogo 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both',
-                        }}
-                    />
-                </foreignObject>
+                    <foreignObject x="100" y="100" width="200" height="200">
+                        <img
+                            src="/logo.svg"
+                            alt="Dribly"
+                            className="w-full h-full object-contain"
+                        />
+                    </foreignObject>
                 </g>
             </svg>
 
-            {/* Keyframes injected once */}
             <style>{`
                 @keyframes drawLine {
                     to { stroke-dashoffset: 0; }
@@ -136,10 +120,12 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     from {
                         clip-path: circle(0% at 50% 50%);
                         opacity: 0;
+                        transform: scale(0.5);
                     }
                     to {
                         clip-path: circle(50% at 50% 50%);
                         opacity: 1;
+                        transform: scale(1);
                     }
                 }
             `}</style>
