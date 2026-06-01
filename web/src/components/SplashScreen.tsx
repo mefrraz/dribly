@@ -13,15 +13,16 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
 
     useEffect(() => {
         const t1 = setTimeout(() => setPhase('slide'), 700)
-        const t2 = setTimeout(() => setPhase('done'), 1700)
-        const t3 = setTimeout(() => setFadeOut(true), 2300)
-        const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 2700)
+        const t2 = setTimeout(() => setPhase('done'), 2000)
+        const t3 = setTimeout(() => setFadeOut(true), 2500)
+        const t4 = setTimeout(() => { setHidden(true); doneRef.current() }, 2900)
         return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
     }, [])
 
     if (hidden) return null
 
     const sliding = phase === 'slide' || phase === 'done'
+    const letters = 'Dribly'.split('')
 
     return (
         <div
@@ -34,12 +35,12 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 className="absolute flex items-center gap-2.5"
                 style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
             >
-                {/* 📦 Logo — moves LEFT */}
+                {/* Logo — moves LEFT */}
                 <div
                     className="relative shrink-0"
                     style={{
                         transform: sliding ? 'translateX(-30px)' : 'translateX(0)',
-                        transition: 'transform 1s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
                 >
                     <img
@@ -58,17 +59,34 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                     )}
                 </div>
 
-                {/* 📝 Text — moves RIGHT (from behind logo) */}
-                <span
-                    className="text-3xl font-black text-white tracking-tight whitespace-nowrap relative z-0"
-                    style={{
-                        opacity: sliding ? 1 : 0,
-                        transform: sliding ? 'translateX(0)' : 'translateX(-40px)',
-                        transition: 'opacity 0.6s ease-out, transform 1s cubic-bezier(0.4, 0, 0.2, 1)',
-                        filter: sliding ? 'blur(0)' : 'blur(4px)',
-                    }}
-                >
-                    Dribly<span className="text-[#7C3AED]">.</span>
+                {/* Text — letter by letter, emerges from BEHIND the logo */}
+                <span className="text-3xl font-black text-white tracking-tight whitespace-nowrap relative z-0">
+                    {letters.map((letter, i) => (
+                        <span
+                            key={i}
+                            style={{
+                                display: 'inline-block',
+                                opacity: sliding ? 1 : 0,
+                                transform: sliding ? 'translateX(0)' : 'translateX(-50px)',
+                                transition: `opacity 0.3s ease-out ${0.8 + i * 0.08}s, transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)`,
+                                filter: sliding ? 'blur(0)' : 'blur(6px)',
+                            }}
+                        >
+                            {letter}
+                        </span>
+                    ))}
+                    <span
+                        className="text-[#7C3AED]"
+                        style={{
+                            display: 'inline-block',
+                            opacity: sliding ? 1 : 0,
+                            transform: sliding ? 'translateX(0)' : 'translateX(-50px)',
+                            transition: `opacity 0.3s ease-out ${0.8 + letters.length * 0.08}s, transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)`,
+                            filter: sliding ? 'blur(0)' : 'blur(6px)',
+                        }}
+                    >
+                        .
+                    </span>
                 </span>
             </div>
 
