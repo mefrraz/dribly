@@ -320,7 +320,24 @@ export default function Mapa() {
             {/* Legend */}
             <div className="absolute bottom-4 left-4 z-[1000] bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-xl px-3 py-2 text-xs text-zinc-500 dark:text-zinc-400 shadow-lg border border-zinc-200 dark:border-white/10">
                 <p><span className="font-bold text-dribly-purple">{pavilions.length}</span> pavilhões mapeados</p>
-                <p className="text-[10px] mt-0.5">232 com coordenadas exatas</p>
+            </div>
+
+            {/* Map footer — bottom bar with quick stats */}
+            <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-t border-zinc-200 dark:border-white/10 px-4 py-2 flex items-center justify-center gap-4 text-[10px] text-zinc-500 dark:text-zinc-400">
+                <span className="flex items-center gap-1.5">
+                    <MapPin size={10} className="text-dribly-purple" />
+                    {pavilions.length} pavilhões
+                </span>
+                <span className="w-px h-3 bg-zinc-300 dark:bg-zinc-700" />
+                <span className="flex items-center gap-1.5">
+                    <Search size={10} className="text-dribly-purple" />
+                    Pesquisa rápida
+                </span>
+                <span className="w-px h-3 bg-zinc-300 dark:bg-zinc-700" />
+                <span className="flex items-center gap-1.5">
+                    <MapPin size={10} className="text-dribly-purple" />
+                    Clique num ponto
+                </span>
             </div>
 
         </div>

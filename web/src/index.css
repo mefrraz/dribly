@@ -115,10 +115,9 @@
 .leaflet-bottom {
   z-index: 2;
 }
-/* Move zoom controls to middle-right of the map, away from search bar */
+/* Move zoom controls to left side, vertically centered */
 .leaflet-top.leaflet-left {
-  left: auto;
-  right: 12px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
 }

@@ -113,8 +113,14 @@ export async function fetchPavilionGameCounts(): Promise<Map<number, number>> {
 
 /** Clean pavilion name for display */
 export function displayPavilionName(pavilion: Pavilion): string {
-    return pavilion.nome
-        .replace(/^Pavilhão\s+/i, '')
-        .replace(/^Mun\.\s+/i, 'Municipal ')
-        .trim()
+    let nome = pavilion.nome.trim()
+    // Standardize "Mun. " to "Municipal "
+    nome = nome.replace(/^Mun\.\s+/i, 'Municipal ')
+    // Only strip "Pavilhão" if the full name starts with it AND still has meaningful content after
+    // Otherwise keep the original name
+    const withoutPrefix = nome.replace(/^Pavilhão\s+(Municipal\s+)?/i, '')
+    if (withoutPrefix.length >= 3) {
+        nome = withoutPrefix
+    }
+    return nome
 }
