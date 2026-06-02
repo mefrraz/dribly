@@ -272,7 +272,7 @@ export default function Mapa() {
 
     return (
         <>
-        <div style={{ position: 'fixed', top: '3.5rem', bottom: '4rem', left: 0, right: 0, zIndex: 10 }} className="md:top-16 md:bottom-0">
+        <div style={{ position: 'fixed', top: '3.5rem', bottom: 0, left: 0, right: 0, zIndex: 10 }} className="md:top-16">
 
             {/* Top bar: search + locate + filter */}
             <div className="absolute top-7 left-3 right-3 md:left-4 md:right-auto z-[1100] flex items-start gap-2">
