@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { supabase } from './supabase'
-import { useAuth } from './AuthContext'
 
 export interface Club {
     id: number
@@ -22,8 +21,6 @@ export function displayName(club: Club): string {
 interface ClubContextType {
     selectedClub: Club | null
     setSelectedClub: (club: Club | null) => void
-    favoriteClub: Club | null
-    setFavoriteClub: (club: Club | null) => void
     clubs: Club[]
     loadClubs: () => Promise<void>
     getClubBySlug: (slug: string) => Promise<Club | null>
@@ -31,7 +28,6 @@ interface ClubContextType {
 
 const ClubContext = createContext<ClubContextType | null>(null)
 
-const FAVORITE_KEY = 'dribly_favorite_club'
 const CLUBS_CACHE_KEY = 'dribly_clubs_cache'
 
 function loadCachedClubs(): Club[] {
@@ -48,7 +44,6 @@ function saveClubsCache(clubs: Club[]) {
 
 export function ClubProvider({ children }: { children: ReactNode }) {
     const [selectedClub, setSelectedClub] = useState<Club | null>(null)
-    const [favoriteClub, setFavoriteClubState] = useState<Club | null>(null)
     const [clubs, setClubs] = useState<Club[]>(() => loadCachedClubs())
     const [clubsFetched, setClubsFetched] = useState(false)
 
@@ -80,59 +75,10 @@ export function ClubProvider({ children }: { children: ReactNode }) {
         return null
     }, [clubs])
 
-    const { user } = useAuth()
-    const setFavoriteClub = useCallback((club: Club | null) => {
-        setFavoriteClubState(club)
-        if (club) {
-            localStorage.setItem(FAVORITE_KEY, JSON.stringify(club))
-            if (user) {
-                supabase.from('user_favorites').upsert({ user_id: user.id, club_id: club.id }, { onConflict: 'user_id' }).then(()=>{}, ()=>{})
-            }
-        } else {
-            localStorage.removeItem(FAVORITE_KEY)
-            if (user) {
-                supabase.from('user_favorites').delete().eq('user_id', user.id).then(()=>{}, ()=>{})
-            }
-        }
-    }, [user])
-
-    // Load favorite: Supabase first (if logged in), then localStorage
-    useEffect(() => {
-        if (user) {
-            supabase.from('user_favorites').select('club_id').eq('user_id', user.id).single().then(({data}) => {
-                if (data?.club_id) {
-                    // Find club in already-loaded clubs or fetch it
-                    const found = clubs.find(c => c.id === data.club_id)
-                    if (found) {
-                        setFavoriteClubState(found)
-                        localStorage.setItem(FAVORITE_KEY, JSON.stringify(found))
-                    } else {
-                        supabase.from('clubs').select('*').eq('id', data.club_id).single().then(({data:cd}) => {
-                            if (cd) { setFavoriteClubState(cd as Club); localStorage.setItem(FAVORITE_KEY, JSON.stringify(cd)) }
-                        }, ()=>{})
-                    }
-                }
-            }, () => {
-                // Fallback to localStorage
-                try {
-                    const stored = localStorage.getItem(FAVORITE_KEY)
-                    if (stored) setFavoriteClubState(JSON.parse(stored) as Club)
-                } catch {}
-            })
-        } else {
-            try {
-                const stored = localStorage.getItem(FAVORITE_KEY)
-                if (stored) setFavoriteClubState(JSON.parse(stored) as Club)
-            } catch {}
-        }
-    }, [user, clubs])
-
     return (
         <ClubContext.Provider value={{
             selectedClub,
             setSelectedClub,
-            favoriteClub,
-            setFavoriteClub,
             clubs,
             loadClubs,
             getClubBySlug,

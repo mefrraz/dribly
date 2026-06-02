@@ -1,16 +1,16 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { Calendar, Trophy, ChevronRight, Clock, MapPin, RefreshCw, AlertCircle, Star, Heart } from 'lucide-react'
+import { Calendar, Trophy, ChevronRight, Clock, MapPin, RefreshCw, AlertCircle, Heart } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
 import { useFollows } from '../../hooks/useFollows'
 import { useAuth } from '../../lib/AuthContext'
 import { SkeletonHero } from '../../components/Skeleton'
-import { useClub, type Club, displayName } from '../../lib/ClubContext'
+import { type Club, displayName } from '../../lib/ClubContext'
 
 function ClubHome() {
     const { club } = useOutletContext<{ club: Club }>()
     const { user } = useAuth()
-    const { favoriteClub, setFavoriteClub } = useClub()
+
     const { isFollowing, toggleFollow } = useFollows()
     const { games: allGames, loading, error, refresh } = useGames('2025/2026', club.id, club.name)
     const [showLoadingMsg, setShowLoadingMsg] = useState(false)
@@ -53,15 +53,11 @@ function ClubHome() {
         return formatted.charAt(0).toUpperCase() + formatted.slice(1)
     }
 
-    const isFavorited = favoriteClub?.id === club.id
     const followed = user ? isFollowing('club', club.id) : false
     const [followLoading, setFollowLoading] = useState(false)
     const [needsLogin, setNeedsLogin] = useState(false)
 
-    const handleFavorite = () => {
-        if (!user) { setNeedsLogin(true); setTimeout(() => setNeedsLogin(false), 2500); return }
-        setFavoriteClub(isFavorited ? null : club)
-    }
+
     const handleFollow = async () => {
         if (!user) { setNeedsLogin(true); setTimeout(() => setNeedsLogin(false), 2500); return }
         setFollowLoading(true)
@@ -120,13 +116,6 @@ function ClubHome() {
                 </div>
                 <h1 className="text-lg font-bold text-zinc-900 dark:text-white truncate flex-1">{displayName(club)}</h1>
                 <div className="flex items-center gap-1">
-                    <button onClick={handleFavorite} data-tour="favorite"
-                        className={`p-2 rounded-full transition-all active:scale-[0.9] ${
-                            isFavorited ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-500/10' : 'text-zinc-400 hover:text-yellow-500 hover:bg-zinc-100 dark:hover:bg-white/5'
-                        }`}
-                        title={isFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}>
-                        <Star size={18} strokeWidth={isFavorited ? 2.5 : 2} fill={isFavorited ? 'currentColor' : 'none'} />
-                    </button>
                     <button onClick={handleFollow} data-tour="follow"
                         className={`p-2 rounded-full transition-all active:scale-[0.9] ${
                             followLoading ? 'opacity-50' : ''

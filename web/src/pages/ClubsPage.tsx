@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Loader2, Star, Heart } from 'lucide-react'
+import { Search, Loader2, Heart } from 'lucide-react'
 import { useClub, displayName } from '../lib/ClubContext'
 import { useAuth } from '../lib/AuthContext'
 import { useFollows } from '../hooks/useFollows'
@@ -9,7 +9,6 @@ import { normalize, buildSearchText } from '../lib/clubSearch'
 export default function ClubsPage() {
     const { clubs, loadClubs } = useClub()
     const { user } = useAuth()
-    const { favoriteClub, setFavoriteClub } = useClub()
     const { isFollowing, toggleFollow } = useFollows()
     const [search, setSearch] = useState('')
     const [loading, setLoading] = useState(true)
@@ -55,7 +54,6 @@ export default function ClubsPage() {
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
                         {filtered.map(club => {
-                            const isFav = favoriteClub?.id === club.id
                             const isFol = user ? isFollowing('club', club.id) : false
                             return (
                                 <div key={club.id} className="group relative">
@@ -77,14 +75,6 @@ export default function ClubsPage() {
                                     {/* Action buttons */}
                                     {user && (
                                         <div className="absolute top-2 right-2 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button
-                                                onClick={(e) => { e.preventDefault(); setFavoriteClub(isFav ? null : club) }}
-                                                className={`p-1 rounded-full transition-all ${
-                                                    isFav ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-500/10' : 'text-zinc-400 hover:text-yellow-500 bg-white dark:bg-zinc-800'
-                                                }`}
-                                                title={isFav ? 'Remover dos favoritos' : 'Favoritar'}>
-                                                <Star size={13} strokeWidth={isFav ? 2.5 : 2} fill={isFav ? 'currentColor' : 'none'} />
-                                            </button>
                                             <button
                                                 onClick={(e) => { e.preventDefault(); toggleFollow('club', club.id) }}
                                                 className={`p-1 rounded-full transition-all ${

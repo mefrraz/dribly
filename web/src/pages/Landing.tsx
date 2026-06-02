@@ -7,7 +7,7 @@ import { Search, ChevronRight, ChevronLeft, ArrowRight, Trophy, Clock } from 'lu
 import { supabase } from '../lib/supabase'
 import { GameCard } from '../components/GameCard'
 import { useClub, type Club, displayName } from '../lib/ClubContext'
-import { useAuth } from '../lib/AuthContext'
+
 import { type Match } from '../components/types'
 import { normalize, buildSearchText } from '../lib/clubSearch'
 import SplashScreen from '../components/SplashScreen'
@@ -56,8 +56,8 @@ function Landing() {
     const inputRef = useRef<HTMLInputElement>(null)
     const dropdownRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
-    const { clubs, loadClubs, favoriteClub } = useClub()
-    const { user } = useAuth()
+    const { clubs, loadClubs } = useClub()
+
     const [splashDone, setSplashDone] = useState(() => sessionStorage.getItem("dribly_splash_shown") === "1")
 
     const normalizedClubs = useMemo(() => clubs.map(c => ({ ...c, _n: buildSearchText(c) })), [clubs])
@@ -117,7 +117,7 @@ function Landing() {
                     <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto leading-relaxed mb-6 animate-slide-up">Resultados de todos os clubes de basquetebol em Portugal</p>
                     <div className="flex flex-wrap justify-center gap-2 mb-6 animate-slide-up">{FEATURED_CLUBS.map(({ name, slug }) => { const c = clubs.find(x => x.slug === slug); if (!c) return null; return (<button key={c.slug} onClick={() => selectClub(c)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all ${slug === 'ud-oliveirense' ? 'hidden sm:flex' : ''}`}><span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">{c.logo_url ? <img src={c.logo_url} alt="" className="w-3.5 h-3.5 object-contain" /> : <span className="text-[9px] font-bold text-zinc-500">{name.charAt(0).toUpperCase()}</span>}</span>{displayName(c)}</button>) })}</div>
                     <div className="max-w-lg mx-auto relative animate-slide-up" ref={dropdownRef}><div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none"><Search size={20} className="text-zinc-400" /></div><input ref={inputRef} type="text" value={query} onChange={e => { setQuery(e.target.value); setSelectedIdx(-1) }} onKeyDown={handleKeyDown} onFocus={() => query.trim() && setShowDropdown(true)} placeholder="Pesquisar clubes e competições..." className="w-full pl-12 pr-4 py-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none shadow-lg shadow-zinc-200/50 dark:shadow-black/20 transition-all focus:ring-2 focus:ring-dribly-purple/30 focus:border-dribly-purple" />{showDropdown && totalResults > 0 && (<div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl shadow-xl overflow-hidden z-50 text-left">{results.length > 0 && (<div><div className="px-4 py-2 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Clubes</div>{results.map((club,i) => (<button key={club.slug} onClick={() => selectClub(club)} className={'w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ' + (selectedIdx === i ? 'bg-dribly-purple/10 dark:bg-dribly-purple/20' : 'hover:bg-zinc-50 dark:hover:bg-white/5')}><div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">{club.logo_url ? <img src={club.logo_url} alt="" className="w-6 h-6 object-contain" /> : <span className="text-xs font-bold text-zinc-500">{displayName(club).charAt(0).toUpperCase()}</span>}</div><span className="text-sm font-medium text-zinc-900 dark:text-white truncate">{displayName(club)}</span></button>))}</div>)}{compResults.length > 0 && (<div className={results.length > 0 ? 'border-t border-zinc-100 dark:border-white/5' : ''}><div className="px-4 py-2 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Competições</div>{compResults.map((comp,i) => { const idx = results.length + i; return (<button key={'comp-'+comp.competition_id} onClick={() => { navigate('/competicao/' + comp.competition_id); setQuery(''); setShowDropdown(false) }} className={'w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ' + (selectedIdx === idx ? 'bg-dribly-purple/10 dark:bg-dribly-purple/20' : 'hover:bg-zinc-50 dark:hover:bg-white/5')}><div className="w-9 h-9 rounded-full bg-dribly-purple/10 dark:bg-dribly-purple/20 flex items-center justify-center shrink-0"><Trophy size={16} className="text-dribly-purple" /></div><div className="min-w-0"><span className="text-sm font-medium text-zinc-900 dark:text-white truncate block">{compMetaMap.get(comp.competition_id)?.name || comp.competition_name}</span><span className="text-[10px] text-zinc-400">{comp.association_name}</span></div></button>) })}</div>)}{(results.length === 3 || compResults.length === 3) && (<Link to={'/search?q=' + encodeURIComponent(query)} onClick={() => setShowDropdown(false)} className="block w-full text-center py-3 text-xs font-bold text-dribly-purple hover:bg-dribly-purple/5 border-t border-zinc-100 dark:border-white/5 transition-colors">Ver todos os resultados</Link>)}</div>)}</div>
-                    {!user && favoriteClub && (<Link to={'/clube/' + favoriteClub.slug + '/home'} className="inline-flex items-center gap-2 mt-5 px-4 py-2 rounded-full bg-dribly-purple/5 dark:bg-dribly-purple/10 text-dribly-purple text-xs font-bold border border-dribly-purple/20 hover:bg-dribly-purple/10 dark:hover:bg-dribly-purple/20 transition-all group animate-slide-up"><HomeIcon size={14} /><span>Continuar com {displayName(favoriteClub)}</span><ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" /></Link>)}
+
                 </div>
             </div>
 
@@ -313,6 +313,6 @@ function Landing() {
     )
 }
 
-function HomeIcon({ size, className }: { size: number; className?: string }) { return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>) }
+
 
 export default Landing

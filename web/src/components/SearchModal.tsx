@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, X, Building2, Trophy, Star, Heart } from 'lucide-react'
+import { Search, X, Building2, Trophy, Heart } from 'lucide-react'
 import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { useAuth } from '../lib/AuthContext'
 import { useFollows } from '../hooks/useFollows'
@@ -28,7 +28,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     const inputRef = useRef<HTMLInputElement>(null)
     const navigate = useNavigate()
     const { user } = useAuth()
-    const { favoriteClub, setFavoriteClub, clubs, loadClubs } = useClub()
+    const { clubs, loadClubs } = useClub()
     const { isFollowing, toggleFollow } = useFollows()
     const [allComps, setAllComps] = useState<CompetitionResult[]>([])
     const [compLogoMap, setCompLogoMap] = useState<Map<number, string>>(new Map())
@@ -120,7 +120,6 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                             <span className="text-sm font-medium text-zinc-900 dark:text-white truncate flex-1">{displayName(club)}</span>
                                         </div>
                                         <div className="flex items-center gap-1 shrink-0" onClick={e => e.stopPropagation()}>
-                                            <button onClick={() => user && setFavoriteClub(favoriteClub?.id === club.id ? null : club)} className={`p-1 rounded-full transition-all ${!user ? 'opacity-30 cursor-not-allowed' : favoriteClub?.id === club.id ? 'text-yellow-500' : 'text-zinc-400 hover:text-yellow-500'}`} title={!user ? 'Inicia sessão para favoritar' : favoriteClub?.id === club.id ? 'Remover dos favoritos' : 'Favoritar'}><Star size={15} strokeWidth={favoriteClub?.id === club.id ? 2.5 : 2} fill={favoriteClub?.id === club.id ? 'currentColor' : 'none'} /></button>
                                             <button onClick={() => user && toggleFollow('club', club.id)} className={`p-1 rounded-full transition-all ${user && isFollowing('club', club.id) ? 'text-dribly-purple' : 'text-zinc-400 hover:text-dribly-purple'}`} title={user && isFollowing('club', club.id) ? 'Deixar de seguir' : 'Seguir'}><Heart size={15} strokeWidth={user && isFollowing('club', club.id) ? 2.5 : 2} fill={user && isFollowing('club', club.id) ? 'currentColor' : 'none'} /></button>
                                         </div>
                                     </button>

@@ -41,7 +41,7 @@ interface Props {
 }
 
 export function PostOnboardingSuggestions({ onComplete }: Props) {
-    const { clubs, loadClubs, favoriteClub, setFavoriteClub } = useClub()
+    const { clubs, loadClubs } = useClub()
     const { toggleFollow, follows } = useFollows()
     const [competitions, setCompetitions] = useState<Competition[]>([])
     const [loading, setLoading] = useState(true)
@@ -50,7 +50,6 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
     const [visible, setVisible] = useState(false)
     const [exiting, setExiting] = useState(false)
 
-    const [favoritedId, setFavoritedId] = useState<number | null>(favoriteClub?.id ?? null)
     const [followedClubIds, setFollowedClubIds] = useState<Set<number>>(new Set())
     const [followedCompIds, setFollowedCompIds] = useState<Set<number>>(new Set())
 
@@ -119,16 +118,6 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
 
     // ---- Actions ----
 
-    const handleFavorite = async (club: Club) => {
-        setFavoriteClub(club)
-        setFavoritedId(club.id)
-        // Auto-follow when favoriting in suggestions
-        if (!followedClubIds.has(club.id)) {
-            await toggleFollow('club', club.id)
-            setFollowedClubIds(prev => new Set(prev).add(club.id))
-        }
-    }
-
     const handleFollowClub = async (clubId: number) => {
         await toggleFollow('club', clubId)
         setFollowedClubIds(prev => {
@@ -166,32 +155,18 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
     }
 
     // ---- Shared club row ----
-    const renderClubRow = (club: Club, mode: 'favorite' | 'follow') => {
-        const isFavClub = favoritedId === club.id
-        const isFollowed = followedClubIds.has(club.id) || (mode === 'favorite' && isFavClub)
-
-        let active: boolean
-        let bgClass: string
-        let icon: React.ReactNode
-
-        if (mode === 'favorite') {
-            active = isFavClub
-            bgClass = active
-                ? 'bg-yellow-50 dark:bg-yellow-500/10 border-yellow-300 dark:border-yellow-500/40 text-yellow-700 dark:text-yellow-400'
-                : 'bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-yellow-200 dark:hover:border-yellow-500/20'
-            icon = active ? <Check size={15} className="text-yellow-500 shrink-0" /> : <Star size={14} className="text-zinc-300 shrink-0" />
-        } else {
-            active = isFollowed
-            bgClass = active
-                ? 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400'
-                : 'bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-red-200 dark:hover:border-red-500/20'
-            icon = active ? <Heart size={14} className="text-red-500 fill-red-500 shrink-0" /> : <Heart size={14} className="text-zinc-300 shrink-0" />
-        }
+    const renderClubRow = (club: Club) => {
+        const isFollowed = followedClubIds.has(club.id)
+        const active = isFollowed
+        const bgClass = active
+            ? 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400'
+            : 'bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-red-200 dark:hover:border-red-500/20'
+        const icon = active ? <Heart size={14} className="text-red-500 fill-red-500 shrink-0" /> : <Heart size={14} className="text-zinc-300 shrink-0" />
 
         return (
             <button
                 key={club.id}
-                onClick={() => (mode === 'favorite' ? handleFavorite(club) : handleFollowClub(club.id))}
+                onClick={() => handleFollowClub(club.id)}
                 className={`w-full flex items-center gap-3 p-2.5 rounded-xl border text-sm font-medium transition-all active:scale-[0.98] ${bgClass}`}
             >
                 {club.logo_url ? (
@@ -239,11 +214,11 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
                         </div>
 
                         {clubSearchResults.length > 0 ? (
-                            <div className="space-y-1.5 mb-5">{clubSearchResults.map(c => renderClubRow(c, 'favorite'))}</div>
+                            <div className="space-y-1.5 mb-5">{clubSearchResults.map(c => renderClubRow(c))}</div>
                         ) : (
                             <>
                                 <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Sugestões</p>
-                                <div className="space-y-1.5 mb-5">{favClubs.map(c => renderClubRow(c, 'favorite'))}</div>
+                                <div className="space-y-1.5 mb-5">{favClubs.map(c => renderClubRow(c))}</div>
                             </>
                         )}
 
@@ -270,11 +245,11 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
                         </div>
 
                         {clubSearchResults.length > 0 ? (
-                            <div className="space-y-1.5 mb-5">{clubSearchResults.map(c => renderClubRow(c, 'follow'))}</div>
+                            <div className="space-y-1.5 mb-5">{clubSearchResults.map(c => renderClubRow(c))}</div>
                         ) : (
                             <>
                                 <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Sugestões</p>
-                                <div className="space-y-1.5 mb-5">{followClubs.map(c => renderClubRow(c, 'follow'))}</div>
+                                <div className="space-y-1.5 mb-5">{followClubs.map(c => renderClubRow(c))}</div>
                             </>
                         )}
 

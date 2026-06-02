@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Sun, Moon, Instagram, Github, Info, BarChart2, Home, Star, Search, LogIn, Heart, Trophy, Building2, MapPin } from 'lucide-react'
+import { Sun, Moon, Instagram, Github, Info, BarChart2, Home, Search, LogIn, Heart, Trophy, Building2, MapPin } from 'lucide-react'
 import PWAInstallBanner from './components/PWAInstallBanner'
 import BottomNav from './components/BottomNav'
 import { SearchModal } from './components/SearchModal'
 import { AuthModal } from './components/AuthModal'
 import { OnboardingTour, type TourTrigger } from './components/OnboardingTour'
 import { PostOnboardingSuggestions } from './components/PostOnboardingSuggestions'
-import { useClub, displayName } from './lib/ClubContext'
 import { useAuth } from './lib/AuthContext'
 
 function Layout() {
@@ -17,19 +16,15 @@ function Layout() {
     const [onboardingTrigger, setOnboardingTrigger] = useState<TourTrigger | null>(null)
     const [showSuggestions, setShowSuggestions] = useState(false)
     const location = useLocation()
-    const { favoriteClub, selectedClub } = useClub()
     const { user } = useAuth()
 
     const handleAuthSuccess = useCallback((method: 'signin' | 'signup') => {
-        // Only show onboarding tour after sign-up, not sign-in
         if (method === 'signup') {
             setTimeout(() => {
                 setOnboardingTrigger(method as TourTrigger)
             }, 500)
         }
     }, [])
-
-    const activeClub = selectedClub || favoriteClub
 
     useEffect(() => { window.scrollTo(0, 0) }, [location.pathname])
 
@@ -85,11 +80,6 @@ function Layout() {
                                 <Link to="/" className={`${navPill} ${isActive('/') ? navPillActive : navPillInactive}`}>
                                     <Home size={14} /> Início
                                 </Link>
-                                {user && activeClub && (
-                                    <Link to={`/clube/${activeClub.slug}/home`} data-tour="my-club" className={`${navPill} ${isActive(`/clube/${activeClub.slug}/home`) ? navPillActive : navPillInactive}`}>
-                                        <Star size={14} /> Meu Clube
-                                    </Link>
-                                )}
                                 {user && (
                                     <Link to="/seguidos" data-tour="seguidos-nav" className={`${navPill} ${isActive('/seguidos') ? navPillActive : navPillInactive}`}>
                                         <Heart size={14} /> Seguidos
@@ -110,29 +100,15 @@ function Layout() {
                             </div>
                         </div>
 
-                        {/* Club selector — absolutely centered on mobile, only when logged in */}
-                        {user && (
-                            <div className="absolute left-1/2 -translate-x-1/2 sm:hidden z-10">
-                                <button onClick={() => setSearchOpen(true)}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border border-dribly-purple/30 text-dribly-purple hover:bg-dribly-purple/5 hover:border-dribly-purple/60 active:scale-[0.97]">
-                                    <Star size={14} strokeWidth={activeClub ? 2 : 1.5} className={activeClub ? 'fill-dribly-purple text-dribly-purple' : 'text-dribly-purple'} />
-                                    {activeClub ? displayName(activeClub) : 'Escolher clube'}
-                                </button>
-                            </div>
-                        )}
+                        {/* Center spacer on mobile */}
+                        <div className="absolute left-1/2 -translate-x-1/2 sm:hidden z-10" />
 
                         {/* RIGHT: Search + Club selector (desktop) + About + Theme */}
                         <div className="flex items-center gap-1 ml-auto">
                             <button onClick={() => setSearchOpen(true)} className="hidden sm:flex items-center gap-1.5 px-2 py-1.5 rounded-full text-xs font-bold transition-all text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5 hover:text-zinc-700 dark:hover:text-zinc-200">
                                 <Search size={14} />
                             </button>
-                            {user && (
-                                <button onClick={() => setSearchOpen(true)}
-                                    className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border border-dribly-purple/30 text-dribly-purple hover:bg-dribly-purple/5 hover:border-dribly-purple/60 active:scale-[0.97]">
-                                    <Star size={14} strokeWidth={activeClub ? 2 : 1.5} className={activeClub ? 'fill-dribly-purple text-dribly-purple' : 'text-dribly-purple'} />
-                                    <span className="max-w-[80px] truncate">{activeClub ? displayName(activeClub) : 'Clube'}</span>
-                                </button>
-                            )}
+
                             <Link to="/about" className={`hidden sm:flex ${navIcon} ${isActive('/about') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Sobre">
                                 <Info size={17} />
                             </Link>
@@ -187,7 +163,7 @@ function Layout() {
                 </div>
             </footer>
 
-            <BottomNav onOpenSearch={() => setSearchOpen(true)} />
+            <BottomNav />
             <PWAInstallBanner />
             <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
             <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} onAuthSuccess={handleAuthSuccess} />
