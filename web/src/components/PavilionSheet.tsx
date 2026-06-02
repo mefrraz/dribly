@@ -35,6 +35,8 @@ function toMatch(g: GameAtPavilion): Match {
     }
 }
 
+import { Link } from 'react-router-dom'
+
 export function PavilionSheet({ pavilion, isOpen, onClose }: Props) {
     const [games, setGames] = useState<GameAtPavilion[]>([])
     const [loading, setLoading] = useState(false)
@@ -122,23 +124,18 @@ export function PavilionSheet({ pavilion, isOpen, onClose }: Props) {
                     )}
                 </div>
 
-                {/* Footer — link to pavilion page (future) */}
-                <div className="px-5 py-2.5 border-t border-zinc-100 dark:border-white/5 shrink-0">
-                    {pavilion.fpb_url ? (
-                        <a
-                            href={pavilion.fpb_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-dribly-purple/10 text-dribly-purple text-xs font-bold hover:bg-dribly-purple/20 transition-colors"
+                {/* Footer — link to Dribly pavilion page */}
+                {pavilion.recinto_id && (
+                    <div className="px-5 py-2.5 border-t border-zinc-100 dark:border-white/5 shrink-0">
+                        <Link
+                            to={`/pavilhao/${pavilion.recinto_id}`}
+                            onClick={onClose}
+                            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-dribly-purple text-white text-xs font-bold hover:bg-dribly-purple/90 transition-colors"
                         >
-                            Ver na FPB <ExternalLink size={12} />
-                        </a>
-                    ) : (
-                        <p className="text-[10px] text-zinc-400 text-center">
-                            Página do pavilhão em breve
-                        </p>
-                    )}
-                </div>
+                            Ver pavilhão <ExternalLink size={12} />
+                        </Link>
+                    </div>
+                )}
             </div>
         </>
     )
