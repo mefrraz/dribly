@@ -130,7 +130,7 @@ export default function Mapa() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+            <div className="fixed inset-0 flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 z-10">
                 <div className="flex flex-col items-center gap-3">
                     <Loader2 size={32} className="animate-spin text-dribly-purple" />
                     <span className="text-sm text-zinc-400">A carregar mapa...</span>
@@ -140,7 +140,16 @@ export default function Mapa() {
     }
 
     return (
-        <div className="relative w-full h-[calc(100vh-7rem)] md:h-[calc(100vh-5rem)]">
+        <>
+        {/* Full-screen map between navbars */}
+        <div style={{
+            position: 'fixed',
+            top: '3.5rem', // 14 = h-14
+            bottom: '4rem', // 16 = h-16 bottom nav
+            left: 0,
+            right: 0,
+            zIndex: 10,
+        }} className="md:top-16 md:bottom-0">
             {pavilions.length === 0 ? (
                 <div className="h-full flex items-center justify-center">
                     <p className="text-sm text-zinc-400">Nenhum pavilhão com localização disponível.</p>
@@ -202,14 +211,15 @@ export default function Mapa() {
                 <p className="text-[10px] mt-0.5">232 com coordenadas exatas</p>
             </div>
 
-            {/* Bottom Sheet */}
-            {selected && (
-                <PavilionSheet
-                    pavilion={selected}
-                    isOpen={sheetOpen}
-                    onClose={() => setSheetOpen(false)}
-                />
-            )}
         </div>
-    )
+
+        {/* Sheet — rendered OUTSIDE the map div, at root stacking level */}
+        {selected && (
+            <PavilionSheet
+                pavilion={selected}
+                isOpen={sheetOpen}
+                onClose={() => setSheetOpen(false)}
+            />
+        )}
+    </>)
 }
