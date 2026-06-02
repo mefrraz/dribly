@@ -7,7 +7,8 @@
  * - Pin click → bottom sheet com jogos futuros no pavilhão
  * - Todos os dados via Supabase (pavilions + games_2025_2026)
  */
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { Loader2 } from 'lucide-react'
@@ -47,23 +48,21 @@ function clusterIcon(count: number): L.DivIcon {
     })
 }
 
-/** Zoom to bounds of all markers — waits for map tiles to be ready first */
-function FitBounds({ pavilions }: { pavilions: Pavilion[] }) {
+/** Fit bounds on first load only — respects URL-stored position on back-navigation */
+function FitBounds({ pavilions, skip }: { pavilions: Pavilion[]; skip: boolean }) {
     const map = useMap()
 
     useEffect(() => {
-        if (pavilions.length === 0) return
+        if (skip || pavilions.length === 0) return
         const bounds = L.latLngBounds(
             pavilions.map((p) => [p.lat, p.lng] as [number, number])
         )
-        // Wait for map to be fully initialized before fitting bounds
-        // This avoids NS_BINDING_ABORTED on tile requests
         map.whenReady(() => {
             setTimeout(() => {
                 map.fitBounds(bounds, { padding: [30, 30], maxZoom: 13 })
             }, 300)
         })
-    }, [map, pavilions])
+    }, [map, pavilions, skip])
 
     return null
 }
@@ -97,22 +96,34 @@ function useClusters(pavilions: Pavilion[], zoom: number): Map<string, Pavilion[
     }, [pavilions, zoom])
 }
 
-/** Track current zoom level */
-function ZoomWatcher({ onZoom }: { onZoom: (z: number) => void }) {
+/** Track zoom + sync position to URL */
+function ZoomWatcher({ onZoom, onMove }: { onZoom: (z: number) => void; onMove: (map: L.Map) => void }) {
     const map = useMap()
     useEffect(() => {
         onZoom(map.getZoom())
-        map.on('zoomend', () => onZoom(map.getZoom()))
-    }, [map, onZoom])
+        const handler = () => {
+            onZoom(map.getZoom())
+            onMove(map)
+        }
+        map.on('moveend', handler)
+        return () => { map.off('moveend', handler) }
+    }, [map, onZoom, onMove])
     return null
 }
 
 export default function Mapa() {
+    const [searchParams, setSearchParams] = useSearchParams()
     const [pavilions, setPavilions] = useState<Pavilion[]>([])
     const [loading, setLoading] = useState(true)
-    const [zoom, setZoom] = useState(8)
+    const [zoom, setZoom] = useState(() => Number(searchParams.get('z')) || 8)
+    const [center, setCenter] = useState<[number, number]>(() => {
+        const lat = searchParams.get('lat')
+        const lng = searchParams.get('lng')
+        return lat && lng ? [parseFloat(lat), parseFloat(lng)] : [39.7, -8.0]
+    })
     const [selected, setSelected] = useState<Pavilion | null>(null)
     const [sheetOpen, setSheetOpen] = useState(false)
+    const [initialFitDone, setInitialFitDone] = useState(!!searchParams.get('z'))
     const mapRef = useRef<any>(null)
 
     useEffect(() => {
@@ -128,6 +139,13 @@ export default function Mapa() {
         setSelected(pavilion)
         setSheetOpen(true)
     }
+
+    /** Sync map position to URL so back-navigation restores the exact view */
+    const syncToUrl = useCallback((map: L.Map) => {
+        const c = map.getCenter()
+        const z = map.getZoom()
+        setSearchParams({ lat: c.lat.toFixed(5), lng: c.lng.toFixed(5), z: String(z) }, { replace: true })
+    }, [setSearchParams])
 
     if (loading) {
         return (
@@ -157,8 +175,8 @@ export default function Mapa() {
                 </div>
             ) : (
                 <MapContainer
-                    center={[39.7, -8.0]}
-                    zoom={8}
+                    center={center}
+                    zoom={zoom}
                     minZoom={6}
                     maxZoom={18}
                     ref={mapRef}
@@ -171,8 +189,8 @@ export default function Mapa() {
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
 
-                    <FitBounds pavilions={pavilions} />
-                    <ZoomWatcher onZoom={setZoom} />
+                    <FitBounds pavilions={pavilions} skip={initialFitDone} />
+                    <ZoomWatcher onZoom={setZoom} onMove={syncToUrl} />
 
                     {/* Render clusters */}
                     {Array.from(clusters.entries()).map(([key, group]) => {
