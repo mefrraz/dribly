@@ -382,17 +382,21 @@ export default function Mapa() {
                 </MapContainer>
             )}
 
-            {/* Map footer */}
+            {/* Map footer bar */}
             <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-t border-zinc-200 dark:border-white/10 px-4 py-2 flex items-center justify-center gap-4 text-[10px] text-zinc-500 dark:text-zinc-400">
                 <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#7C3AED] shadow-sm shadow-purple-500/50" />
-                    {activePavilionIds.size} ativos
+                    {activePavilionIds.size} com jogos
+                </span>
+                <span className="w-px h-3 bg-zinc-300 dark:bg-zinc-700" />
+                <span className="flex items-center gap-1.5">
+                    <Search size={10} className="text-dribly-purple" />
+                    Pesquisa por nome
                 </span>
                 <span className="w-px h-3 bg-zinc-300 dark:bg-zinc-700" />
                 <span className="flex items-center gap-1.5">
                     <MapPin size={10} className="text-dribly-purple" />
-                    {pavilions.length} total
-                    {selectedDistrict && <span className="opacity-60 ml-1">· {selectedDistrict}</span>}
+                    Clique num ponto
                 </span>
             </div>
 
