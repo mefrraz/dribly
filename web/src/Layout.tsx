@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { Sun, Moon, Instagram, Github, Info, BarChart2, Home, Search, LogIn, Heart, Trophy, Building2, MapPin } from 'lucide-react'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import PWAInstallBanner from './components/PWAInstallBanner'
 import BottomNav from './components/BottomNav'
 import { SearchModal } from './components/SearchModal'
@@ -142,7 +143,9 @@ function Layout() {
             </nav>
 
             <main className="flex-grow pt-4 md:pt-6 pb-24">
-                <Outlet />
+                <ErrorBoundary>
+                    <Outlet />
+                </ErrorBoundary>
             </main>
 
             <footer className="hidden md:block bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-white/10 py-8">
