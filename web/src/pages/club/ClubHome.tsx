@@ -112,11 +112,17 @@ function ClubHome() {
                 url={`/clube/${club.slug}`}
             />
             <div className="max-w-xl mx-auto space-y-5 pb-20 px-3">
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 pt-1">
+                <Link to="/clubes" className="hover:text-dribly-purple transition-colors">Clubes</Link>
+                <ChevronRight size={10} />
+                <span className="text-zinc-600 dark:text-zinc-300 font-medium truncate">{displayName(club)}</span>
+            </div>
             {/* Club header bar with actions */}
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
                     {club.logo_url ? (
-                        <img src={club.logo_url} alt="" className="w-7 h-7 object-contain" />
+                        <img src={club.logo_url} alt={displayName(club)} className="w-7 h-7 object-contain" />
                     ) : (
                         <span className="text-sm font-bold text-zinc-500">{displayName(club).charAt(0)}</span>
                     )}
