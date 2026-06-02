@@ -68,16 +68,25 @@ function FitBounds({ pavilions }: { pavilions: Pavilion[] }) {
     return null
 }
 
-/** Simple clustering: group pavilions by grid cell at current zoom */
+/**
+ * Cluster pavilions by proximity at current zoom.
+ * Precision scales exponentially so that at zoom 14+ individual markers show.
+ * At zoom 10: ~2km radius → multiple pavilions clustered
+ * At zoom 14: ~100m radius → individual pavilions visible
+ * At zoom 18: ~5m radius → all individual
+ */
 function useClusters(pavilions: Pavilion[], zoom: number): Map<string, Pavilion[]> {
     return useMemo(() => {
-        const precision = Math.max(2, Math.min(6, Math.floor(zoom / 3)))
+        // precision = 5 * 2^(zoom-4). Gives exponential granularity.
+        const precision = Math.max(10, Math.ceil(Math.pow(2, zoom - 4)) * 5)
         const clusters = new Map<string, Pavilion[]>()
 
         for (const p of pavilions) {
             const latR = Math.round(p.lat * precision) / precision
             const lngR = Math.round(p.lng * precision) / precision
-            const key = `${latR.toFixed(4)},${lngR.toFixed(4)}`
+            // Use sufficient decimal places for the key
+            const decimals = Math.max(3, Math.ceil(Math.log10(precision)))
+            const key = `${latR.toFixed(decimals)},${lngR.toFixed(decimals)}`
 
             if (!clusters.has(key)) clusters.set(key, [])
             clusters.get(key)!.push(p)
