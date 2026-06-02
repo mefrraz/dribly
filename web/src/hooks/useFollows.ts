@@ -48,31 +48,51 @@ export function useFollows() {
 
     const toggleFollow = useCallback(async (entityType: 'club' | 'competition', entityId: number) => {
         if (!user) return false
-        const following = follows.find(f => f.entity_type === entityType && f.entity_id === entityId)
-        if (following) {
-            // Unfollow
-            const { error } = await supabase
-                .from('user_follows')
-                .delete()
-                .eq('id', following.id)
-                .eq('user_id', user.id)
-            if (!error) {
-                setFollows(prev => prev.filter(f => f.id !== following.id))
-                return true
-            }
+        
+        const currentlyFollowing = follows.find(f => f.entity_type === entityType && f.entity_id === entityId)
+        const previousFollows = [...follows]
+
+        // 1. Optimistic Update: update UI immediately
+        if (currentlyFollowing) {
+            setFollows(prev => prev.filter(f => f.id !== currentlyFollowing.id))
         } else {
-            // Follow
-            const { data, error } = await supabase
-                .from('user_follows')
-                .upsert({ user_id: user.id, entity_type: entityType, entity_id: entityId }, { onConflict: 'user_id, entity_type, entity_id' })
-                .select()
-                .single()
-            if (!error && data) {
-                setFollows(prev => [...prev, data as Follow])
-                return true
-            }
+            // Add a temporary follow entry with a negative ID
+            const tempId = -Date.now()
+            setFollows(prev => [...prev, { id: tempId, user_id: user.id, entity_type: entityType, entity_id: entityId }])
         }
-        return false
+
+        try {
+            // 2. Network Request
+            if (currentlyFollowing) {
+                const { error } = await supabase
+                    .from('user_follows')
+                    .delete()
+                    .eq('id', currentlyFollowing.id)
+                    .eq('user_id', user.id)
+                if (error) throw error
+            } else {
+                const { data, error } = await supabase
+                    .from('user_follows')
+                    .upsert({ user_id: user.id, entity_type: entityType, entity_id: entityId }, { onConflict: 'user_id, entity_type, entity_id' })
+                    .select()
+                    .single()
+                if (error) throw error
+                
+                // 3. Replace temp entry with real entry from DB
+                if (data) {
+                    setFollows(prev => {
+                        const withoutTemp = prev.filter(f => f.id < 0)
+                        return [...withoutTemp, data as Follow]
+                    })
+                }
+            }
+            return true
+        } catch (err) {
+            // 4. Rollback on failure
+            setFollows(previousFollows)
+            console.error('Follow toggle failed:', err)
+            return false
+        }
     }, [user, follows])
 
     const followedClubIds = follows.filter(f => f.entity_type === 'club').map(f => f.entity_id)
