@@ -274,8 +274,8 @@ export default function Mapa() {
         <>
         <div style={{ position: 'fixed', top: '3.5rem', bottom: '4rem', left: 0, right: 0, zIndex: 10 }} className="md:top-16 md:bottom-0">
 
-            {/* Top bar: search + locate + filter on desktop */}
-            <div className="absolute top-3 left-3 right-3 md:left-4 md:right-auto z-[1100] flex items-start gap-2">
+            {/* Top bar: search + locate + filter */}
+            <div className="absolute top-7 left-3 right-3 md:left-4 md:right-auto z-[1100] flex items-start gap-2">
                 {/* Search bar */}
                 <div className="relative flex-1 md:flex-none md:w-72">
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
@@ -323,7 +323,7 @@ export default function Mapa() {
 
             {/* District filter dropdown */}
             {showFilters && (
-                <div className="absolute top-[3.75rem] left-3 md:left-4 z-[1100] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-xl p-2 max-h-[40vh] overflow-y-auto min-w-[180px]">
+                <div className="absolute top-[5rem] left-3 md:left-4 z-[1100] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-xl p-2 max-h-[40vh] overflow-y-auto min-w-[180px]">
                     <button
                         onClick={() => { setSelectedDistrict(''); setShowFilters(false) }}
                         className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!selectedDistrict ? 'bg-dribly-purple text-white' : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5'}`}
@@ -383,7 +383,7 @@ export default function Mapa() {
             )}
 
             {/* Map footer bar */}
-            <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-t border-zinc-200 dark:border-white/10 px-4 py-2 flex items-center justify-center gap-4 text-[10px] text-zinc-500 dark:text-zinc-400">
+            <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-auto z-[1000] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl px-3 py-2 flex items-center justify-center gap-4 text-[10px] text-zinc-500 dark:text-zinc-400 shadow-lg">
                 <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#7C3AED] shadow-sm shadow-purple-500/50" />
                     {activePavilionIds.size} com jogos
