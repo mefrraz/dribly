@@ -153,10 +153,10 @@ function LocateButton({ mapRef }: { mapRef: React.RefObject<L.Map | null> }) {
         <button
             onClick={handleLocate}
             disabled={locating}
-            className="absolute top-3 left-14 md:left-auto md:right-4 z-[1000] p-2.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-lg text-dribly-purple hover:bg-white dark:hover:bg-zinc-800 transition-colors"
+            className="shrink-0 p-2.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-lg hover:bg-white dark:hover:bg-zinc-800 transition-colors"
             title="Localizar-me"
         >
-            <Navigation size={18} className={locating ? 'animate-spin' : hasLocated ? 'text-blue-500' : ''} />
+            <Navigation size={18} className={locating ? 'animate-spin text-dribly-purple' : hasLocated ? 'text-blue-500' : 'text-dribly-purple'} />
         </button>
     )
 }
@@ -274,56 +274,56 @@ export default function Mapa() {
         <>
         <div style={{ position: 'fixed', top: '3.5rem', bottom: '4rem', left: 0, right: 0, zIndex: 10 }} className="md:top-16 md:bottom-0">
 
-            {/* Search bar */}
-            <div className="absolute top-3 left-3 right-3 md:left-4 md:right-auto md:w-80 z-[1100]">
-                <div className="relative">
+            {/* Top bar: search + locate + filter on desktop */}
+            <div className="absolute top-3 left-3 right-3 md:left-4 md:right-auto z-[1100] flex items-start gap-2">
+                {/* Search bar */}
+                <div className="relative flex-1 md:flex-none md:w-72">
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                     <input type="text" value={searchQuery}
                         onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true) }}
                         onFocus={() => searchQuery.trim() && setSearchOpen(true)}
                         onBlur={() => setTimeout(() => setSearchOpen(false), 200)}
                         placeholder="Pesquisar pavilhões..."
-                        className="w-full pl-9 pr-4 py-2.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none shadow-lg transition-all focus:ring-2 focus:ring-dribly-purple/30"
+                        className="w-full pl-9 pr-8 py-2.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none shadow-lg transition-all focus:ring-2 focus:ring-dribly-purple/30"
                     />
                     {searchQuery && (
                         <button onClick={() => { setSearchQuery(''); setSearchOpen(false) }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600">
                             <X size={14} />
                         </button>
                     )}
+                    {searchOpen && searchResults.length > 0 && (
+                        <div className="absolute top-full mt-1.5 left-0 right-0 md:w-72 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden max-h-[50vh] overflow-y-auto">
+                            {searchResults.map((p) => (
+                                <button key={p.id} onMouseDown={() => { setSearchQuery(''); setSearchOpen(false); flyToPavilion(p) }}
+                                    className="w-full text-left px-3.5 py-2.5 flex items-center gap-3 hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors">
+                                    <MapPin size={14} className="text-dribly-purple shrink-0" />
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">{displayPavilionName(p)}</p>
+                                        <p className="text-[10px] text-zinc-400 truncate">{p.cidade}{p.distrito ? `, ${p.distrito}` : ''}</p>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
-                {searchOpen && searchResults.length > 0 && (
-                    <div className="mt-1.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden max-h-[50vh] overflow-y-auto">
-                        {searchResults.map((p) => (
-                            <button key={p.id} onMouseDown={() => { setSearchQuery(''); setSearchOpen(false); flyToPavilion(p) }}
-                                className="w-full text-left px-3.5 py-2.5 flex items-center gap-3 hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors">
-                                <MapPin size={14} className="text-dribly-purple shrink-0" />
-                                <div className="min-w-0">
-                                    <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">{displayPavilionName(p)}</p>
-                                    <p className="text-[10px] text-zinc-400 truncate">{p.cidade}{p.distrito ? `, ${p.distrito}` : ''}</p>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-                )}
+
+                {/* Locate button */}
+                <LocateButton mapRef={mapRef} />
+
+                {/* Filter button */}
+                <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`shrink-0 p-2.5 rounded-xl shadow-lg border border-zinc-200 dark:border-white/10 transition-colors ${showFilters ? 'bg-dribly-purple text-white' : 'bg-white/95 dark:bg-zinc-900/95 text-dribly-purple'}`}
+                    title="Filtrar por distrito"
+                >
+                    <Filter size={18} />
+                </button>
             </div>
-
-            {/* Locate button */}
-            <LocateButton mapRef={mapRef} />
-
-            {/* Filter button */}
-            <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`absolute top-3 ${showFilters ? 'bg-dribly-purple text-white' : 'bg-white/95 dark:bg-zinc-900/95 text-dribly-purple'} md:left-auto md:right-16 p-2.5 border border-zinc-200 dark:border-white/10 rounded-xl shadow-lg transition-colors z-[1100]`}
-                style={{ left: '3.25rem' }}
-                title="Filtrar por distrito"
-            >
-                <Filter size={18} />
-            </button>
 
             {/* District filter dropdown */}
             {showFilters && (
-                <div className="absolute top-14 left-3 md:left-4 z-[1100] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-xl p-2 max-h-[40vh] overflow-y-auto min-w-[180px]">
+                <div className="absolute top-[3.75rem] left-3 md:left-4 z-[1100] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-xl p-2 max-h-[40vh] overflow-y-auto min-w-[180px]">
                     <button
                         onClick={() => { setSelectedDistrict(''); setShowFilters(false) }}
                         className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!selectedDistrict ? 'bg-dribly-purple text-white' : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5'}`}
