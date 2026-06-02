@@ -110,7 +110,7 @@ function SearchPage() {
                     )}
 
                     {clubResults.length > 0 && (
-                        <div className="animate-slide-up">
+                        <div className="">
                             <div className="flex items-center gap-2 mb-3">
                                 <Building2 size={14} className="text-dribly-purple" />
                                 <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Clubes ({clubResults.length})</h2>
@@ -136,7 +136,7 @@ function SearchPage() {
                     )}
 
                     {compResults.length > 0 && (
-                        <div className="animate-slide-up">
+                        <div className="">
                             <div className="flex items-center gap-2 mb-3">
                                 <Trophy size={14} className="text-dribly-purple" />
                                 <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Competições ({compResults.length})</h2>

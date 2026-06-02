@@ -94,7 +94,7 @@ function ClubTeamDetail() {
 
             {/* Header Card */}
             <div className="max-w-xl mx-auto px-3">
-                <div className="glass-card p-5 animate-slide-up">
+                <div className="glass-card p-5 ">
                     <div className="flex items-center gap-4">
                         <div className="w-14 h-14 rounded-2xl bg-[var(--club-color)]/10 dark:bg-[var(--club-color)]/20 flex items-center justify-center shrink-0">
                             <span className="text-xl font-black text-[var(--club-color)]">{decoded.charAt(0).toUpperCase()}</span>
@@ -141,7 +141,7 @@ function ClubTeamDetail() {
 
             {/* Upcoming Games — Horizontal carousel */}
             {upcoming.length > 0 && (
-                <div className="animate-slide-up">
+                <div className="">
                     <div className="flex items-center justify-between px-4 mb-3">
                         <h3 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-[var(--club-color)] animate-pulse" />
@@ -221,7 +221,7 @@ function ClubTeamDetail() {
 
             {/* Finished Games — Horizontal carousel */}
             {finished.length > 0 && (
-                <div className="animate-slide-up">
+                <div className="">
                     <div className="flex items-center justify-between px-4 mb-3">
                         <h3 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-[var(--club-color)]" />
@@ -288,7 +288,7 @@ function ClubTeamDetail() {
             )}
 
             {/* Plantel placeholder */}
-            <div className="animate-slide-up px-4">
+            <div className="px-4">
                 <div className="max-w-xl mx-auto">
                     <div className="glass-card p-6 text-center">
                         <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">

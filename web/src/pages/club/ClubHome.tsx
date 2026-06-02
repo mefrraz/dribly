@@ -73,7 +73,7 @@ function ClubHome() {
         return (
             <div className="max-w-xl mx-auto space-y-5 pb-20 px-3">
                 {showLoadingMsg && (
-                    <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 animate-fade-in flex items-center justify-center gap-2 pt-2">
+                    <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 flex items-center justify-center gap-2 pt-2">
                         <RefreshCw size={12} className="animate-spin" />
                         A atualizar dados...
                     </div>
@@ -129,20 +129,20 @@ function ClubHome() {
                 </div>
             </div>
             {needsLogin && (
-                <div className="text-center text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-xl py-2 px-3 animate-fade-in">
+                <div className="text-center text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-xl py-2 px-3 ">
                     Inicia sessão para favoritar e seguir clubes.
                 </div>
             )}
 
             {games.length === 0 && !loading && !error && (
-                <div className="glass-card p-6 text-center animate-fade-in">
+                <div className="glass-card p-6 text-center ">
                     <Calendar size={32} className="mx-auto text-zinc-300 dark:text-zinc-600 mb-3" />
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">Este clube não tem jogos registados na FPB para esta época.</p>
                 </div>
             )}
             {/* Hero: Next Game */}
             {nextGame && (
-                <Link to={`/game/${nextGame.slug || ''}?clube=${club.slug}`} className="block group animate-slide-up">
+                <Link to={`/game/${nextGame.slug || ''}?clube=${club.slug}`} className="block group ">
                     <div className="glass-card overflow-hidden group-hover:border-[var(--club-color)]/30 transition-all duration-200">
                         <div className="bg-gradient-to-r from-[var(--club-color)]/10 via-zinc-50 to-[var(--club-color)]/10 dark:from-[var(--club-color)]/5 dark:via-zinc-900 dark:to-[var(--club-color)]/5 border-b border-zinc-100 dark:border-white/5 p-3 flex justify-between items-center">
                             <span className="text-[10px] font-bold text-[var(--club-color)] uppercase tracking-wide">{nextGame.escalao || 'Sénior Masculino'}</span>
@@ -198,7 +198,7 @@ function ClubHome() {
 
             {/* Recent Results */}
             {recentResults.length > 0 && (
-                <div className="space-y-3 animate-slide-up">
+                <div className="space-y-3 ">
                     <div className="flex items-center justify-between">
                         <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Últimos Resultados</h3>
                         <Link to={`/clube/${club.slug}/games?view=results`} className="text-xs text-[var(--club-color)] font-bold hover:underline">Ver todos</Link>
@@ -230,7 +230,7 @@ function ClubHome() {
 
             {/* Upcoming Games */}
             {upcomingGames.length > 0 && (
-                <div className="space-y-3 animate-slide-up">
+                <div className="space-y-3 ">
                     <div className="flex items-center justify-between">
                         <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Próximos Jogos</h3>
                         <Link to={`/clube/${club.slug}/games?view=agenda`} className="text-xs text-[var(--club-color)] font-bold hover:underline">Ver agenda</Link>

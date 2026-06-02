@@ -12,7 +12,7 @@ function About() {
             </div>
 
             {/* Intro + Creator combined */}
-            <div className="glass-card p-6 animate-fade-in">
+            <div className="glass-card p-6 ">
                 <div className="flex flex-col items-center text-center mb-5">
                     <h1 className="text-2xl font-black text-zinc-900 dark:text-white">Dribly<span className="text-dribly-purple">.</span></h1>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-xs mt-1">
@@ -37,7 +37,7 @@ function About() {
             </div>
 
             {/* Tech + Source combined */}
-            <div className="glass-card p-6 animate-slide-up">
+            <div className="glass-card p-6 ">
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
                     Os dados são obtidos diretamente do site oficial da <strong>Federação Portuguesa de Basquetebol (FPB)</strong> e dos Resultados Tugabasket.
                     Inclui jogos, resultados e classificações de todos os clubes registados na FPB.

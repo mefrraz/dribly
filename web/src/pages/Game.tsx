@@ -287,7 +287,7 @@ function Game() {
     return (
         <div className="max-w-xl mx-auto pb-24 px-3 space-y-3">
             {/* Header */}
-            <div className="flex items-center justify-between pt-3 animate-fade-in">
+            <div className="flex items-center justify-between pt-3 ">
                 <button onClick={() => window.history.back()} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
                     <ArrowLeft size={22} />
                 </button>
@@ -300,7 +300,7 @@ function Game() {
 
 
             {/* Hero Card */}
-            <div className="glass-card overflow-hidden animate-slide-up group hover:border-dribly-blue/30 transition-all duration-200">
+            <div className="glass-card overflow-hidden group hover:border-dribly-blue/30 transition-all duration-200">
                 <div className="bg-gradient-to-r from-dribly-blue/10 via-zinc-50 to-dribly-blue/10 dark:from-dribly-blue/5 dark:via-zinc-900 dark:to-dribly-blue/5 border-b border-zinc-100 dark:border-white/5 p-3 flex justify-between items-center">
                     <span className="text-[10px] font-bold text-dribly-blue uppercase">{match.escalao}</span>
                     <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase truncate ml-2">{match.competicao}</span>
@@ -368,7 +368,7 @@ function Game() {
             </div>
 
             {/* Location Card */}
-            <div className="glass-card p-5 flex items-start gap-4 animate-slide-up">
+            <div className="glass-card p-5 flex items-start gap-4 ">
                 <div className="p-3 rounded-full bg-zinc-100 dark:bg-white/5 text-dribly-blue shrink-0">
                     <MapPin size={20} />
                 </div>
@@ -391,7 +391,7 @@ function Game() {
             </div>
 
             {/* Date Card */}
-            <div className="glass-card p-5 flex items-start gap-4 animate-slide-up">
+            <div className="glass-card p-5 flex items-start gap-4 ">
                 <div className="p-3 rounded-full bg-zinc-100 dark:bg-white/5 text-dribly-blue shrink-0">
                     <Calendar size={20} />
                 </div>
@@ -405,7 +405,7 @@ function Game() {
 
             {/* Duelo — comparação direta dos 2 melhores jogadores (um de cada equipa) */}
             {topPerfCasa.nome && topPerfFora.nome && (
-                <div className="glass-card overflow-hidden animate-slide-up">
+                <div className="glass-card overflow-hidden ">
                     <div className="p-4 border-b border-zinc-100 dark:border-white/5">
                         <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />
@@ -457,7 +457,7 @@ function Game() {
 
             {/* Top Performers — melhor jogador de cada categoria no jogo todo */}
             {detailLeaders.length > 0 && (
-                <div className="glass-card overflow-hidden animate-slide-up">
+                <div className="glass-card overflow-hidden ">
                     <div className="p-4 border-b border-zinc-100 dark:border-white/5">
                         <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
                             <span className="w-1 h-1 rounded-full bg-dribly-purple" />
@@ -491,7 +491,7 @@ function Game() {
 
             {/* H2H History */}
             {recentGames.length > 0 && (
-                <div className="glass-card overflow-hidden animate-slide-up">
+                <div className="glass-card overflow-hidden ">
                     <div className="p-3.5 border-b border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02]">
                         <h3 className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-blue" />
@@ -536,7 +536,7 @@ function Game() {
 
             {/* Próximos Confrontos */}
             {upcomingH2H.length > 0 && (
-                <div className="glass-card overflow-hidden animate-slide-up">
+                <div className="glass-card overflow-hidden ">
                     <div className="p-4 border-b border-zinc-100 dark:border-white/5">
                         <h3 className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-blue" />

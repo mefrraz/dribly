@@ -59,14 +59,13 @@ export function PavilionSheet({ pavilion, isOpen, onClose }: Props) {
         <>
             {/* Backdrop — only on mobile */}
             <div
-                className="fixed inset-0 z-[2000] md:hidden bg-black/30 backdrop-blur-sm animate-fade-in"
+                className="fixed inset-0 z-[2000] md:hidden bg-black/30 backdrop-blur-sm "
                 onClick={onClose}
             />
 
             {/* Card — full-width bottom sheet on mobile, floating card on desktop */}
             <div className={`
-                fixed z-[2001] animate-slide-up
-                inset-x-0 bottom-0
+                fixed z-[2001] inset-x-0 bottom-0
                 md:inset-x-auto md:bottom-6 md:right-6 md:left-auto
                 md:w-[400px] md:max-h-[70vh] md:rounded-2xl md:border md:shadow-2xl
                 max-h-[60vh] rounded-t-2xl md:rounded-2xl

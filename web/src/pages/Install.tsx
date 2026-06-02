@@ -15,7 +15,7 @@ function Install() {
             </div>
 
             {/* Intro */}
-            <div className="glass-card p-6 flex flex-col items-center text-center animate-fade-in">
+            <div className="glass-card p-6 flex flex-col items-center text-center ">
                 <div className="w-20 h-20 bg-dribly-blue rounded-full flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
                     <Smartphone size={32} className="text-white" />
                 </div>
@@ -29,7 +29,7 @@ function Install() {
 
             {/* iOS Instructions */}
             {(isIOS || !isAndroid) && (
-                <div className="glass-card p-6 animate-slide-up">
+                <div className="glass-card p-6 ">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-8 h-8 bg-zinc-100 dark:bg-white/10 rounded-lg flex items-center justify-center">
                             <span className="text-lg">🍎</span>
@@ -61,7 +61,7 @@ function Install() {
 
             {/* Android Instructions */}
             {(isAndroid || !isIOS) && (
-                <div className="glass-card p-6 animate-slide-up">
+                <div className="glass-card p-6 ">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-8 h-8 bg-zinc-100 dark:bg-white/10 rounded-lg flex items-center justify-center">
                             <span className="text-lg">🤖</span>
@@ -92,7 +92,7 @@ function Install() {
             )}
 
             {/* Benefits */}
-            <div className="glass-card p-6 animate-slide-up">
+            <div className="glass-card p-6 ">
                 <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">
                     Vantagens
                 </h3>

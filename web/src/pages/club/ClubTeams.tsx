@@ -115,7 +115,7 @@ function ClubTeams() {
                     <Link
                         key={team.teamId}
                         to={`/clube/${club.slug}/team/${encodeURIComponent(team.teamId)}`}
-                        className="glass-card p-4 flex items-center gap-4 group animate-slide-up hover:border-[var(--club-color)]/20"
+                        className="glass-card p-4 flex items-center gap-4 group hover:border-[var(--club-color)]/20"
                     >
                         {/* Avatar circle */}
                         <div className="w-12 h-12 rounded-full bg-[var(--club-color)]/10 dark:bg-[var(--club-color)]/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">

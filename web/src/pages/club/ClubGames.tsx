@@ -110,7 +110,7 @@ function ClubGames() {
 
             {/* Error banner */}
             {error && !loading && (
-                <div className="px-3 max-w-lg mx-auto animate-slide-up">
+                <div className="px-3 max-w-lg mx-auto ">
                     <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
                         <AlertCircle size={14} className="text-red-500 shrink-0" />
                         <span className="text-xs text-red-700 dark:text-red-300 flex-1">{error}</span>
@@ -123,7 +123,7 @@ function ClubGames() {
             {loading && (
                 <div>
                     {showLoadingMsg && (
-                        <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 animate-fade-in flex items-center justify-center gap-2 pt-4 pb-2">
+                        <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 flex items-center justify-center gap-2 pt-4 pb-2">
                             <RefreshCw size={12} className="animate-spin" />
                             A atualizar dados...
                         </div>
@@ -146,7 +146,7 @@ function ClubGames() {
             {!loading && sortedDates.length > 0 && (
                 <div className="space-y-6 px-2 md:px-4">
                     {sortedDates.map(date => (
-                        <div key={date} className="animate-slide-up">
+                        <div key={date} className="">
                             <div className="flex items-center gap-3 mb-3 px-2">
                                 <h3 className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">{formatDate(date)}</h3>
                                 <div className="flex-1 h-px bg-zinc-200 dark:bg-white/5" />

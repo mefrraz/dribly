@@ -97,7 +97,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     return (
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-            <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-white/10 overflow-hidden animate-slide-up">
+            <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-white/10 overflow-hidden ">
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-100 dark:border-white/5">
                     <Search size={18} className="text-zinc-400 shrink-0" />
                     <input ref={inputRef} type="text" value={query} onChange={e => { setQuery(e.target.value); setSelectedIndex(-1) }} onKeyDown={handleKeyDown} placeholder="Pesquisar clubes e competições..." className="flex-1 bg-transparent text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none" />
