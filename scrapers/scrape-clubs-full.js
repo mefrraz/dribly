@@ -1,6 +1,8 @@
-﻿import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import 'dotenv/config'
 import * as fs from 'fs'
+import * as cheerio from 'cheerio'
+import { z } from 'zod'
 
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SUPABASE_KEY = process.env.SUPABASE_KEY
@@ -13,6 +15,16 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
+const clubSchema = z.object({
+    id: z.number(),
+    name: z.string().min(1),
+    short_name: z.string(),
+    color: z.string().regex(/^#[0-9a-fA-F]{3,6}$/),
+    logo_url: z.string().nullable(),
+    local: z.string(),
+    region: z.string(),
+})
+
 async function main() {
     console.log('Fetching https://www.fpb.pt/clubes/ ...')
     const res = await fetch('https://www.fpb.pt/clubes/', {
@@ -23,25 +35,50 @@ async function main() {
         process.exit(1)
     }
     const html = await res.text()
+    const $ = cheerio.load(html)
 
-    // Parse club cards
-    const clubRegex = /<div class="clube visible ">\s*<a href="\/calendario\/clube_(\d+)">\s*<div class="clube-head"[^>]*><\/div>\s*<div class="clube-body"\s*style='background-color:(#[^']+)'[^>]*>\s*(?:<img[^>]+src="([^"]+)"[^>]*>)?\s*<div class="clube-shortname">([^<]*)<\/div>\s*<div class="clube-name">([^<]*)<\/div>\s*<div class="clube-local">([^<]*)<\/div>\s*<div class="clube-region">([^<]*)<\/div>/g
+    const rawClubs = []
+    $('div.clube').each((_, el) => {
+        const $el = $(el)
+        const a = $el.find('a').first()
+        const href = a.attr('href')
+        const idMatch = href?.match(/\/calendario\/clube_(\d+)/)
+        if (!idMatch) return
+        
+        const id = parseInt(idMatch[1], 10)
+        const body = $el.find('.clube-body')
+        const style = body.attr('style') || ''
+        const colorMatch = style.match(/background-color:\s*(#[0-9a-fA-F]+)/)
+        const color = colorMatch ? colorMatch[1] : '#000000'
+        
+        const img = body.find('img')
+        const logo_url = img.attr('src') ? img.attr('src').trim() : null
+        
+        const short_name = body.find('.clube-shortname').text().trim()
+        const name = body.find('.clube-name').text().trim()
+        const local = body.find('.clube-local').text().trim()
+        const region = body.find('.clube-region').text().trim()
+        
+        rawClubs.push({ id, name, short_name, color, logo_url, local, region })
+    })
+
+    console.log('Found ' + rawClubs.length + ' raw clubs')
 
     const clubs = []
-    let match
-    while ((match = clubRegex.exec(html)) !== null) {
-        clubs.push({
-            id: parseInt(match[1]),
-            name: match[5].trim(),
-            short_name: match[4].trim(),
-            color: match[2].trim(),
-            logo_url: match[3] ? match[3].trim() : null,
-            local: match[6].trim(),
-            region: match[7].trim(),
-        })
+    let validationErrors = 0
+    for (const raw of rawClubs) {
+        const result = clubSchema.safeParse(raw)
+        if (result.success) {
+            clubs.push(result.data)
+        } else {
+            validationErrors++
+            if (validationErrors <= 3) {
+                console.error('Validation error for club', raw.id, result.error.errors)
+            }
+        }
     }
 
-    console.log('Found ' + clubs.length + ' clubs')
+    console.log('Validated ' + clubs.length + ' clubs (' + validationErrors + ' invalid)')
 
     const colorCounts = {}
     clubs.forEach(c => {
