@@ -54,7 +54,7 @@ export function useGames(season = '2025/2026', clube = 119, clubName = '') {
   const tableName = getTableName(season)
 
   /** Filter games to only those involving the target club */
-  function filterByClub(games: Match[]): Match[] {
+  const filterByClub = useCallback((games: Match[]): Match[] => {
     if (!clubName) return games
     const upper = clubName.toUpperCase()
     // Use a substring match — team names from FPB can vary slightly
@@ -63,7 +63,7 @@ export function useGames(season = '2025/2026', clube = 119, clubName = '') {
       g.equipa_casa.toUpperCase().includes(upper) ||
       g.equipa_fora.toUpperCase().includes(upper)
     )
-  }
+  }, [clubName])
 
   // Persist games to localStorage whenever they change
   useEffect(() => {
@@ -159,7 +159,7 @@ export function useGames(season = '2025/2026', clube = 119, clubName = '') {
     let cancelled = false
 
     const loadData = async () => {
-      if (localCache.length === 0) {
+      if (loadLocalCache(season, clube).length === 0) {
         setLoading(true)
       }
       setError(null)
@@ -210,7 +210,7 @@ export function useGames(season = '2025/2026', clube = 119, clubName = '') {
     return () => {
       cancelled = true
     }
-  }, [season, clube, tableName, refresh])
+  }, [season, clube, tableName, refresh, filterByClub, clubName])
 
   return {
     games,

@@ -40,7 +40,7 @@ export function useStandings(season: string, competitionId: number | null) {
 
                 if (cancelled) return
 
-                const relevant = (cached || []).filter((r: any) =>
+                const relevant = (cached || []).filter((r: Standing) =>
                     r.competicao && typeof r.competicao === 'string'
                 )
 
