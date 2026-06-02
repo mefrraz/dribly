@@ -252,46 +252,57 @@ export default function CompetitionDetail() {
 
     const logoMaps = useMemo(() => buildLogoMap(clubs), [clubs])
 
+    // Memoize the top team calculation to avoid O(N) loops on every render
+    const topTeam = useMemo(() => findTopTeam(standings), [standings])
+
+    // Memoize the transformation of FPB games to Match objects to avoid O(N) string operations per render
+    const matches = useMemo(() => {
+        return games.map(g => fpbGameToMatch(g, logoMaps))
+    }, [games, logoMaps])
+
+    // Separate games into schedule and results using the pre-computed matches
+    const scheduleMatches = useMemo(() =>
+        matches.filter(m =>
+            m.status !== 'FINALIZADO' && m.status !== 'A DECORRER' &&
+            (m.resultado_casa === null || m.resultado_fora === null) &&
+            m.data >= today
+        ).sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()),
+        [matches, today]
+    )
+
+    const resultsMatches = useMemo(() =>
+        matches.filter(m =>
+            m.status === 'FINALIZADO' || m.status === 'A DECORRER' ||
+            (m.resultado_casa !== null && m.resultado_fora !== null)
+        ).sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),
+        [matches]
+    )
+
+    const scheduleByDate = useMemo(() => {
+        const groups: Record<string, typeof matches> = {}
+        for (const m of scheduleMatches) {
+            if (!groups[m.data]) groups[m.data] = []
+            groups[m.data].push(m)
+        }
+        return Object.entries(groups)
+    }, [scheduleMatches])
+
+    const resultsByDate = useMemo(() => {
+        const groups: Record<string, typeof matches> = {}
+        for (const m of resultsMatches) {
+            if (!groups[m.data]) groups[m.data] = []
+            groups[m.data].push(m)
+        }
+        return Object.entries(groups)
+    }, [resultsMatches])
+
+    const today = new Date().toISOString().split('T')[0]
+
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr)
         const formatted = date.toLocaleDateString('pt-PT', { weekday: 'short', day: 'numeric', month: 'long' })
         return formatted.charAt(0).toUpperCase() + formatted.slice(1)
     }
-
-    // Separate games into schedule (upcoming/not started) and results (finished/in-progress)
-    const today = new Date().toISOString().split('T')[0]
-    const scheduleList = useMemo(() =>
-        games.filter(g =>
-            g.estado !== 'FINALIZADO' && g.estado !== 'A DECORRER' &&
-            (g.resultado_casa === undefined || g.resultado_fora === undefined) &&
-            g.data >= today
-        ).sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()),
-        [games, today]
-    )
-    const scheduleByDate = useMemo(() => {
-        const groups: Record<string, FPBGame[]> = {}
-        for (const g of scheduleList) {
-            if (!groups[g.data]) groups[g.data] = []
-            groups[g.data].push(g)
-        }
-        return Object.entries(groups)
-    }, [scheduleList])
-
-    const resultsList = useMemo(() =>
-        games.filter(g =>
-            g.estado === 'FINALIZADO' || g.estado === 'A DECORRER' ||
-            (g.resultado_casa !== undefined && g.resultado_fora !== undefined)
-        ).sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),
-        [games]
-    )
-    const resultsByDate = useMemo(() => {
-        const groups: Record<string, FPBGame[]> = {}
-        for (const g of resultsList) {
-            if (!groups[g.data]) groups[g.data] = []
-            groups[g.data].push(g)
-        }
-        return Object.entries(groups)
-    }, [resultsList])
 
     if (!provaId) {
         return (
@@ -377,13 +388,12 @@ export default function CompetitionDetail() {
                                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                                         {/* Leader card */}
                                         {(() => {
-                                            const top = findTopTeam(standings)
-                                            if (!top) return (
+                                            if (!topTeam) return (
                                                 <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center justify-center">
                                                     <p className="text-xs text-zinc-400">Sem classificação disponível.</p>
                                                 </div>
                                             )
-                                            const topLogo = findLogo(top.name, logoMaps)
+                                            const topLogo = findLogo(topTeam.name, logoMaps)
                                             return (
                                                 <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center gap-4">
                                                     <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-700/50">
@@ -395,17 +405,17 @@ export default function CompetitionDetail() {
                                                     </div>
                                                     <div className="min-w-0">
                                                         <div className="flex items-center gap-2 mb-0.5">
-                                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{top.label}</span>
+                                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{topTeam.label}</span>
                                                             <span className="px-1.5 py-0.5 rounded-md bg-dribly-purple/10 text-[9px] font-black text-dribly-purple tabular-nums">#1</span>
                                                         </div>
-                                                        <p className="text-sm sm:text-base font-black text-zinc-900 dark:text-white truncate leading-tight">{top.name}</p>
-                                                        {top.j !== undefined && (
+                                                        <p className="text-sm sm:text-base font-black text-zinc-900 dark:text-white truncate leading-tight">{topTeam.name}</p>
+                                                        {topTeam.j !== undefined && (
                                                             <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1.5 flex-wrap">
-                                                                <span className="tabular-nums">{top.j} jogos</span>
+                                                                <span className="tabular-nums">{topTeam.j} jogos</span>
                                                                 <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
-                                                                <span className="text-emerald-600 dark:text-emerald-400 tabular-nums font-bold">{top.v}V</span>
-                                                                <span className="text-red-500 dark:text-red-400 tabular-nums font-bold">{top.d}D</span>
-                                                                {top.pts !== undefined && (<><span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" /><span className="font-black text-zinc-900 dark:text-white tabular-nums">{top.pts} pts</span></>)}
+                                                                <span className="text-emerald-600 dark:text-emerald-400 tabular-nums font-bold">{topTeam.v}V</span>
+                                                                <span className="text-red-500 dark:text-red-400 tabular-nums font-bold">{topTeam.d}D</span>
+                                                                {topTeam.pts !== undefined && (<><span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" /><span className="font-black text-zinc-900 dark:text-white tabular-nums">{topTeam.pts} pts</span></>)}
                                                             </p>
                                                         )}
                                                     </div>
@@ -471,10 +481,10 @@ export default function CompetitionDetail() {
                                                 <CalendarDays size={14} className="text-dribly-purple" />
                                                 Próximos Jogos
                                             </h3>
-                                            {scheduleList.length > 0 ? (
+                                            {scheduleMatches.length > 0 ? (
                                                 <div className="space-y-2">
-                                                    {scheduleList.slice(0, 3).map((g, i) => (
-                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="agenda" />
+                                                    {scheduleMatches.slice(0, 3).map((m, i) => (
+                                                        <GameCard key={i} match={m} mode="agenda" />
                                                     ))}
                                                 </div>
                                             ) : (
@@ -488,10 +498,10 @@ export default function CompetitionDetail() {
                                                 <Trophy size={14} className="text-dribly-purple" />
                                                 Últimos Resultados
                                             </h3>
-                                            {resultsList.length > 0 ? (
+                                            {resultsMatches.length > 0 ? (
                                                 <div className="space-y-2">
-                                                    {resultsList.slice(0, 3).map((g, i) => (
-                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="results" />
+                                                    {resultsMatches.slice(0, 3).map((m, i) => (
+                                                        <GameCard key={i} match={m} mode="results" />
                                                     ))}
                                                 </div>
                                             ) : (
@@ -621,18 +631,18 @@ export default function CompetitionDetail() {
 
                             {/* Results */}
                             {tab === 'resultados' && (
-                                resultsList.length === 0
+                                resultsMatches.length === 0
                                     ? <Empty text="Sem resultados disponíveis." />
                                     : <div className="space-y-6 px-2 md:px-4">
-                                        {resultsByDate.map(([date, dateGames]) => (
+                                        {resultsByDate.map(([date, dateMatches]) => (
                                             <div key={date}>
                                                 <div className="flex items-center gap-3 mb-3 px-2">
                                                     <h3 className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">{formatDate(date)}</h3>
                                                     <div className="flex-1 h-px bg-zinc-200 dark:bg-white/5" />
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                    {dateGames.map((g, i) => (
-                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="results" />
+                                                    {dateMatches.map((m, i) => (
+                                                        <GameCard key={i} match={m} mode="results" />
                                                     ))}
                                                 </div>
                                             </div>
@@ -642,18 +652,18 @@ export default function CompetitionDetail() {
 
                             {/* Schedule */}
                             {tab === 'calendario' && (
-                                scheduleList.length === 0
+                                scheduleMatches.length === 0
                                     ? <Empty text="Sem jogos agendados." />
                                     : <div className="space-y-6 px-2 md:px-4">
-                                        {scheduleByDate.map(([date, dateGames]) => (
+                                        {scheduleByDate.map(([date, dateMatches]) => (
                                             <div key={date}>
                                                 <div className="flex items-center gap-3 mb-3 px-2">
                                                     <h3 className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">{formatDate(date)}</h3>
                                                     <div className="flex-1 h-px bg-zinc-200 dark:bg-white/5" />
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                    {dateGames.map(g => (
-                                                        <GameCard key={g.jogo_id || g.data+g.equipa_casa} match={fpbGameToMatch(g, logoMaps)} mode="agenda" />
+                                                    {dateMatches.map(m => (
+                                                        <GameCard key={m.id || m.data+m.equipa_casa} match={m} mode="agenda" />
                                                     ))}
                                                 </div>
                                             </div>
