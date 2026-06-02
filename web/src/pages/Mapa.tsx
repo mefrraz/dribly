@@ -112,7 +112,7 @@ export default function Mapa() {
     const [zoom, setZoom] = useState(8)
     const [selected, setSelected] = useState<Pavilion | null>(null)
     const [sheetOpen, setSheetOpen] = useState(false)
-    const mapRef = useRef<L.Map | null>(null)
+    const mapRef = useRef<any>(null)
 
     useEffect(() => {
         fetchPavilions().then((data) => {
@@ -149,7 +149,7 @@ export default function Mapa() {
                 <MapContainer
                     center={[39.7, -8.0]}
                     zoom={8}
-                    whenCreated={(map: L.Map) => { mapRef.current = map }}
+                    ref={mapRef}
                     className="w-full h-full"
                     zoomControl={true}
                     scrollWheelZoom={true}
