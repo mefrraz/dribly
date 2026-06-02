@@ -9,6 +9,7 @@ export interface Pavilion {
     recinto_id: number | null
     nome: string
     rua: string | null
+    codigo_postal: string | null
     cidade: string | null
     distrito: string | null
     concelho: string | null

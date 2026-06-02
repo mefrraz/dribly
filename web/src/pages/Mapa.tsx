@@ -116,14 +116,14 @@ export default function Mapa() {
     const [pavilions, setPavilions] = useState<Pavilion[]>([])
     const [loading, setLoading] = useState(true)
     const [zoom, setZoom] = useState(() => Number(searchParams.get('z')) || 8)
-    const [center, setCenter] = useState<[number, number]>(() => {
+    const [center] = useState<[number, number]>(() => {
         const lat = searchParams.get('lat')
         const lng = searchParams.get('lng')
         return lat && lng ? [parseFloat(lat), parseFloat(lng)] : [39.7, -8.0]
     })
     const [selected, setSelected] = useState<Pavilion | null>(null)
     const [sheetOpen, setSheetOpen] = useState(false)
-    const [initialFitDone, setInitialFitDone] = useState(!!searchParams.get('z'))
+    const [initialFitDone] = useState(!!searchParams.get('z'))
     const mapRef = useRef<any>(null)
 
     useEffect(() => {
