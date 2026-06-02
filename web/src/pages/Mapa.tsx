@@ -14,21 +14,18 @@ import { Loader2 } from 'lucide-react'
 import { fetchPavilions, type Pavilion } from '../lib/mapData'
 import { PavilionSheet } from '../components/PavilionSheet'
 
-// Fix default marker icons in bundler
-import iconUrl from 'leaflet/dist/images/marker-icon.png'
-import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png'
-import shadowUrl from 'leaflet/dist/images/marker-shadow.png'
-
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl })
-
-/** Custom Dribly marker icon */
-const DRIBLY_ICON = new L.Icon({
-    iconUrl: '/logo.svg',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -12],
-    className: 'dribly-marker',
+/** Custom Dribly marker — purple circle with border */
+const DRIBLY_ICON = L.divIcon({
+    html: `<div style="
+        width:12px;height:12px;
+        background:#7C3AED;
+        border:2px solid white;
+        border-radius:50%;
+        box-shadow:0 1px 4px rgba(0,0,0,0.3);
+    "></div>`,
+    className: '',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6],
 })
 
 /** Cluster icon factory */
