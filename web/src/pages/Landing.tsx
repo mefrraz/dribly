@@ -11,6 +11,7 @@ import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { type Match } from '../components/types'
 import { normalize, buildSearchText } from '../lib/clubSearch'
 import SplashScreen from '../components/SplashScreen'
+import { SeoHead } from '../components/SeoHead'
 
 const FEATURED_CLUBS = [
     { name: 'FC Porto', slug: 'fc-porto' },
@@ -107,6 +108,11 @@ function Landing() {
     const scrollCarousel = (dir: number) => { if (!carouselRef.current) return; const el = carouselRef.current; const max = el.scrollWidth - el.clientWidth; if (dir > 0 && el.scrollLeft >= max - 10) { el.scrollTo({ left: 0, behavior: 'smooth' }) } else if (dir < 0 && el.scrollLeft <= 10) { el.scrollTo({ left: max, behavior: 'smooth' }) } else { el.scrollBy({ left: dir * 312, behavior: 'smooth' }) } }
     return (
         <>
+            <SeoHead
+                title="Basquetebol Português"
+                description="Acompanha jogos, resultados e classificações de todos os clubes de basquetebol em Portugal."
+                url="/"
+            />
             {!splashDone && <SplashScreen onDone={() => { sessionStorage.setItem("dribly_splash_shown", "1"); setSplashDone(true) }} />}
             <div className="pb-24">
             {/* Hero */}

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import Layout from './Layout'
 import ClubLayout from './pages/club/ClubLayout'
 import Landing from './pages/Landing'
@@ -24,6 +25,7 @@ import { AuthProvider } from './lib/AuthContext'
 
 function App() {
     return (
+        <HelmetProvider>
         <BrowserRouter>
             <AuthProvider>
             <ClubProvider>
@@ -55,6 +57,7 @@ function App() {
             </ClubProvider>
             </AuthProvider>
         </BrowserRouter>
+        </HelmetProvider>
     )
 }
 

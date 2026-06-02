@@ -12,6 +12,7 @@ import {
 import { GameCard } from '../components/GameCard'
 import { type Match } from '../components/types'
 import { SkeletonGameGrid, SkeletonHero } from '../components/Skeleton'
+import { SeoHead } from '../components/SeoHead'
 
 const COMP_NAMES: Record<number, string> = {
     10902: 'Liga Betclic Masculina',
@@ -314,7 +315,13 @@ export default function CompetitionDetail() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
+        <>
+            <SeoHead
+                title={compName || `Competição #${provaId}`}
+                description={`Classificações, jogos e estatísticas da ${compName || `Competição #${provaId}`} na época 2025/2026.`}
+                url={`/competicao/${provaId}`}
+            />
+            <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
             <div className="max-w-6xl mx-auto px-3 sm:px-5 pt-6 pb-24">
                 <div className="flex items-center justify-between mb-6">
                     <Link to="/ligas" className="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors group">

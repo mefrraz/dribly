@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /perfil
+Disallow: /seguidos
+Disallow: /install
+
+Sitemap: https://dribly.pt/sitemap.xml

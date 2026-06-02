@@ -5,6 +5,7 @@ import { useGames } from '../../hooks/useGames'
 import { useFollows } from '../../hooks/useFollows'
 import { useAuth } from '../../lib/AuthContext'
 import { SkeletonHero } from '../../components/Skeleton'
+import { SeoHead } from '../../components/SeoHead'
 import { type Club, displayName } from '../../lib/ClubContext'
 
 function ClubHome() {
@@ -104,7 +105,13 @@ function ClubHome() {
     }
 
     return (
-        <div className="max-w-xl mx-auto space-y-5 pb-20 px-3">
+        <>
+            <SeoHead
+                title={`${displayName(club)}`}
+                description={`Jogos, resultados e calendário do ${displayName(club)} na época 2025/2026. Acompanha todas as partidas de basquetebol.`}
+                url={`/clube/${club.slug}`}
+            />
+            <div className="max-w-xl mx-auto space-y-5 pb-20 px-3">
             {/* Club header bar with actions */}
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
@@ -276,6 +283,7 @@ function TeamBlock({ name, logo }: { name: string; logo: string | null }) {
                 {name.toUpperCase()}
             </p>
         </div>
+        </>
     )
 }
 

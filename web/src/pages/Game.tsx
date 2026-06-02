@@ -5,6 +5,7 @@ import { fetchFPBGames } from '../lib/fpbApi'
 import { fetchGameDetail, type FPBGameDetail } from '../lib/fpbCompetitionsApi'
 import { ArrowLeft, MapPin, Share2, Trophy, Navigation, TrendingUp, ExternalLink, Calendar, Check, Clock } from 'lucide-react'
 import { SkeletonHero } from '../components/Skeleton'
+import { SeoHead } from '../components/SeoHead'
 import { Match } from '../components/types'
 import { useClub, type Club } from '../lib/ClubContext'
 
@@ -285,7 +286,13 @@ function Game() {
 
     // Compute top performers per category
     return (
-        <div className="max-w-xl mx-auto pb-24 px-3 space-y-3">
+        <>
+            <SeoHead
+                title={`${match.equipa_casa} vs ${match.equipa_fora}`}
+                description={hasScores ? `${match.equipa_casa} ${match.resultado_casa} - ${match.resultado_fora} ${match.equipa_fora} · ${dateFormatted}` : `${match.equipa_casa} vs ${match.equipa_fora} · ${dateFormatted}`}
+                url={`/game/${match.slug || slug}`}
+            />
+            <div className="max-w-xl mx-auto pb-24 px-3 space-y-3">
             {/* Header */}
             <div className="flex items-center justify-between pt-3 animate-fade-in">
                 <button onClick={() => window.history.back()} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
@@ -569,6 +576,7 @@ function Game() {
             )}
 
         </div>
+        </>
     )
 }
 
