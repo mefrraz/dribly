@@ -10,7 +10,7 @@ export default async function handler(request: Request) {
     const wpAction = url.searchParams.get('wp_action')
     if (endpoint || wpAction) {
         let apiUrl: string
-        let headers: Record<string, string> = {
+        const headers: Record<string, string> = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
             'Accept': 'application/json',
         }

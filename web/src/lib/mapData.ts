@@ -69,7 +69,7 @@ export async function fetchGamesAtPavilion(pavilionName: string, _city?: string 
     if (!searchName || searchName.length < 3) return []
 
     // Try multiple match strategies
-    let query = supabase
+    const query = supabase
         .from('games_2025_2026')
         .select('*')
         .ilike('local', `%${searchName}%`)

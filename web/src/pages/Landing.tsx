@@ -97,7 +97,7 @@ function Landing() {
     }, [associations.length])
 
         // Search effects (clubs + competitions, max 3 each)
-    useEffect(() => { if (!query.trim()) { setResults([]); setCompResults([]); setShowDropdown(false); setSelectedIdx(-1); return }; const q = normalize(query); setResults(normalizedClubs.filter(c => c._n.includes(q)).sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999)).slice(0, 3)); if (allComps.length > 0) { const filtered = allComps.filter(r => normalize(r.competition_name).includes(q)).slice(0, 3); setCompResults(filtered) }; setShowDropdown(true); setSelectedIdx(-1) }, [query, normalizedClubs, allComps])
+    useEffect(() => { if (!query.trim()) { setResults([]); setCompResults([]); setShowDropdown(false); setSelectedIdx(-1); return } const q = normalize(query); setResults(normalizedClubs.filter(c => c._n.includes(q)).sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999)).slice(0, 3)); if (allComps.length > 0) { const filtered = allComps.filter(r => normalize(r.competition_name).includes(q)).slice(0, 3); setCompResults(filtered) } setShowDropdown(true); setSelectedIdx(-1) }, [query, normalizedClubs, allComps])
     useEffect(() => { const f = (e: MouseEvent) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node) && inputRef.current && !inputRef.current.contains(e.target as Node)) setShowDropdown(false) }; document.addEventListener('mousedown', f); return () => document.removeEventListener('mousedown', f) }, [])
 
         const totalResults = results.length + compResults.length
