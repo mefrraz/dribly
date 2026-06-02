@@ -3,19 +3,36 @@
  * Route: /pavilhao/:recintoId
  *
  * Tabs:
- *   Geral    — pavilion info (name, address, map preview)
- *   Agenda   — upcoming games at this pavilion
- *   Resultados — past results at this pavilion
+ *   Geral      — pavilion info (name, address)
+ *   Agenda     — upcoming games at this pavilion (date-separated)
+ *   Resultados — past results at this pavilion (date-separated)
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Loader2, MapPin, CalendarDays, Trophy, Info } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Pavilion } from '../lib/mapData'
 import { GameCard } from '../components/GameCard'
+import { EmptyState } from '../components/EmptyState'
 import type { Match } from '../components/types'
 
 type Tab = 'geral' | 'agenda' | 'resultados'
+
+function formatDate(dateStr: string) {
+    const date = new Date(dateStr)
+    const formatted = date.toLocaleDateString('pt-PT', { weekday: 'short', day: 'numeric', month: 'long' })
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+}
+
+/** Group matches by date, sorted */
+function groupByDate(matches: Match[]): [string, Match[]][] {
+    const groups: Record<string, Match[]> = {}
+    for (const m of matches) {
+        if (!groups[m.data]) groups[m.data] = []
+        groups[m.data].push(m)
+    }
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b))
+}
 
 export default function PavilionPage() {
     const { recintoId } = useParams<{ recintoId: string }>()
@@ -31,32 +48,23 @@ export default function PavilionPage() {
         const loadData = async () => {
             const pavRes = await supabase.from('pavilions').select('*').eq('recinto_id', parseInt(recintoId)).single()
 
-            if (!pavRes.data) {
-                setLoading(false)
-                return
-            }
+            if (!pavRes.data) { setLoading(false); return }
 
             const pav = pavRes.data as Pavilion
             setPavilion(pav)
 
-            // Search games by pavilion name (stripped of common prefixes)
             const searchName = pav.nome
-                .replace(/^Pavilhão\s+/i, '')
-                .replace(/^Pav\.\s*/i, '')
-                .replace(/^Mun\.\s*/i, '')
-                .trim()
-                .substring(0, 40)
+                .replace(/^Pavilhão\s+/i, '').replace(/^Pav\.\s*/i, '').replace(/^Mun\.\s*/i, '')
+                .trim().substring(0, 40)
 
             const gamesRes = await supabase.from('games_2025_2026').select('*')
                 .ilike('local', `%${searchName}%`)
                 .order('data', { ascending: false })
-                .limit(50)
+                .limit(100)
 
             if (gamesRes.data) {
                 setGames(gamesRes.data.map((g: any) => ({
-                    ...g,
-                    id: g.id || g.slug,
-                    status: g.status as Match['status'],
+                    ...g, id: g.id || g.slug, status: g.status as Match['status'],
                 })) as Match[])
             }
             setLoading(false)
@@ -64,6 +72,27 @@ export default function PavilionPage() {
 
         loadData().catch(() => setLoading(false))
     }, [recintoId])
+
+    const upcoming = useMemo(() => games
+        .filter((g) => g.status === 'AGENDADO' && g.data >= new Date().toISOString().split('T')[0])
+        .sort((a, b) => a.data.localeCompare(b.data)),
+    [games])
+
+    const results = useMemo(() => games
+        .filter((g) => g.status === 'FINALIZADO')
+        .sort((a, b) => b.data.localeCompare(a.data)),
+    [games])
+
+    const upcomingByDate = useMemo(() => groupByDate(upcoming), [upcoming])
+    const resultsByDate = useMemo(() => groupByDate(results), [results])
+
+    const address = [pavilion?.rua, pavilion?.codigo_postal, pavilion?.cidade].filter(Boolean).join(', ')
+
+    const tabs: { value: Tab; label: string; icon: any }[] = [
+        { value: 'geral', label: 'Geral', icon: Info },
+        { value: 'agenda', label: 'Agenda', icon: CalendarDays },
+        { value: 'resultados', label: 'Resultados', icon: Trophy },
+    ]
 
     if (loading) {
         return (
@@ -82,26 +111,14 @@ export default function PavilionPage() {
         )
     }
 
-    const upcoming = games.filter((g) => g.status === 'AGENDADO' || (g.data >= new Date().toISOString().split('T')[0]))
-    const results = games.filter((g) => g.status === 'FINALIZADO')
-    const address = [pavilion.rua, pavilion.codigo_postal, pavilion.cidade].filter(Boolean).join(', ')
-
-    const tabs: { value: Tab; label: string; icon: any }[] = [
-        { value: 'geral', label: 'Geral', icon: Info },
-        { value: 'agenda', label: 'Agenda', icon: CalendarDays },
-        { value: 'resultados', label: 'Resultados', icon: Trophy },
-    ]
-
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
-            <div className="max-w-4xl mx-auto px-4 pt-6 pb-24">
-                {/* Back */}
+            <div className="max-w-6xl mx-auto px-4 pt-6 pb-24">
                 <Link to="/mapa" className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 mb-4 group">
                     <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                     Mapa
                 </Link>
 
-                {/* Header */}
                 <div className="flex items-start gap-4 mb-6">
                     <div className="w-14 h-14 rounded-2xl bg-dribly-purple/10 flex items-center justify-center shrink-0">
                         <MapPin size={24} className="text-dribly-purple" />
@@ -125,15 +142,10 @@ export default function PavilionPage() {
                         const active = tab === t.value
                         const Icon = t.icon
                         return (
-                            <button
-                                key={t.value}
-                                onClick={() => setTab(t.value)}
+                            <button key={t.value} onClick={() => setTab(t.value)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                                    active
-                                        ? 'bg-dribly-purple text-white'
-                                        : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/5'
-                                }`}
-                            >
+                                    active ? 'bg-dribly-purple text-white' : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/5'
+                                }`}>
                                 <Icon size={14} />
                                 {t.label}
                             </button>
@@ -141,7 +153,6 @@ export default function PavilionPage() {
                     })}
                 </div>
 
-                {/* Tab content */}
                 {tab === 'geral' && (
                     <div className="space-y-4">
                         <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
@@ -164,27 +175,9 @@ export default function PavilionPage() {
                                     <p className="font-medium text-zinc-900 dark:text-white mt-0.5">{pavilion.distrito || '—'}</p>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-zinc-100 dark:border-white/5">
-                                <div className="text-center">
-                                    <p className="text-lg font-black text-dribly-purple">{upcoming.length}</p>
-                                    <p className="text-[10px] text-zinc-400">Jogos futuros</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-lg font-black text-dribly-purple">{results.length}</p>
-                                    <p className="text-[10px] text-zinc-400">Resultados</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-lg font-black text-dribly-purple">{games.length}</p>
-                                    <p className="text-[10px] text-zinc-400">Total jogos</p>
-                                </div>
-                            </div>
                             {pavilion.fpb_url && (
-                                <a
-                                    href={pavilion.fpb_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 mt-4 text-xs text-dribly-purple hover:underline"
-                                >
+                                <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1.5 mt-4 text-xs text-dribly-purple hover:underline">
                                     Ver na FPB →
                                 </a>
                             )}
@@ -193,23 +186,47 @@ export default function PavilionPage() {
                 )}
 
                 {tab === 'agenda' && (
-                    <div className="space-y-2">
-                        {upcoming.length === 0 ? (
-                            <p className="text-sm text-zinc-400 text-center py-8">Sem jogos agendados.</p>
-                        ) : (
-                            upcoming.map((g, i) => <GameCard key={g.slug || i} match={g} mode="agenda" />)
-                        )}
-                    </div>
+                    upcoming.length === 0 ? (
+                        <EmptyState view="agenda" />
+                    ) : (
+                        <div className="space-y-6 px-2 md:px-4">
+                            {upcomingByDate.map(([date, dateGames]) => (
+                                <div key={date}>
+                                    <div className="flex items-center gap-3 mb-3 px-2">
+                                        <h3 className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">{formatDate(date)}</h3>
+                                        <div className="flex-1 h-px bg-zinc-200 dark:bg-white/5" />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        {dateGames.map((match) => (
+                                            <GameCard key={match.id || match.slug} match={match} mode="agenda" />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )
                 )}
 
                 {tab === 'resultados' && (
-                    <div className="space-y-2">
-                        {results.length === 0 ? (
-                            <p className="text-sm text-zinc-400 text-center py-8">Sem resultados disponíveis.</p>
-                        ) : (
-                            results.slice(0, 30).map((g, i) => <GameCard key={g.slug || i} match={g} mode="results" />)
-                        )}
-                    </div>
+                    results.length === 0 ? (
+                        <EmptyState view="results" />
+                    ) : (
+                        <div className="space-y-6 px-2 md:px-4">
+                            {resultsByDate.map(([date, dateGames]) => (
+                                <div key={date}>
+                                    <div className="flex items-center gap-3 mb-3 px-2">
+                                        <h3 className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">{formatDate(date)}</h3>
+                                        <div className="flex-1 h-px bg-zinc-200 dark:bg-white/5" />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        {dateGames.map((match) => (
+                                            <GameCard key={match.id || match.slug} match={match} mode="results" />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )
                 )}
             </div>
         </div>

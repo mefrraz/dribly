@@ -26,8 +26,8 @@ function toMatch(g: GameAtPavilion): Match {
         equipa_fora: g.equipa_fora,
         resultado_casa: g.resultado_casa,
         resultado_fora: g.resultado_fora,
-        escalao: '',
-        competicao: '',
+        escalao: g.escalao || '',
+        competicao: g.competicao || '',
         local: g.local,
         logotipo_casa: g.logotipo_casa,
         logotipo_fora: g.logotipo_fora,
@@ -112,9 +112,19 @@ export function PavilionSheet({ pavilion, isOpen, onClose }: Props) {
                             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                                 {games.length} jogo{games.length !== 1 ? 's' : ''} futuro{games.length !== 1 ? 's' : ''}
                             </p>
-                            {games.slice(0, 4).map((g, i) => (
-                                <GameCard key={g.slug || i} match={toMatch(g)} mode="agenda" />
-                            ))}
+                            {games.slice(0, 4).map((g, i) => {
+                                const m = toMatch(g)
+                                return (
+                                    <div key={g.slug || i}>
+                                        <GameCard match={m} mode="agenda" />
+                                        {(m.escalao || m.competicao) && (
+                                            <p className="text-[10px] text-zinc-400 mt-0.5 px-1">
+                                                {m.escalao || m.competicao}
+                                            </p>
+                                        )}
+                                    </div>
+                                )
+                            })}
                             {games.length > 4 && (
                                 <p className="text-[11px] text-zinc-400 text-center">
                                     +{games.length - 4} jogos

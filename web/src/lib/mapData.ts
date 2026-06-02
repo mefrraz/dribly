@@ -31,6 +31,8 @@ export interface GameAtPavilion {
     equipa_fora: string
     resultado_casa: number | null
     resultado_fora: number | null
+    escalao?: string
+    competicao?: string
     status: string
     logotipo_casa: string | null
     logotipo_fora: string | null
