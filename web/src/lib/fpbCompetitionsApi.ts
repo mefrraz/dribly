@@ -1,6 +1,14 @@
 import { type Match } from '../components/types'
+import { z } from 'zod'
 
 const FPB_PROXY = '/api/fpb'
+
+// Zod schema for FPB AJAX responses to prevent crashes on malformed data
+const FpbAjaxResponseSchema = z.object({
+    result: z.object({
+        body: z.string()
+    }).optional()
+}).catch({})
 
 export interface FPBStandingTeam {
     posicao: number
@@ -149,7 +157,11 @@ export async function fetchStandings(provaId: number): Promise<FPBStandingPhase[
             const res = await fetch(`${FPB_PROXY}?${params.toString()}`)
             if (!res.ok) return { name: fase.name, teams: [], type: 'table' as const }
             const json = await res.json()
-            const body: string = json?.result?.body || ''
+            
+            // Validate JSON structure with Zod
+            const parsed = FpbAjaxResponseSchema.safeParse(json)
+            const body: string = parsed.success && parsed.data.result?.body ? parsed.data.result.body : ''
+            
             if (!body) return { name: fase.name, teams: [], type: 'table' as const }
             const teams = scrapeStandings(body)
             const type = body.includes('phase-game') ? 'games' as const : 'table' as const
@@ -630,7 +642,7 @@ function scrapePlayerStats(html: string): FPBPlayerStat[] {
                 allStats.set(key, existingEntry)
             }
             for (const k of keys) {
-                ;(existingEntry as any)[k] = score
+                (existingEntry as any)[k] = score
             }
             if (!existingEntry.clube_nome) existingEntry.clube_nome = team
         }
@@ -645,7 +657,7 @@ function scrapePlayerStats(html: string): FPBPlayerStat[] {
         const userId = parseInt(im[2])
         for (const [, player] of allStats) {
             if (altName.includes(player.nome) || player.nome.includes(altName)) {
-                ;(player as any).photoUrl = photoUrl
+                (player as any).photoUrl = photoUrl
                 player.atleta_id = userId
                 break
             }
