@@ -12,15 +12,6 @@
   --color-text-secondary-dark: #9B99B5;
 }
 
-/* Global page fade-in — entire page fades in as one unit */
-@keyframes page-fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.page-fade-in {
-  animation: page-fade-in 0.4s ease-out;
-}
-
 @layer base {
   html {
     overflow-y: scroll;
@@ -102,6 +93,15 @@
   animation: fade-in 0.2s ease-out;
 }
 
+/* Global page fade-in — entire page fades in as one unit */
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-fade-in {
+  animation: page-fade-in 0.4s ease-out;
+}
+
 /* Leaflet overrides */
 .leaflet-container {
   width: 100%;
@@ -113,4 +113,18 @@
 .leaflet-top,
 .leaflet-bottom {
   z-index: 2;
+}
+/* Move zoom controls to middle-right of the map */
+.leaflet-left {
+  display: none;
+}
+.leaflet-right {
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.leaflet-right .leaflet-control {
+  float: none;
+  clear: both;
+  margin-top: 4px;
 }

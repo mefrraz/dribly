@@ -124,8 +124,18 @@ export default function Mapa() {
     const [selected, setSelected] = useState<Pavilion | null>(null)
     const [sheetOpen, setSheetOpen] = useState(false)
     const [initialFitDone] = useState(!!searchParams.get('z'))
+    const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+    const [darkMode, setDarkMode] = useState(isDark)
     const [searchQuery, setSearchQuery] = useState('')
     const [searchOpen, setSearchOpen] = useState(false)
+    
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setDarkMode(document.documentElement.classList.contains('dark'))
+        })
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+        return () => observer.disconnect()
+    }, [])
     const mapRef = useRef<any>(null)
 
     useEffect(() => {
@@ -263,8 +273,11 @@ export default function Mapa() {
                     scrollWheelZoom={true}
                 >
                     <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+                        url={darkMode
+                            ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                            : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'
+                        }
                     />
 
                     <FitBounds pavilions={pavilions} skip={initialFitDone} />
