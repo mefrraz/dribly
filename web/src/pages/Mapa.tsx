@@ -11,8 +11,8 @@ import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
-import { Loader2 } from 'lucide-react'
-import { fetchPavilions, type Pavilion } from '../lib/mapData'
+import { Loader2, Search, X, MapPin } from 'lucide-react'
+import { fetchPavilions, type Pavilion, displayPavilionName } from '../lib/mapData'
 import { PavilionSheet } from '../components/PavilionSheet'
 
 /** Custom Dribly marker — purple circle with border */
@@ -124,6 +124,8 @@ export default function Mapa() {
     const [selected, setSelected] = useState<Pavilion | null>(null)
     const [sheetOpen, setSheetOpen] = useState(false)
     const [initialFitDone] = useState(!!searchParams.get('z'))
+    const [searchQuery, setSearchQuery] = useState('')
+    const [searchOpen, setSearchOpen] = useState(false)
     const mapRef = useRef<any>(null)
 
     useEffect(() => {
@@ -140,12 +142,37 @@ export default function Mapa() {
         setSheetOpen(true)
     }
 
+    /** Fly to a pavilion on the map */
+    const flyToPavilion = useCallback((p: Pavilion) => {
+        const m = mapRef.current
+        if (m) {
+            m.flyTo([p.lat, p.lng], 16, { duration: 0.8 })
+            setTimeout(() => {
+                setSelected(p)
+                setSheetOpen(true)
+            }, 900)
+        }
+    }, [])
+
     /** Sync map position to URL so back-navigation restores the exact view */
     const syncToUrl = useCallback((map: L.Map) => {
         const c = map.getCenter()
         const z = map.getZoom()
         setSearchParams({ lat: c.lat.toFixed(5), lng: c.lng.toFixed(5), z: String(z) }, { replace: true })
     }, [setSearchParams])
+
+    // Filtered pavilions for search
+    const searchResults = useMemo(() => {
+        if (!searchQuery.trim()) return []
+        const q = searchQuery.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        return pavilions
+            .filter((p) => {
+                const name = displayPavilionName(p).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                const city = (p.cidade || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                return name.includes(q) || city.includes(q)
+            })
+            .slice(0, 8)
+    }, [searchQuery, pavilions])
 
     if (loading) {
         return (
@@ -163,12 +190,63 @@ export default function Mapa() {
         {/* Full-screen map between navbars */}
         <div style={{
             position: 'fixed',
-            top: '3.5rem', // 14 = h-14
-            bottom: '4rem', // 16 = h-16 bottom nav
+            top: '3.5rem',
+            bottom: '4rem',
             left: 0,
             right: 0,
             zIndex: 10,
         }} className="md:top-16 md:bottom-0">
+
+            {/* Search bar — floats over map */}
+            <div className="absolute top-3 left-3 right-3 md:left-4 md:right-auto md:w-80 z-[1000]">
+                <div className="relative">
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true) }}
+                        onFocus={() => searchQuery.trim() && setSearchOpen(true)}
+                        onBlur={() => setTimeout(() => setSearchOpen(false), 200)}
+                        placeholder="Pesquisar pavilhões..."
+                        className="w-full pl-9 pr-4 py-2.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none shadow-lg transition-all focus:ring-2 focus:ring-dribly-purple/30"
+                    />
+                    {searchQuery && (
+                        <button
+                            onClick={() => { setSearchQuery(''); setSearchOpen(false) }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                        >
+                            <X size={14} />
+                        </button>
+                    )}
+                </div>
+
+                {/* Search results dropdown */}
+                {searchOpen && searchResults.length > 0 && (
+                    <div className="mt-1.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden max-h-[50vh] overflow-y-auto">
+                        {searchResults.map((p) => (
+                            <button
+                                key={p.id}
+                                onMouseDown={() => {
+                                    setSearchQuery('')
+                                    setSearchOpen(false)
+                                    flyToPavilion(p)
+                                }}
+                                className="w-full text-left px-3.5 py-2.5 flex items-center gap-3 hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors"
+                            >
+                                <MapPin size={14} className="text-dribly-purple shrink-0" />
+                                <div className="min-w-0">
+                                    <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+                                        {displayPavilionName(p)}
+                                    </p>
+                                    <p className="text-[10px] text-zinc-400 truncate">{p.cidade}{p.distrito ? `, ${p.distrito}` : ''}</p>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Map */}
             {pavilions.length === 0 ? (
                 <div className="h-full flex items-center justify-center">
                     <p className="text-sm text-zinc-400">Nenhum pavilhão com localização disponível.</p>
