@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Heart, ListOrdered, CalendarDays, Trophy, Users, BarChart4, LayoutDashboard, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Loader2, Heart, ListOrdered, CalendarDays, Trophy, Users, BarChart4, LayoutDashboard, ExternalLink } from 'lucide-react'
 import { useFollows } from '../hooks/useFollows'
 import { useAuth } from '../lib/AuthContext'
 import { useClub } from '../lib/ClubContext'
@@ -11,8 +11,6 @@ import {
 } from '../lib/fpbCompetitionsApi'
 import { GameCard } from '../components/GameCard'
 import { type Match } from '../components/types'
-import { SkeletonGameGrid, SkeletonHero } from '../components/Skeleton'
-import { SeoHead } from '../components/SeoHead'
 
 const COMP_NAMES: Record<number, string> = {
     10902: 'Liga Betclic Masculina',
@@ -254,57 +252,46 @@ export default function CompetitionDetail() {
 
     const logoMaps = useMemo(() => buildLogoMap(clubs), [clubs])
 
-    // Memoize the top team calculation to avoid O(N) loops on every render
-    const topTeam = useMemo(() => findTopTeam(standings), [standings])
-
-    // Memoize the transformation of FPB games to Match objects to avoid O(N) string operations per render
-    const matches = useMemo(() => {
-        return games.map(g => fpbGameToMatch(g, logoMaps))
-    }, [games, logoMaps])
-
-    const today = new Date().toISOString().split('T')[0]
-
-    // Separate games into schedule and results using the pre-computed matches
-    const scheduleMatches = useMemo(() =>
-        matches.filter(m =>
-            m.status !== 'FINALIZADO' && m.status !== 'A DECORRER' &&
-            (m.resultado_casa === null || m.resultado_fora === null) &&
-            m.data >= today
-        ).sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()),
-        [matches, today]
-    )
-
-    const resultsMatches = useMemo(() =>
-        matches.filter(m =>
-            m.status === 'FINALIZADO' || m.status === 'A DECORRER' ||
-            (m.resultado_casa !== null && m.resultado_fora !== null)
-        ).sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),
-        [matches]
-    )
-
-    const scheduleByDate = useMemo(() => {
-        const groups: Record<string, typeof matches> = {}
-        for (const m of scheduleMatches) {
-            if (!groups[m.data]) groups[m.data] = []
-            groups[m.data].push(m)
-        }
-        return Object.entries(groups)
-    }, [scheduleMatches])
-
-    const resultsByDate = useMemo(() => {
-        const groups: Record<string, typeof matches> = {}
-        for (const m of resultsMatches) {
-            if (!groups[m.data]) groups[m.data] = []
-            groups[m.data].push(m)
-        }
-        return Object.entries(groups)
-    }, [resultsMatches])
-
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr)
         const formatted = date.toLocaleDateString('pt-PT', { weekday: 'short', day: 'numeric', month: 'long' })
         return formatted.charAt(0).toUpperCase() + formatted.slice(1)
     }
+
+    // Separate games into schedule (upcoming/not started) and results (finished/in-progress)
+    const today = new Date().toISOString().split('T')[0]
+    const scheduleList = useMemo(() =>
+        games.filter(g =>
+            g.estado !== 'FINALIZADO' && g.estado !== 'A DECORRER' &&
+            (g.resultado_casa === undefined || g.resultado_fora === undefined) &&
+            g.data >= today
+        ).sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()),
+        [games, today]
+    )
+    const scheduleByDate = useMemo(() => {
+        const groups: Record<string, FPBGame[]> = {}
+        for (const g of scheduleList) {
+            if (!groups[g.data]) groups[g.data] = []
+            groups[g.data].push(g)
+        }
+        return Object.entries(groups)
+    }, [scheduleList])
+
+    const resultsList = useMemo(() =>
+        games.filter(g =>
+            g.estado === 'FINALIZADO' || g.estado === 'A DECORRER' ||
+            (g.resultado_casa !== undefined && g.resultado_fora !== undefined)
+        ).sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),
+        [games]
+    )
+    const resultsByDate = useMemo(() => {
+        const groups: Record<string, FPBGame[]> = {}
+        for (const g of resultsList) {
+            if (!groups[g.data]) groups[g.data] = []
+            groups[g.data].push(g)
+        }
+        return Object.entries(groups)
+    }, [resultsList])
 
     if (!provaId) {
         return (
@@ -315,13 +302,7 @@ export default function CompetitionDetail() {
     }
 
     return (
-        <>
-            <SeoHead
-                title={compName || `Competição #${provaId}`}
-                description={`Classificações, jogos e estatísticas da ${compName || `Competição #${provaId}`} na época 2025/2026.`}
-                url={`/competicao/${provaId}`}
-            />
-            <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
             <div className="max-w-6xl mx-auto px-3 sm:px-5 pt-6 pb-24">
                 <div className="flex items-center justify-between mb-6">
                     <Link to="/ligas" className="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors group">
@@ -383,30 +364,10 @@ export default function CompetitionDetail() {
 
                 <div className="mt-5">
                     {loading ? (
-                        <>
-                            {tab === 'geral' && (
-                                <div className="space-y-5">
-                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                                        <SkeletonHero />
-                                        <div className="lg:col-span-7 grid grid-cols-2 gap-2.5">
-                                            {Array.from({ length: 4 }).map((_, i) => (
-                                                <div key={i} className="rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-3 animate-pulse bg-white dark:bg-zinc-900/60">
-                                                    <div className="h-3 w-20 bg-zinc-200 dark:bg-zinc-700 rounded mb-2" />
-                                                    <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-700 rounded mb-1" />
-                                                    <div className="h-3 w-16 bg-zinc-200 dark:bg-zinc-700 rounded mb-2" />
-                                                    <div className="h-6 w-10 bg-zinc-200 dark:bg-zinc-700 rounded" />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                                        <SkeletonGameGrid count={2} days={1} />
-                                        <SkeletonGameGrid count={2} days={1} />
-                                    </div>
-                                </div>
-                            )}
-                            {tab !== 'geral' && <SkeletonGameGrid count={3} days={2} />}
-                        </>
+                        <div className="flex flex-col items-center justify-center py-16 gap-3">
+                            <Loader2 size={24} className="animate-spin text-dribly-purple" />
+                            <span className="text-xs font-medium text-zinc-400">A carregar...</span>
+                        </div>
                     ) : (
                         <>
                             {/* Overview */}
@@ -416,34 +377,35 @@ export default function CompetitionDetail() {
                                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                                         {/* Leader card */}
                                         {(() => {
-                                            if (!topTeam) return (
+                                            const top = findTopTeam(standings)
+                                            if (!top) return (
                                                 <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center justify-center">
                                                     <p className="text-xs text-zinc-400">Sem classificação disponível.</p>
                                                 </div>
                                             )
-                                            const topLogo = findLogo(topTeam.name, logoMaps)
+                                            const topLogo = findLogo(top.name, logoMaps)
                                             return (
                                                 <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center gap-4">
                                                     <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-700/50">
                                                         {topLogo ? (
                                                             <img src={topLogo} alt="" className="w-14 h-14 sm:w-[72px] sm:h-[72px] object-contain" />
                                                         ) : (
-                                                            <span className="text-2xl font-bold text-zinc-500">{topTeam.name.charAt(0)}</span>
+                                                            <span className="text-2xl font-bold text-zinc-500">{top.name.charAt(0)}</span>
                                                         )}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <div className="flex items-center gap-2 mb-0.5">
-                                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{topTeam.label}</span>
+                                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{top.label}</span>
                                                             <span className="px-1.5 py-0.5 rounded-md bg-dribly-purple/10 text-[9px] font-black text-dribly-purple tabular-nums">#1</span>
                                                         </div>
-                                                        <p className="text-sm sm:text-base font-black text-zinc-900 dark:text-white truncate leading-tight">{topTeam.name}</p>
-                                                        {topTeam.j !== undefined && (
+                                                        <p className="text-sm sm:text-base font-black text-zinc-900 dark:text-white truncate leading-tight">{top.name}</p>
+                                                        {top.j !== undefined && (
                                                             <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1.5 flex-wrap">
-                                                                <span className="tabular-nums">{topTeam.j} jogos</span>
+                                                                <span className="tabular-nums">{top.j} jogos</span>
                                                                 <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
-                                                                <span className="text-emerald-600 dark:text-emerald-400 tabular-nums font-bold">{topTeam.v}V</span>
-                                                                <span className="text-red-500 dark:text-red-400 tabular-nums font-bold">{topTeam.d}D</span>
-                                                                {topTeam.pts !== undefined && (<><span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" /><span className="font-black text-zinc-900 dark:text-white tabular-nums">{topTeam.pts} pts</span></>)}
+                                                                <span className="text-emerald-600 dark:text-emerald-400 tabular-nums font-bold">{top.v}V</span>
+                                                                <span className="text-red-500 dark:text-red-400 tabular-nums font-bold">{top.d}D</span>
+                                                                {top.pts !== undefined && (<><span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" /><span className="font-black text-zinc-900 dark:text-white tabular-nums">{top.pts} pts</span></>)}
                                                             </p>
                                                         )}
                                                     </div>
@@ -509,10 +471,10 @@ export default function CompetitionDetail() {
                                                 <CalendarDays size={14} className="text-dribly-purple" />
                                                 Próximos Jogos
                                             </h3>
-                                            {scheduleMatches.length > 0 ? (
+                                            {scheduleList.length > 0 ? (
                                                 <div className="space-y-2">
-                                                    {scheduleMatches.slice(0, 3).map((m, i) => (
-                                                        <GameCard key={i} match={m} mode="agenda" />
+                                                    {scheduleList.slice(0, 3).map((g, i) => (
+                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="agenda" />
                                                     ))}
                                                 </div>
                                             ) : (
@@ -526,10 +488,10 @@ export default function CompetitionDetail() {
                                                 <Trophy size={14} className="text-dribly-purple" />
                                                 Últimos Resultados
                                             </h3>
-                                            {resultsMatches.length > 0 ? (
+                                            {resultsList.length > 0 ? (
                                                 <div className="space-y-2">
-                                                    {resultsMatches.slice(0, 3).map((m, i) => (
-                                                        <GameCard key={i} match={m} mode="results" />
+                                                    {resultsList.slice(0, 3).map((g, i) => (
+                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="results" />
                                                     ))}
                                                 </div>
                                             ) : (
@@ -659,18 +621,18 @@ export default function CompetitionDetail() {
 
                             {/* Results */}
                             {tab === 'resultados' && (
-                                resultsMatches.length === 0
+                                resultsList.length === 0
                                     ? <Empty text="Sem resultados disponíveis." />
                                     : <div className="space-y-6 px-2 md:px-4">
-                                        {resultsByDate.map(([date, dateMatches]) => (
+                                        {resultsByDate.map(([date, dateGames]) => (
                                             <div key={date}>
                                                 <div className="flex items-center gap-3 mb-3 px-2">
                                                     <h3 className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">{formatDate(date)}</h3>
                                                     <div className="flex-1 h-px bg-zinc-200 dark:bg-white/5" />
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                    {dateMatches.map((m, i) => (
-                                                        <GameCard key={i} match={m} mode="results" />
+                                                    {dateGames.map((g, i) => (
+                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="results" />
                                                     ))}
                                                 </div>
                                             </div>
@@ -680,18 +642,18 @@ export default function CompetitionDetail() {
 
                             {/* Schedule */}
                             {tab === 'calendario' && (
-                                scheduleMatches.length === 0
+                                scheduleList.length === 0
                                     ? <Empty text="Sem jogos agendados." />
                                     : <div className="space-y-6 px-2 md:px-4">
-                                        {scheduleByDate.map(([date, dateMatches]) => (
+                                        {scheduleByDate.map(([date, dateGames]) => (
                                             <div key={date}>
                                                 <div className="flex items-center gap-3 mb-3 px-2">
                                                     <h3 className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">{formatDate(date)}</h3>
                                                     <div className="flex-1 h-px bg-zinc-200 dark:bg-white/5" />
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                    {dateMatches.map(m => (
-                                                        <GameCard key={m.id || m.data+m.equipa_casa} match={m} mode="agenda" />
+                                                    {dateGames.map(g => (
+                                                        <GameCard key={g.jogo_id || g.data+g.equipa_casa} match={fpbGameToMatch(g, logoMaps)} mode="agenda" />
                                                     ))}
                                                 </div>
                                             </div>
@@ -765,7 +727,6 @@ export default function CompetitionDetail() {
                 </div>
             </div>
         </div>
-        </>
     )
 }
 
