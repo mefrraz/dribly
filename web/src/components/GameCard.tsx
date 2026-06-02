@@ -59,7 +59,7 @@ export function GameCard({ match, mode, clubName, clubSlug }: GameCardProps) {
   return (
     <Link to={linkSlug} className="glass-card flex flex-col group active:scale-[0.98] h-full">
       {/* Top bar */}
-      <div className="flex justify-between items-center p-4 pb-2 border-b border-zinc-100 dark:border-white/5">
+      <div className="flex justify-between items-center px-4 py-2.5 border-b border-zinc-100 dark:border-white/5">
         <div className="flex items-center gap-2 min-w-0">
           {mode === 'agenda' ? (
             hasHora(match.hora) ? (
