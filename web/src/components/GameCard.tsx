@@ -1,4 +1,5 @@
-﻿import { Link } from 'react-router-dom'
+﻿import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Clock, MapPin, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Match } from './types'
 
@@ -115,11 +116,19 @@ export function GameCard({ match, mode, clubName, clubSlug }: GameCardProps) {
 }
 
 function TeamRow({ name, logo, score, dimmed }: { name: string; logo: string | null; score: number | null; dimmed: boolean }) {
+  const [imgError, setImgError] = useState(false)
+
   return (
     <div className={`flex items-center justify-between ${dimmed ? 'opacity-60' : ''}`}>
       <div className="flex items-center gap-3 min-w-0">
-        {logo ? (
-          <img src={logo} alt="" className="w-8 h-8 object-contain rounded-full bg-zinc-50 dark:bg-zinc-800" loading="lazy" />
+        {logo && !imgError ? (
+          <img 
+            src={logo} 
+            alt="" 
+            className="w-8 h-8 object-contain rounded-full bg-zinc-50 dark:bg-zinc-800" 
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
         ) : (
           <div className="w-8 h-8 bg-zinc-100 dark:bg-white/10 rounded-full flex items-center justify-center shrink-0">
             <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">{name.charAt(0).toUpperCase()}</span>
