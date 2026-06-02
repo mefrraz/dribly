@@ -50,7 +50,7 @@ function clusterIcon(count: number): L.DivIcon {
     })
 }
 
-/** Zoom to bounds of all markers */
+/** Zoom to bounds of all markers — waits for map tiles to be ready first */
 function FitBounds({ pavilions }: { pavilions: Pavilion[] }) {
     const map = useMap()
 
@@ -59,7 +59,13 @@ function FitBounds({ pavilions }: { pavilions: Pavilion[] }) {
         const bounds = L.latLngBounds(
             pavilions.map((p) => [p.lat, p.lng] as [number, number])
         )
-        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 13 })
+        // Wait for map to be fully initialized before fitting bounds
+        // This avoids NS_BINDING_ABORTED on tile requests
+        map.whenReady(() => {
+            setTimeout(() => {
+                map.fitBounds(bounds, { padding: [30, 30], maxZoom: 13 })
+            }, 300)
+        })
     }, [map, pavilions])
 
     return null
