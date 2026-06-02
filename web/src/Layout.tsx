@@ -19,6 +19,7 @@ function Layout() {
     const [showSuggestions, setShowSuggestions] = useState(false)
     const location = useLocation()
     const { user } = useAuth()
+    const isMapaPage = location.pathname === '/mapa'
 
     const handleAuthSuccess = useCallback((method: 'signin' | 'signup') => {
         if (method === 'signup') {
@@ -149,7 +150,7 @@ function Layout() {
                 </ErrorBoundary>
             </main>
 
-            <footer className="hidden md:block bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-white/10 py-8">
+            <footer className={`hidden md:block bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-white/10 py-8 ${isMapaPage ? '!hidden' : ''}`}>
                 <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-zinc-500">
                     <div className="flex items-center gap-2">
                         <span className="font-bold text-zinc-900 dark:text-white">Dribly</span>

@@ -106,6 +106,7 @@
 .leaflet-container {
   width: 100%;
   height: 100%;
+  font-family: 'Outfit', sans-serif;
 }
 .leaflet-pane {
   z-index: 1;
@@ -114,17 +115,28 @@
 .leaflet-bottom {
   z-index: 2;
 }
-/* Move zoom controls to middle-right of the map */
-.leaflet-left {
-  display: none;
-}
-.leaflet-right {
+/* Move zoom controls to middle-right of the map, away from search bar */
+.leaflet-top.leaflet-left {
+  left: auto;
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
 }
-.leaflet-right .leaflet-control {
+.leaflet-top.leaflet-left .leaflet-control {
   float: none;
   clear: both;
   margin-top: 4px;
+}
+/* Fix attribution position — bottom-left */
+.leaflet-bottom.leaflet-left {
+  left: 12px;
+  bottom: 12px;
+}
+.leaflet-bottom.leaflet-right {
+  right: auto;
+  left: 12px;
+}
+.leaflet-control-attribution {
+  font-size: 9px !important;
+  opacity: 0.6;
 }
