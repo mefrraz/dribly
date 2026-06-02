@@ -22,7 +22,7 @@
   </a>
 </p>
 
-> **v5.1.0** — semi-final · Auth Clerk completa · [dribly.pt](https://dribly.pt)
+> **v6.0.0** — 🗺️ Mapa de pavilhões · [dribly.pt](https://dribly.pt)
 
 ---
 
@@ -52,6 +52,7 @@ O Dribly nasceu da frustração de não existir uma plataforma única, rápida e
 | 🌓 **Modo claro/escuro** | v1.0 | Transição suave |
 | 📱 **PWA instalável** | v1.2 | Instala como app nativa |
 | 🔌 **Offline parcial** | v3.0 | Service Worker + cache inteligente |
+| 🗺️ **Mapa de pavilhões** | v6.0 | Mapa interativo com 400+ pavilhões, jogos perto de ti |
 | 🎨 **Tema dinâmico** | v2.9 | Cada clube com accent color própria |
 | 🎯 **Tour onboarding** | v3.3 | Tour guiado ao criar conta |
 | 💡 **Sugestões pós-registo** | v3.3 | Sugestões de clubes/ligas na 1ª vez |

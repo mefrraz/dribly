@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { BarChart2, Building2, Heart, Star, Trophy } from 'lucide-react'
+import { MapPin, Building2, Heart, Star, Trophy } from 'lucide-react'
 import { useClub } from '../lib/ClubContext'
 import { useAuth } from '../lib/AuthContext'
 
@@ -66,10 +66,10 @@ function BottomNav({ onOpenSearch }: BottomNavProps) {
                     </>
                 )}
 
-                <Link to="/standings"
-                    className={`flex flex-col items-center justify-center w-full h-full gap-1 ${isActive('/standings') ? 'text-dribly-purple' : 'text-zinc-400 dark:text-zinc-500'}`}>
-                    <BarChart2 size={18} strokeWidth={isActive('/standings') ? 2.5 : 2} />
-                    <span className="text-[10px] font-medium">Classificações</span>
+                <Link to="/mapa"
+                    className={`flex flex-col items-center justify-center w-full h-full gap-1 ${isActive('/mapa') ? 'text-dribly-purple' : 'text-zinc-400 dark:text-zinc-500'}`}>
+                    <MapPin size={18} strokeWidth={isActive('/mapa') ? 2.5 : 2} />
+                    <span className="text-[10px] font-medium">Mapa</span>
                 </Link>
             </div>
         </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Sun, Moon, Instagram, Github, Info, BarChart2, Home, Star, Search, LogIn, Heart, Trophy, Building2 } from 'lucide-react'
+import { Sun, Moon, Instagram, Github, Info, BarChart2, Home, Star, Search, LogIn, Heart, Trophy, Building2, MapPin } from 'lucide-react'
 import PWAInstallBanner from './components/PWAInstallBanner'
 import BottomNav from './components/BottomNav'
 import { SearchModal } from './components/SearchModal'
@@ -100,6 +100,9 @@ function Layout() {
                                 </Link>
                                 <Link to="/ligas" className={`${navPill} ${isActive('/ligas') ? navPillActive : navPillInactive}`}>
                                     <Trophy size={14} /> Ligas
+                                </Link>
+                                <Link to="/mapa" className={`${navPill} ${isActive('/mapa') ? navPillActive : navPillInactive}`}>
+                                    <MapPin size={14} /> Mapa
                                 </Link>
                                 <Link to="/standings" className={`${navPill} ${isActive('/standings') ? navPillActive : navPillInactive}`}>
                                     <BarChart2 size={14} /> Classificações
