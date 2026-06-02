@@ -11,6 +11,7 @@ import {
 } from '../lib/fpbCompetitionsApi'
 import { GameCard } from '../components/GameCard'
 import { type Match } from '../components/types'
+import { SkeletonGameGrid, SkeletonHero } from '../components/Skeleton'
 
 const COMP_NAMES: Record<number, string> = {
     10902: 'Liga Betclic Masculina',
@@ -375,10 +376,30 @@ export default function CompetitionDetail() {
 
                 <div className="mt-5">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-16 gap-3">
-                            <Loader2 size={24} className="animate-spin text-dribly-purple" />
-                            <span className="text-xs font-medium text-zinc-400">A carregar...</span>
-                        </div>
+                        <>
+                            {tab === 'geral' && (
+                                <div className="space-y-5">
+                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                                        <SkeletonHero />
+                                        <div className="lg:col-span-7 grid grid-cols-2 gap-2.5">
+                                            {Array.from({ length: 4 }).map((_, i) => (
+                                                <div key={i} className="rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-3 animate-pulse bg-white dark:bg-zinc-900/60">
+                                                    <div className="h-3 w-20 bg-zinc-200 dark:bg-zinc-700 rounded mb-2" />
+                                                    <div className="h-4 w-24 bg-zinc-200 dark:bg-zinc-700 rounded mb-1" />
+                                                    <div className="h-3 w-16 bg-zinc-200 dark:bg-zinc-700 rounded mb-2" />
+                                                    <div className="h-6 w-10 bg-zinc-200 dark:bg-zinc-700 rounded" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                                        <SkeletonGameGrid count={2} days={1} />
+                                        <SkeletonGameGrid count={2} days={1} />
+                                    </div>
+                                </div>
+                            )}
+                            {tab !== 'geral' && <SkeletonGameGrid count={3} days={2} />}
+                        </>
                     ) : (
                         <>
                             {/* Overview */}
