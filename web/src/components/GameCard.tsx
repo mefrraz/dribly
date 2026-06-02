@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom'
 import { Clock, MapPin, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Match } from './types'
-import { matchName, isClubWin } from '../lib/matchUtils'
+import { isClubWin } from '../lib/matchUtils'
 
 interface GameCardProps {
   match: Match

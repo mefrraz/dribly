@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Loader2, Heart, ListOrdered, CalendarDays, Trophy, Users, BarChart4, LayoutDashboard, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Heart, ListOrdered, CalendarDays, Trophy, Users, BarChart4, LayoutDashboard, ExternalLink } from 'lucide-react'
 import { useFollows } from '../hooks/useFollows'
 import { useAuth } from '../lib/AuthContext'
 import { useClub } from '../lib/ClubContext'
@@ -262,6 +262,8 @@ export default function CompetitionDetail() {
         return games.map(g => fpbGameToMatch(g, logoMaps))
     }, [games, logoMaps])
 
+    const today = new Date().toISOString().split('T')[0]
+
     // Separate games into schedule and results using the pre-computed matches
     const scheduleMatches = useMemo(() =>
         matches.filter(m =>
@@ -297,8 +299,6 @@ export default function CompetitionDetail() {
         }
         return Object.entries(groups)
     }, [resultsMatches])
-
-    const today = new Date().toISOString().split('T')[0]
 
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr)
@@ -428,7 +428,7 @@ export default function CompetitionDetail() {
                                                         {topLogo ? (
                                                             <img src={topLogo} alt="" className="w-14 h-14 sm:w-[72px] sm:h-[72px] object-contain" />
                                                         ) : (
-                                                            <span className="text-2xl font-bold text-zinc-500">{top.name.charAt(0)}</span>
+                                                            <span className="text-2xl font-bold text-zinc-500">{topTeam.name.charAt(0)}</span>
                                                         )}
                                                     </div>
                                                     <div className="min-w-0">
@@ -765,6 +765,7 @@ export default function CompetitionDetail() {
                 </div>
             </div>
         </div>
+        </>
     )
 }
 

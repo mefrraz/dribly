@@ -85,10 +85,8 @@ export function useFollows() {
                         const withoutTemp = prev.filter(f => f.id < 0)
                         return [...withoutTemp, data as Follow]
                     })
+                    toast.success(currentlyFollowing ? 'Clube removido dos seguidos' : 'Clube adicionado aos seguidos')
                 }
-            }
-            if (data) {
-                toast.success(currentlyFollowing ? 'Clube removido dos seguidos' : 'Clube adicionado aos seguidos')
             }
             return true
         } catch (err) {
