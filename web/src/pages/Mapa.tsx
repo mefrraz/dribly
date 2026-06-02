@@ -112,7 +112,7 @@ export default function Mapa() {
     const [zoom, setZoom] = useState(8)
     const [selected, setSelected] = useState<Pavilion | null>(null)
     const [sheetOpen, setSheetOpen] = useState(false)
-    const mapRef = useRef<any>(null)
+    const mapRef = useRef<L.Map | null>(null)
 
     useEffect(() => {
         fetchPavilions().then((data) => {
@@ -147,9 +147,9 @@ export default function Mapa() {
                 </div>
             ) : (
                 <MapContainer
-                    ref={mapRef}
                     center={[39.7, -8.0]}
                     zoom={8}
+                    whenCreated={(map: L.Map) => { mapRef.current = map }}
                     className="w-full h-full"
                     zoomControl={true}
                     scrollWheelZoom={true}
@@ -184,12 +184,9 @@ export default function Mapa() {
                                 icon={clusterIcon(group.length)}
                                 eventHandlers={{
                                     click: () => {
-                                        // Zoom in to this cluster
                                         const m = mapRef.current
                                         if (m) {
-                                            m.flyTo([first.lat, first.lng], zoom + 2, {
-                                                duration: 0.5,
-                                            })
+                                            m.flyTo([first.lat, first.lng], Math.min(zoom + 3, 18), { duration: 0.5 })
                                         }
                                     },
                                 }}
