@@ -69,23 +69,24 @@ function FitBounds({ pavilions }: { pavilions: Pavilion[] }) {
 }
 
 /**
- * Cluster pavilions by proximity at current zoom.
- * Precision scales exponentially so that at zoom 14+ individual markers show.
- * At zoom 10: ~2km radius → multiple pavilions clustered
- * At zoom 14: ~100m radius → individual pavilions visible
- * At zoom 18: ~5m radius → all individual
+ * Cluster pavilions by proximity at current zoom using grid-based bucketing.
+ * Formula: cell_size ≈ 14km at zoom 8, 220m at zoom 14, 14m at zoom 18.
+ *
+ *   zoom 8  → precision 8       → cell ~14km (district level)
+ *   zoom 10 → precision 32      → cell ~3.5km (concelho level)
+ *   zoom 12 → precision 128     → cell ~870m (neighborhood)
+ *   zoom 14 → precision 512     → cell ~220m (individual pavilions start showing)
+ *   zoom 16 → precision 2048    → cell ~55m (all individual)
  */
 function useClusters(pavilions: Pavilion[], zoom: number): Map<string, Pavilion[]> {
     return useMemo(() => {
-        // precision = 5 * 2^(zoom-4). Gives exponential granularity.
-        const precision = Math.max(10, Math.ceil(Math.pow(2, zoom - 4)) * 5)
+        const precision = Math.max(2, Math.pow(2, zoom - 5))
         const clusters = new Map<string, Pavilion[]>()
 
         for (const p of pavilions) {
             const latR = Math.round(p.lat * precision) / precision
             const lngR = Math.round(p.lng * precision) / precision
-            // Use sufficient decimal places for the key
-            const decimals = Math.max(3, Math.ceil(Math.log10(precision)))
+            const decimals = Math.max(3, Math.ceil(Math.log10(precision)) + 1)
             const key = `${latR.toFixed(decimals)},${lngR.toFixed(decimals)}`
 
             if (!clusters.has(key)) clusters.set(key, [])
@@ -158,6 +159,8 @@ export default function Mapa() {
                 <MapContainer
                     center={[39.7, -8.0]}
                     zoom={8}
+                    minZoom={6}
+                    maxZoom={18}
                     ref={mapRef}
                     className="w-full h-full"
                     zoomControl={true}
