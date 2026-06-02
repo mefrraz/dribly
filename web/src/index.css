@@ -136,6 +136,5 @@
   left: 12px;
 }
 .leaflet-control-attribution {
-  font-size: 9px !important;
-  opacity: 0.6;
+  display: none;
 }
