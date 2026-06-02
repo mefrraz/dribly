@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/AuthContext'
+import { toast } from '../components/Toast'
 
 export interface Follow {
     id: number
@@ -86,11 +87,15 @@ export function useFollows() {
                     })
                 }
             }
+            if (data) {
+                toast.success(currentlyFollowing ? 'Clube removido dos seguidos' : 'Clube adicionado aos seguidos')
+            }
             return true
         } catch (err) {
             // 4. Rollback on failure
             setFollows(previousFollows)
             console.error('Follow toggle failed:', err)
+            toast.error('Ocorreu um erro. A reverter...')
             return false
         }
     }, [user, follows])

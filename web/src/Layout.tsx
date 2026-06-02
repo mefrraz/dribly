@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { Sun, Moon, Instagram, Github, Info, BarChart2, Home, Search, LogIn, Heart, Trophy, Building2, MapPin } from 'lucide-react'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { ToastContainer } from './components/Toast'
 import PWAInstallBanner from './components/PWAInstallBanner'
 import BottomNav from './components/BottomNav'
 import { SearchModal } from './components/SearchModal'
@@ -168,6 +169,7 @@ function Layout() {
 
             <BottomNav />
             <PWAInstallBanner />
+            <ToastContainer />
             <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
             <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} onAuthSuccess={handleAuthSuccess} />
             {onboardingTrigger && (
