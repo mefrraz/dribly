@@ -143,7 +143,7 @@ function Layout() {
                 </div>
             </nav>
 
-            <main className="flex-grow pt-4 md:pt-6 pb-24">
+            <main className="flex-grow pt-4 md:pt-6 pb-24 page-fade-in">
                 <ErrorBoundary>
                     <Outlet />
                 </ErrorBoundary>
