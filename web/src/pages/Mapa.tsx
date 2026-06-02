@@ -382,8 +382,8 @@ export default function Mapa() {
                 </MapContainer>
             )}
 
-            {/* Map footer bar */}
-            <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-auto z-[1000] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl px-3 py-2 flex items-center justify-center gap-4 text-[10px] text-zinc-500 dark:text-zinc-400 shadow-lg">
+            {/* Map footer bar — floating card on the left */}
+            <div className="absolute bottom-4 left-4 z-[1000] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl px-3 py-2 flex items-center gap-3 text-[10px] text-zinc-500 dark:text-zinc-400 shadow-lg">
                 <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-[#7C3AED] shadow-sm shadow-purple-500/50" />
                     {activePavilionIds.size} com jogos
