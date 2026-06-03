@@ -580,14 +580,14 @@ function Game() {
                                     </div>
                                     <span className="text-[12px] font-semibold text-zinc-900 dark:text-white group-hover:text-dribly-blue transition-colors shrink-0">{semiAbrev(firstTeam)}</span>
                                     <span className="text-zinc-400 font-medium text-xs tabular-nums shrink-0">{firstScore}-{secondScore}</span>
-                                    <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
+                                    <span className="text-[12px] text-zinc-500 dark:text-zinc-400 shrink-0">{semiAbrev(secondTeam)}</span>
+                                    <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50 mr-8">
                                         {secondLogo ? (
                                             <img src={secondLogo} alt="" className="w-5 h-5 object-contain" />
                                         ) : (
                                             <span className="text-[9px] font-bold text-zinc-500">{semiAbrev(secondTeam).charAt(0)}</span>
                                         )}
                                     </div>
-                                    <span className="text-[12px] text-zinc-500 dark:text-zinc-400 truncate flex-1 min-w-0">{semiAbrev(secondTeam)}</span>
                                     <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase shrink-0 font-medium">{shortDate}</span>
                                 </Link>
                             )
