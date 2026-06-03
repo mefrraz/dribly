@@ -135,22 +135,29 @@ export default function PavilionPage() {
                         <MapPin size={24} className="text-dribly-purple" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-black text-zinc-900 dark:text-white inline-flex items-center gap-2">
+                        <h1 className="text-xl font-black text-zinc-900 dark:text-white">
                             {pavilion.nome}
+                        </h1>
+                        <div className="flex items-center gap-2 mt-1">
                             {pavilion.distrito && (
-                                <span className="inline-block px-2 py-0.5 rounded-md bg-dribly-purple/10 text-[10px] font-bold text-dribly-purple align-middle">
+                                <span className="inline-block px-2 py-0.5 rounded-md bg-dribly-purple/10 text-[10px] font-bold text-dribly-purple">
                                     {pavilion.distrito}
                                 </span>
                             )}
-                        </h1>
-                        {address ? (
-                            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
-                               target="_blank" rel="noopener noreferrer"
-                               className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 block hover:text-dribly-blue transition-colors group">
-                                <span className="group-hover:underline">{address}</span>
-                                <Navigation size={12} className="inline-block ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </a>
-                        ) : null}
+                            {pavilion.concelho && (
+                                <span className="text-xs text-zinc-400">{pavilion.concelho}</span>
+                            )}
+                        </div>
+                        {address && (
+                            <div className="flex items-center gap-2 mt-2">
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400">{address}</p>
+                                <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || pavilion.nome)}`}
+                                   target="_blank" rel="noopener noreferrer"
+                                   className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold text-dribly-blue hover:underline">
+                                    <Navigation size={11} /> Maps
+                                </a>
+                            </div>
+                        )}
                     </div>
                 </div>
 
