@@ -9,7 +9,7 @@
  */
 import { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { ArrowLeft, Loader2, MapPin, CalendarDays, Trophy, Info, Navigation } from 'lucide-react'
+import { ArrowLeft, Loader2, MapPin, CalendarDays, Trophy, Info, Navigation, Home, Mail, Building2, Globe } from 'lucide-react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabase'
@@ -135,15 +135,22 @@ export default function PavilionPage() {
                         <MapPin size={24} className="text-dribly-purple" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-black text-zinc-900 dark:text-white">
+                        <h1 className="text-xl font-black text-zinc-900 dark:text-white inline-flex items-center gap-2">
                             {pavilion.nome}
+                            {pavilion.distrito && (
+                                <span className="inline-block px-2 py-0.5 rounded-md bg-dribly-purple/10 text-[10px] font-bold text-dribly-purple align-middle">
+                                    {pavilion.distrito}
+                                </span>
+                            )}
                         </h1>
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">{address}</p>
-                        {pavilion.distrito && (
-                            <span className="inline-block mt-1.5 px-2 py-0.5 rounded-md bg-dribly-purple/10 text-[10px] font-bold text-dribly-purple">
-                                {pavilion.distrito}
-                            </span>
-                        )}
+                        {address ? (
+                            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
+                               target="_blank" rel="noopener noreferrer"
+                               className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 block hover:text-dribly-blue transition-colors group">
+                                <span className="group-hover:underline">{address}</span>
+                                <Navigation size={12} className="inline-block ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </a>
+                        ) : null}
                     </div>
                 </div>
 
@@ -166,14 +173,15 @@ export default function PavilionPage() {
 
                 {tab === 'geral' && (
                     <div className="space-y-4">
-                        {/* Mini map */}
-                        <div className="rounded-2xl overflow-hidden h-52 border border-zinc-200 dark:border-zinc-800">
+                        {/* Map with overlay buttons */}
+                        <div className="rounded-2xl overflow-hidden h-52 border border-zinc-200 dark:border-zinc-800 relative group">
                             <MapContainer
                                 center={[pavilion.lat, pavilion.lng]}
                                 zoom={15}
                                 zoomControl={false}
-                                dragging={true}
+                                dragging={false}
                                 scrollWheelZoom={false}
+                                doubleClickZoom={false}
                                 attributionControl={false}
                                 className="w-full h-full"
                             >
@@ -185,38 +193,51 @@ export default function PavilionPage() {
                                     })}
                                 />
                             </MapContainer>
+                            <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || pavilion.nome)}`}
+                                   target="_blank" rel="noopener noreferrer"
+                                   className="px-2.5 py-1.5 rounded-lg bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm text-[10px] font-bold text-dribly-blue shadow-lg hover:bg-dribly-blue hover:text-white transition-colors inline-flex items-center gap-1">
+                                    <Navigation size={11} />
+                                    Maps
+                                </a>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || pavilion.nome)}`}
-                               target="_blank" rel="noopener noreferrer"
-                               className="inline-flex items-center gap-1.5 text-[10px] font-bold text-dribly-blue bg-dribly-blue/5 hover:bg-dribly-blue hover:text-white px-3 py-1.5 rounded-full transition-colors">
-                                <Navigation size={12} />
-                                Google Maps
-                            </a>
-                        </div>
+
+                        {/* Info grid with icons */}
                         <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
-                            <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4">Informação</h3>
-                            <div className="grid grid-cols-2 gap-3 text-sm">
-                                <div>
-                                    <p className="text-[10px] text-zinc-400 uppercase">Morada</p>
-                                    <p className="font-medium text-zinc-900 dark:text-white mt-0.5">{pavilion.rua || '—'}</p>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="flex items-start gap-2.5">
+                                    <Home size={14} className="text-zinc-400 shrink-0 mt-0.5" />
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Morada</p>
+                                        <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.rua || '—'}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-[10px] text-zinc-400 uppercase">Código Postal</p>
-                                    <p className="font-medium text-zinc-900 dark:text-white mt-0.5">{pavilion.codigo_postal || '—'}</p>
+                                <div className="flex items-start gap-2.5">
+                                    <Mail size={14} className="text-zinc-400 shrink-0 mt-0.5" />
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Código Postal</p>
+                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.codigo_postal || '—'}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-[10px] text-zinc-400 uppercase">Cidade</p>
-                                    <p className="font-medium text-zinc-900 dark:text-white mt-0.5">{pavilion.cidade || '—'}</p>
+                                <div className="flex items-start gap-2.5">
+                                    <Building2 size={14} className="text-zinc-400 shrink-0 mt-0.5" />
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Cidade</p>
+                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.cidade || '—'}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-[10px] text-zinc-400 uppercase">Distrito</p>
-                                    <p className="font-medium text-zinc-900 dark:text-white mt-0.5">{pavilion.distrito || '—'}</p>
+                                <div className="flex items-start gap-2.5">
+                                    <Globe size={14} className="text-zinc-400 shrink-0 mt-0.5" />
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Distrito</p>
+                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.distrito || '—'}</p>
+                                    </div>
                                 </div>
                             </div>
                             {pavilion.fpb_url && (
                                 <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 mt-4 text-xs text-dribly-purple hover:underline">
+                                    className="inline-flex items-center gap-1.5 mt-4 text-xs text-dribly-purple hover:underline font-medium">
                                     Ver na FPB →
                                 </a>
                             )}
