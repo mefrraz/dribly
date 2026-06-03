@@ -46,9 +46,7 @@ O Dribly nasceu da frustração de não existir uma plataforma única, rápida e
 | 📅 **Jogos e agenda** | v1.0 | Calendário, resultados, fichas de jogo detalhadas |
 | 🏆 **Classificações** | v3.3 | Tabelas via WordPress AJAX com J, V, D, PM, PS, DIF, PTS |
 | 📊 **Estatísticas individuais** | v3.4 | 22 campos — PTS, REB, AST, VAL, %L2, %L3, %LL |
-| ⭐ **Favoritar clube** | v3.4 | Favoritar clube + segui-lo automaticamente |
-| ❤️ **Seguir clubes/ligas** | v3.4 | Página dedicada "Seguidos" |
-| 🗺️ **Mapas / Pavilhões** | v3.4 | Pavilhões no mapa |
+| ❤️ **Seguir clubes/ligas** | v3.4 | Página dedicada "Seguidos", botão Heart nos clubes |
 | 🌓 **Modo claro/escuro** | v1.0 | Transição suave |
 | 📱 **PWA instalável** | v1.2 | Instala como app nativa |
 | 🔌 **Offline parcial** | v3.0 | Service Worker + cache inteligente |
