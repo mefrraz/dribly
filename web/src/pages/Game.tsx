@@ -66,6 +66,15 @@ function Game() {
     const [pavilion, setPavilion] = useState<Pavilion | null>(null)
     const [loading, setLoading] = useState(true)
     const [copied, setCopied] = useState(false)
+    const [darkMode, setDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
+
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setDarkMode(document.documentElement.classList.contains('dark'))
+        })
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+        return () => observer.disconnect()
+    }, [])
 
     useEffect(() => {
         if (clubSlug) {
@@ -382,7 +391,7 @@ function Game() {
                                 attributionControl={false}
                                 className="w-full h-full pointer-events-none"
                             >
-                                <TileLayer url="https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png" />
+                                <TileLayer url={darkMode ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png' : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'} />
                                 <Marker position={[pavilion.lat, pavilion.lng]}
                                     icon={L.divIcon({
                                         html: `<div style="width:16px;height:16px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(124,58,237,0.8)"></div>`,

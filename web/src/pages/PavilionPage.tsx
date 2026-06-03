@@ -8,8 +8,10 @@
  *   Resultados — past results at this pavilion (date-separated)
  */
 import { useEffect, useState, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Loader2, MapPin, CalendarDays, Trophy, Info } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { ArrowLeft, Loader2, MapPin, CalendarDays, Trophy, Info, Navigation } from 'lucide-react'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import L from 'leaflet'
 import { supabase } from '../lib/supabase'
 import type { Pavilion } from '../lib/mapData'
 import { GameCard } from '../components/GameCard'
@@ -40,6 +42,15 @@ export default function PavilionPage() {
     const [games, setGames] = useState<Match[]>([])
     const [loading, setLoading] = useState(true)
     const [tab, setTab] = useState<Tab>('geral')
+    const [darkMode, setDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
+
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setDarkMode(document.documentElement.classList.contains('dark'))
+        })
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+        return () => observer.disconnect()
+    }, [])
 
     useEffect(() => {
         if (!recintoId) return
@@ -114,10 +125,10 @@ export default function PavilionPage() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
             <div className="max-w-6xl mx-auto px-4 pt-6 pb-24">
-                <Link to="/mapa" className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 mb-4 group">
+                <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 mb-4 group">
                     <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-                    Mapa
-                </Link>
+                    Voltar
+                </button>
 
                 <div className="flex items-start gap-4 mb-6">
                     <div className="w-14 h-14 rounded-2xl bg-dribly-purple/10 flex items-center justify-center shrink-0">
@@ -155,6 +166,34 @@ export default function PavilionPage() {
 
                 {tab === 'geral' && (
                     <div className="space-y-4">
+                        {/* Mini map */}
+                        <div className="rounded-2xl overflow-hidden h-52 border border-zinc-200 dark:border-zinc-800">
+                            <MapContainer
+                                center={[pavilion.lat, pavilion.lng]}
+                                zoom={15}
+                                zoomControl={false}
+                                dragging={true}
+                                scrollWheelZoom={false}
+                                attributionControl={false}
+                                className="w-full h-full"
+                            >
+                                <TileLayer url={darkMode ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png' : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'} />
+                                <Marker position={[pavilion.lat, pavilion.lng]}
+                                    icon={L.divIcon({
+                                        html: `<div style="width:20px;height:20px;background:#7C3AED;border:3px solid white;border-radius:50%;box-shadow:0 0 10px rgba(124,58,237,0.6)"></div>`,
+                                        className: '', iconSize: [20, 20], iconAnchor: [10, 10]
+                                    })}
+                                />
+                            </MapContainer>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || pavilion.nome)}`}
+                               target="_blank" rel="noopener noreferrer"
+                               className="inline-flex items-center gap-1.5 text-[10px] font-bold text-dribly-blue bg-dribly-blue/5 hover:bg-dribly-blue hover:text-white px-3 py-1.5 rounded-full transition-colors">
+                                <Navigation size={12} />
+                                Google Maps
+                            </a>
+                        </div>
                         <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
                             <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4">Informação</h3>
                             <div className="grid grid-cols-2 gap-3 text-sm">
