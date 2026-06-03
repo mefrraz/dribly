@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
+import { useState } from 'react'
 import Layout from './Layout'
 import ClubLayout from './pages/club/ClubLayout'
 import Landing from './pages/Landing'
@@ -22,13 +23,17 @@ import PavilionPage from './pages/PavilionPage'
 import NotFound from './pages/NotFound'
 import { ClubProvider } from './lib/ClubContext'
 import { AuthProvider } from './lib/AuthContext'
+import SplashScreen from './components/SplashScreen'
 
 function App() {
+    const [splashDone, setSplashDone] = useState(() => sessionStorage.getItem('dribly_splash_shown') === '1')
+
     return (
         <HelmetProvider>
         <BrowserRouter>
             <AuthProvider>
             <ClubProvider>
+                {!splashDone && <SplashScreen onDone={() => { sessionStorage.setItem('dribly_splash_shown', '1'); setSplashDone(true) }} />}
                 <Routes>
                     <Route path="/" element={<Layout />}>
                         <Route index element={<Landing />} />
