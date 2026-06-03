@@ -144,20 +144,10 @@ export default function PavilionPage() {
                                     {pavilion.distrito}
                                 </span>
                             )}
-                            {pavilion.concelho && (
-                                <span className="text-xs text-zinc-400">{pavilion.concelho}</span>
+                            {pavilion.cidade && pavilion.cidade !== pavilion.distrito && (
+                                <span className="text-xs text-zinc-400">{pavilion.cidade}</span>
                             )}
                         </div>
-                        {address && (
-                            <div className="flex items-center gap-2 mt-2">
-                                <p className="text-sm text-zinc-500 dark:text-zinc-400">{address}</p>
-                                <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || pavilion.nome)}`}
-                                   target="_blank" rel="noopener noreferrer"
-                                   className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold text-dribly-blue hover:underline">
-                                    <Navigation size={11} /> Maps
-                                </a>
-                            </div>
-                        )}
                     </div>
                 </div>
 
