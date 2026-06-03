@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase'
 import { fetchFPBGames } from '../lib/fpbApi'
 import { fetchGameDetail, type FPBGameDetail } from '../lib/fpbCompetitionsApi'
 import { ArrowLeft, MapPin, Share2, Trophy, Navigation, TrendingUp, ExternalLink, Calendar, Check, Clock, Info } from 'lucide-react'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import L from 'leaflet'
 import { SkeletonHero } from '../components/Skeleton'
 import { Match } from '../components/types'
 import { useClub, type Club } from '../lib/ClubContext'
@@ -363,46 +365,82 @@ function Game() {
                 </div>
             </div>
 
-            {/* Location Card — with pavilion link + mini map */}
-            <div className="glass-card p-5 flex items-start gap-4 ">
-                <div className="p-3 rounded-full bg-zinc-100 dark:bg-white/5 text-dribly-blue shrink-0">
-                    <MapPin size={20} />
-                </div>
-                <div className="min-w-0 flex-1">
-                    <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mb-1">Localização</h4>
-                    {match.local ? (
-                        <>
-                            <p className="text-sm font-medium text-zinc-900 dark:text-white mb-1 break-words">{match.local}</p>
-                            <div className="flex flex-wrap items-center gap-2">
-                                <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(match.local)}`}
-                                   target="_blank" rel="noopener noreferrer"
-                                   className="inline-flex items-center gap-1 text-[10px] font-bold text-dribly-blue hover:text-black dark:hover:text-white transition-colors group">
-                                    <Navigation size={11} />
-                                    <span className="group-hover:underline">Google Maps</span>
-                                </a>
-                                {pavilion && (
-                                    <Link to={`/pavilhao/${pavilion.recinto_id || pavilion.id}`}
-                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-dribly-purple hover:text-black dark:hover:text-white transition-colors group">
-                                        <Info size={11} />
-                                        <span className="group-hover:underline">Ver pavilhão</span>
-                                    </Link>
-                                )}
+            {/* Location Card — full-width, map on top, info below */}
+            {match.local ? (
+                <div className="glass-card overflow-hidden">
+                    {/* Mini map — full card width */}
+                    {pavilion ? (
+                        <Link to={`/pavilhao/${pavilion.recinto_id || pavilion.id}`} className="block h-40 w-full relative cursor-pointer group">
+                            <MapContainer
+                                center={[pavilion.lat, pavilion.lng]}
+                                zoom={15}
+                                zoomControl={false}
+                                dragging={false}
+                                scrollWheelZoom={false}
+                                doubleClickZoom={false}
+                                touchZoom={false}
+                                attributionControl={false}
+                                className="w-full h-full pointer-events-none"
+                            >
+                                <TileLayer url="https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png" />
+                                <Marker position={[pavilion.lat, pavilion.lng]}
+                                    icon={L.divIcon({
+                                        html: `<div style="width:16px;height:16px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(124,58,237,0.8)"></div>`,
+                                        className: '', iconSize: [16, 16], iconAnchor: [8, 8]
+                                    })}
+                                />
+                            </MapContainer>
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm text-xs font-bold text-dribly-purple px-3 py-1.5 rounded-full">Ver pavilhão →</span>
                             </div>
+                        </Link>
+                    ) : match.local ? (
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(match.local)}`}
+                           target="_blank" rel="noopener noreferrer"
+                           className="block h-40 w-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors group">
+                            <div className="text-center">
+                                <MapPin size={28} className="mx-auto text-dribly-purple mb-1" />
+                                <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-300">Ver no Google Maps</span>
+                            </div>
+                        </a>
+                    ) : null}
+                    {/* Info row */}
+                    <div className="p-3 flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-zinc-100 dark:bg-white/5 text-dribly-blue shrink-0">
+                            <MapPin size={16} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">{match.local}</p>
+                            {pavilion && <p className="text-[10px] text-zinc-400 truncate">{pavilion.cidade}{pavilion.distrito ? `, ${pavilion.distrito}` : ''}</p>}
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                            <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(match.local)}`}
+                               target="_blank" rel="noopener noreferrer"
+                               className="p-1.5 rounded-lg bg-zinc-100 dark:bg-white/5 text-dribly-blue hover:bg-dribly-blue hover:text-white transition-colors"
+                               title="Google Maps">
+                                <Navigation size={14} />
+                            </a>
                             {pavilion && (
                                 <Link to={`/pavilhao/${pavilion.recinto_id || pavilion.id}`}
-                                    className="block mt-2 rounded-lg overflow-hidden border border-zinc-200 dark:border-white/10 h-28 bg-zinc-100 dark:bg-zinc-800">
-                                    <div className="w-full h-full flex items-center justify-center text-zinc-400 text-xs gap-1.5">
-                                        <MapPin size={14} className="text-dribly-purple" />
-                                        <span>Ver no mapa de pavilhões</span>
-                                    </div>
+                                    className="p-1.5 rounded-lg bg-dribly-purple/10 text-dribly-purple hover:bg-dribly-purple hover:text-white transition-colors"
+                                    title="Página do pavilhão">
+                                    <Info size={14} />
                                 </Link>
                             )}
-                        </>
-                    ) : (
-                        <p className="text-sm text-zinc-500 italic">A definir</p>
-                    )}
+                        </div>
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <div className="glass-card p-5 flex items-start gap-4">
+                    <div className="p-3 rounded-full bg-zinc-100 dark:bg-white/5 text-dribly-blue shrink-0">
+                        <MapPin size={20} />
+                    </div>
+                    <div>
+                        <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mb-1">Localização</h4>
+                        <p className="text-sm text-zinc-500 italic">A definir</p>
+                    </div>
+                </div>
+            )}
 
             {/* Date Card */}
             <div className="glass-card p-5 flex items-start gap-4 ">

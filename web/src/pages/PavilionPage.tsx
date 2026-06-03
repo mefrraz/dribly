@@ -106,7 +106,7 @@ export default function PavilionPage() {
         return (
             <div className="max-w-xl mx-auto px-4 py-16 text-center">
                 <p className="text-zinc-500">Pavilhão não encontrado.</p>
-                <Link to="/mapa" className="text-dribly-purple text-sm mt-2 inline-block">← Voltar ao mapa</Link>
+                <button onClick={() => window.history.back()} className="text-dribly-purple text-sm mt-2 inline-block">← Voltar</button>
             </div>
         )
     }
