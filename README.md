@@ -22,7 +22,7 @@
   </a>
 </p>
 
-> **v6.0.0** — 🗺️ Mapa de pavilhões · [dribly.pt](https://dribly.pt)
+> **v7.18.0** — 🛠️ Estabilização: backend, scraper, SEO, a11y, CI/CD · [dribly.pt](https://dribly.pt)
 
 ---
 
@@ -53,6 +53,12 @@ O Dribly nasceu da frustração de não existir uma plataforma única, rápida e
 | 📱 **PWA instalável** | v1.2 | Instala como app nativa |
 | 🔌 **Offline parcial** | v3.0 | Service Worker + cache inteligente |
 | 🗺️ **Mapa de pavilhões** | v6.0 | Mapa interativo com 400+ pavilhões, jogos perto de ti |
+| 🛠️ **CI/CD scraper automático** | v7.2 | GitHub Action diária para manter dados frescos |
+| 🧪 **Testes unitários** | v7.6 | Vitest com lógica de parsing testável |
+| 🔍 **SEO dinâmico** | v7.15 | Meta tags por página, robots.txt, sitemap |
+| ♿ **Acessibilidade** | v7.16 | Alt text, breadcrumbs, indicadores de scroll acessíveis |
+| 🛡️ **ErrorBoundary global** | v7.9 | Fallback amigável em vez de ecrã branco |
+| ⚡ **Pre-warming de cache** | v7.12 | Dados pré-carregados antes do pico de utilização |
 | 🎨 **Tema dinâmico** | v2.9 | Cada clube com accent color própria |
 | 🎯 **Tour onboarding** | v3.3 | Tour guiado ao criar conta |
 | 💡 **Sugestões pós-registo** | v3.3 | Sugestões de clubes/ligas na 1ª vez |
