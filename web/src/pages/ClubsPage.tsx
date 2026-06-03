@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Loader2, Heart } from 'lucide-react'
+import { Search, Heart } from 'lucide-react'
 import { useClub, displayName } from '../lib/ClubContext'
 import { useAuth } from '../lib/AuthContext'
 import { useFollows } from '../hooks/useFollows'
@@ -57,9 +57,14 @@ export default function ClubsPage() {
                 </div>
 
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-16 gap-3">
-                        <Loader2 className="animate-spin text-dribly-purple" size={28} />
-                        <span className="text-sm text-zinc-400">A carregar clubes...</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
+                        {Array.from({ length: 15 }).map((_, i) => (
+                            <div key={i} className="bg-white dark:bg-zinc-900/90 border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 animate-pulse text-center">
+                                <div className="w-16 h-16 mx-auto rounded-full bg-zinc-200 dark:bg-zinc-700 mb-3" />
+                                <div className="h-3 w-20 bg-zinc-200 dark:bg-zinc-700 rounded mx-auto mb-1" />
+                                <div className="h-2.5 w-14 bg-zinc-200 dark:bg-zinc-700 rounded mx-auto" />
+                            </div>
+                        ))}
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="text-center py-16">

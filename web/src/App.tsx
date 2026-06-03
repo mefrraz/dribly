@@ -20,6 +20,8 @@ import Leagues from './pages/Leagues'
 import CompetitionDetail from './pages/CompetitionDetail'
 import Mapa from './pages/Mapa'
 import PavilionPage from './pages/PavilionPage'
+import ClubTeams from './pages/club/ClubTeams'
+import ClubTeamDetail from './pages/club/ClubTeamDetail'
 import NotFound from './pages/NotFound'
 import { ClubProvider } from './lib/ClubContext'
 import { AuthProvider } from './lib/AuthContext'
@@ -41,6 +43,8 @@ function App() {
                             <Route index element={<ClubHome />} />
                             <Route path="home" element={<ClubHome />} />
                             <Route path="games" element={<ClubGames />} />
+                            <Route path="team" element={<ClubTeams />} />
+                            <Route path="team/:teamId" element={<ClubTeamDetail />} />
                         </Route>
                         <Route path="game/:slug" element={<Game />} />
                         <Route path="standings" element={<Standings />} />
