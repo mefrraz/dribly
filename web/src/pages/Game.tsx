@@ -54,7 +54,6 @@ function Game() {
     const [match, setMatch] = useState<Match | null>(null)
     const [club, setClub] = useState<Club | null>(null)
     const [detailLeaders, setDetailLeaders] = useState<FPBGameDetail['gameLeaders']>([])
-    const [detailAbrev, setDetailAbrev] = useState<{ casa: string; fora: string }>({ casa: '', fora: '' })
     const [topPerfCasa, setTopPerfCasa] = useState<{ nome: string; foto: string }>({ nome: '', foto: '' })
     const [topPerfFora, setTopPerfFora] = useState<{ nome: string; foto: string }>({ nome: '', foto: '' })
     const [topPerfStats, setTopPerfStats] = useState<{ label: string; casa: string; fora: string }[]>([])
@@ -92,7 +91,6 @@ function Game() {
                         fetchGameDetail(String(m.id)).then(detail => {
                             if (detail) {
                                 setDetailLeaders(detail.gameLeaders)
-                                setDetailAbrev({ casa: detail.abrev_casa, fora: detail.abrev_fora })
                                 setTopPerfCasa(detail.topPerfCasa)
                                 setTopPerfFora(detail.topPerfFora)
                                 setTopPerfStats(detail.topPerfStats)
@@ -110,7 +108,6 @@ function Game() {
                     if (detail) {
                         setMatch(detailToMatch(detail))
                         setDetailLeaders(detail.gameLeaders)
-                        setDetailAbrev({ casa: detail.abrev_casa, fora: detail.abrev_fora })
                         setTopPerfCasa(detail.topPerfCasa)
                         setTopPerfFora(detail.topPerfFora)
                         setTopPerfStats(detail.topPerfStats)
@@ -332,7 +329,7 @@ function Game() {
                     </div>
 
                     <div className="flex items-center justify-between gap-4">
-                        <TeamBlock name={match.equipa_casa} logo={match.logotipo_casa} abrev={detailAbrev.casa || undefined} clubSlug={(() => { const n = match.equipa_casa; const found = clubs.find(c => n.toUpperCase().includes(c.name.toUpperCase())); return found ? found.slug : null })()} />
+                        <TeamBlock name={match.equipa_casa} logo={match.logotipo_casa} clubSlug={(() => { const n = match.equipa_casa; const found = clubs.find(c => n.toUpperCase().includes(c.name.toUpperCase())); return found ? found.slug : null })()} />
                         <div className="flex flex-col items-center gap-1 shrink-0">
                             {isFinished || isLive ? (
                                 <div className="flex items-center gap-1 sm:gap-3">
@@ -350,7 +347,7 @@ function Game() {
                                 </div>
                             )}
                         </div>
-                        <TeamBlock name={match.equipa_fora} logo={match.logotipo_fora} abrev={detailAbrev.fora || undefined} clubSlug={(() => { const n = match.equipa_fora; const found = clubs.find(c => n.toUpperCase().includes(c.name.toUpperCase())); return found ? found.slug : null })()} />
+                        <TeamBlock name={match.equipa_fora} logo={match.logotipo_fora} clubSlug={(() => { const n = match.equipa_fora; const found = clubs.find(c => n.toUpperCase().includes(c.name.toUpperCase())); return found ? found.slug : null })()} />
                     </div>
 
 
@@ -572,18 +569,18 @@ function Game() {
     )
 }
 
-function TeamBlock({ name, logo, clubSlug, abrev }: { name: string; logo: string | null; clubSlug?: string | null; abrev?: string }) {
+function TeamBlock({ name, logo, clubSlug }: { name: string; logo: string | null; clubSlug?: string | null }) {
     const content = (
         <div className="flex-1 flex flex-col items-center text-center gap-1 min-w-0">
             <div className="w-20 h-20 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
                 {logo ? (
                     <img src={logo} alt="" className="w-14 h-14 object-contain" />
                 ) : (
-                    <span className="text-2xl font-bold text-zinc-500">{(abrev ? semiAbrev(name) : name).charAt(0)}</span>
+                    <span className="text-2xl font-bold text-zinc-500">{semiAbrev(name).charAt(0)}</span>
                 )}
             </div>
             <p className="text-xs font-black text-zinc-900 dark:text-white leading-tight truncate w-full">
-                {abrev ? semiAbrev(name) : name.toUpperCase()}
+                {semiAbrev(name)}
             </p>
         </div>
     );
