@@ -113,19 +113,40 @@
 }
 .leaflet-top,
 .leaflet-bottom {
-  z-index: 2;
+  z-index: 1000;
 }
 /* Move zoom controls to left side, vertically centered */
-.leaflet-top.leaflet-left {
+.leaflet-left.leaflet-top {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
 }
-.leaflet-top.leaflet-left .leaflet-control {
+.leaflet-left.leaflet-top .leaflet-control {
   float: none;
   clear: both;
   margin-top: 4px;
 }
+.leaflet-control-zoom {
+  display: block !important;
+  visibility: visible !important;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.leaflet-control-zoom a {
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  font-size: 18px;
+  background: rgba(24,24,27,0.9) !important;
+  color: #fff !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.leaflet-control-zoom a:last-child {
+  border-bottom: none;
+}
+
 /* Fix attribution position — bottom-left */
 .leaflet-bottom.leaflet-left {
   left: 12px;

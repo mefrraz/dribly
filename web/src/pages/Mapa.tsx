@@ -323,17 +323,17 @@ export default function Mapa() {
 
             {/* District filter dropdown */}
             {showFilters && (
-                <div className="absolute top-[5rem] left-3 md:left-4 z-[1100] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-xl p-2 max-h-[40vh] overflow-y-auto min-w-[180px]">
+                <div className="absolute top-[5rem] left-3 right-3 md:left-4 md:right-auto md:w-52 z-[1100] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-xl p-2 max-h-[40vh] overflow-y-auto">
                     <button
                         onClick={() => { setSelectedDistrict(''); setShowFilters(false) }}
-                        className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!selectedDistrict ? 'bg-dribly-purple text-white' : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5'}`}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!selectedDistrict ? 'bg-dribly-purple text-white' : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5'}`}
                     >
                         Todos os distritos
                     </button>
                     {districts.map(d => (
                         <button key={d}
                             onClick={() => { setSelectedDistrict(d); setShowFilters(false) }}
-                            className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedDistrict === d ? 'bg-dribly-purple text-white' : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5'}`}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedDistrict === d ? 'bg-dribly-purple text-white' : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5'}`}
                         >
                             {d}
                         </button>
