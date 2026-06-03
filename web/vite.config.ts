@@ -64,6 +64,21 @@ export default defineConfig({
                 // Cache Supabase API responses for offline access
                 runtimeCaching: [
                     {
+                        // Cache FPB proxy responses (stale-while-revalidate)
+                        urlPattern: /\/api\/fpb/i,
+                        handler: 'StaleWhileRevalidate',
+                        options: {
+                            cacheName: 'fpb-api-cache',
+                            expiration: {
+                                maxEntries: 50,
+                                maxAgeSeconds: 60 * 15 // 15 minutes
+                            },
+                            cacheableResponse: {
+                                statuses: [0, 200]
+                            }
+                        }
+                    },
+                    {
                         // Cache Supabase REST API calls
                         urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/i,
                         handler: 'NetworkFirst',

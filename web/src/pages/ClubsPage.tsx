@@ -5,6 +5,20 @@ import { useClub, displayName } from '../lib/ClubContext'
 import { useAuth } from '../lib/AuthContext'
 import { useFollows } from '../hooks/useFollows'
 import { normalize, buildSearchText } from '../lib/clubSearch'
+import { supabase } from '../lib/supabase'
+
+const prefetchedIds = new Set<number>()
+
+function prefetchClubGames(clubId: number, clubName: string) {
+    if (prefetchedIds.has(clubId)) return
+    prefetchedIds.add(clubId)
+    supabase
+        .from('games_2025_2026')
+        .select('*', { count: 'exact', head: true })
+        .or(`equipa_casa.ilike.%${clubName}%,equipa_fora.ilike.%${clubName}%`)
+        .order('data', { ascending: true })
+        .then(() => undefined)
+}
 
 export default function ClubsPage() {
     const { clubs, loadClubs } = useClub()
@@ -59,6 +73,7 @@ export default function ClubsPage() {
                                 <div key={club.id} className="group relative">
                                     <Link
                                         to={`/clube/${club.slug}/home`}
+                                        onMouseEnter={() => prefetchClubGames(club.id, club.name)}
                                         className="block bg-white dark:bg-zinc-900/90 border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 hover:border-dribly-purple/40 dark:hover:border-dribly-purple/40 hover:shadow-md transition-all duration-200 text-center"
                                     >
                                         <div className="w-16 h-16 mx-auto rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center overflow-hidden mb-3 border border-zinc-100 dark:border-zinc-700/50 group-hover:scale-105 transition-transform">

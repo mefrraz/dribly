@@ -97,6 +97,25 @@ O Dribly nasceu da frustração de não existir uma plataforma única, rápida e
   </tbody>
 </table>
 
+## 📈 Rate Limits
+
+Testámos os limites das fontes externas com 1000+ pedidos consecutivos para planear a frequência do scraping:
+
+| Fonte | Rate Limit? | Latência média | Pedidos seguros/dia |
+|---|---|---|---|
+| **FPB `/clubes/`** | ❌ Nenhum | ~0.06s | Ilimitados |
+| **FPB `/calendario/`** | ❌ Nenhum | ~0.30s | Ilimitados |
+| **TugaBasket** | ❌ Nenhum | ~0.02s | Ilimitados |
+
+**Conclusão:** Nenhuma das fontes impõe rate limits. O scraper atual faz ~7 pedidos/dia — bem abaixo de qualquer limite que pudesse existir.
+
+Para testares tu próprio:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/rate-limit-test.ps1
+powershell -ExecutionPolicy Bypass -File scripts/rate-limit-test.ps1 -RequestsPerSecond 10 -TotalRequests 100
+```
+
 ---
 
 ## 🛠️ Stack
