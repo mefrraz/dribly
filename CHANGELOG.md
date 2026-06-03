@@ -4,6 +4,167 @@
 
 ---
 
+## [v7.18] — 2026-06-03
+
+### Fix
+- **Zoom controls visíveis no mobile:** `z-index` dos controlos Leaflet aumentado de 2 para 1000, com `visibility: visible !important`. Botões redesenhados: 36x36px, cantos arredondados 12px, fundo dark translúcido.
+- **Dropdown de filtros responsivo:** no mobile ocupa largura total (`left-3 right-3`), no desktop fica compacto (`md:w-52`). Padding e tamanho de letra aumentados para touch no mobile.
+
+---
+
+## [v7.17] — 2026-06-02
+
+### Fix
+- **Build errors resolvidos:** fecho de fragmento em falta, imports não utilizados removidos, scope de dados corrigido.
+
+---
+
+## [v7.16] — 2026-06-02
+
+### Fix
+- **Acessibilidade melhorada:** `alt` text em imagens, breadcrumbs adicionados às páginas, indicadores de scroll nos carrosséis.
+
+---
+
+## [v7.15] — 2026-06-02
+
+### Feat
+- **SEO dinâmico:** meta tags com React Helmet por página, `robots.txt` e sitemap gerados. Links canónicos e títulos descritivos.
+
+---
+
+## [v7.14] — 2026-06-02
+
+### Feat
+- **Skeleton loaders consistentes:** todas as páginas agora mostram skeletons durante o carregamento, melhorando a perceção de performance.
+
+---
+
+## [v7.13] — 2026-06-02
+
+### Feat
+- **Sistema de Toast:** feedback visual leve para ações de seguir/deixar de seguir clubes. Toasts com animação slide-in e auto-dismiss.
+
+---
+
+## [v7.12] — 2026-06-02
+
+### Feat
+- **Pre-warming de dados:** GitHub Action que aquece a cache de competições antes do pico de utilização, evitando cold starts na Vercel.
+
+---
+
+## [v7.11] — 2026-06-02
+
+### Refactor
+- **Validação Zod nas respostas FPB:** parser AJAX com schema validation para prevenir crashes silenciosos causados por HTML inesperado da FPB.
+
+---
+
+## [v7.10] — 2026-06-02
+
+### Fix
+- **Optimistic UI no useFollows:** atualização imediata do estado de seguir/deixar de seguir com rollback automático se a API falhar — previne race conditions.
+
+---
+
+## [v7.9] — 2026-06-02
+
+### Feat
+- **ErrorBoundary global:** wrapper que captura erros em runtime e mostra fallback amigável em vez de ecrã branco.
+
+---
+
+## [v7.8] — 2026-06-02
+
+### Perf
+- **Memoização pesada no CompetitionDetail:** `useMemo` em transformações de dados que causavam re-renders desnecessários, reduzindo lag na navegação.
+
+---
+
+## [v7.7] — 2026-06-02
+
+### Refactor
+- **Consolidação SQL:** 60 ficheiros SQL fragmentados unificados num único seed script para migrações Supabase.
+
+---
+
+## [v7.6] — 2026-06-02
+
+### Test
+- **Testes unitários com Vitest:** lógica de parsing de jogos extraída para módulos utilitários testáveis. Primeira bateria de testes adicionada.
+
+---
+
+## [v7.5] — 2026-06-02
+
+### Feat
+- **Script de auditoria de logos:** verifica links quebrados de imagens de clubes e gera relatório para limpeza automática.
+
+---
+
+## [v7.4] — 2026-06-02
+
+### Fix
+- **ESLint config:** configuração de linting adicionada ao projeto. Corrigidas dependências críticas de hooks React e tipos TypeScript.
+
+---
+
+## [v7.3] — 2026-06-02
+
+### Fix
+- **PWA cache otimizada:** duração de cache ajustada para equilibrar frescura dos dados com performance. Fallbacks para imagens quebradas (placeholder + onError).
+
+---
+
+## [v7.2] — 2026-06-02
+
+### CI
+- **Scraper diário automático:** GitHub Action agendada para correr o scraper FPB todos os dias, mantendo os dados atualizados sem intervenção manual.
+
+---
+
+## [v7.1] — 2026-06-02
+
+### Refactor
+- **Scraper reescrito:** regex frágeis substituídos por Cheerio (jQuery-like parsing). Validação Zod adicionada aos dados extraídos para prevenir dados corrompidos na base.
+
+---
+
+## [v6.1] — 2026-06-02
+
+### Feat
+- **Página de detalhe do pavilhão** (`/pavilhao/:recintoId`) com separadores Geral, Agenda e Resultados
+- **Pesquisa de pavilhões** com fly-to animado e abertura da bottom sheet
+- **Posição do mapa guardada na URL** para back-navigation restaurar a vista exata
+- **Bottom sheet como floating card** no desktop, full-width sheet no mobile
+
+### Fix
+- **Clustering refinado:** zoom 8 = células de 14km, zoom 14 = marcadores individuais de 220m
+- **Mapa fullscreen** entre navbars, sheet acima do mapa (z-2000+)
+- **Marcadores melhorados:** DivIcon circles sem o ícone default quebrado do Leaflet
+- **Compatibilidade react-leaflet v4:** `ref` em vez de `whenCreated`, espera `map ready` no FitBounds
+- Leaflet CSS importado no `main.tsx` (via npm, não @import)
+- Escalão removido do GameCard na página do pavilhão
+
+---
+
+## [v6.0] — 2026-06-02
+
+### Feat
+- **Mapa de pavilhões:** Leaflet + CartoDB tiles (Voyager claro / Dark Matter escuro)
+- **400+ pavilhões** de Portugal continental e ilhas
+- **Clustering inteligente:** agrupa pins por proximidade, mostra contagem no cluster
+- **Marcadores coloridos:** roxo (jogos futuros no pavilhão) vs cinza (sem jogos)
+- **Bottom sheet** com jogos futuros ao clicar num pavilhão
+- **Botão "Localizar-me"** com geolocalização do browser e círculo azul
+- **Filtro por distrito** dinâmico
+- **Zoom controls à esquerda** centrados verticalmente
+- **Tiles adaptativos** (claro/escuro conforme tema)
+- Dados via Supabase com join pavilions ↔ games_2025_2026
+
+---
+
 ## [v5.14] — 2026-05-31
 
 ### Feat
@@ -1760,7 +1921,9 @@ Layout antigo + seletor de clube modal + navegação Meu Clube/Jogos.
 | `v3.x` | Classificações, estatísticas, competições |
 | `v4.x` | Auth Clerk, domínio próprio, perfil |
 | `v5.x` | Auth completa, password recovery, sessões |
+| `v6.x` | Mapa de pavilhões interativo (Leaflet) |
+| `v7.x` | Estabilização: backend, scraper, SEO, a11y, performance, CI/CD |
 
 ---
 
-*Gerado a partir do histórico de git com 160+ tags e 430+ commits.*
+*Gerado a partir do histórico de git com 180+ tags e 470+ commits.*
