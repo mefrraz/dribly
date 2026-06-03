@@ -3,10 +3,11 @@ import { useParams, useSearchParams, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { fetchFPBGames } from '../lib/fpbApi'
 import { fetchGameDetail, type FPBGameDetail } from '../lib/fpbCompetitionsApi'
-import { ArrowLeft, MapPin, Share2, Trophy, Navigation, TrendingUp, ExternalLink, Calendar, Check, Clock } from 'lucide-react'
+import { ArrowLeft, MapPin, Share2, Trophy, Navigation, TrendingUp, ExternalLink, Calendar, Check, Clock, Info } from 'lucide-react'
 import { SkeletonHero } from '../components/Skeleton'
 import { Match } from '../components/types'
 import { useClub, type Club } from '../lib/ClubContext'
+import { fetchPavilions, type Pavilion } from '../lib/mapData'
 
 /** Converts a long team name to a semi-abbreviated version (e.g. "Futebol Clube do Porto" → "FC Porto") */
 function semiAbrev(fullName: string): string {
@@ -60,6 +61,7 @@ function Game() {
 
     const [recentGames, setRecentGames] = useState<Match[]>([])
     const [upcomingH2H, setUpcomingH2H] = useState<Match[]>([])
+    const [pavilion, setPavilion] = useState<Pavilion | null>(null)
     const [loading, setLoading] = useState(true)
     const [copied, setCopied] = useState(false)
 
@@ -86,7 +88,6 @@ function Game() {
                     const m = data as Match
                     setMatch(m)
                     setLoading(false)
-                    // Also try to fetch full FPB game detail for stats (non-blocking)
                     if (m.id) {
                         fetchGameDetail(String(m.id)).then(detail => {
                             if (detail) {
@@ -95,13 +96,12 @@ function Game() {
                                 setTopPerfFora(detail.topPerfFora)
                                 setTopPerfStats(detail.topPerfStats)
                             }
-                        }).catch(() => { /* FPB stats not available — fine */ })
+                        }).catch(() => {})
                     }
                     return
                 }
             }
 
-            // 2) If no club in URL, try competition game detail (slug is numeric internalID)
             if (!clubSlug && /^\d+$/.test(slug)) {
                 try {
                     const detail = await fetchGameDetail(slug)
@@ -111,23 +111,18 @@ function Game() {
                         setTopPerfCasa(detail.topPerfCasa)
                         setTopPerfFora(detail.topPerfFora)
                         setTopPerfStats(detail.topPerfStats)
-
-
                     }
                 } catch { /* ignore */ }
                 setLoading(false)
                 return
             }
 
-            // 3) If no club in URL, stop here
             if (!clubSlug) {
                 setLoading(false)
                 return
             }
 
-            // 3) Wait for club to load, then try FPB API
-            //    (club will be null until getClubBySlug resolves — keep loading)
-            if (!club) return // re-run when club loads
+            if (!club) return
 
             try {
                 const seasons = ['2025/2026', '2024/2025', '2023/2024', '2022/2023']
@@ -219,6 +214,16 @@ function Game() {
             })
     }, [match, slug])
 
+    // Look up pavilion by match.local name
+    useEffect(() => {
+        if (!match?.local) return
+        fetchPavilions().then(pavs => {
+            const q = match.local!.toLowerCase().trim()
+            const found = pavs.find(p => p.nome.toLowerCase().includes(q) || q.includes(p.nome.toLowerCase()))
+            setPavilion(found || null)
+        }).catch(() => {})
+    }, [match?.local])
+
     const shareGame = async () => {
         if (!match) return
         const hasScore = match.resultado_casa !== null && match.resultado_fora !== null
@@ -272,7 +277,6 @@ function Game() {
     const dateFormatted = new Date(match.data).toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     const hasHora = match.hora && match.hora.replace(/[^0-9]/g, "").length > 0
 
-    // Club context
     const clubUpper = club ? club.name.toUpperCase() : ''
     const isClubWin = clubUpper && hasScores ? (
         (match.equipa_casa.toUpperCase().includes(clubUpper) && match.resultado_casa! > match.resultado_fora!) ||
@@ -280,7 +284,6 @@ function Game() {
     ) : null
     const isDraw = hasScores && match.resultado_casa === match.resultado_fora
 
-    // Compute top performers per category
     return (
         <div className="max-w-xl mx-auto pb-24 px-3 space-y-3">
             {/* Header */}
@@ -293,8 +296,6 @@ function Game() {
                     {copied ? <Check size={18} /> : <Share2 size={18} />}
                 </button>
             </div>
-
-
 
             {/* Hero Card */}
             <div className="glass-card overflow-hidden group hover:border-dribly-blue/30 transition-all duration-200">
@@ -329,7 +330,7 @@ function Game() {
                     </div>
 
                     <div className="flex items-center justify-between gap-4">
-                        <TeamBlock name={match.equipa_casa} logo={match.logotipo_casa} clubSlug={(() => { const n = match.equipa_casa; const found = clubs.find(c => n.toUpperCase().includes(c.name.toUpperCase())); return found ? found.slug : null })()} />
+                        <TeamBlock name={match.equipa_casa} logo={match.logotipo_casa} clubSlug={findClubSlug(match.equipa_casa, clubs)} />
                         <div className="flex flex-col items-center gap-1 shrink-0">
                             {isFinished || isLive ? (
                                 <div className="flex items-center gap-1 sm:gap-3">
@@ -347,10 +348,8 @@ function Game() {
                                 </div>
                             )}
                         </div>
-                        <TeamBlock name={match.equipa_fora} logo={match.logotipo_fora} clubSlug={(() => { const n = match.equipa_fora; const found = clubs.find(c => n.toUpperCase().includes(c.name.toUpperCase())); return found ? found.slug : null })()} />
+                        <TeamBlock name={match.equipa_fora} logo={match.logotipo_fora} clubSlug={findClubSlug(match.equipa_fora, clubs)} />
                     </div>
-
-
 
                     {/* FPB Link */}
                     <div className="mt-6 flex justify-center">
@@ -364,22 +363,40 @@ function Game() {
                 </div>
             </div>
 
-            {/* Location Card */}
+            {/* Location Card — with pavilion link + mini map */}
             <div className="glass-card p-5 flex items-start gap-4 ">
                 <div className="p-3 rounded-full bg-zinc-100 dark:bg-white/5 text-dribly-blue shrink-0">
                     <MapPin size={20} />
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                     <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mb-1">Localização</h4>
                     {match.local ? (
                         <>
-                            <p className="text-sm font-medium text-zinc-900 dark:text-white mb-2 break-words">{match.local}</p>
-                            <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(match.local)}`}
-                               target="_blank" rel="noopener noreferrer"
-                               className="inline-flex items-center gap-1.5 text-[10px] font-bold text-dribly-blue hover:text-black dark:hover:text-white transition-colors group">
-                                <Navigation size={12} />
-                                <span className="group-hover:underline">Abrir no Google Maps</span>
-                            </a>
+                            <p className="text-sm font-medium text-zinc-900 dark:text-white mb-1 break-words">{match.local}</p>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(match.local)}`}
+                                   target="_blank" rel="noopener noreferrer"
+                                   className="inline-flex items-center gap-1 text-[10px] font-bold text-dribly-blue hover:text-black dark:hover:text-white transition-colors group">
+                                    <Navigation size={11} />
+                                    <span className="group-hover:underline">Google Maps</span>
+                                </a>
+                                {pavilion && (
+                                    <Link to={`/pavilhao/${pavilion.recinto_id || pavilion.id}`}
+                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-dribly-purple hover:text-black dark:hover:text-white transition-colors group">
+                                        <Info size={11} />
+                                        <span className="group-hover:underline">Ver pavilhão</span>
+                                    </Link>
+                                )}
+                            </div>
+                            {pavilion && (
+                                <Link to={`/pavilhao/${pavilion.recinto_id || pavilion.id}`}
+                                    className="block mt-2 rounded-lg overflow-hidden border border-zinc-200 dark:border-white/10 h-28 bg-zinc-100 dark:bg-zinc-800">
+                                    <div className="w-full h-full flex items-center justify-center text-zinc-400 text-xs gap-1.5">
+                                        <MapPin size={14} className="text-dribly-purple" />
+                                        <span>Ver no mapa de pavilhões</span>
+                                    </div>
+                                </Link>
+                            )}
                         </>
                     ) : (
                         <p className="text-sm text-zinc-500 italic">A definir</p>
@@ -398,9 +415,7 @@ function Game() {
                 </div>
             </div>
 
-
-
-            {/* Duelo — comparação direta dos 2 melhores jogadores (um de cada equipa) */}
+            {/* Duelo */}
             {topPerfCasa.nome && topPerfFora.nome && (
                 <div className="glass-card overflow-hidden ">
                     <div className="p-4 border-b border-zinc-100 dark:border-white/5">
@@ -410,7 +425,6 @@ function Game() {
                         </h3>
                     </div>
                     <div className="p-4">
-                        {/* Players header — compacto e elegante */}
                         <div className="flex items-center justify-center gap-3 sm:gap-5 mb-5">
                             <div className="flex flex-col items-center gap-1 text-center min-w-0" style={{ flex: '1 1 0px' }}>
                                 <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
@@ -428,7 +442,6 @@ function Game() {
                                 <span className="text-[10px] sm:text-sm font-semibold text-zinc-700 dark:text-zinc-200 leading-tight line-clamp-1">{topPerfFora.nome}</span>
                             </div>
                         </div>
-                        {/* Stats comparison */}
                         <div className="space-y-2">
                             {topPerfStats.map((stat, i) => {
                                 const cv = parseInt(stat.casa) || 0
@@ -452,7 +465,7 @@ function Game() {
                 </div>
             )}
 
-            {/* Top Performers — melhor jogador de cada categoria no jogo todo */}
+            {/* Top Performers */}
             {detailLeaders.length > 0 && (
                 <div className="glass-card overflow-hidden ">
                     <div className="p-4 border-b border-zinc-100 dark:border-white/5">
@@ -490,10 +503,10 @@ function Game() {
             {recentGames.length > 0 && (
                 <div className="glass-card overflow-hidden ">
                     <div className="p-3.5 border-b border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02]">
-                        <h3 className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                        <h3 className="text-xs font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-blue" />
                             Últimos Confrontos
-                            <span className="text-zinc-400 dark:text-zinc-500 font-medium truncate text-[10px]">{match.equipa_casa} vs {match.equipa_fora}</span>
+                            <span className="text-zinc-400 dark:text-zinc-500 font-medium truncate text-[10px]">{semiAbrev(match.equipa_casa)} vs {semiAbrev(match.equipa_fora)}</span>
                         </h3>
                     </div>
                     <div className="divide-y divide-zinc-100 dark:divide-white/5">
@@ -504,24 +517,33 @@ function Game() {
                             const firstScore = isHome ? game.resultado_casa : game.resultado_fora
                             const secondScore = isHome ? game.resultado_fora : game.resultado_casa
                             const shortDate = new Date(game.data).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short', year: 'numeric' })
-                            const homeLogo = game.logotipo_casa || undefined
-                            const awayLogo = game.logotipo_fora || undefined
+                            const homeLogo = game.logotipo_casa
+                            const awayLogo = game.logotipo_fora
+                            const firstLogo = isHome ? homeLogo : awayLogo
+                            const secondLogo = isHome ? awayLogo : homeLogo
 
                             return (
-                                <Link to={`/game/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-3 px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
-                                    <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
-                                        {(isHome ? homeLogo : awayLogo) ? (
-                                            <img src={isHome ? homeLogo : awayLogo} alt="" className="w-6 h-6 object-contain" />
+                                <Link to={`/game/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
+                                    <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
+                                        {firstLogo ? (
+                                            <img src={firstLogo} alt="" className="w-5 h-5 object-contain" />
                                         ) : (
-                                            <span className="text-[10px] font-bold text-zinc-500">{firstTeam.charAt(0)}</span>
+                                            <span className="text-[9px] font-bold text-zinc-500">{semiAbrev(firstTeam).charAt(0)}</span>
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-[13px] font-semibold text-zinc-900 dark:text-white truncate group-hover:text-dribly-blue transition-colors">
-                                            <span className="font-bold">{firstTeam}</span>
-                                            <span className="text-zinc-400 mx-1.5 font-medium text-sm tabular-nums">{firstScore}-{secondScore}</span>
-                                            <span className="text-zinc-500 dark:text-zinc-400 font-normal">{secondTeam}</span>
+                                        <p className="text-[12px] text-zinc-900 dark:text-white truncate group-hover:text-dribly-blue transition-colors">
+                                            <span className="font-semibold">{semiAbrev(firstTeam)}</span>
+                                            <span className="text-zinc-400 mx-1.5 font-medium text-xs tabular-nums">{firstScore}-{secondScore}</span>
+                                            <span className="text-zinc-500 dark:text-zinc-400">{semiAbrev(secondTeam)}</span>
                                         </p>
+                                    </div>
+                                    <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
+                                        {secondLogo ? (
+                                            <img src={secondLogo} alt="" className="w-5 h-5 object-contain" />
+                                        ) : (
+                                            <span className="text-[9px] font-bold text-zinc-500">{semiAbrev(secondTeam).charAt(0)}</span>
+                                        )}
                                     </div>
                                     <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase shrink-0 font-medium">{shortDate}</span>
                                 </Link>
@@ -535,10 +557,10 @@ function Game() {
             {upcomingH2H.length > 0 && (
                 <div className="glass-card overflow-hidden ">
                     <div className="p-4 border-b border-zinc-100 dark:border-white/5">
-                        <h3 className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                        <h3 className="text-xs font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-blue" />
                             Próximos Confrontos
-                            <span className="text-zinc-500 dark:text-zinc-500 font-medium truncate">{match.equipa_casa} vs {match.equipa_fora}</span>
+                            <span className="text-zinc-500 dark:text-zinc-500 font-medium truncate text-[10px]">{semiAbrev(match.equipa_casa)} vs {semiAbrev(match.equipa_fora)}</span>
                         </h3>
                     </div>
                     <div className="divide-y divide-zinc-100 dark:divide-white/5">
@@ -552,9 +574,9 @@ function Game() {
                                     <TrendingUp size={12} className="text-dribly-blue shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs text-zinc-900 dark:text-white truncate group-hover:text-dribly-blue transition-colors">
-                                            <span className="font-bold">{match.equipa_casa}</span>
+                                            <span className="font-semibold">{semiAbrev(match.equipa_casa)}</span>
                                             <span className="text-zinc-400 mx-1">vs</span>
-                                            <span className="text-zinc-500">{opponent}</span>
+                                            <span className="text-zinc-500">{semiAbrev(opponent)}</span>
                                         </p>
                                     </div>
                                     <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase shrink-0">{shortDate}</span>
@@ -567,6 +589,11 @@ function Game() {
 
         </div>
     )
+}
+
+function findClubSlug(name: string, clubs: Club[]): string | null {
+    const found = clubs.find(c => name.toUpperCase().includes(c.name.toUpperCase()))
+    return found ? found.slug : null
 }
 
 function TeamBlock({ name, logo, clubSlug }: { name: string; logo: string | null; clubSlug?: string | null }) {
@@ -589,7 +616,5 @@ function TeamBlock({ name, logo, clubSlug }: { name: string; logo: string | null
     }
     return content;
 }
-
-
 
 export default Game
