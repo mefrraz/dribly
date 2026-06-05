@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from './supabase'
 import { fetchTeams, type FPBTeam } from './fpbCompetitionsApi'
 
-const CACHE_KEY = 'dribly_team_photos'
+const CACHE_KEY = 'dribly_team_photos_v2'
 const CACHE_TTL = 10 * 60 * 1000
 
 interface PhotoMap {
-    [teamName: string]: string
+    [teamId: string]: string
 }
 
 function getCache(): Record<string, { ts: number; map: PhotoMap }> {
@@ -19,6 +19,10 @@ function setCache(clubKey: string, map: PhotoMap) {
     const cache = getCache()
     cache[clubKey] = { ts: Date.now(), map }
     try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(cache)) } catch {}
+}
+
+function normalize(text: string): string {
+    return text.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
 }
 
 export function useTeamPhotos(clubName: string): { photos: PhotoMap; loading: boolean } {
@@ -54,6 +58,8 @@ export function useTeamPhotos(clubName: string): { photos: PhotoMap; loading: bo
                 }
 
                 const photoMap: PhotoMap = {}
+                const normClub = normalize(clubName)
+
                 for (const row of data) {
                     if (cancelled) return
                     try {
@@ -61,7 +67,14 @@ export function useTeamPhotos(clubName: string): { photos: PhotoMap; loading: bo
                         for (const t of teams) {
                             if (t.photo && t.nome) {
                                 const clean = t.nome.replace(/\s+/g, ' ').trim()
-                                if (!photoMap[clean]) photoMap[clean] = t.photo
+                                const normName = normalize(clean)
+                                let teamId = normName
+                                    .replace(new RegExp(normClub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '')
+                                    .replace(/^[\s\-–—/]+/, '')
+                                    .replace(/[\s\-–—/]+$/, '')
+                                    .trim()
+                                if (!teamId || teamId.length < 2) teamId = clean
+                                if (!photoMap[teamId]) photoMap[teamId] = t.photo
                             }
                         }
                     } catch { /* skip failed comps */ }

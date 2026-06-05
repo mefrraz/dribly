@@ -135,11 +135,16 @@ function ClubTeamDetail() {
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
                     <div className="p-6">
                         <h1 className="text-xl font-black text-zinc-900 dark:text-white truncate">{teamName}</h1>
-                        <span className="inline-block mt-1.5 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
-                            {escalao || generoLabel}
-                            {escalao && genero !== null && generoLabel !== 'Indefinido' ? ` · ${generoLabel}` : ''}
-                            {!escalao && genero === null ? 'Indefinido' : ''}
-                        </span>
+                        <div className="flex items-center gap-1.5 mt-1.5">
+                            {escalao && (
+                                <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                                    {escalao}
+                                </span>
+                            )}
+                            <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                                {generoLabel}
+                            </span>
+                        </div>
                         <p className="text-xs text-zinc-500 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">{club.name}</p>
                     </div>
 

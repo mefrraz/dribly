@@ -182,7 +182,7 @@ function ClubTeams() {
 
             <div className="space-y-2.5">
                 {teams.map(team => {
-                    const photoUrl = teamPhotos[team.teamId]
+                    const photoUrl = teamPhotos[team.teamId] || teamPhotos[team.teamId.replace(/\s+/g, ' ').trim()]
                     return (
                         <Link
                             key={team.teamId}
@@ -205,11 +205,16 @@ function ClubTeams() {
                                         <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
                                             {team.teamId}
                                         </h3>
-                                        <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
-                                            {team.escalao || (team.genero ? GENERO_LABELS[team.genero] : '')}
-                                            {team.escalao && team.genero ? ` · ${GENERO_LABELS[team.genero]}` : ''}
-                                            {!team.escalao && !team.genero ? 'Indefinido' : ''}
-                                        </span>
+                                        <div className="flex items-center gap-1.5 mt-1">
+                                            {team.escalao && (
+                                                <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                                                    {team.escalao}
+                                                </span>
+                                            )}
+                                            <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                                                {team.genero ? GENERO_LABELS[team.genero] : 'Indefinido'}
+                                            </span>
+                                        </div>
                                     </div>
                                     <ChevronRight size={16} className="text-zinc-400 shrink-0 mt-1" />
                                 </div>
