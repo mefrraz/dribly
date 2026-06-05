@@ -39,7 +39,7 @@ export function useTeamPhotos(clubId: number, clubName: string): { teamData: Dat
         async function run() {
             try {
                 // 1 call to get ALL equipa IDs for this club
-                const r = await fetch(`${FPB_PROXY}?wp_action=get_equipas&idClube=${clubId}`)
+                const r = await fetch(`${FPB_PROXY}?wp_action=get_equipas&idClube=${clubId}&epoca=2025/2026`)
                 if (!r.ok || cancelled) { setLoading(false); return }
                 const ids = parseClubTeams(await r.text())
                 if (cancelled || ids.length === 0) { setLoading(false); return }

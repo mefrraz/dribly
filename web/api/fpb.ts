@@ -20,7 +20,8 @@ export default async function handler(request: Request) {
                 const idCompeticao = url.searchParams.get('idCompeticao')
                 const idClube = url.searchParams.get('idClube')
                 if (idClube) {
-                    apiUrl = `https://www.fpb.pt/wp-admin/admin-ajax.php?action=get_equipas&idClube=${idClube}`
+                    const epoca = url.searchParams.get('epoca') || '2025/2026'
+                    apiUrl = `https://www.fpb.pt/wp-admin/admin-ajax.php?action=get_equipas&idClube=${idClube}&epoca=${encodeURIComponent(epoca)}`
                 } else {
                     apiUrl = `https://www.fpb.pt/wp-admin/admin-ajax.php?action=get_equipas&idCompeticao=${idCompeticao || ''}`
                 }
