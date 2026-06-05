@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { Users, ChevronRight, Calendar } from 'lucide-react'
+import { Users, ChevronRight, Calendar, ArrowLeft } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
 import { useTeamPhotos } from '../../lib/useTeamPhotos'
 import { SkeletonGameGrid } from '../../components/Skeleton'
@@ -28,13 +28,6 @@ function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: 
     return suffix
 }
 
-function detectGender(teamName: string, escalao: string): 'M' | 'F' | null {
-    const upper = (teamName + ' ' + (escalao || '')).toUpperCase()
-    if (/\bFEMININ[OA]S?\b/.test(upper)) return 'F'
-    if (/\bMASCULIN[OA]S?\b/.test(upper)) return 'M'
-    return null
-}
-
 function formatShortDate(dateStr: string) {
     const d = new Date(dateStr)
     return d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })
@@ -44,16 +37,10 @@ function fpbCoverPhoto(clubId: number): string {
     return `https://sav2.fpb.pt/uploads/clubes/capa/CLU_capa${clubId}.jpg`
 }
 
-const GENERO_CONFIG: Record<string, { label: string; className: string }> = {
-    M: { label: 'Masculino', className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
-    F: { label: 'Feminino', className: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400' },
-}
-
 interface TeamEntry {
     teamId: string
     slug: string
     escalao: string
-    genero: 'M' | 'F' | null
     wins: number
     losses: number
     draws: number
@@ -111,7 +98,6 @@ function ClubTeams() {
                 teamId,
                 slug: slugify(teamId),
                 escalao,
-                genero: detectGender(teamId, escalao),
                 wins, losses, draws, total, pct,
                 lastGame,
                 competition: mainComp,
@@ -144,7 +130,11 @@ function ClubTeams() {
 
     return (
         <div className="max-w-xl mx-auto space-y-4 pb-20 px-3">
-            <div className="pt-3 pb-1">
+            <Link to={`/clube/${club.slug}/home`} className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 mb-3 group">
+                <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                {displayName(club)}
+            </Link>
+            <div className="pt-1 pb-1">
                 <h2 className="text-xl font-black text-zinc-900 dark:text-white">Equipas</h2>
                 <p className="text-xs text-zinc-500 mt-1">{teams.length} equipas de {displayName(club)} na época 2025/2026</p>
             </div>
@@ -222,7 +212,7 @@ function ClubTeams() {
                                     <img
                                         src={photoUrl}
                                         alt=""
-                                        className="absolute inset-0 w-full h-full object-cover object-top"
+                                        className="absolute inset-0 w-full h-full object-cover object-center"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                                 </div>
@@ -237,15 +227,6 @@ function ClubTeams() {
                                             {team.escalao && (
                                                 <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
                                                     {team.escalao}
-                                                </span>
-                                            )}
-                                            {team.genero ? (
-                                                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${GENERO_CONFIG[team.genero].className}`}>
-                                                    {GENERO_CONFIG[team.genero].label}
-                                                </span>
-                                            ) : (
-                                                <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
-                                                    Indefinido
                                                 </span>
                                             )}
                                         </div>
