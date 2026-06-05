@@ -574,6 +574,67 @@ export async function fetchTeams(provaId: number): Promise<FPBTeam[]> {
     }
 }
 
+// ---- Club team photos via FPB equipas page ----
+
+interface ClubTeamPhoto {
+    nome: string      // e.g., "Sénior Masculino"
+    photo_url: string | null
+    equipa_id: string | null
+}
+
+/**
+ * Fetch team photos directly from the FPB club equipas page.
+ * Much more reliable than going through competition pages.
+ * URL: https://www.fpb.pt/equipas/clube_127/
+ */
+export async function fetchClubTeamPhotos(clubId: number): Promise<ClubTeamPhoto[]> {
+    try {
+        // Use Vercel proxy to avoid CORS
+        const res = await fetch(`${FPB_PROXY}?page=equipas&clube=${clubId}`)
+        if (!res.ok) return []
+        const html = await res.text()
+        return scrapeClubTeamPhotos(html)
+    } catch {
+        return []
+    }
+}
+
+/** Parse .equipa blocks from FPB clube equipas HTML */
+function scrapeClubTeamPhotos(html: string): ClubTeamPhoto[] {
+    const results: ClubTeamPhoto[] = []
+
+    // Pattern: <div class="equipa"> with .equipa-photo (background-image) and .equipa-name
+    const blockRe = /<div class="equipa">([\s\S]*?)<div class="equipa-name">([^<]*)<\/div>[\s\S]*?<\/a>\s*<\/div>/g
+    let m: RegExpExecArray | null
+    while ((m = blockRe.exec(html)) !== null) {
+        const block = m[1]
+        const nameRaw = m[2].trim()
+        if (!nameRaw) continue
+
+        // Extract photo URL from background-image
+        const bgMatch = block.match(/background-image:\s*url\(([^)]+)\)/)
+        const photoUrl = bgMatch?.[1]?.replace(/['"]/g, '') || null
+
+        // Extract equipa ID from link
+        const linkMatch = block.match(/href="\/equipa\/(equipa_\d+)"/)
+        const equipaId = linkMatch?.[1] || null
+
+        // Normalize name: "Sénior                Masculino" → "Sénior Masculino"
+        const nome = nameRaw.replace(/\s+/g, ' ').trim()
+
+        // Skip default placeholder images
+        const isDefault = photoUrl && /ass_highlight_default/i.test(photoUrl)
+
+        results.push({
+            nome,
+            photo_url: isDefault ? null : photoUrl,
+            equipa_id: equipaId,
+        })
+    }
+
+    return results
+}
+
 // ---- Player stats via HTML scraping ----
 
 export async function fetchPlayerStats(provaId: number, _tipo: string = 'val'): Promise<FPBPlayerStat[]> {

@@ -69,7 +69,7 @@ function ClubTeams() {
     const games = allGames || []
     const clubNameUpper = club.name.toUpperCase()
     const coverPhoto = fpbCoverPhoto(club.id)
-    const { photos: teamPhotos } = useTeamPhotos(club.name)
+    const { photos: teamPhotos } = useTeamPhotos(club.id, club.name)
 
     const teams = useMemo(() => {
         const teamMap = new Map<string, Match[]>()
