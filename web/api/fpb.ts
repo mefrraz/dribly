@@ -3,11 +3,50 @@ export const config = {
 }
 
 export default async function handler(request: Request) {
+    // CORS preflight
+    if (request.method === 'OPTIONS') {
+        return new Response(null, {
+            status: 204,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            },
+        })
+    }
+
     const url = new URL(request.url)
     const endpoint = url.searchParams.get('endpoint')
+    const wpAction = url.searchParams.get('wp_action')
+    const wpActionPost = url.searchParams.get('wp_action_post')
+
+    // POST mode: forward POST to WordPress AJAX
+    if (wpActionPost && request.method === 'POST') {
+        try {
+            const body = await request.text()
+            const fpbRes = await fetch('https://www.fpb.pt/wp-admin/admin-ajax.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                    'Referer': 'https://www.fpb.pt/',
+                },
+                body,
+            })
+            const text = await fpbRes.text()
+            return new Response(text, {
+                status: fpbRes.status,
+                headers: {
+                    'Content-Type': 'text/html; charset=utf-8',
+                    'Access-Control-Allow-Origin': '*',
+                },
+            })
+        } catch {
+            return new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+        }
+    }
 
     // Proxy mode: forward to sav2.fpb.pt API or WordPress AJAX
-    const wpAction = url.searchParams.get('wp_action')
     if (endpoint || wpAction) {
         let apiUrl: string
         const headers: Record<string, string> = {
@@ -27,7 +66,6 @@ export default async function handler(request: Request) {
                 }
                 headers['Referer'] = 'https://www.fpb.pt/'
             } else {
-                // WordPress AJAX: get_more_fase_regular
                 const competicao = url.searchParams.get('competicao') || ''
                 const fase = url.searchParams.get('fase') || '30969'
                 apiUrl = `https://www.fpb.pt/wp-admin/admin-ajax.php?action=${wpAction}&competicao%5B%5D=${competicao}&fase=${fase}`

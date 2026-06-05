@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link, useParams, useSearchParams, useOutletContext } from 'react-router-dom'
 import { ArrowLeft, Calendar, Trophy } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
+import { useEquipaGames } from '../../hooks/useEquipaGames'
 import { SkeletonGameGrid } from '../../components/Skeleton'
 import { EmptyState } from '../../components/EmptyState'
 import { GameCard } from '../../components/GameCard'
@@ -53,8 +54,12 @@ function ClubTeamDetail() {
         return v === 'results' ? 'results' : 'agenda'
     })
 
-    const { games: allGames, loading } = useGames('2025/2026', club.id, club.name)
-    const games = allGames || []
+    const isEquipaId = teamSlug?.startsWith('equipa_')
+    const { games: clubGames, loading: clubLoading } = useGames('2025/2026', club.id, club.name)
+    const { games: equipaGames, loading: equipaLoading } = useEquipaGames(isEquipaId ? teamSlug || '' : '')
+
+    const loading = isEquipaId ? equipaLoading : clubLoading
+    const games = isEquipaId ? equipaGames : (clubGames || [])
     const clubNameUpper = club.name.toUpperCase()
 
     useEffect(() => {
@@ -62,6 +67,11 @@ function ClubTeamDetail() {
     }, [view, setSearchParams])
 
     const { teamName, teamGames } = useMemo(() => {
+        if (isEquipaId) {
+            // All games belong to this equipa
+            return { teamName: teamSlug || '', teamGames: games }
+        }
+
         const filtered = games.filter(g => {
             let fullTeamName = ''
             if (g.equipa_casa.toUpperCase().includes(clubNameUpper)) fullTeamName = g.equipa_casa
@@ -80,7 +90,7 @@ function ClubTeamDetail() {
             : ''
 
         return { teamName: name, teamGames: filtered }
-    }, [games, teamSlug, clubNameUpper, club.name])
+    }, [games, teamSlug, clubNameUpper, club.name, isEquipaId])
 
     const finished = useMemo(() =>
         teamGames.filter(g => g.status === 'FINALIZADO').sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),
