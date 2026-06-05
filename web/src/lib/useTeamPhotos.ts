@@ -1,52 +1,37 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
-import { fetchTeams, type FPBTeam } from './fpbCompetitionsApi'
 
-const CACHE_KEY = 'dribly_team_photos_v5'
+const FPB_PROXY = '/api/fpb'
+const CACHE_KEY = 'dribly_team_photos_v6'
 const CACHE_TTL = 30 * 60 * 1000
 
 interface PhotoMap { [teamId: string]: string }
 
-function getCache(): Record<string, { ts: number; map: PhotoMap }> {
-    try { return JSON.parse(sessionStorage.getItem(CACHE_KEY) || '{}') } catch { return {} }
-}
-function setCache(clubKey: string, map: PhotoMap) {
-    const cache = getCache()
-    cache[clubKey] = { ts: Date.now(), map }
-    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(cache)) } catch {}
-}
+function getCache(): Record<string, { ts: number; map: PhotoMap }> { try { return JSON.parse(sessionStorage.getItem(CACHE_KEY) || '{}') } catch { return {} } }
+function setCache(k: string, m: PhotoMap) { const c = getCache(); c[k] = { ts: Date.now(), map: m }; try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(c)) } catch {} }
 
-function normalize(text: string): string {
-    return text.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
-}
+function norm(s: string) { return s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim() }
 
-/** Build multiple lookup keys from a team name and club name */
-function buildKeys(nome: string, clubName: string): string[] {
-    const clean = nome.replace(/\s+/g, ' ').trim()
-    const upperClub = normalize(clubName)
-    let id = normalize(clean)
-        .replace(new RegExp(upperClub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '')
-        .replace(/^[\s\-–—/]+/, '')
-        .replace(/[\s\-–—/]+$/, '')
-        .trim()
-    if (!id || id.length < 2) id = normalize(clean)
-
-    const keys = new Set<string>()
-    keys.add(id); keys.add(id.toLowerCase()); keys.add(id.toUpperCase())
-    keys.add(clean); keys.add(clean.toLowerCase()); keys.add(normalize(clean))
-
-    const noGender = id.replace(/\s+(MASCULINO|FEMININO)\s*$/i, '').trim()
-    if (noGender && noGender !== id) {
-        keys.add(noGender); keys.add(noGender.toLowerCase())
+/** Directly parse the WP AJAX HTML for team photos */
+function parseTeamPhotos(html: string): { nome: string; photo: string | null }[] {
+    const results: { nome: string; photo: string | null }[] = []
+    // Match each .equipa block
+    const blockRe = /<div class="equipa">\s*<a href="[^"]*">([\s\S]*?)<\/a>\s*<\/div>/g
+    let m
+    while ((m = blockRe.exec(html)) !== null) {
+        const block = m[1]
+        // Extract name from .equipa-name
+        const nameMatch = block.match(/<div class="equipa-name">([^<]+)<\/div>/)
+        const name = nameMatch?.[1]?.trim()
+        if (!name) continue
+        // Extract photo from .equipa-head background-image
+        const bgMatch = block.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/)
+        const photo = bgMatch?.[1] || null
+        // Skip default placeholders
+        const isDefault = photo && /ass_highlight_default/i.test(photo)
+        results.push({ nome: name, photo: isDefault ? null : photo })
     }
-    // Also try just the escalão part (e.g., "SENIOR" from "SENIOR MASCULINO")
-    const escParts = id.split(/\s+/)
-    if (escParts.length >= 2) {
-        const esc = escParts[0]
-        keys.add(esc); keys.add(esc.toLowerCase())
-    }
-
-    return Array.from(keys)
+    return results
 }
 
 export function useTeamPhotos(clubId: number, clubName: string): { photos: PhotoMap; loading: boolean } {
@@ -55,78 +40,43 @@ export function useTeamPhotos(clubId: number, clubName: string): { photos: Photo
 
     useEffect(() => {
         if (!clubId || !clubName) return
-
-        const key = clubName.toLowerCase().trim()
+        const cacheKey = clubName.toLowerCase().trim()
         const cache = getCache()
-        if (cache[key] && Date.now() - cache[key].ts < CACHE_TTL) {
-            setPhotos(cache[key].map)
-            setLoading(false)
-            return
-        }
+        if (cache[cacheKey] && Date.now() - cache[cacheKey].ts < CACHE_TTL) { setPhotos(cache[cacheKey].map); setLoading(false); return }
 
         let cancelled = false
-
         async function run() {
             try {
-                // Find competitions this club participates in
-                const { data } = await supabase
-                    .from('competitions')
-                    .select('competition_id')
-                    .contains('club_names', [clubName])
-                    .eq('season', '2025/2026')
-
+                const { data } = await supabase.from('competitions').select('competition_id').contains('club_names', [clubName]).eq('season', '2025/2026')
                 if (cancelled || !data || data.length === 0) { setLoading(false); return }
 
                 const photoMap: PhotoMap = {}
                 const seen = new Set<number>()
-
                 for (const row of data) {
                     if (cancelled) return
                     if (seen.has(row.competition_id)) continue
                     seen.add(row.competition_id)
-
                     try {
-                        const teams: FPBTeam[] = await fetchTeams(row.competition_id)
+                        const res = await fetch(`${FPB_PROXY}?wp_action=get_equipas&idCompeticao=${row.competition_id}`)
+                        if (!res.ok) continue
+                        const html = await res.text()
+                        const teams = parseTeamPhotos(html)
                         for (const t of teams) {
-                            if (t.photo && t.nome && !t.photo.includes('ass_highlight_default')) {
-                                const rawName = t.nome.replace(/\s+/g, ' ').trim()
-                                // Store photo under multiple key patterns:
-                                // 1. Raw name: "SL Benfica"
-                                // 2. Normalized
-                                // 3. ID-based (strip club name)
-                                const allKeys = new Set<string>()
-                                allKeys.add(rawName)
-                                allKeys.add(rawName.toLowerCase())
-                                allKeys.add(normalize(rawName))
-                                // Also add individual words for partial matching
-                                for (const word of rawName.split(/\s+/)) {
-                                    if (word.length > 2) {
-                                        allKeys.add(word.toLowerCase())
-                                        allKeys.add(normalize(word))
-                                    }
-                                }
-                                // Add buildKeys output
-                                for (const k of buildKeys(t.nome, clubName)) {
-                                    allKeys.add(k)
-                                }
-                                for (const k of allKeys) {
-                                    if (!photoMap[k]) photoMap[k] = t.photo
-                                }
-                            }
+                            if (!t.photo) continue
+                            const clean = t.nome.replace(/\s+/g, ' ').trim()
+                            const allKeys = new Set<string>()
+                            allKeys.add(clean); allKeys.add(clean.toLowerCase()); allKeys.add(norm(clean))
+                            for (const w of clean.split(/\s+/)) { if (w.length > 2) { allKeys.add(w.toLowerCase()); allKeys.add(norm(w)) } }
+                            for (const k of allKeys) { if (!photoMap[k]) photoMap[k] = t.photo }
                         }
-                    } catch { /* skip failed comps */ }
+                    } catch { /* skip */ }
                 }
-
-                if (!cancelled) {
-                    setCache(key, photoMap)
+                if (!cancelled && Object.keys(photoMap).length > 0) {
+                    setCache(cacheKey, photoMap)
                     setPhotos(photoMap)
-                    console.log(`📸 useTeamPhotos: ${Object.keys(photoMap).length} photos for "${clubName}"`)
                 }
-            } catch {} finally {
-                if (!cancelled) setLoading(false)
-            }
+            } catch {} finally { if (!cancelled) setLoading(false) }
         }
-
         run()
         return () => { cancelled = true }
     }, [clubId, clubName])
