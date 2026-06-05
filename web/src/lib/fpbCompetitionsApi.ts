@@ -574,6 +574,64 @@ export async function fetchTeams(provaId: number): Promise<FPBTeam[]> {
     }
 }
 
+// ---- Individual team page scraper (real team names) ----
+
+interface TeamPageInfo {
+    nome: string       // e.g., "FC GAIA A"
+    escalao: string    // e.g., "Sub 16"
+    logo: string | null
+}
+
+/**
+ * Fetch team info from individual FPB equipa page.
+ * URL: https://www.fpb.pt/equipa/equipa_59060/
+ */
+export async function fetchTeamPage(equipaId: string): Promise<TeamPageInfo | null> {
+    try {
+        const res = await fetch(`${FPB_PROXY}?page=equipa&equipa_id=${equipaId}`)
+        if (!res.ok) return null
+        const html = await res.text()
+
+        // Extract team name — appears as plain text like "FC GAIA A"
+        // Strategy: find the club logo img, then look for text nearby
+        const logoMatch = html.match(/uploads\/clubes\/logotipo\/[^"]*"/)
+        let nome = ''
+        let escalao = ''
+
+        // Extract all text nodes, find the one near the logo that looks like a team name
+        const textBlocks = html
+            .replace(/<script[\s\S]*?<\/script>/g, '')
+            .replace(/<style[\s\S]*?<\/style>/g, '')
+            .replace(/<[^>]+>/g, '\n')
+            .split('\n')
+            .map(l => l.trim())
+            .filter(l => l.length > 2 && !l.startsWith('{') && !l.startsWith('//'))
+
+        // Find team name: usually a short uppercase text near "FC", "SL", "UD", etc.
+        const clubPrefixes = /\b(FC|SL|SC|CD|GD|UD|AD|GS|CP|CF|ABC|AJ|AA)\b/i
+        for (const line of textBlocks) {
+            if (clubPrefixes.test(line) && line.length < 40 && !line.includes('FPB') && !line.includes('Cookie')) {
+                nome = line.trim()
+                break
+            }
+        }
+
+        // Find escalão in text
+        const escalaoPatterns = ['Sénior', 'Sub', 'Mini', 'Senior', 'SUB', 'MINI']
+        for (const line of textBlocks) {
+            if (escalaoPatterns.some(p => line.toUpperCase().includes(p.toUpperCase())) && line.length < 30) {
+                escalao = line.trim()
+                break
+            }
+        }
+
+        if (!nome) return null
+        return { nome, escalao, logo: null }
+    } catch {
+        return null
+    }
+}
+
 // ---- Club team photos via FPB equipas page ----
 
 interface ClubTeamPhoto {

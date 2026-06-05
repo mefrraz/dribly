@@ -68,6 +68,10 @@ export default async function handler(request: Request) {
 
     if (internalID) {
         fpbUrl = `https://www.fpb.pt/ficha-de-jogo?internalID=${internalID}`
+    } else if (page === 'equipa') {
+        // Individual team page: /equipa/equipa_59060/
+        const equipaId = url.searchParams.get('equipa_id') || ''
+        fpbUrl = `https://www.fpb.pt/equipa/${equipaId}/`
     } else if (page === 'equipas') {
         // Club teams page: /equipas/clube_127/ (no extra query params)
         const clubId = clube || '127'
