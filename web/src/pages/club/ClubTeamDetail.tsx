@@ -30,6 +30,13 @@ function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: 
     return suffix
 }
 
+function detectGender(teamName: string, escalao: string): 'M' | 'F' | null {
+    const upper = (teamName + ' ' + (escalao || '')).toUpperCase()
+    if (/\bFEMININ[OA]S?\b/.test(upper)) return 'F'
+    if (/\bMASCULIN[OA]S?\b/.test(upper)) return 'M'
+    return null
+}
+
 function formatDate(dateStr: string) {
     const date = new Date(dateStr)
     const formatted = date.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -110,9 +117,9 @@ function ClubTeamDetail() {
             : new Date(b).getTime() - new Date(a).getTime()
     )
 
-    const initials = teamName
-        ? teamName.split(/\s+/).map(w => w.charAt(0).toUpperCase()).slice(0, 2).join('')
-        : '?'
+    const genero = detectGender(teamName, teamGames[0]?.escalao || '')
+    const escalao = teamGames[0]?.escalao || ''
+    const generoLabel = genero === 'M' ? 'Masculino' : genero === 'F' ? 'Feminino' : 'Indefinido'
 
     return (
         <div className="max-w-6xl mx-auto space-y-4 pb-24">
@@ -127,15 +134,22 @@ function ClubTeamDetail() {
             <div className="max-w-xl mx-auto px-3">
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
                     <div className="p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
-                                <span className="text-xl font-black text-zinc-500 dark:text-zinc-400">{initials}</span>
-                            </div>
-                            <div className="min-w-0">
-                                <h1 className="text-xl font-black text-zinc-900 dark:text-white truncate">{teamName}</h1>
-                                <p className="text-xs text-zinc-500 mt-0.5">{club.name}</p>
-                            </div>
+                        <h1 className="text-xl font-black text-zinc-900 dark:text-white truncate">{teamName}</h1>
+                        <div className="flex items-center gap-2 mt-1.5">
+                            {escalao && (
+                                <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
+                                    {escalao}
+                                </span>
+                            )}
+                            <span className={`text-xs font-semibold ${
+                                genero === 'M' ? 'text-blue-600 dark:text-blue-400' :
+                                genero === 'F' ? 'text-pink-600 dark:text-pink-400' :
+                                'text-zinc-400'
+                            }`}>
+                                {generoLabel}
+                            </span>
                         </div>
+                        <p className="text-xs text-zinc-500 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">{club.name}</p>
                     </div>
 
                     <div className="px-5 pb-5">

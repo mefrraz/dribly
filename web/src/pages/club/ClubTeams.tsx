@@ -27,24 +27,36 @@ function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: 
     return suffix
 }
 
+function detectGender(teamName: string, escalao: string): 'M' | 'F' | null {
+    const upper = (teamName + ' ' + (escalao || '')).toUpperCase()
+    if (/\bFEMININ[OA]S?\b/.test(upper)) return 'F'
+    if (/\bMASCULIN[OA]S?\b/.test(upper)) return 'M'
+    return null
+}
+
 function formatShortDate(dateStr: string) {
     const d = new Date(dateStr)
     return d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })
 }
 
+function fpbCoverPhoto(clubId: number): string {
+    return `https://sav2.fpb.pt/uploads/clubes/capa/CLU_capa${clubId}.jpg`
+}
+
+const GENERO_LABELS: Record<string, string> = { M: 'Masculino', F: 'Feminino' }
+
 interface TeamEntry {
     teamId: string
     slug: string
     escalao: string
+    genero: 'M' | 'F' | null
     wins: number
     losses: number
     draws: number
     total: number
     pct: number | null
-    lastResult: 'W' | 'L' | 'D' | null
     lastGame: Match | null
     competition: string
-    venueCount: number
 }
 
 function ClubTeams() {
@@ -52,6 +64,7 @@ function ClubTeams() {
     const { games: allGames, loading } = useGames('2025/2026', club.id, club.name)
     const games = allGames || []
     const clubNameUpper = club.name.toUpperCase()
+    const coverPhoto = fpbCoverPhoto(club.id)
 
     const teams = useMemo(() => {
         const teamMap = new Map<string, Match[]>()
@@ -86,26 +99,17 @@ function ClubTeams() {
             const total = wins + losses + draws
             const pct = total > 0 ? Math.round(wins / (wins + losses) * 100) : null
 
-            let lastResult: 'W' | 'L' | 'D' | null = null
-            if (lastGame && lastGame.resultado_casa !== null && lastGame.resultado_fora !== null) {
-                const home = lastGame.equipa_casa.toUpperCase().includes(clubNameUpper)
-                if (lastGame.resultado_casa === lastGame.resultado_fora) lastResult = 'D'
-                else if (home ? lastGame.resultado_casa > lastGame.resultado_fora : lastGame.resultado_fora > lastGame.resultado_casa) lastResult = 'W'
-                else lastResult = 'L'
-            }
-
             const competitions = [...new Set(teamGames.map(g => g.competicao).filter(Boolean))]
             const mainComp = competitions[0] || ''
-            const venues = new Set(teamGames.map(g => g.local).filter(Boolean))
 
             entries.push({
                 teamId,
                 slug: slugify(teamId),
                 escalao,
+                genero: detectGender(teamId, escalao),
                 wins, losses, draws, total, pct,
-                lastResult, lastGame,
+                lastGame,
                 competition: mainComp,
-                venueCount: venues.size,
             })
         })
 
@@ -155,83 +159,93 @@ function ClubTeams() {
                 </div>
             </div>
 
-            <div className="space-y-3">
-                {teams.map(team => {
-                    const initials = team.teamId
-                        .split(/\s+/)
-                        .map(w => w.charAt(0).toUpperCase())
-                        .slice(0, 2)
-                        .join('')
-                    return (
-                        <Link
-                            key={team.teamId}
-                            to={`/clube/${club.slug}/team/${team.slug}`}
-                            className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
-                        >
-                            <div className="p-4">
-                                <div className="flex items-start gap-3">
-                                    <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-sm font-black text-zinc-500 dark:text-zinc-400">
-                                        {initials}
-                                    </div>
+            {/* Photo card — FPB cover photo as hero background */}
+            <Link
+                to={`/clube/${club.slug}/team`}
+                className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
+            >
+                <div className="relative h-36 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                    <img
+                        src={coverPhoto}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <p className="text-white text-sm font-black drop-shadow-md">{club.name}</p>
+                        <p className="text-white/80 text-xs">{teams.length} equipas · Época 2025/2026</p>
+                    </div>
+                </div>
+            </Link>
 
-                                    <div className="min-w-0 flex-1">
-                                        <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
-                                            {team.teamId}
-                                        </h3>
-                                        <div className="flex flex-wrap items-center gap-2 mt-1.5">
-                                            {team.escalao && (
-                                                <span className="inline-block px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
-                                                    {team.escalao}
-                                                </span>
-                                            )}
-                                            {team.competition && (
-                                                <span className="text-[10px] text-zinc-400 truncate max-w-[180px]">{team.competition}</span>
-                                            )}
-                                        </div>
+            <div className="space-y-2.5">
+                {teams.map(team => (
+                    <Link
+                        key={team.teamId}
+                        to={`/clube/${club.slug}/team/${team.slug}`}
+                        className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
+                    >
+                        <div className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
+                                        {team.teamId}
+                                    </h3>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        {team.escalao && (
+                                            <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
+                                                {team.escalao}
+                                            </span>
+                                        )}
+                                        <span className={`text-[10px] font-semibold ${
+                                            team.genero === 'M' ? 'text-blue-600 dark:text-blue-400' :
+                                            team.genero === 'F' ? 'text-pink-600 dark:text-pink-400' :
+                                            'text-zinc-400'
+                                        }`}>
+                                            {team.genero ? GENERO_LABELS[team.genero] : 'Indefinido'}
+                                        </span>
                                     </div>
-
-                                    <ChevronRight size={16} className="text-zinc-400 shrink-0 mt-1" />
                                 </div>
+                                <ChevronRight size={16} className="text-zinc-400 shrink-0 mt-1" />
+                            </div>
 
-                                {team.total > 0 ? (
-                                    <div className="flex items-center gap-3 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-                                        <div className="flex items-center gap-4">
-                                            <div>
-                                                <span className="text-lg font-black text-zinc-900 dark:text-white">{team.total}</span>
-                                                <span className="text-[10px] text-zinc-500 ml-1">J</span>
-                                            </div>
-                                            <div>
-                                                <span className="text-lg font-black text-green-600 dark:text-green-400">{team.wins}</span>
-                                                <span className="text-[10px] text-green-600/70 dark:text-green-400/70 ml-1">V</span>
-                                            </div>
-                                            <div>
-                                                <span className="text-lg font-black text-red-500">{team.losses}</span>
-                                                <span className="text-[10px] text-red-500/70 ml-1">D</span>
-                                            </div>
-                                            {team.pct !== null && (
-                                                <div>
-                                                    <span className="text-lg font-black text-zinc-500">{team.pct}%</span>
-                                                </div>
-                                            )}
+                            {team.total > 0 ? (
+                                <div className="flex items-center gap-4 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <span className="text-base font-black text-zinc-900 dark:text-white">{team.total}</span>
+                                            <span className="text-[10px] text-zinc-500 ml-0.5">J</span>
                                         </div>
-                                        <div className="flex-1" />
-                                        {team.lastGame && (
-                                            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
-                                                <Calendar size={11} />
-                                                <span>{formatShortDate(team.lastGame.data)}</span>
-                                            </div>
+                                        <div>
+                                            <span className="text-base font-black text-green-600 dark:text-green-400">{team.wins}</span>
+                                            <span className="text-[10px] text-green-600/70 dark:text-green-400/70 ml-0.5">V</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-base font-black text-red-500">{team.losses}</span>
+                                            <span className="text-[10px] text-red-500/70 ml-0.5">D</span>
+                                        </div>
+                                        {team.pct !== null && (
+                                            <span className="text-xs font-bold text-zinc-500">{team.pct}%</span>
                                         )}
                                     </div>
-                                ) : (
-                                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-                                        <Calendar size={12} className="text-zinc-400" />
-                                        <span className="text-xs text-zinc-400 italic">Sem jogos ainda esta época</span>
-                                    </div>
-                                )}
-                            </div>
-                        </Link>
-                    )
-                })}
+                                    <div className="flex-1" />
+                                    {team.lastGame && (
+                                        <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+                                            <Calendar size={11} />
+                                            <span>{formatShortDate(team.lastGame.data)}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                                    <Calendar size={12} className="text-zinc-400" />
+                                    <span className="text-xs text-zinc-400 italic">Sem jogos ainda esta época</span>
+                                </div>
+                            )}
+                        </div>
+                    </Link>
+                ))}
             </div>
         </div>
     )
