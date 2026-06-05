@@ -7,6 +7,11 @@ import { SkeletonGameGrid } from '../../components/Skeleton'
 import { type Club, displayName } from '../../lib/ClubContext'
 import { type Match } from '../../components/types'
 
+function slugify(text: string): string {
+    return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/-+/g, '-')
+}
+
 function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: string): string {
     const upperTeam = fullTeamName.toUpperCase()
     const upperClub = clubName.toUpperCase()
@@ -143,7 +148,7 @@ function ClubTeams() {
                     return (
                         <Link
                             key={team.id}
-                            to={`/clube/${club.slug}/team/${team.id}`}
+                            to={`/clube/${club.slug}/team/${slugify(team.escalao || team.nome)}`}
                             className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
                         >
                             {team.photo && (
