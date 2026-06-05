@@ -120,6 +120,11 @@ function ClubTeamDetail() {
     const genero = detectGender(teamName, teamGames[0]?.escalao || '')
     const escalao = teamGames[0]?.escalao || ''
     const generoLabel = genero === 'M' ? 'Masculino' : genero === 'F' ? 'Feminino' : 'Indefinido'
+    const generoClass = genero === 'M'
+        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+        : genero === 'F'
+            ? 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400'
+            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'
 
     return (
         <div className="max-w-6xl mx-auto space-y-4 pb-24">
@@ -141,7 +146,7 @@ function ClubTeamDetail() {
                                     {escalao}
                                 </span>
                             )}
-                            <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${generoClass}`}>
                                 {generoLabel}
                             </span>
                         </div>

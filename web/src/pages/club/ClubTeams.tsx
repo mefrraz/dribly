@@ -44,7 +44,10 @@ function fpbCoverPhoto(clubId: number): string {
     return `https://sav2.fpb.pt/uploads/clubes/capa/CLU_capa${clubId}.jpg`
 }
 
-const GENERO_LABELS: Record<string, string> = { M: 'Masculino', F: 'Feminino' }
+const GENERO_CONFIG: Record<string, { label: string; className: string }> = {
+    M: { label: 'Masculino', className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
+    F: { label: 'Feminino', className: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400' },
+}
 
 interface TeamEntry {
     teamId: string
@@ -215,9 +218,15 @@ function ClubTeams() {
                                                     {team.escalao}
                                                 </span>
                                             )}
-                                            <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
-                                                {team.genero ? GENERO_LABELS[team.genero] : 'Indefinido'}
-                                            </span>
+                                            {team.genero ? (
+                                                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${GENERO_CONFIG[team.genero].className}`}>
+                                                    {GENERO_CONFIG[team.genero].label}
+                                                </span>
+                                            ) : (
+                                                <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
+                                                    Indefinido
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                     <ChevronRight size={16} className="text-zinc-400 shrink-0 mt-1" />
