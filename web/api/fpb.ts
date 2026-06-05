@@ -17,8 +17,13 @@ export default async function handler(request: Request) {
 
         if (wpAction) {
             if (wpAction === 'get_equipas') {
-                const idCompeticao = url.searchParams.get('idCompeticao') || ''
-                apiUrl = `https://www.fpb.pt/wp-admin/admin-ajax.php?action=get_equipas&idCompeticao=${idCompeticao}`
+                const idCompeticao = url.searchParams.get('idCompeticao')
+                const idClube = url.searchParams.get('idClube')
+                if (idClube) {
+                    apiUrl = `https://www.fpb.pt/wp-admin/admin-ajax.php?action=get_equipas&idClube=${idClube}`
+                } else {
+                    apiUrl = `https://www.fpb.pt/wp-admin/admin-ajax.php?action=get_equipas&idCompeticao=${idCompeticao || ''}`
+                }
                 headers['Referer'] = 'https://www.fpb.pt/'
             } else {
                 // WordPress AJAX: get_more_fase_regular
