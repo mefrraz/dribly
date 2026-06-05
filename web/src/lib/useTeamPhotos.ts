@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 const FPB_PROXY = '/api/fpb'
-const CACHE_KEY = 'dribly_team_data_v7'
+const CACHE_KEY = 'dribly_team_data_v8'
 const CACHE_TTL = 30 * 60 * 1000
 
 export interface TeamData {
@@ -136,6 +136,11 @@ export function useTeamPhotos(clubId: number, clubName: string): { teamData: Dat
                 for (const [id, compData] of equipas) {
                     if (!dataMap[id]) {
                         dataMap[id] = { nome: compData.nome, escalao: '', photo: compData.photo }
+                    }
+                    // Also add normalized escalão as a lookup key
+                    const esc = norm(dataMap[id].escalao)
+                    if (esc && !dataMap[esc]) {
+                        dataMap[esc] = dataMap[id]
                     }
                 }
 

@@ -56,7 +56,7 @@ function ClubTeams() {
     const games = allGames || []
     const clubNameUpper = club.name.toUpperCase()
     const coverPhoto = fpbCoverPhoto(club.id)
-    const { teamData } = useTeamPhotos(club.id, club.name)
+    const { teamData, loading: teamDataLoading } = useTeamPhotos(club.id, club.name)
 
     const teams = useMemo(() => {
         const teamMap = new Map<string, Match[]>()
@@ -108,7 +108,7 @@ function ClubTeams() {
         return entries
     }, [games, clubNameUpper, club.name])
 
-    if (loading) {
+    if (loading || teamDataLoading) {
         return (
             <div className="max-w-xl mx-auto px-3 pt-4">
                 <SkeletonGameGrid days={3} count={2} />
@@ -176,25 +176,9 @@ function ClubTeams() {
             <div className="space-y-2.5">
                 {teams.map(team => {
                     const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
-                    const teamNorm = norm(team.teamId)
-                    const teamNoGender = teamNorm.replace(/\s+(MASCULINO|FEMININO)\s*$/i, '').trim()
-                    let matched: TeamData | undefined
-                    for (const [, td] of Object.entries(teamData)) {
-                        const tdEsc = norm(td.escalao)
-                        // Match by team ID (e.g., "SENIOR MASCULINO" matches "FC GAIA A" if escalão matches)
-                        if (tdEsc && (teamNoGender.includes(tdEsc) || tdEsc.includes(teamNoGender))) {
-                            matched = td; break
-                        }
-                    }
-                    // Fallback: match by escalao only
-                    if (!matched) {
-                        for (const [, td] of Object.entries(teamData)) {
-                            const tdEsc = norm(td.escalao)
-                            if (tdEsc && (teamNorm.includes(tdEsc) || tdEsc.includes(teamNorm.substring(0, 10)))) {
-                                matched = td; break
-                            }
-                        }
-                    }
+                    // Direct lookup by normalized escalão (teamData has escalão→data mappings)
+                    const escKey = norm(team.teamId.replace(/\s+(MASCULINO|FEMININO)\s*$/i, '').trim())
+                    const matched = teamData[escKey] as TeamData | undefined
 
                     const displayName = matched?.nome || team.teamId
                     const displayEscalao = matched?.escalao || team.escalao
