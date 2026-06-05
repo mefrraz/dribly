@@ -69,8 +69,22 @@ function ClubTeams() {
         return <div className="max-w-xl mx-auto px-3 pt-4"><SkeletonGameGrid days={3} count={2} /></div>
     }
 
-    // Use FPB teams as the source of truth for display
-    const displayTeams = fpbTeams
+    // Sort: oldest escalão first, same escalão: A before B
+    const escalaoOrder = ['MASTERS', 'VETERANOS', 'SENIOR', 'SUB23', 'SUB22', 'SUB18', 'SUB16', 'SUB14', 'MINI12', 'MINI10', 'MINI8']
+    function escalaoPriority(name: string): number {
+        const n = name.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        for (let i = 0; i < escalaoOrder.length; i++) if (n.includes(escalaoOrder[i])) return i
+        return escalaoOrder.length
+    }
+    const displayTeams = [...fpbTeams].sort((a, b) => {
+        const pa = escalaoPriority(a.escalao || a.nome)
+        const pb = escalaoPriority(b.escalao || b.nome)
+        if (pa !== pb) return pa - pb
+        // Same escalão: A before B
+        const aA = /\bA\b/.test(a.nome); const bA = /\bA\b/.test(b.nome)
+        if (aA && !bA) return -1; if (!aA && bA) return 1
+        return a.nome.localeCompare(b.nome)
+    })
 
     if (displayTeams.length === 0) {
         return (
@@ -112,12 +126,21 @@ function ClubTeams() {
 
             <div className="space-y-2.5">
                 {displayTeams.map(team => {
-                    // Try to find matching game stats via escalão
-                    const tn = (team.escalao || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
+                    // Try to find matching game stats: try escalão, then team name words
+                    const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
+                    const searchTerms = new Set<string>()
+                    searchTerms.add(norm(team.escalao || ''))
+                    for (const w of (team.escalao || '').split(/\s+/)) { if (w.length > 2) searchTerms.add(norm(w)) }
+                    for (const w of team.nome.split(/[\s\-]+/)) { if (w.length > 2) searchTerms.add(norm(w)) }
+                    searchTerms.delete('')
+
                     let stats: TeamStats | undefined
                     for (const [key, s] of gameStats) {
-                        const kn = key.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
-                        if (kn.includes(tn) || tn.includes(kn)) { stats = s; break }
+                        const kn = norm(key)
+                        for (const st of searchTerms) {
+                            if (kn.includes(st) || st.includes(kn)) { stats = s; break }
+                        }
+                        if (stats) break
                     }
 
                     return (
