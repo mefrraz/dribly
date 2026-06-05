@@ -11,21 +11,7 @@ export interface TeamData {
 interface DataMap { [teamId: string]: TeamData }
 const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
 
-/** Fuzzy check: does the team name belong to this club? */
-function belongsToClub(teamName: string, clubName: string, clubId: number): boolean {
-    const tn = norm(teamName)
-    const cn = norm(clubName)
-    // Direct inclusion
-    if (tn.includes(cn) || cn.includes(tn.replace(/\s+/g, ''))) return true
-    // Word-level: check individual words of club name against team name
-    const clubWords = cn.split(/\s+/).filter(w => w.length > 2)
-    for (const w of clubWords) {
-        if (tn.includes(w)) return true
-    }
-    return false
-}
-
-/** Parse WP AJAX for equipa IDs + photos */
+/** Parse WP AJAX for ALL equipa IDs + photos (no club filter) */
 function parseCompTeams(html: string): { equipaId: string; nome: string; photo: string | null }[] {
     const results: { equipaId: string; nome: string; photo: string | null }[] = []
     const re = /<div class="equipa">\s*<a href="\/equipa\/(equipa_\d+)">([\s\S]*?)<\/a>\s*<\/div>/g
@@ -43,8 +29,8 @@ function parseCompTeams(html: string): { equipaId: string; nome: string; photo: 
     return results
 }
 
-/** Parse individual equipa page for real team name */
-function parseEquipaPage(html: string): { nome: string; escalao: string } | null {
+/** Parse individual equipa page for: team name, escalão, club name */
+function parseEquipaPage(html: string): { nome: string; escalao: string; clube: string } | null {
     const lines = html
         .replace(/<script[\s\S]*?<\/script>/g, '')
         .replace(/<style[\s\S]*?<\/style>/g, '')
@@ -53,6 +39,7 @@ function parseEquipaPage(html: string): { nome: string; escalao: string } | null
         .map(l => l.trim())
         .filter(l => l.length > 2 && l.length < 60 && !l.startsWith('{') && !l.startsWith('//') && !l.includes('Cookie'))
 
+    // Team name: short text with club prefix (FC, SL, SC, etc.)
     const clubRe = /\b(FC|SL|SC|CD|GD|UD|AD|GS|CP|CF|ABC|AJ|AA|ACR|GDB|GDR|NBA|CA|CS|GC|GDC)\b/i
     let nome = ''
     for (const l of lines) {
@@ -61,26 +48,50 @@ function parseEquipaPage(html: string): { nome: string; escalao: string } | null
         }
     }
 
+    // Escalão
     const escRe = /\b(S(é|e)nior|Sub\s*\d+|Mini\s*\d+|SUB\s*\d+|MINI\s*\d+)\b/i
     let escalao = ''
     for (const l of lines) {
         if (escRe.test(l) && l.length < 30) { escalao = l; break }
     }
 
+    // Club name: find the first line that looks like a full club name (longer, multiple words)
+    const clubNameRe = /^(Futebol Clube|Sporting Clube|Clube Desportivo|Grupo Desportivo|Associação|União Desportiva|Atletico Clube|Ginasio Clube|Basquete Clube)/i
+    let clube = ''
+    for (const l of lines) {
+        if (clubNameRe.test(l) && l.length > 10 && l.length < 80) {
+            clube = l; break
+        }
+    }
+
     if (!nome) return null
-    return { nome, escalao }
+    return { nome, escalao, clube }
 }
 
-async function fetchBatch(ids: string[]): Promise<{ equipaId: string; nome: string; escalao: string }[]> {
+async function fetchBatch(ids: string[]): Promise<{ equipaId: string; nome: string; escalao: string; clube: string }[]> {
     const results = await Promise.all(ids.map(async (id) => {
         try {
             const r = await fetch(`${FPB_PROXY}?page=equipa&equipa_id=${id}`)
             if (!r.ok) return null
             const info = parseEquipaPage(await r.text())
-            return info ? { equipaId: id, nome: info.nome, escalao: info.escalao } : null
+            return info ? { equipaId: id, ...info } : null
         } catch { return null }
     }))
-    return results.filter(Boolean) as { equipaId: string; nome: string; escalao: string }[]
+    return results.filter(Boolean) as { equipaId: string; nome: string; escalao: string; clube: string }[]
+}
+
+/** Check if equipa belongs to the club (using data FROM the equipa page, no DB) */
+function matchesClub(info: { nome: string; clube: string }, clubName: string): boolean {
+    const cn = norm(clubName)
+    // Club name from page
+    if (info.clube && norm(info.clube).includes(cn)) return true
+    // Team name
+    if (norm(info.nome).includes(cn)) return true
+    // Word-level
+    for (const w of cn.split(/\s+/)) {
+        if (w.length > 2 && norm(info.nome).includes(w)) return true
+    }
+    return false
 }
 
 export function useTeamPhotos(clubId: number, clubName: string): { teamData: DataMap; loading: boolean } {
@@ -96,7 +107,7 @@ export function useTeamPhotos(clubId: number, clubName: string): { teamData: Dat
             try {
                 const topComps = [10902, 10903, 10904, 10906, 10907, 10908]
 
-                // Step 1: fetch all competitions in parallel → get equipa IDs + photos
+                // Step 1: fetch ALL teams from all competitions (no filter)
                 const compResults = await Promise.all(topComps.map(async (cid) => {
                     try {
                         const r = await fetch(`${FPB_PROXY}?wp_action=get_equipas&idCompeticao=${cid}`)
@@ -105,21 +116,21 @@ export function useTeamPhotos(clubId: number, clubName: string): { teamData: Dat
                 }))
                 if (cancelled) return
 
-                // Deduplicate equipas by ID, filter by club
-                const equipas = new Map<string, { nome: string; photo: string | null }>()
+                // Deduplicate ALL equipa IDs
+                const allEquipas = new Map<string, { nome: string; photo: string | null }>()
                 for (const compTeams of compResults) {
                     for (const t of compTeams) {
-                        if (!belongsToClub(t.nome, clubName, clubId)) continue
-                        if (equipas.has(t.equipaId)) continue
-                        equipas.set(t.equipaId, { nome: t.nome, photo: t.photo })
+                        if (!allEquipas.has(t.equipaId)) {
+                            allEquipas.set(t.equipaId, { nome: t.nome, photo: t.photo })
+                        }
                     }
                 }
                 if (cancelled) return
 
-                console.log(`📸 FC Gaia: ${equipas.size} equipas encontradas nas competições, IDs:`, Array.from(equipas.keys()))
+                console.log(`📸 ${clubName}: ${allEquipas.size} equipas únicas encontradas`)
 
-                // Step 2: fetch individual pages in parallel batches (5 at a time)
-                const ids = Array.from(equipas.keys())
+                // Step 2: fetch individual pages in batches (5 at a time)
+                const ids = Array.from(allEquipas.keys())
                 const dataMap: DataMap = {}
                 const BATCH = 5
                 for (let i = 0; i < ids.length; i += BATCH) {
@@ -127,30 +138,22 @@ export function useTeamPhotos(clubId: number, clubName: string): { teamData: Dat
                     const batch = ids.slice(i, i + BATCH)
                     const batchResults = await fetchBatch(batch)
                     for (const r of batchResults) {
-                        const compData = equipas.get(r.equipaId)
+                        // Filter: only keep equipas matching THIS club
+                        if (!matchesClub(r, clubName)) continue
+                        const compData = allEquipas.get(r.equipaId)
                         dataMap[r.equipaId] = {
                             nome: r.nome,
                             escalao: r.escalao || compData?.nome || '',
                             photo: compData?.photo || null,
                         }
-                        // Also add normalized escalão as lookup key
                         const esc = norm(r.escalao)
                         if (esc && !dataMap[esc]) dataMap[esc] = dataMap[r.equipaId]
                     }
                 }
 
-                // Fallback: any equipas not yet fetched keep comp data
-                for (const [id, compData] of equipas) {
-                    if (!dataMap[id]) {
-                        dataMap[id] = { nome: compData.nome, escalao: '', photo: compData.photo }
-                        const esc = norm(dataMap[id].escalao)
-                        if (esc && !dataMap[esc]) dataMap[esc] = dataMap[id]
-                    }
-                }
-
                 if (!cancelled) {
+                    console.log(`📸 ${clubName} final: ${Object.keys(dataMap).length} equipas do clube`)
                     setTeamData(dataMap)
-                    console.log(`📸 FC Gaia final: ${Object.keys(dataMap).length} entries`, Object.keys(dataMap))
                 }
             } catch {} finally { if (!cancelled) setLoading(false) }
         }
