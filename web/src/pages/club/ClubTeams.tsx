@@ -70,17 +70,18 @@ function ClubTeams() {
     }
 
     // Sort: oldest escalão first, same escalão: A before B
+    // Check both name AND escalão for priority (e.g., "FC Gaia Sub23" → SUB23 even if escalão is "Sénior Masculino")
     const escalaoOrder = ['MASTERS', 'VETERANOS', 'SENIOR', 'SUB23', 'SUB22', 'SUB18', 'SUB16', 'SUB14', 'MINI12', 'MINI10', 'MINI8']
-    function escalaoPriority(name: string): number {
-        const n = name.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        for (let i = 0; i < escalaoOrder.length; i++) if (n.includes(escalaoOrder[i])) return i
+    function escalaoPriority(t: typeof fpbTeams[0]): number {
+        const search = (t.nome + ' ' + (t.escalao || '')).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/\bSUB\s*(\d)/gi, 'SUB$1') // normalize "Sub 14" → "SUB14"
+            .replace(/\bMINI\s*(\d)/gi, 'MINI$1') // normalize "Mini 12" → "MINI12"
+        for (let i = 0; i < escalaoOrder.length; i++) if (search.includes(escalaoOrder[i])) return i
         return escalaoOrder.length
     }
     const displayTeams = [...fpbTeams].sort((a, b) => {
-        const pa = escalaoPriority(a.escalao || a.nome)
-        const pb = escalaoPriority(b.escalao || b.nome)
+        const pa = escalaoPriority(a); const pb = escalaoPriority(b)
         if (pa !== pb) return pa - pb
-        // Same escalão: A before B
         const aA = /\bA\b/.test(a.nome); const bA = /\bA\b/.test(b.nome)
         if (aA && !bA) return -1; if (!aA && bA) return 1
         return a.nome.localeCompare(b.nome)
@@ -126,21 +127,22 @@ function ClubTeams() {
 
             <div className="space-y-2.5">
                 {displayTeams.map(team => {
-                    // Try to find matching game stats: try escalão, then team name words
                     const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
-                    const searchTerms = new Set<string>()
-                    searchTerms.add(norm(team.escalao || ''))
-                    for (const w of (team.escalao || '').split(/\s+/)) { if (w.length > 2) searchTerms.add(norm(w)) }
-                    for (const w of team.nome.split(/[\s\-]+/)) { if (w.length > 2) searchTerms.add(norm(w)) }
-                    searchTerms.delete('')
+                    const escNorm = norm(team.escalao || '')
+                    const nameWords = team.nome.split(/[\s\-]+/).map(w => norm(w)).filter(w => w.length > 2 && !/^(FC|SL|SC|CD|GD|UD|AD)$/i.test(w))
 
                     let stats: TeamStats | undefined
+                    let bestScore = 0
                     for (const [key, s] of gameStats) {
                         const kn = norm(key)
-                        for (const st of searchTerms) {
-                            if (kn.includes(st) || st.includes(kn)) { stats = s; break }
-                        }
-                        if (stats) break
+                        // Exact match on full escalão = best
+                        if (kn === escNorm || kn.includes(escNorm) || escNorm.includes(kn)) { stats = s; break }
+                        // Count matching words
+                        let score = 0
+                        for (const w of nameWords) { if (kn.includes(w) || w.includes(kn)) score++ }
+                        const escWords = escNorm.split(/\s+/).filter(w => w.length > 2)
+                        for (const w of escWords) { if (kn.includes(w) || w.includes(kn)) score++ }
+                        if (score > bestScore) { bestScore = score; stats = s }
                     }
 
                     return (
