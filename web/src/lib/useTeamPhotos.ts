@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 const FPB_PROXY = '/api/fpb'
 
 export interface TeamData { id: string; nome: string; escalao: string; photo: string | null }
-const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
 
 function parseClubTeams(html: string): string[] {
     const ids: string[] = []
