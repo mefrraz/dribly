@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import { Users, ChevronRight, Calendar } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
+import { useTeamPhotos } from '../../lib/useTeamPhotos'
 import { SkeletonGameGrid } from '../../components/Skeleton'
 import { type Club, displayName } from '../../lib/ClubContext'
 import { type Match } from '../../components/types'
@@ -65,6 +66,7 @@ function ClubTeams() {
     const games = allGames || []
     const clubNameUpper = club.name.toUpperCase()
     const coverPhoto = fpbCoverPhoto(club.id)
+    const { photos: teamPhotos } = useTeamPhotos(club.name)
 
     const teams = useMemo(() => {
         const teamMap = new Map<string, Match[]>()
@@ -159,7 +161,6 @@ function ClubTeams() {
                 </div>
             </div>
 
-            {/* Photo card — FPB cover photo as hero background */}
             <Link
                 to={`/clube/${club.slug}/team`}
                 className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
@@ -180,72 +181,76 @@ function ClubTeams() {
             </Link>
 
             <div className="space-y-2.5">
-                {teams.map(team => (
-                    <Link
-                        key={team.teamId}
-                        to={`/clube/${club.slug}/team/${team.slug}`}
-                        className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
-                    >
-                        <div className="p-4">
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="min-w-0 flex-1">
-                                    <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
-                                        {team.teamId}
-                                    </h3>
-                                    <div className="flex items-center gap-2 mt-1">
-                                        {team.escalao && (
-                                            <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
-                                                {team.escalao}
-                                            </span>
-                                        )}
-                                        <span className={`text-[10px] font-semibold ${
-                                            team.genero === 'M' ? 'text-blue-600 dark:text-blue-400' :
-                                            team.genero === 'F' ? 'text-pink-600 dark:text-pink-400' :
-                                            'text-zinc-400'
-                                        }`}>
-                                            {team.genero ? GENERO_LABELS[team.genero] : 'Indefinido'}
-                                        </span>
-                                    </div>
-                                </div>
-                                <ChevronRight size={16} className="text-zinc-400 shrink-0 mt-1" />
-                            </div>
-
-                            {team.total > 0 ? (
-                                <div className="flex items-center gap-4 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-                                    <div className="flex items-center gap-4">
-                                        <div>
-                                            <span className="text-base font-black text-zinc-900 dark:text-white">{team.total}</span>
-                                            <span className="text-[10px] text-zinc-500 ml-0.5">J</span>
-                                        </div>
-                                        <div>
-                                            <span className="text-base font-black text-green-600 dark:text-green-400">{team.wins}</span>
-                                            <span className="text-[10px] text-green-600/70 dark:text-green-400/70 ml-0.5">V</span>
-                                        </div>
-                                        <div>
-                                            <span className="text-base font-black text-red-500">{team.losses}</span>
-                                            <span className="text-[10px] text-red-500/70 ml-0.5">D</span>
-                                        </div>
-                                        {team.pct !== null && (
-                                            <span className="text-xs font-bold text-zinc-500">{team.pct}%</span>
-                                        )}
-                                    </div>
-                                    <div className="flex-1" />
-                                    {team.lastGame && (
-                                        <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
-                                            <Calendar size={11} />
-                                            <span>{formatShortDate(team.lastGame.data)}</span>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-                                    <Calendar size={12} className="text-zinc-400" />
-                                    <span className="text-xs text-zinc-400 italic">Sem jogos ainda esta época</span>
+                {teams.map(team => {
+                    const photoUrl = teamPhotos[team.teamId]
+                    return (
+                        <Link
+                            key={team.teamId}
+                            to={`/clube/${club.slug}/team/${team.slug}`}
+                            className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
+                        >
+                            {photoUrl && (
+                                <div className="relative h-32 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                                    <img
+                                        src={photoUrl}
+                                        alt=""
+                                        className="absolute inset-0 w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                                 </div>
                             )}
-                        </div>
-                    </Link>
-                ))}
+                            <div className="p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
+                                            {team.teamId}
+                                        </h3>
+                                        <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
+                                            {team.escalao || (team.genero ? GENERO_LABELS[team.genero] : '')}
+                                            {team.escalao && team.genero ? ` · ${GENERO_LABELS[team.genero]}` : ''}
+                                            {!team.escalao && !team.genero ? 'Indefinido' : ''}
+                                        </span>
+                                    </div>
+                                    <ChevronRight size={16} className="text-zinc-400 shrink-0 mt-1" />
+                                </div>
+
+                                {team.total > 0 ? (
+                                    <div className="flex items-center gap-4 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                                        <div className="flex items-center gap-4">
+                                            <div>
+                                                <span className="text-base font-black text-zinc-900 dark:text-white">{team.total}</span>
+                                                <span className="text-[10px] text-zinc-500 ml-0.5">J</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-base font-black text-green-600 dark:text-green-400">{team.wins}</span>
+                                                <span className="text-[10px] text-green-600/70 dark:text-green-400/70 ml-0.5">V</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-base font-black text-red-500">{team.losses}</span>
+                                                <span className="text-[10px] text-red-500/70 ml-0.5">D</span>
+                                            </div>
+                                            {team.pct !== null && (
+                                                <span className="text-xs font-bold text-zinc-500">{team.pct}%</span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1" />
+                                        {team.lastGame && (
+                                            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+                                                <Calendar size={11} />
+                                                <span>{formatShortDate(team.lastGame.data)}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                                        <Calendar size={12} className="text-zinc-400" />
+                                        <span className="text-xs text-zinc-400 italic">Sem jogos ainda esta época</span>
+                                    </div>
+                                )}
+                            </div>
+                        </Link>
+                    )
+                })}
             </div>
         </div>
     )
