@@ -185,18 +185,28 @@ function ClubTeams() {
 
             <div className="space-y-2.5">
                 {teams.map(team => {
-                    // Try many key variations to find a photo
+                    // Build comprehensive lookup keys
+                    const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
+                    const clubNorm = norm(club.name)
                     const keys = [
-                        team.teamId,
-                        team.teamId.toUpperCase(),
-                        team.teamId.toLowerCase(),
-                        team.teamId.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim(),
+                        team.teamId, team.teamId.toLowerCase(), team.teamId.toUpperCase(), norm(team.teamId),
                     ]
-                    // Also try without gender
+                    // Without gender
                     const noGender = team.teamId.replace(/\s+(MASCULINO|FEMININO|Masculino|Feminino)\s*$/i, '').trim()
                     if (noGender && noGender !== team.teamId) {
-                        keys.push(noGender, noGender.toLowerCase(), noGender.toUpperCase())
+                        keys.push(noGender, noGender.toLowerCase(), noGender.toUpperCase(), norm(noGender))
                     }
+                    // Individual words of teamId
+                    for (const w of team.teamId.split(/\s+/)) {
+                        if (w.length > 2) { keys.push(w, w.toLowerCase(), w.toUpperCase(), norm(w)) }
+                    }
+                    // Club name as fallback (most FPB competition pages show club-level names)
+                    keys.push(club.name, club.name.toLowerCase(), clubNorm)
+                    // Individual words of club name
+                    for (const w of club.name.split(/\s+/)) {
+                        if (w.length > 2) { keys.push(w, w.toLowerCase(), w.toUpperCase(), norm(w)) }
+                    }
+
                     let photoUrl: string | undefined
                     for (const k of keys) {
                         if (teamPhotos[k]) { photoUrl = teamPhotos[k]; break }

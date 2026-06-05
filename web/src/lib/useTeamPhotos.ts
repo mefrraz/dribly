@@ -89,8 +89,27 @@ export function useTeamPhotos(clubId: number, clubName: string): { photos: Photo
                         const teams: FPBTeam[] = await fetchTeams(row.competition_id)
                         for (const t of teams) {
                             if (t.photo && t.nome && !t.photo.includes('ass_highlight_default')) {
-                                const keys = buildKeys(t.nome, clubName)
-                                for (const k of keys) {
+                                const rawName = t.nome.replace(/\s+/g, ' ').trim()
+                                // Store photo under multiple key patterns:
+                                // 1. Raw name: "SL Benfica"
+                                // 2. Normalized
+                                // 3. ID-based (strip club name)
+                                const allKeys = new Set<string>()
+                                allKeys.add(rawName)
+                                allKeys.add(rawName.toLowerCase())
+                                allKeys.add(normalize(rawName))
+                                // Also add individual words for partial matching
+                                for (const word of rawName.split(/\s+/)) {
+                                    if (word.length > 2) {
+                                        allKeys.add(word.toLowerCase())
+                                        allKeys.add(normalize(word))
+                                    }
+                                }
+                                // Add buildKeys output
+                                for (const k of buildKeys(t.nome, clubName)) {
+                                    allKeys.add(k)
+                                }
+                                for (const k of allKeys) {
                                     if (!photoMap[k]) photoMap[k] = t.photo
                                 }
                             }
