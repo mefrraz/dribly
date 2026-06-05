@@ -18,18 +18,6 @@ function slugify(text: string): string {
         .replace(/-+/g, '-')
 }
 
-function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: string): string {
-    const upperTeam = fullTeamName.toUpperCase()
-    const upperClub = clubName.toUpperCase()
-    let suffix = upperTeam
-        .replace(new RegExp(upperClub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '')
-        .replace(/^[\s\-–—/]+/, '')
-        .replace(/[\s\-–—/]+$/, '')
-        .trim()
-    if (!suffix || suffix.length < 2) suffix = fallbackEscalao || fullTeamName
-    return suffix
-}
-
 function detectGender(teamName: string, escalao: string): 'M' | 'F' | null {
     const upper = (teamName + ' ' + (escalao || '')).toUpperCase()
     if (/\bFEMININ[OA]S?\b/.test(upper)) return 'F'
