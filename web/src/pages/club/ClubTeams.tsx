@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import { Users, ChevronRight, Calendar, ArrowLeft } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
-import { useTeamPhotos } from '../../lib/useTeamPhotos'
+import { useTeamPhotos, type TeamData } from '../../lib/useTeamPhotos'
 import { SkeletonGameGrid } from '../../components/Skeleton'
 import { type Club, displayName } from '../../lib/ClubContext'
 import { type Match } from '../../components/types'
@@ -56,7 +56,7 @@ function ClubTeams() {
     const games = allGames || []
     const clubNameUpper = club.name.toUpperCase()
     const coverPhoto = fpbCoverPhoto(club.id)
-    const { photos: teamPhotos } = useTeamPhotos(club.id, club.name)
+    const { teamData } = useTeamPhotos(club.id, club.name)
 
     const teams = useMemo(() => {
         const teamMap = new Map<string, Match[]>()
@@ -175,32 +175,30 @@ function ClubTeams() {
 
             <div className="space-y-2.5">
                 {teams.map(team => {
-                    // Build comprehensive lookup keys
                     const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
-                    const clubNorm = norm(club.name)
-                    const keys = [
-                        team.teamId, team.teamId.toLowerCase(), team.teamId.toUpperCase(), norm(team.teamId),
-                    ]
-                    // Without gender
-                    const noGender = team.teamId.replace(/\s+(MASCULINO|FEMININO|Masculino|Feminino)\s*$/i, '').trim()
-                    if (noGender && noGender !== team.teamId) {
-                        keys.push(noGender, noGender.toLowerCase(), noGender.toUpperCase(), norm(noGender))
+                    const teamNorm = norm(team.teamId)
+                    const teamNoGender = teamNorm.replace(/\s+(MASCULINO|FEMININO)\s*$/i, '').trim()
+                    let matched: TeamData | undefined
+                    for (const [, td] of Object.entries(teamData)) {
+                        const tdEsc = norm(td.escalao)
+                        // Match by team ID (e.g., "SENIOR MASCULINO" matches "FC GAIA A" if escalão matches)
+                        if (tdEsc && (teamNoGender.includes(tdEsc) || tdEsc.includes(teamNoGender))) {
+                            matched = td; break
+                        }
                     }
-                    // Individual words of teamId
-                    for (const w of team.teamId.split(/\s+/)) {
-                        if (w.length > 2) { keys.push(w, w.toLowerCase(), w.toUpperCase(), norm(w)) }
-                    }
-                    // Club name as fallback (most FPB competition pages show club-level names)
-                    keys.push(club.name, club.name.toLowerCase(), clubNorm)
-                    // Individual words of club name
-                    for (const w of club.name.split(/\s+/)) {
-                        if (w.length > 2) { keys.push(w, w.toLowerCase(), w.toUpperCase(), norm(w)) }
+                    // Fallback: match by escalao only
+                    if (!matched) {
+                        for (const [, td] of Object.entries(teamData)) {
+                            const tdEsc = norm(td.escalao)
+                            if (tdEsc && (teamNorm.includes(tdEsc) || tdEsc.includes(teamNorm.substring(0, 10)))) {
+                                matched = td; break
+                            }
+                        }
                     }
 
-                    let photoUrl: string | undefined
-                    for (const k of keys) {
-                        if (teamPhotos[k]) { photoUrl = teamPhotos[k]; break }
-                    }
+                    const displayName = matched?.nome || team.teamId
+                    const displayEscalao = matched?.escalao || team.escalao
+                    const photoUrl = matched?.photo || undefined
                     return (
                         <Link
                             key={team.teamId}
@@ -221,12 +219,12 @@ function ClubTeams() {
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
                                         <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
-                                            {team.teamId}
+                                            {displayName}
                                         </h3>
                                         <div className="flex items-center gap-1.5 mt-1">
-                                            {team.escalao && (
+                                            {displayEscalao && (
                                                 <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
-                                                    {team.escalao}
+                                                    {displayEscalao}
                                                 </span>
                                             )}
                                         </div>

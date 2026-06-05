@@ -594,7 +594,6 @@ export async function fetchTeamPage(equipaId: string): Promise<TeamPageInfo | nu
 
         // Extract team name — appears as plain text like "FC GAIA A"
         // Strategy: find the club logo img, then look for text nearby
-        const logoMatch = html.match(/uploads\/clubes\/logotipo\/[^"]*"/)
         let nome = ''
         let escalao = ''
 

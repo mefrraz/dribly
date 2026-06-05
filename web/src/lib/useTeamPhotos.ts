@@ -1,80 +1,147 @@
 import { useState, useEffect } from 'react'
 
 const FPB_PROXY = '/api/fpb'
-const CACHE_KEY = 'dribly_team_photos_v6'
+const CACHE_KEY = 'dribly_team_data_v7'
 const CACHE_TTL = 30 * 60 * 1000
 
-interface PhotoMap { [teamId: string]: string }
+export interface TeamData {
+    nome: string       // real team name: "FC GAIA A"
+    escalao: string    // e.g., "Sub 16"
+    photo: string | null
+}
 
-function getCache(): Record<string, { ts: number; map: PhotoMap }> { try { return JSON.parse(sessionStorage.getItem(CACHE_KEY) || '{}') } catch { return {} } }
-function setCache(k: string, m: PhotoMap) { const c = getCache(); c[k] = { ts: Date.now(), map: m }; try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(c)) } catch {} }
+interface DataMap { [teamId: string]: TeamData }
+const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
 
-function norm(s: string) { return s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim() }
+function getCache() { try { return JSON.parse(sessionStorage.getItem(CACHE_KEY) || '{}') } catch { return {} } }
+function setCache(k: string, v: DataMap) { const c = getCache(); c[k] = { ts: Date.now(), map: v }; try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(c)) } catch {} }
 
-/** Directly parse the WP AJAX HTML for team photos */
-function parseTeamPhotos(html: string): { nome: string; photo: string | null }[] {
-    const results: { nome: string; photo: string | null }[] = []
-    // Match each .equipa block
-    const blockRe = /<div class="equipa">\s*<a href="[^"]*">([\s\S]*?)<\/a>\s*<\/div>/g
+/** Parse WP AJAX for equipa IDs + photos */
+function parseCompTeams(html: string): { equipaId: string; nome: string; photo: string | null }[] {
+    const results: { equipaId: string; nome: string; photo: string | null }[] = []
+    const re = /<div class="equipa">\s*<a href="\/equipa\/(equipa_\d+)">([\s\S]*?)<\/a>\s*<\/div>/g
     let m
-    while ((m = blockRe.exec(html)) !== null) {
-        const block = m[1]
-        // Extract name from .equipa-name
-        const nameMatch = block.match(/<div class="equipa-name">([^<]+)<\/div>/)
-        const name = nameMatch?.[1]?.trim()
-        if (!name) continue
-        // Extract photo from .equipa-head background-image
-        const bgMatch = block.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/)
-        const photo = bgMatch?.[1] || null
-        // Skip default placeholders
-        const isDefault = photo && /ass_highlight_default/i.test(photo)
-        results.push({ nome: name, photo: isDefault ? null : photo })
+    while ((m = re.exec(html)) !== null) {
+        const equipaId = m[1]
+        const block = m[2]
+        const nm = block.match(/<div class="equipa-name">([^<]+)<\/div>/)
+        const bg = block.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/)
+        const nome = nm?.[1]?.trim() || ''
+        const photo = bg?.[1] || null
+        const isPlaceholder = photo && /ass_highlight_default/i.test(photo)
+        results.push({ equipaId, nome, photo: isPlaceholder ? null : photo })
     }
     return results
 }
 
-export function useTeamPhotos(clubId: number, clubName: string): { photos: PhotoMap; loading: boolean } {
-    const [photos, setPhotos] = useState<PhotoMap>({})
+/** Parse individual equipa page for real team name */
+function parseEquipaPage(html: string): { nome: string; escalao: string } | null {
+    const lines = html
+        .replace(/<script[\s\S]*?<\/script>/g, '')
+        .replace(/<style[\s\S]*?<\/style>/g, '')
+        .replace(/<[^>]+>/g, '\n')
+        .split('\n')
+        .map(l => l.trim())
+        .filter(l => l.length > 2 && l.length < 60 && !l.startsWith('{') && !l.startsWith('//') && !l.includes('Cookie'))
+
+    // Team name: short text with club prefix (FC, SL, SC, etc.)
+    const clubRe = /\b(FC|SL|SC|CD|GD|UD|AD|GS|CP|CF|ABC|AJ|AA|ACR|GDB|GDR|NBA|CA|CS|GC|GDC)\b/i
+    let nome = ''
+    for (const l of lines) {
+        if (clubRe.test(l) && !l.includes('FPB') && !l.includes('Subscrever') && !l.includes('Newsletter')) {
+            nome = l; break
+        }
+    }
+
+    // Escalão: "Sub 16", "Sénior", "Mini 12", etc.
+    const escRe = /\b(S(é|e)nior|Sub\s*\d+|Mini\s*\d+|SUB\s*\d+|MINI\s*\d+)\b/i
+    let escalao = ''
+    for (const l of lines) {
+        if (escRe.test(l) && l.length < 30) { escalao = l; break }
+    }
+
+    if (!nome) return null
+    return { nome, escalao }
+}
+
+async function fetchBatch(ids: string[]): Promise<{ equipaId: string; nome: string; escalao: string }[]> {
+    const results = await Promise.all(ids.map(async (id) => {
+        try {
+            const r = await fetch(`${FPB_PROXY}?page=equipa&equipa_id=${id}`)
+            if (!r.ok) return null
+            const info = parseEquipaPage(await r.text())
+            return info ? { equipaId: id, nome: info.nome, escalao: info.escalao } : null
+        } catch { return null }
+    }))
+    return results.filter(Boolean) as { equipaId: string; nome: string; escalao: string }[]
+}
+
+export function useTeamPhotos(clubId: number, clubName: string): { teamData: DataMap; loading: boolean } {
+    const [teamData, setTeamData] = useState<DataMap>({})
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if (!clubId || !clubName) return
-        const cacheKey = clubName.toLowerCase().trim()
+        const key = clubName.toLowerCase().trim()
         const cache = getCache()
-        if (cache[cacheKey] && Date.now() - cache[cacheKey].ts < CACHE_TTL) { setPhotos(cache[cacheKey].map); setLoading(false); return }
+        if (cache[key] && Date.now() - cache[key].ts < CACHE_TTL) {
+            setTeamData(cache[key].map); setLoading(false); return
+        }
 
         let cancelled = false
         async function run() {
             try {
-                // Fetch top competitions that are most likely to have team photos
-                // Liga Betclic (10902), Proliga (10903), 1ª Divisão, etc.
-                const topCompIds = [10902, 10903, 10904, 10906, 10907, 10908]
-                const photoMap: PhotoMap = {}
+                const topComps = [10902, 10903, 10904, 10906, 10907, 10908]
+                const clubNorm = norm(clubName)
 
-                for (const compId of topCompIds) {
-                    if (cancelled) return
+                // Step 1: fetch all competitions in parallel → get equipa IDs + photos
+                const compResults = await Promise.all(topComps.map(async (cid) => {
                     try {
-                        const res = await fetch(`${FPB_PROXY}?wp_action=get_equipas&idCompeticao=${compId}`)
-                        if (!res.ok) continue
-                        const html = await res.text()
-                        const teams = parseTeamPhotos(html)
-                        // Only keep teams matching this club
-                        const clubNorm = norm(clubName)
-                        for (const t of teams) {
-                            if (!t.photo) continue
-                            const clean = t.nome.replace(/\s+/g, ' ').trim()
-                            // Check if this team belongs to the club
-                            if (!norm(clean).includes(clubNorm) && !clubNorm.includes(norm(clean).replace(/\s+/g, ''))) continue
-                            const allKeys = new Set<string>()
-                            allKeys.add(clean); allKeys.add(clean.toLowerCase()); allKeys.add(norm(clean))
-                            for (const w of clean.split(/\s+/)) { if (w.length > 2) { allKeys.add(w.toLowerCase()); allKeys.add(norm(w)) } }
-                            for (const k of allKeys) { if (!photoMap[k]) photoMap[k] = t.photo }
-                        }
-                    } catch { /* skip */ }
+                        const r = await fetch(`${FPB_PROXY}?wp_action=get_equipas&idCompeticao=${cid}`)
+                        return r.ok ? parseCompTeams(await r.text()) : []
+                    } catch { return [] }
+                }))
+                if (cancelled) return
+
+                // Deduplicate equipas by ID, keep first photo
+                const equipas = new Map<string, { nome: string; photo: string | null }>()
+                for (const compTeams of compResults) {
+                    for (const t of compTeams) {
+                        if (!norm(t.nome).includes(clubNorm) && !clubNorm.includes(norm(t.nome).replace(/\s+/g, ''))) continue
+                        if (equipas.has(t.equipaId)) continue
+                        equipas.set(t.equipaId, { nome: t.nome, photo: t.photo })
+                    }
                 }
-                if (!cancelled && Object.keys(photoMap).length > 0) {
-                    setCache(cacheKey, photoMap)
-                    setPhotos(photoMap)
+                if (cancelled) return
+
+                // Step 2: fetch individual pages in parallel batches (5 at a time)
+                const ids = Array.from(equipas.keys())
+                const dataMap: DataMap = {}
+                const BATCH = 5
+                for (let i = 0; i < ids.length; i += BATCH) {
+                    if (cancelled) return
+                    const batch = ids.slice(i, i + BATCH)
+                    const batchResults = await fetchBatch(batch)
+                    for (const r of batchResults) {
+                        const compData = equipas.get(r.equipaId)
+                        dataMap[r.equipaId] = {
+                            nome: r.nome,
+                            escalao: r.escalao || compData?.nome || '',
+                            photo: compData?.photo || null,
+                        }
+                    }
+                }
+
+                // Fallback: any equipas not yet fetched keep competition data
+                for (const [id, compData] of equipas) {
+                    if (!dataMap[id]) {
+                        dataMap[id] = { nome: compData.nome, escalao: '', photo: compData.photo }
+                    }
+                }
+
+                if (!cancelled && Object.keys(dataMap).length > 0) {
+                    setCache(key, dataMap)
+                    setTeamData(dataMap)
                 }
             } catch {} finally { if (!cancelled) setLoading(false) }
         }
@@ -82,5 +149,5 @@ export function useTeamPhotos(clubId: number, clubName: string): { photos: Photo
         return () => { cancelled = true }
     }, [clubId, clubName])
 
-    return { photos, loading }
+    return { teamData, loading }
 }
