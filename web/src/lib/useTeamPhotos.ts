@@ -18,7 +18,9 @@ function parseEquipa(html: string): { nome: string; escalao: string; photo: stri
     const lv = html.match(/<div class="team-level">\s*([^<]+)\s*<\/div>/)
     const ph = html.match(/<div class="team-right[^"]*">\s*<img\s+src="([^"]+)"\s*\/>/)
     const nome = nm?.[1]?.trim(); if (!nome) return null
-    return { nome, escalao: (lv?.[1]?.trim() || '').split('|')[0]?.trim() || '', photo: ph?.[1]?.trim() || null }
+    const photoRaw = ph?.[1]?.trim() || null
+    const photo = photoRaw && !/ass_highlight_default/i.test(photoRaw) ? photoRaw : null
+    return { nome, escalao: (lv?.[1]?.trim() || '').split('|')[0]?.trim() || '', photo }
 }
 
 async function fetchBatch(ids: string[]): Promise<{ id: string; nome: string; escalao: string; photo: string | null }[]> {
@@ -51,9 +53,21 @@ export function useTeamPhotos(clubId: number, clubName: string): { teamData: Dat
                 for (let i = 0; i < ids.length; i += 5) {
                     if (cancelled) return
                     for (const r of await fetchBatch(ids.slice(i, i + 5))) {
-                        dataMap[r.id] = { nome: r.nome, escalao: r.escalao, photo: r.photo }
-                        const esc = norm(r.escalao)
-                        if (esc && !dataMap[esc]) dataMap[esc] = dataMap[r.id]
+                        const td: TeamData = { nome: r.nome, escalao: r.escalao, photo: r.photo }
+                        dataMap[r.id] = td
+                        // Store under multiple lookup keys
+                        const keys = new Set<string>()
+                        keys.add(norm(r.escalao)) // "SENIOR MASCULINO"
+                        keys.add(norm(r.nome)) // "FC GAIA - FOKUS"
+                        for (const w of r.nome.split(/[\s\-]+/)) {
+                            if (w.length > 2 && !/^[A-Z]{1,2}$/i.test(w)) keys.add(norm(w)) // "FOKUS", "GAIA"
+                        }
+                        for (const w of r.escalao.split(/\s+/)) {
+                            if (w.length > 2) keys.add(norm(w)) // "SENIOR", "MASCULINO"
+                        }
+                        for (const k of keys) {
+                            if (k && !dataMap[k]) dataMap[k] = td
+                        }
                     }
                 }
 
