@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 
 const FPB_PROXY = '/api/fpb'
 
-export interface TeamData { nome: string; escalao: string; photo: string | null }
-interface DataMap { [key: string]: TeamData }
+export interface TeamData { id: string; nome: string; escalao: string; photo: string | null }
 const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
 
 function parseClubTeams(html: string): string[] {
@@ -23,14 +22,14 @@ function parseEquipa(html: string): { nome: string; escalao: string; photo: stri
     return { nome, escalao: (lv?.[1]?.trim() || '').split('|')[0]?.trim() || '', photo }
 }
 
-async function fetchBatch(ids: string[]): Promise<{ id: string; nome: string; escalao: string; photo: string | null }[]> {
+async function fetchBatch(ids: string[]): Promise<TeamData[]> {
     return (await Promise.all(ids.map(async id => {
         try { const r = await fetch(`${FPB_PROXY}?page=equipa&equipa_id=${id}`); if (!r.ok) return null; const p = parseEquipa(await r.text()); return p ? { id, ...p } : null } catch { return null }
-    }))).filter(Boolean) as any[]
+    }))).filter(Boolean) as TeamData[]
 }
 
-export function useTeamPhotos(clubId: number, clubName: string): { teamData: DataMap; loading: boolean } {
-    const [teamData, setTeamData] = useState<DataMap>({})
+export function useTeamPhotos(clubId: number, clubName: string): { teams: TeamData[]; loading: boolean } {
+    const [teams, setTeams] = useState<TeamData[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -40,43 +39,25 @@ export function useTeamPhotos(clubId: number, clubName: string): { teamData: Dat
 
         async function run() {
             try {
-                // 1 call to get ALL equipa IDs for this club
                 const r = await fetch(`${FPB_PROXY}?wp_action=get_equipas&idClube=${clubId}&epoca=2025/2026`)
                 if (!r.ok || cancelled) { setLoading(false); return }
                 const ids = parseClubTeams(await r.text())
                 if (cancelled || ids.length === 0) { setLoading(false); return }
 
-                console.log(`📸 ${clubName}: ${ids.length} equipas do clube, IDs:`, ids)
+                console.log(`📸 ${clubName}: ${ids.length} equipas`)
 
-                // 2. Fetch individual pages in batches of 5
-                const dataMap: DataMap = {}
+                const allTeams: TeamData[] = []
                 for (let i = 0; i < ids.length; i += 5) {
                     if (cancelled) return
-                    for (const r of await fetchBatch(ids.slice(i, i + 5))) {
-                        const td: TeamData = { nome: r.nome, escalao: r.escalao, photo: r.photo }
-                        dataMap[r.id] = td
-                        // Store under multiple lookup keys
-                        const keys = new Set<string>()
-                        keys.add(norm(r.escalao)) // "SENIOR MASCULINO"
-                        keys.add(norm(r.nome)) // "FC GAIA - FOKUS"
-                        for (const w of r.nome.split(/[\s\-]+/)) {
-                            if (w.length > 2 && !/^[A-Z]{1,2}$/i.test(w)) keys.add(norm(w)) // "FOKUS", "GAIA"
-                        }
-                        for (const w of r.escalao.split(/\s+/)) {
-                            if (w.length > 2) keys.add(norm(w)) // "SENIOR", "MASCULINO"
-                        }
-                        for (const k of keys) {
-                            if (k && !dataMap[k]) dataMap[k] = td
-                        }
-                    }
+                    allTeams.push(...(await fetchBatch(ids.slice(i, i + 5))))
                 }
 
-                if (!cancelled) setTeamData(dataMap)
+                if (!cancelled) setTeams(allTeams)
             } catch {} finally { if (!cancelled) setLoading(false) }
         }
         run()
         return () => { cancelled = true }
     }, [clubId, clubName])
 
-    return { teamData, loading }
+    return { teams, loading }
 }

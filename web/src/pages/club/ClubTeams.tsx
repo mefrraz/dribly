@@ -2,18 +2,14 @@ import { useMemo } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import { Users, ChevronRight, Calendar, ArrowLeft } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
-import { useTeamPhotos } from '../../lib/useTeamPhotos'
+import { useTeamPhotos, type TeamData } from '../../lib/useTeamPhotos'
 import { SkeletonGameGrid } from '../../components/Skeleton'
 import { type Club, displayName } from '../../lib/ClubContext'
 import { type Match } from '../../components/types'
 
 function slugify(text: string): string {
-    return text
-        .toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        .replace(/-+/g, '-')
+    return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/-+/g, '-')
 }
 
 function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: string): string {
@@ -21,9 +17,7 @@ function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: 
     const upperClub = clubName.toUpperCase()
     let suffix = upperTeam
         .replace(new RegExp(upperClub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '')
-        .replace(/^[\s\-–—/]+/, '')
-        .replace(/[\s\-–—/]+$/, '')
-        .trim()
+        .replace(/^[\s\-–—/]+/, '').replace(/[\s\-–—/]+$/, '').trim()
     if (!suffix || suffix.length < 2) suffix = fallbackEscalao || fullTeamName
     return suffix
 }
@@ -33,90 +27,52 @@ function formatShortDate(dateStr: string) {
     return d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })
 }
 
-function fpbCoverPhoto(clubId: number): string {
-    return `https://sav2.fpb.pt/uploads/clubes/capa/CLU_capa${clubId}.jpg`
-}
-
-interface TeamEntry {
-    teamId: string
-    slug: string
-    escalao: string
-    wins: number
-    losses: number
-    draws: number
-    total: number
-    pct: number | null
-    lastGame: Match | null
-    competition: string
-}
+interface TeamStats { wins: number; losses: number; draws: number; total: number; pct: number | null; lastGame: Match | null }
 
 function ClubTeams() {
     const { club } = useOutletContext<{ club: Club }>()
-    const { games: allGames, loading } = useGames('2025/2026', club.id, club.name)
+    const { games: allGames, loading: gamesLoading } = useGames('2025/2026', club.id, club.name)
+    const { teams: fpbTeams, loading: teamDataLoading } = useTeamPhotos(club.id, club.name)
     const games = allGames || []
     const clubNameUpper = club.name.toUpperCase()
-    const coverPhoto = fpbCoverPhoto(club.id)
-    const { teamData, loading: teamDataLoading } = useTeamPhotos(club.id, club.name)
 
-    const teams = useMemo(() => {
-        const teamMap = new Map<string, Match[]>()
+    // Build game stats per team from game data
+    const gameStats = useMemo(() => {
+        const map = new Map<string, Match[]>()
         games.forEach(g => {
             let fullTeamName = ''
-            if (g.equipa_casa.toUpperCase().includes(clubNameUpper)) {
-                fullTeamName = g.equipa_casa
-            } else if (g.equipa_fora.toUpperCase().includes(clubNameUpper)) {
-                fullTeamName = g.equipa_fora
-            }
+            if (g.equipa_casa.toUpperCase().includes(clubNameUpper)) fullTeamName = g.equipa_casa
+            else if (g.equipa_fora.toUpperCase().includes(clubNameUpper)) fullTeamName = g.equipa_fora
             if (!fullTeamName) return
-            const teamId = extractTeamId(fullTeamName, club.name, g.escalao || '')
-            if (!teamMap.has(teamId)) teamMap.set(teamId, [])
-            teamMap.get(teamId)!.push(g)
+            const tid = extractTeamId(fullTeamName, club.name, g.escalao || '')
+            if (!map.has(tid)) map.set(tid, [])
+            map.get(tid)!.push(g)
         })
-
-        const entries: TeamEntry[] = []
-        teamMap.forEach((teamGames, teamId) => {
-            const escalao = teamGames[0]?.escalao || ''
-            const finished = teamGames.filter(g => g.status === 'FINALIZADO')
-            const lastGame = finished.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())[0] || null
-
+        const stats = new Map<string, TeamStats>()
+        map.forEach((tg, tid) => {
+            const finished = tg.filter(g => g.status === 'FINALIZADO')
             let wins = 0, losses = 0, draws = 0
             finished.forEach(g => {
-                const clubHome = g.equipa_casa.toUpperCase().includes(clubNameUpper)
+                const ch = g.equipa_casa.toUpperCase().includes(clubNameUpper)
                 if (g.resultado_casa === null || g.resultado_fora === null) return
                 if (g.resultado_casa === g.resultado_fora) { draws++; return }
-                if (clubHome ? g.resultado_casa > g.resultado_fora : g.resultado_fora > g.resultado_casa) wins++
-                else losses++
+                if (ch ? g.resultado_casa > g.resultado_fora : g.resultado_fora > g.resultado_casa) wins++; else losses++
             })
-
             const total = wins + losses + draws
-            const pct = total > 0 ? Math.round(wins / (wins + losses) * 100) : null
-
-            const competitions = [...new Set(teamGames.map(g => g.competicao).filter(Boolean))]
-            const mainComp = competitions[0] || ''
-
-            entries.push({
-                teamId,
-                slug: slugify(teamId),
-                escalao,
-                wins, losses, draws, total, pct,
-                lastGame,
-                competition: mainComp,
-            })
+            const lastGame = [...finished].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())[0] || null
+            stats.set(tid, { wins, losses, draws, total, pct: total > 0 ? Math.round(wins / (wins + losses) * 100) : null, lastGame })
         })
-
-        entries.sort((a, b) => a.teamId.localeCompare(b.teamId))
-        return entries
+        return stats
     }, [games, clubNameUpper, club.name])
 
-    if (loading || teamDataLoading) {
-        return (
-            <div className="max-w-xl mx-auto px-3 pt-4">
-                <SkeletonGameGrid days={3} count={2} />
-            </div>
-        )
+    if (gamesLoading || teamDataLoading) {
+        return <div className="max-w-xl mx-auto px-3 pt-4"><SkeletonGameGrid days={3} count={2} /></div>
     }
 
-    if (teams.length === 0) {
+    // Use FPB teams as the source of truth for display
+    const displayTeams = fpbTeams
+
+    if (displayTeams.length === 0) {
         return (
             <div className="max-w-xl mx-auto px-3 py-20 text-center">
                 <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4">
@@ -136,67 +92,43 @@ function ClubTeams() {
             </Link>
             <div className="pt-1 pb-1">
                 <h2 className="text-xl font-black text-zinc-900 dark:text-white">Equipas</h2>
-                <p className="text-xs text-zinc-500 mt-1">{teams.length} equipas de {displayName(club)} na época 2025/2026</p>
+                <p className="text-xs text-zinc-500 mt-1">{displayTeams.length} equipas de {displayName(club)} na época 2025/2026</p>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center shadow-sm">
-                    <p className="text-2xl font-black text-dribly-purple">{teams.length}</p>
+                    <p className="text-2xl font-black text-dribly-purple">{displayTeams.length}</p>
                     <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Equipas</p>
                 </div>
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center shadow-sm">
-                    <p className="text-2xl font-black text-zinc-900 dark:text-white">{teams.reduce((s, t) => s + t.total, 0)}</p>
+                    <p className="text-2xl font-black text-zinc-900 dark:text-white">{[...gameStats.values()].reduce((s, t) => s + t.total, 0)}</p>
                     <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Jogos</p>
                 </div>
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center shadow-sm">
-                    <p className="text-2xl font-black text-green-600 dark:text-green-400">{teams.reduce((s, t) => s + t.wins, 0)}</p>
+                    <p className="text-2xl font-black text-green-600 dark:text-green-400">{[...gameStats.values()].reduce((s, t) => s + t.wins, 0)}</p>
                     <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Vitórias</p>
                 </div>
             </div>
 
-            <Link
-                to={`/clube/${club.slug}/team`}
-                className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
-            >
-                <div className="relative h-36 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-                    <img
-                        src={coverPhoto}
-                        alt=""
-                        className="absolute inset-0 w-full h-full object-cover"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <p className="text-white text-sm font-black drop-shadow-md">{club.name}</p>
-                        <p className="text-white/80 text-xs">{teams.length} equipas · Época 2025/2026</p>
-                    </div>
-                </div>
-            </Link>
-
             <div className="space-y-2.5">
-                {teams.map(team => {
-                    const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
-                    // Try matching: full normalized name first, then without gender
-                    const fullKey = norm(team.teamId)
-                    const noGenderKey = norm(team.teamId.replace(/\s+(MASCULINO|FEMININO)\s*$/i, '').trim())
-                    const matched = teamData[fullKey] || teamData[noGenderKey] || undefined
+                {displayTeams.map(team => {
+                    // Try to find matching game stats via escalão
+                    const tn = (team.escalao || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
+                    let stats: TeamStats | undefined
+                    for (const [key, s] of gameStats) {
+                        const kn = key.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
+                        if (kn.includes(tn) || tn.includes(kn)) { stats = s; break }
+                    }
 
-                    const displayName = matched?.nome || team.teamId
-                    const displayEscalao = matched?.escalao || team.escalao
-                    const photoUrl = matched?.photo || undefined
                     return (
                         <Link
-                            key={team.teamId}
-                            to={`/clube/${club.slug}/team/${team.slug}`}
+                            key={team.id}
+                            to={`/clube/${club.slug}/team/${slugify(team.escalao || team.nome)}`}
                             className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
                         >
-                            {photoUrl && (
+                            {team.photo && (
                                 <div className="relative h-48 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-                                    <img
-                                        src={photoUrl}
-                                        alt=""
-                                        className="absolute inset-0 w-full h-full object-cover object-center"
-                                    />
+                                    <img src={team.photo} alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                                 </div>
                             )}
@@ -204,45 +136,27 @@ function ClubTeams() {
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
                                         <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
-                                            {displayName}
+                                            {team.nome}
                                         </h3>
-                                        <div className="flex items-center gap-1.5 mt-1">
-                                            {displayEscalao && (
+                                        {team.escalao && (
+                                            <div className="flex items-center gap-1.5 mt-1">
                                                 <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-500 dark:text-zinc-400">
-                                                    {displayEscalao}
+                                                    {team.escalao}
                                                 </span>
-                                            )}
-                                        </div>
+                                            </div>
+                                        )}
                                     </div>
                                     <ChevronRight size={16} className="text-zinc-400 shrink-0 mt-1" />
                                 </div>
 
-                                {team.total > 0 ? (
+                                {stats && stats.total > 0 ? (
                                     <div className="flex items-center gap-4 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-                                        <div className="flex items-center gap-4">
-                                            <div>
-                                                <span className="text-base font-black text-zinc-900 dark:text-white">{team.total}</span>
-                                                <span className="text-[10px] text-zinc-500 ml-0.5">J</span>
-                                            </div>
-                                            <div>
-                                                <span className="text-base font-black text-green-600 dark:text-green-400">{team.wins}</span>
-                                                <span className="text-[10px] text-green-600/70 dark:text-green-400/70 ml-0.5">V</span>
-                                            </div>
-                                            <div>
-                                                <span className="text-base font-black text-red-500">{team.losses}</span>
-                                                <span className="text-[10px] text-red-500/70 ml-0.5">D</span>
-                                            </div>
-                                            {team.pct !== null && (
-                                                <span className="text-xs font-bold text-zinc-500">{team.pct}%</span>
-                                            )}
-                                        </div>
+                                        <div><span className="text-base font-black text-zinc-900 dark:text-white">{stats.total}</span><span className="text-[10px] text-zinc-500 ml-0.5">J</span></div>
+                                        <div><span className="text-base font-black text-green-600 dark:text-green-400">{stats.wins}</span><span className="text-[10px] text-green-600/70 dark:text-green-400/70 ml-0.5">V</span></div>
+                                        <div><span className="text-base font-black text-red-500">{stats.losses}</span><span className="text-[10px] text-red-500/70 ml-0.5">D</span></div>
+                                        {stats.pct !== null && <span className="text-xs font-bold text-zinc-500">{stats.pct}%</span>}
                                         <div className="flex-1" />
-                                        {team.lastGame && (
-                                            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
-                                                <Calendar size={11} />
-                                                <span>{formatShortDate(team.lastGame.data)}</span>
-                                            </div>
-                                        )}
+                                        {stats.lastGame && <div className="flex items-center gap-1.5 text-[10px] text-zinc-400"><Calendar size={11} /><span>{formatShortDate(stats.lastGame.data)}</span></div>}
                                     </div>
                                 ) : (
                                     <div className="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
