@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import { fetchTeams, type FPBTeam } from './fpbCompetitionsApi'
 
-const CACHE_KEY = 'dribly_team_photos_v2'
+const CACHE_KEY = 'dribly_team_photos_v3'
 const CACHE_TTL = 10 * 60 * 1000
 
 interface PhotoMap {
@@ -25,15 +25,23 @@ function normalize(text: string): string {
     return text.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
 }
 
+function extractTeamIdFromName(fullName: string, clubName: string): string {
+    const upperTeam = normalize(fullName)
+    const upperClub = normalize(clubName)
+    let suffix = upperTeam
+        .replace(new RegExp(upperClub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '')
+        .replace(/^[\s\-–—/]+/, '')
+        .replace(/[\s\-–—/]+$/, '')
+        .trim()
+    if (!suffix || suffix.length < 2) suffix = normalize(fullName)
+    return suffix
+}
+
 export function useTeamPhotos(clubName: string): { photos: PhotoMap; loading: boolean } {
     const [photos, setPhotos] = useState<PhotoMap>({})
     const [loading, setLoading] = useState(true)
-    const fired = useRef(false)
 
     useEffect(() => {
-        if (fired.current) return
-        fired.current = true
-
         const key = clubName.toLowerCase().trim()
         const cache = getCache()
         if (cache[key] && Date.now() - cache[key].ts < CACHE_TTL) {
@@ -58,23 +66,24 @@ export function useTeamPhotos(clubName: string): { photos: PhotoMap; loading: bo
                 }
 
                 const photoMap: PhotoMap = {}
-                const normClub = normalize(clubName)
-
+                const seen = new Set<number>()
                 for (const row of data) {
                     if (cancelled) return
+                    if (seen.has(row.competition_id)) continue
+                    seen.add(row.competition_id)
                     try {
                         const teams: FPBTeam[] = await fetchTeams(row.competition_id)
                         for (const t of teams) {
                             if (t.photo && t.nome) {
                                 const clean = t.nome.replace(/\s+/g, ' ').trim()
-                                const normName = normalize(clean)
-                                let teamId = normName
-                                    .replace(new RegExp(normClub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '')
-                                    .replace(/^[\s\-–—/]+/, '')
-                                    .replace(/[\s\-–—/]+$/, '')
-                                    .trim()
-                                if (!teamId || teamId.length < 2) teamId = clean
-                                if (!photoMap[teamId]) photoMap[teamId] = t.photo
+                                const id = extractTeamIdFromName(clean, clubName)
+                                const idLower = id.toLowerCase()
+                                const cleanLower = clean.toLowerCase()
+                                if (!photoMap[id]) photoMap[id] = t.photo
+                                if (!photoMap[idLower]) photoMap[idLower] = t.photo
+                                if (!photoMap[clean]) photoMap[clean] = t.photo
+                                if (!photoMap[cleanLower]) photoMap[cleanLower] = t.photo
+                                if (!photoMap[normalize(clean)]) photoMap[normalize(clean)] = t.photo
                             }
                         }
                     } catch { /* skip failed comps */ }

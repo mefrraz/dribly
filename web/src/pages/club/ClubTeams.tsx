@@ -182,7 +182,11 @@ function ClubTeams() {
 
             <div className="space-y-2.5">
                 {teams.map(team => {
-                    const photoUrl = teamPhotos[team.teamId] || teamPhotos[team.teamId.replace(/\s+/g, ' ').trim()]
+                    const normId = team.teamId.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
+                    const photoUrl = teamPhotos[team.teamId]
+                        || teamPhotos[normId]
+                        || teamPhotos[team.teamId.toLowerCase()]
+                        || teamPhotos[team.teamId.toUpperCase()]
                     return (
                         <Link
                             key={team.teamId}
