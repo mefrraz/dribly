@@ -67,20 +67,16 @@ function ClubTeamDetail() {
             if (g.equipa_casa.toUpperCase().includes(clubNameUpper)) fullTeamName = g.equipa_casa
             else if (g.equipa_fora.toUpperCase().includes(clubNameUpper)) fullTeamName = g.equipa_fora
             if (!fullTeamName) return false
-            const tid = extractTeamId(fullTeamName, club.name, g.escalao || '')
-            return slugify(tid) === teamSlug
+            // Match by full team name slug (distinguishes "FC GAIA A" from "FC GAIA B")
+            return slugify(fullTeamName) === teamSlug
         })
 
         const name = filtered.length > 0
-            ? extractTeamId(
-                filtered[0].equipa_casa.toUpperCase().includes(clubNameUpper) ? filtered[0].equipa_casa : filtered[0].equipa_fora,
-                club.name,
-                filtered[0].escalao || ''
-              )
+            ? (filtered[0].equipa_casa.toUpperCase().includes(clubNameUpper) ? filtered[0].equipa_casa : filtered[0].equipa_fora)
             : ''
 
         return { teamName: name, teamGames: filtered }
-    }, [games, teamSlug, clubNameUpper, club.name])
+    }, [games, teamSlug, clubNameUpper])
 
     const finished = useMemo(() =>
         teamGames.filter(g => g.status === 'FINALIZADO').sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),
