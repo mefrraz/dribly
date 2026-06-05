@@ -26,19 +26,24 @@ function parseCompTeams(html: string): { equipaId: string; nome: string; photo: 
     return r
 }
 
-/** Parse individual equipa page */
-function parseEquipa(html: string): { nome: string; escalao: string } | null {
-    const lines = html.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style[\s\S]*?<\/style>/g, '')
-        .replace(/<[^>]+>/g, '\n').split('\n').map(l => l.trim())
-        .filter(l => l.length > 2 && l.length < 60 && !l.includes('Cookie') && !l.startsWith('{'))
-    const clubRe = /\b(FC|SL|SC|CD|GD|UD|AD|GS|CP|CF|ABC|AJ|AA)\b/i
-    let nome = ''; for (const l of lines) { if (clubRe.test(l) && !l.includes('FPB') && !l.includes('Newsletter')) { nome = l; break } }
-    const escRe = /\b(S(é|e)nior|Sub\s*\d+|Mini\s*\d+)\b/i
-    let esc = ''; for (const l of lines) { if (escRe.test(l) && l.length < 30) { esc = l; break } }
-    return nome ? { nome, escalao: esc } : null
+/** Parse individual equipa page — extracts from .team-nome, .team-level, .team-right img */
+function parseEquipa(html: string): { nome: string; escalao: string; photo: string | null } | null {
+    const nomeMatch = html.match(/<div class="team-nome">\s*([^<]+)\s*<\/div>/)
+    const levelMatch = html.match(/<div class="team-level">\s*([^<]+)\s*<\/div>/)
+    const photoMatch = html.match(/<div class="team-right[^"]*">\s*<img\s+src="([^"]+)"\s*\/>/)
+
+    const nome = nomeMatch?.[1]?.trim()
+    if (!nome) return null
+
+    // team-level format: "Sénior Masculino | CN 1.ª Divisão" → take first part as escalão
+    const levelRaw = levelMatch?.[1]?.trim() || ''
+    const escalao = levelRaw.split('|')[0]?.trim() || ''
+
+    const photo = photoMatch?.[1]?.trim() || null
+    return { nome, escalao, photo }
 }
 
-async function fetchBatch(ids: string[]): Promise<{ equipaId: string; nome: string; escalao: string }[]> {
+async function fetchBatch(ids: string[]): Promise<{ equipaId: string; nome: string; escalao: string; photo: string | null }[]> {
     return (await Promise.all(ids.map(async id => {
         try { const r = await fetch(`${FPB_PROXY}?page=equipa&equipa_id=${id}`); if (!r.ok) return null; const p = parseEquipa(await r.text()); return p ? { equipaId: id, ...p } : null } catch { return null }
     }))).filter(Boolean) as any[]
@@ -92,7 +97,8 @@ export function useTeamPhotos(clubId: number, clubName: string, gameTeamIds: str
                 for (let i = 0; i < ids.length; i += 5) {
                     if (cancelled) return
                     for (const r of await fetchBatch(ids.slice(i, i + 5))) {
-                        dataMap[r.equipaId] = { nome: r.nome, escalao: r.escalao, photo: idToPhoto.get(r.equipaId) || null }
+                        // Photo: prefer from individual page, fallback to WP AJAX
+                        dataMap[r.equipaId] = { nome: r.nome, escalao: r.escalao, photo: r.photo || idToPhoto.get(r.equipaId) || null }
                         const esc = norm(r.escalao); if (esc && !dataMap[esc]) dataMap[esc] = dataMap[r.equipaId]
                     }
                 }
