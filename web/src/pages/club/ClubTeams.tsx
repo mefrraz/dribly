@@ -1,10 +1,19 @@
 import { useMemo } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { Users, ChevronRight, TrendingUp, Target, Activity } from 'lucide-react'
+import { Users, ChevronRight, Calendar } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
 import { SkeletonGameGrid } from '../../components/Skeleton'
 import { type Club, displayName } from '../../lib/ClubContext'
 import { type Match } from '../../components/types'
+
+function slugify(text: string): string {
+    return text
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .replace(/-+/g, '-')
+}
 
 function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: string): string {
     const upperTeam = fullTeamName.toUpperCase()
@@ -18,8 +27,14 @@ function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: 
     return suffix
 }
 
+function formatShortDate(dateStr: string) {
+    const d = new Date(dateStr)
+    return d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })
+}
+
 interface TeamEntry {
     teamId: string
+    slug: string
     escalao: string
     wins: number
     losses: number
@@ -28,6 +43,8 @@ interface TeamEntry {
     pct: number | null
     lastResult: 'W' | 'L' | 'D' | null
     lastGame: Match | null
+    competition: string
+    venueCount: number
 }
 
 function ClubTeams() {
@@ -77,7 +94,19 @@ function ClubTeams() {
                 else lastResult = 'L'
             }
 
-            entries.push({ teamId, escalao, wins, losses, draws, total, pct, lastResult, lastGame })
+            const competitions = [...new Set(teamGames.map(g => g.competicao).filter(Boolean))]
+            const mainComp = competitions[0] || ''
+            const venues = new Set(teamGames.map(g => g.local).filter(Boolean))
+
+            entries.push({
+                teamId,
+                slug: slugify(teamId),
+                escalao,
+                wins, losses, draws, total, pct,
+                lastResult, lastGame,
+                competition: mainComp,
+                venueCount: venues.size,
+            })
         })
 
         entries.sort((a, b) => a.teamId.localeCompare(b.teamId))
@@ -112,77 +141,97 @@ function ClubTeams() {
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-                <div className="glass-card p-3 text-center">
-                    <p className="text-2xl font-black text-[var(--club-color)]">{teams.length}</p>
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center shadow-sm">
+                    <p className="text-2xl font-black text-dribly-purple">{teams.length}</p>
                     <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Equipas</p>
                 </div>
-                <div className="glass-card p-3 text-center">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center shadow-sm">
                     <p className="text-2xl font-black text-zinc-900 dark:text-white">{teams.reduce((s, t) => s + t.total, 0)}</p>
                     <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Jogos</p>
                 </div>
-                <div className="glass-card p-3 text-center">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center shadow-sm">
                     <p className="text-2xl font-black text-green-600 dark:text-green-400">{teams.reduce((s, t) => s + t.wins, 0)}</p>
                     <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Vitórias</p>
                 </div>
             </div>
 
             <div className="space-y-3">
-                {teams.map(team => (
-                    <Link
-                        key={team.teamId}
-                        to={`/clube/${club.slug}/team/${encodeURIComponent(team.teamId)}`}
-                        className="glass-card overflow-hidden group hover:border-[var(--club-color)]/30 transition-all duration-200"
-                    >
-                        <div className="p-5">
-                            <div className="flex items-start gap-4">
-                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--club-color)] to-[var(--club-color)]/70 dark:from-[var(--club-color)] dark:to-[var(--club-color)]/50 flex items-center justify-center shrink-0 shadow-md shadow-[var(--club-color)]/20 group-hover:scale-105 transition-transform">
-                                    <span className="text-lg font-black text-white">{team.teamId.charAt(0).toUpperCase()}</span>
-                                </div>
-
-                                <div className="min-w-0 flex-1">
-                                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-[var(--club-color)] transition-colors truncate">
-                                        {team.teamId.length > 30 ? team.teamId.substring(0, 27) + '...' : team.teamId}
-                                    </h3>
-                                    {team.escalao && (
-                                        <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-[var(--club-color)]/10 text-[10px] font-bold text-[var(--club-color)]">
-                                            {team.escalao}
-                                        </span>
-                                    )}
-                                </div>
-
-                                <ChevronRight size={18} className="text-zinc-400 group-hover:text-[var(--club-color)] shrink-0 mt-1 transition-colors" />
-                            </div>
-
-                            {team.total > 0 ? (
-                                <div className="flex items-center gap-4 mt-4 pt-4 border-t border-zinc-100 dark:border-white/5">
-                                    <div className="flex items-center gap-1.5">
-                                        <Target size={13} className="text-green-500" />
-                                        <span className="text-xs font-semibold text-green-600 dark:text-green-400">{team.wins}V</span>
+                {teams.map(team => {
+                    const initials = team.teamId
+                        .split(/\s+/)
+                        .map(w => w.charAt(0).toUpperCase())
+                        .slice(0, 2)
+                        .join('')
+                    return (
+                        <Link
+                            key={team.teamId}
+                            to={`/clube/${club.slug}/team/${team.slug}`}
+                            className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
+                        >
+                            <div className="p-4">
+                                <div className="flex items-start gap-3">
+                                    <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-sm font-black text-zinc-500 dark:text-zinc-400">
+                                        {initials}
                                     </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <Target size={13} className="text-red-400 rotate-180" />
-                                        <span className="text-xs font-semibold text-red-500">{team.losses}D</span>
-                                    </div>
-                                    <div className="flex-1" />
-                                    <div className="flex items-center gap-1.5">
-                                        <Activity size={13} className="text-zinc-400" />
-                                        <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{team.total} jogos</span>
-                                    </div>
-                                    {team.pct !== null && (
-                                        <div className="flex items-center gap-1.5">
-                                            <TrendingUp size={13} className="text-[var(--club-color)]" />
-                                            <span className="text-xs font-bold text-[var(--club-color)]">{team.pct}%</span>
+
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="text-sm font-extrabold text-zinc-900 dark:text-white truncate">
+                                            {team.teamId}
+                                        </h3>
+                                        <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                                            {team.escalao && (
+                                                <span className="inline-block px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
+                                                    {team.escalao}
+                                                </span>
+                                            )}
+                                            {team.competition && (
+                                                <span className="text-[10px] text-zinc-400 truncate max-w-[180px]">{team.competition}</span>
+                                            )}
                                         </div>
-                                    )}
+                                    </div>
+
+                                    <ChevronRight size={16} className="text-zinc-400 shrink-0 mt-1" />
                                 </div>
-                            ) : (
-                                <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-white/5">
-                                    <p className="text-xs text-zinc-400 italic">Sem jogos ainda esta época</p>
-                                </div>
-                            )}
-                        </div>
-                    </Link>
-                ))}
+
+                                {team.total > 0 ? (
+                                    <div className="flex items-center gap-3 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                                        <div className="flex items-center gap-4">
+                                            <div>
+                                                <span className="text-lg font-black text-zinc-900 dark:text-white">{team.total}</span>
+                                                <span className="text-[10px] text-zinc-500 ml-1">J</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-lg font-black text-green-600 dark:text-green-400">{team.wins}</span>
+                                                <span className="text-[10px] text-green-600/70 dark:text-green-400/70 ml-1">V</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-lg font-black text-red-500">{team.losses}</span>
+                                                <span className="text-[10px] text-red-500/70 ml-1">D</span>
+                                            </div>
+                                            {team.pct !== null && (
+                                                <div>
+                                                    <span className="text-lg font-black text-zinc-500">{team.pct}%</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1" />
+                                        {team.lastGame && (
+                                            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+                                                <Calendar size={11} />
+                                                <span>{formatShortDate(team.lastGame.data)}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                                        <Calendar size={12} className="text-zinc-400" />
+                                        <span className="text-xs text-zinc-400 italic">Sem jogos ainda esta época</span>
+                                    </div>
+                                )}
+                            </div>
+                        </Link>
+                    )
+                })}
             </div>
         </div>
     )

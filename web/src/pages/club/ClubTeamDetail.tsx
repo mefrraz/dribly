@@ -9,6 +9,15 @@ import { SegmentControl } from '../../components/SegmentControl'
 import type { Match } from '../../components/types'
 import type { Club } from '../../lib/ClubContext'
 
+function slugify(text: string): string {
+    return text
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .replace(/-+/g, '-')
+}
+
 function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: string): string {
     const upperTeam = fullTeamName.toUpperCase()
     const upperClub = clubName.toUpperCase()
@@ -29,9 +38,8 @@ function formatDate(dateStr: string) {
 
 function ClubTeamDetail() {
     const { club } = useOutletContext<{ club: Club }>()
-    const { teamId: paramTeamId } = useParams<{ teamId: string }>()
+    const { teamId: teamSlug } = useParams<{ teamId: string }>()
     const [searchParams, setSearchParams] = useSearchParams()
-    const decoded = decodeURIComponent(paramTeamId || '')
 
     const [view, setView] = useState<'agenda' | 'results'>(() => {
         const v = searchParams.get('view')
@@ -46,15 +54,26 @@ function ClubTeamDetail() {
         setSearchParams({ view })
     }, [view, setSearchParams])
 
-    const teamGames = useMemo(() =>
-        games.filter(g => {
+    const { teamName, teamGames } = useMemo(() => {
+        const filtered = games.filter(g => {
             let fullTeamName = ''
             if (g.equipa_casa.toUpperCase().includes(clubNameUpper)) fullTeamName = g.equipa_casa
             else if (g.equipa_fora.toUpperCase().includes(clubNameUpper)) fullTeamName = g.equipa_fora
             if (!fullTeamName) return false
-            return extractTeamId(fullTeamName, club.name, g.escalao || '') === decoded
-        }),
-    [games, decoded, clubNameUpper, club.name])
+            const tid = extractTeamId(fullTeamName, club.name, g.escalao || '')
+            return slugify(tid) === teamSlug
+        })
+
+        const name = filtered.length > 0
+            ? extractTeamId(
+                filtered[0].equipa_casa.toUpperCase().includes(clubNameUpper) ? filtered[0].equipa_casa : filtered[0].equipa_fora,
+                club.name,
+                filtered[0].escalao || ''
+              )
+            : ''
+
+        return { teamName: name, teamGames: filtered }
+    }, [games, teamSlug, clubNameUpper, club.name])
 
     const finished = useMemo(() =>
         teamGames.filter(g => g.status === 'FINALIZADO').sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),
@@ -91,9 +110,12 @@ function ClubTeamDetail() {
             : new Date(b).getTime() - new Date(a).getTime()
     )
 
+    const initials = teamName
+        ? teamName.split(/\s+/).map(w => w.charAt(0).toUpperCase()).slice(0, 2).join('')
+        : '?'
+
     return (
         <div className="max-w-6xl mx-auto space-y-4 pb-24">
-            {/* Header */}
             <div className="flex items-center justify-between pt-3 px-3">
                 <Link to={`/clube/${club.slug}/team`} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
                     <ArrowLeft size={22} />
@@ -102,36 +124,35 @@ function ClubTeamDetail() {
                 <div className="w-10" />
             </div>
 
-            {/* Hero Card */}
             <div className="max-w-xl mx-auto px-3">
-                <div className="glass-card overflow-hidden">
-                    <div className="bg-gradient-to-r from-[var(--club-color)]/10 via-white to-[var(--club-color)]/10 dark:from-[var(--club-color)]/10 dark:via-zinc-900 dark:to-[var(--club-color)]/10 p-6">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--club-color)] to-[var(--club-color)]/70 dark:to-[var(--club-color)]/50 flex items-center justify-center shrink-0 shadow-lg shadow-[var(--club-color)]/20">
-                                <span className="text-2xl font-black text-white">{decoded.charAt(0).toUpperCase()}</span>
+                            <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                                <span className="text-xl font-black text-zinc-500 dark:text-zinc-400">{initials}</span>
                             </div>
                             <div className="min-w-0">
-                                <h1 className="text-xl font-black text-zinc-900 dark:text-white truncate">{decoded}</h1>
+                                <h1 className="text-xl font-black text-zinc-900 dark:text-white truncate">{teamName}</h1>
                                 <p className="text-xs text-zinc-500 mt-0.5">{club.name}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="p-5 pt-0">
-                        <div className="grid grid-cols-4 gap-3 -mt-2">
-                            <div className="text-center pt-4">
+                    <div className="px-5 pb-5">
+                        <div className="grid grid-cols-4 gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                            <div className="text-center">
                                 <p className="text-2xl font-black text-zinc-900 dark:text-white">{total}</p>
                                 <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Jogos</p>
                             </div>
-                            <div className="text-center pt-4">
+                            <div className="text-center">
                                 <p className="text-2xl font-black text-green-600 dark:text-green-400">{wins}</p>
                                 <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Vitórias</p>
                             </div>
-                            <div className="text-center pt-4">
+                            <div className="text-center">
                                 <p className="text-2xl font-black text-red-500">{losses}</p>
                                 <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Derrotas</p>
                             </div>
-                            <div className="text-center pt-4">
+                            <div className="text-center">
                                 <p className={`text-2xl font-black ${pct !== null && pct >= 50 ? 'text-green-600 dark:text-green-400' : pct !== null ? 'text-red-500' : 'text-zinc-400'}`}>
                                     {pct !== null ? pct + '%' : '—'}
                                 </p>
@@ -142,7 +163,6 @@ function ClubTeamDetail() {
                 </div>
             </div>
 
-            {/* Segment control */}
             <div className="px-3 mt-2">
                 <SegmentControl
                     options={[
@@ -154,19 +174,16 @@ function ClubTeamDetail() {
                 />
             </div>
 
-            {/* Loading */}
             {loading && (
                 <div>
                     <SkeletonGameGrid days={2} count={3} />
                 </div>
             )}
 
-            {/* Empty */}
             {!loading && sortedDates.length === 0 && (
                 <EmptyState view={view} />
             )}
 
-            {/* Games */}
             {!loading && sortedDates.length > 0 && (
                 <div className="space-y-6 px-2 md:px-4">
                     {sortedDates.map(date => (
