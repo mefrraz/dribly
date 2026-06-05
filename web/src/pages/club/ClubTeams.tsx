@@ -148,7 +148,7 @@ function ClubTeams() {
                     return (
                         <Link
                             key={team.id}
-                            to={`/clube/${club.slug}/team/${slugify(team.nome)}`}
+                            to={`/clube/${club.slug}/team/${slugify(team.nome)}?eid=${team.id}`}
                             className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
                         >
                             {team.photo && (

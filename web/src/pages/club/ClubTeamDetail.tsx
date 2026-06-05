@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link, useParams, useSearchParams, useOutletContext } from 'react-router-dom'
 import { ArrowLeft, Calendar, Trophy } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
+import { useEquipaGames } from '../../hooks/useEquipaGames'
 import { SkeletonGameGrid } from '../../components/Skeleton'
 import { EmptyState } from '../../components/EmptyState'
 import { GameCard } from '../../components/GameCard'
@@ -41,21 +42,28 @@ function ClubTeamDetail() {
         return v === 'results' ? 'results' : 'agenda'
     })
 
-    const { games: allGames, loading } = useGames('2025/2026', club.id, club.name)
-    const games = allGames || []
+    const equipaId = searchParams.get('eid') || ''
+    const { games: clubGames, loading: clubLoading } = useGames('2025/2026', club.id, club.name)
+    const { games: equipaGames, loading: equipaLoading } = useEquipaGames(equipaId)
+
+    const loading = equipaId ? equipaLoading : clubLoading
+    const games = equipaId && equipaGames.length > 0 ? equipaGames : (clubGames || [])
     const clubNameUpper = club.name.toUpperCase()
 
     useEffect(() => {
-        setSearchParams({ view })
-    }, [view, setSearchParams])
+        setSearchParams({ view, ...(equipaId ? { eid: equipaId } : {}) })
+    }, [view, setSearchParams, equipaId])
 
     const { teamName, teamGames } = useMemo(() => {
+        if (equipaId) {
+            return { teamName: teamSlug?.replace(/-/g, ' ').toUpperCase() || '', teamGames: games }
+        }
+
         const filtered = games.filter(g => {
             let fullTeamName = ''
             if (g.equipa_casa.toUpperCase().includes(clubNameUpper)) fullTeamName = g.equipa_casa
             else if (g.equipa_fora.toUpperCase().includes(clubNameUpper)) fullTeamName = g.equipa_fora
             if (!fullTeamName) return false
-            // Match by full team name slug (distinguishes "FC GAIA A" from "FC GAIA B")
             return slugify(fullTeamName) === teamSlug
         })
 
@@ -64,7 +72,7 @@ function ClubTeamDetail() {
             : ''
 
         return { teamName: name, teamGames: filtered }
-    }, [games, teamSlug, clubNameUpper])
+    }, [games, teamSlug, clubNameUpper, equipaId])
 
     const finished = useMemo(() =>
         teamGames.filter(g => g.status === 'FINALIZADO').sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),

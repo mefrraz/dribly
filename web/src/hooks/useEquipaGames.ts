@@ -1,0 +1,107 @@
+import { useState, useEffect } from 'react'
+import type { Match } from '../components/types'
+
+const FPB_PROXY = '/api/fpb'
+
+const MONTHS: Record<string, number> = {
+    'JAN': 1, 'FEV': 2, 'MAR': 3, 'ABR': 4, 'MAI': 5, 'JUN': 6,
+    'JUL': 7, 'AGO': 8, 'SET': 9, 'OUT': 10, 'NOV': 11, 'DEZ': 12,
+}
+
+function parseDate(dateStr: string): string {
+    const parts = dateStr.trim().split(/\s+/)
+    if (parts.length < 3) return ''
+    const day = parseInt(parts[0])
+    const month = MONTHS[parts[1]?.toUpperCase()]
+    const year = parseInt(parts[2])
+    if (!day || !month || !year) return ''
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+function parseGames(html: string): Match[] {
+    const games: Match[] = []
+    const dayRe = /<div class="day-wrapper[^"]*">([\s\S]*?)<\/div>\s*<\/div>\s*(?=<!-- END DAY ROW|$)/g
+    let dm
+    while ((dm = dayRe.exec(html)) !== null) {
+        const dayBlock = dm[1]
+        const dateMatch = dayBlock.match(/<h3 class="date">\s*([^<]+)\s*<\/h3>/)
+        const date = dateMatch ? parseDate(dateMatch[1]) : ''
+        if (!date) continue
+
+        const gameRe = /<a href="https:\/\/www\.fpb\.pt\/ficha-de-jogo\?internalID=(\d+)"[^>]*>([\s\S]*?)<\/a>/g
+        let gm
+        while ((gm = gameRe.exec(dayBlock)) !== null) {
+            const internalId = gm[1]
+            const block = gm[2]
+
+            const siglas = [...block.matchAll(/<span class="sigla">([^<]+)<\/span>/g)].map(m => m[1].trim())
+            const scores = [...block.matchAll(/<h3 class="results_text[^"]*">\s*(\d+)\s*<\/h3>/g)].map(m => parseInt(m[1]))
+            const logos = [...block.matchAll(/<img alt="Logo[^"]*" src="([^"]+)"/g)].map(m => m[1])
+            const localMatch = block.match(/<b>\s*([^<]+?)\s*<\/b>/)
+            const local = localMatch?.[1]?.trim() || null
+            const compMatch = block.match(/<div class="competition">[\s\S]*?<span>\s*([^<]+)\s*<\/span>/)
+            const competicao = compMatch?.[1]?.trim() || ''
+
+            const isResult = block.includes('results_text')
+            const status: Match['status'] = isResult ? 'FINALIZADO' : 'AGENDADO'
+
+            games.push({
+                id: internalId,
+                slug: `${date}-${siglas[0]?.toLowerCase().replace(/\s+/g, '-') || 'x'}-${siglas[1]?.toLowerCase().replace(/\s+/g, '-') || 'y'}`,
+                data: date,
+                hora: '',
+                equipa_casa: siglas[0] || '',
+                equipa_fora: siglas[1] || '',
+                resultado_casa: scores[0] ?? null,
+                resultado_fora: scores[1] ?? null,
+                escalao: '',
+                competicao,
+                local,
+                logotipo_casa: logos[0] || null,
+                logotipo_fora: logos[1] || null,
+                status,
+            })
+        }
+    }
+    return games
+}
+
+export function useEquipaGames(equipaId: string) {
+    const [games, setGames] = useState<Match[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        if (!equipaId) { setLoading(false); return }
+
+        let cancelled = false
+        async function load() {
+            try {
+                const r = await fetch(`${FPB_PROXY}?page=equipa&equipa_id=${equipaId}`)
+                if (!r.ok || cancelled) { setLoading(false); return }
+                const html = await r.text()
+
+                // Extract calendar (tabindex=2) and results (tabindex=3) sections
+                const calendarSection = html.match(/<div class="team-wrapper[^"]*"[^>]*tabindex="2"[^>]*>([\s\S]*?)<\/section>\s*<\/div>/)
+                const resultsSection = html.match(/<div class="team-wrapper[^"]*"[^>]*tabindex="3"[^>]*>([\s\S]*?)<\/section>\s*<\/div>/)
+
+                const calendarGames = calendarSection ? parseGames(calendarSection[1]) : []
+                const resultsGames = resultsSection ? parseGames(resultsSection[1]) : []
+
+                // Merge, deduplicate by id
+                const map = new Map<string, Match>()
+                for (const g of [...calendarGames, ...resultsGames]) {
+                    if (!map.has(g.id)) map.set(g.id, g)
+                }
+
+                if (!cancelled) {
+                    setGames(Array.from(map.values()))
+                    setLoading(false)
+                }
+            } catch { if (!cancelled) setLoading(false) }
+        }
+        load()
+        return () => { cancelled = true }
+    }, [equipaId])
+
+    return { games, loading }
+}
