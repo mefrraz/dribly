@@ -56,8 +56,7 @@ function ClubTeams() {
     const games = allGames || []
     const clubNameUpper = club.name.toUpperCase()
     const coverPhoto = fpbCoverPhoto(club.id)
-    const gameTeamIds = useMemo(() => teams.map(t => t.teamId), [teams])
-    const { teamData, loading: teamDataLoading } = useTeamPhotos(club.id, club.name, gameTeamIds)
+    const { teamData, loading: teamDataLoading } = useTeamPhotos(club.id, club.name)
 
     const teams = useMemo(() => {
         const teamMap = new Map<string, Match[]>()
