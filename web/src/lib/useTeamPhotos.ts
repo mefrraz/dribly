@@ -37,6 +37,32 @@ function extractTeamIdFromName(fullName: string, clubName: string): string {
     return suffix
 }
 
+/** Build lookup keys: try many variations to maximize match probability */
+function buildKeys(nome: string, clubName: string): string[] {
+    const clean = nome.replace(/\s+/g, ' ').trim()
+    const id = extractTeamIdFromName(clean, clubName)
+    const norm = normalize(clean)
+    const keys = new Set<string>()
+
+    // Exact forms
+    keys.add(id)
+    keys.add(id.toLowerCase())
+    keys.add(id.toUpperCase())
+    keys.add(clean)
+    keys.add(clean.toLowerCase())
+    keys.add(clean.toUpperCase())
+    keys.add(norm)
+
+    // Without gender suffix (e.g., "SENIOR MASCULINO" → "SENIOR")
+    const noGender = id.replace(/\s+(MASCULINO|FEMININO)\s*$/i, '').trim()
+    if (noGender && noGender !== id) {
+        keys.add(noGender)
+        keys.add(noGender.toLowerCase())
+    }
+
+    return Array.from(keys)
+}
+
 export function useTeamPhotos(clubName: string): { photos: PhotoMap; loading: boolean } {
     const [photos, setPhotos] = useState<PhotoMap>({})
     const [loading, setLoading] = useState(true)
@@ -74,16 +100,11 @@ export function useTeamPhotos(clubName: string): { photos: PhotoMap; loading: bo
                     try {
                         const teams: FPBTeam[] = await fetchTeams(row.competition_id)
                         for (const t of teams) {
-                            if (t.photo && t.nome) {
-                                const clean = t.nome.replace(/\s+/g, ' ').trim()
-                                const id = extractTeamIdFromName(clean, clubName)
-                                const idLower = id.toLowerCase()
-                                const cleanLower = clean.toLowerCase()
-                                if (!photoMap[id]) photoMap[id] = t.photo
-                                if (!photoMap[idLower]) photoMap[idLower] = t.photo
-                                if (!photoMap[clean]) photoMap[clean] = t.photo
-                                if (!photoMap[cleanLower]) photoMap[cleanLower] = t.photo
-                                if (!photoMap[normalize(clean)]) photoMap[normalize(clean)] = t.photo
+                            if (t.photo && t.nome && !t.photo.includes('ass_highlight_default')) {
+                                const keys = buildKeys(t.nome, clubName)
+                                for (const k of keys) {
+                                    if (!photoMap[k]) photoMap[k] = t.photo
+                                }
                             }
                         }
                     } catch { /* skip failed comps */ }

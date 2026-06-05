@@ -185,11 +185,22 @@ function ClubTeams() {
 
             <div className="space-y-2.5">
                 {teams.map(team => {
-                    const normId = team.teamId.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
-                    const photoUrl = teamPhotos[team.teamId]
-                        || teamPhotos[normId]
-                        || teamPhotos[team.teamId.toLowerCase()]
-                        || teamPhotos[team.teamId.toUpperCase()]
+                    // Try many key variations to find a photo
+                    const keys = [
+                        team.teamId,
+                        team.teamId.toUpperCase(),
+                        team.teamId.toLowerCase(),
+                        team.teamId.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim(),
+                    ]
+                    // Also try without gender
+                    const noGender = team.teamId.replace(/\s+(MASCULINO|FEMININO|Masculino|Feminino)\s*$/i, '').trim()
+                    if (noGender && noGender !== team.teamId) {
+                        keys.push(noGender, noGender.toLowerCase(), noGender.toUpperCase())
+                    }
+                    let photoUrl: string | undefined
+                    for (const k of keys) {
+                        if (teamPhotos[k]) { photoUrl = teamPhotos[k]; break }
+                    }
                     return (
                         <Link
                             key={team.teamId}
