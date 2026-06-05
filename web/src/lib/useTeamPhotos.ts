@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { supabase } from './supabase'
 
 const FPB_PROXY = '/api/fpb'
 const CACHE_KEY = 'dribly_team_photos_v6'
@@ -47,23 +46,25 @@ export function useTeamPhotos(clubId: number, clubName: string): { photos: Photo
         let cancelled = false
         async function run() {
             try {
-                const { data } = await supabase.from('competitions').select('competition_id').contains('club_names', [clubName]).eq('season', '2025/2026')
-                if (cancelled || !data || data.length === 0) { setLoading(false); return }
-
+                // Fetch top competitions that are most likely to have team photos
+                // Liga Betclic (10902), Proliga (10903), 1ª Divisão, etc.
+                const topCompIds = [10902, 10903, 10904, 10906, 10907, 10908]
                 const photoMap: PhotoMap = {}
-                const seen = new Set<number>()
-                for (const row of data) {
+
+                for (const compId of topCompIds) {
                     if (cancelled) return
-                    if (seen.has(row.competition_id)) continue
-                    seen.add(row.competition_id)
                     try {
-                        const res = await fetch(`${FPB_PROXY}?wp_action=get_equipas&idCompeticao=${row.competition_id}`)
+                        const res = await fetch(`${FPB_PROXY}?wp_action=get_equipas&idCompeticao=${compId}`)
                         if (!res.ok) continue
                         const html = await res.text()
                         const teams = parseTeamPhotos(html)
+                        // Only keep teams matching this club
+                        const clubNorm = norm(clubName)
                         for (const t of teams) {
                             if (!t.photo) continue
                             const clean = t.nome.replace(/\s+/g, ' ').trim()
+                            // Check if this team belongs to the club
+                            if (!norm(clean).includes(clubNorm) && !clubNorm.includes(norm(clean).replace(/\s+/g, ''))) continue
                             const allKeys = new Set<string>()
                             allKeys.add(clean); allKeys.add(clean.toLowerCase()); allKeys.add(norm(clean))
                             for (const w of clean.split(/\s+/)) { if (w.length > 2) { allKeys.add(w.toLowerCase()); allKeys.add(norm(w)) } }
