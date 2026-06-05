@@ -176,9 +176,13 @@ function ClubTeams() {
             <div className="space-y-2.5">
                 {teams.map(team => {
                     const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
-                    // Direct lookup by normalized escalão (teamData has escalão→data mappings)
                     const escKey = norm(team.teamId.replace(/\s+(MASCULINO|FEMININO)\s*$/i, '').trim())
                     const matched = teamData[escKey] as TeamData | undefined
+
+                    // Debug
+                    if (!matched) {
+                        console.log(`🔍 No match for team "${team.teamId}" (escKey="${escKey}"). teamData keys:`, Object.keys(teamData).slice(0, 15))
+                    }
 
                     const displayName = matched?.nome || team.teamId
                     const displayEscalao = matched?.escalao || team.escalao
