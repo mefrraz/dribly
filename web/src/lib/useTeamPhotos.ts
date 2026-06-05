@@ -1,20 +1,29 @@
 import { useState, useEffect } from 'react'
 
 const FPB_PROXY = '/api/fpb'
-const CACHE_KEY = 'dribly_team_data_v8'
-const CACHE_TTL = 30 * 60 * 1000
 
 export interface TeamData {
-    nome: string       // real team name: "FC GAIA A"
-    escalao: string    // e.g., "Sub 16"
+    nome: string
+    escalao: string
     photo: string | null
 }
 
 interface DataMap { [teamId: string]: TeamData }
 const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
 
-function getCache() { try { return JSON.parse(sessionStorage.getItem(CACHE_KEY) || '{}') } catch { return {} } }
-function setCache(k: string, v: DataMap) { const c = getCache(); c[k] = { ts: Date.now(), map: v }; try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(c)) } catch {} }
+/** Fuzzy check: does the team name belong to this club? */
+function belongsToClub(teamName: string, clubName: string, clubId: number): boolean {
+    const tn = norm(teamName)
+    const cn = norm(clubName)
+    // Direct inclusion
+    if (tn.includes(cn) || cn.includes(tn.replace(/\s+/g, ''))) return true
+    // Word-level: check individual words of club name against team name
+    const clubWords = cn.split(/\s+/).filter(w => w.length > 2)
+    for (const w of clubWords) {
+        if (tn.includes(w)) return true
+    }
+    return false
+}
 
 /** Parse WP AJAX for equipa IDs + photos */
 function parseCompTeams(html: string): { equipaId: string; nome: string; photo: string | null }[] {
@@ -44,7 +53,6 @@ function parseEquipaPage(html: string): { nome: string; escalao: string } | null
         .map(l => l.trim())
         .filter(l => l.length > 2 && l.length < 60 && !l.startsWith('{') && !l.startsWith('//') && !l.includes('Cookie'))
 
-    // Team name: short text with club prefix (FC, SL, SC, etc.)
     const clubRe = /\b(FC|SL|SC|CD|GD|UD|AD|GS|CP|CF|ABC|AJ|AA|ACR|GDB|GDR|NBA|CA|CS|GC|GDC)\b/i
     let nome = ''
     for (const l of lines) {
@@ -53,7 +61,6 @@ function parseEquipaPage(html: string): { nome: string; escalao: string } | null
         }
     }
 
-    // Escalão: "Sub 16", "Sénior", "Mini 12", etc.
     const escRe = /\b(S(é|e)nior|Sub\s*\d+|Mini\s*\d+|SUB\s*\d+|MINI\s*\d+)\b/i
     let escalao = ''
     for (const l of lines) {
@@ -82,17 +89,12 @@ export function useTeamPhotos(clubId: number, clubName: string): { teamData: Dat
 
     useEffect(() => {
         if (!clubId || !clubName) return
-        const key = clubName.toLowerCase().trim()
-        const cache = getCache()
-        if (cache[key] && Date.now() - cache[key].ts < CACHE_TTL) {
-            setTeamData(cache[key].map); setLoading(false); return
-        }
-
+        setLoading(true)
         let cancelled = false
+
         async function run() {
             try {
                 const topComps = [10902, 10903, 10904, 10906, 10907, 10908]
-                const clubNorm = norm(clubName)
 
                 // Step 1: fetch all competitions in parallel → get equipa IDs + photos
                 const compResults = await Promise.all(topComps.map(async (cid) => {
@@ -103,16 +105,18 @@ export function useTeamPhotos(clubId: number, clubName: string): { teamData: Dat
                 }))
                 if (cancelled) return
 
-                // Deduplicate equipas by ID, keep first photo
+                // Deduplicate equipas by ID, filter by club
                 const equipas = new Map<string, { nome: string; photo: string | null }>()
                 for (const compTeams of compResults) {
                     for (const t of compTeams) {
-                        if (!norm(t.nome).includes(clubNorm) && !clubNorm.includes(norm(t.nome).replace(/\s+/g, ''))) continue
+                        if (!belongsToClub(t.nome, clubName, clubId)) continue
                         if (equipas.has(t.equipaId)) continue
                         equipas.set(t.equipaId, { nome: t.nome, photo: t.photo })
                     }
                 }
                 if (cancelled) return
+
+                console.log(`📸 FC Gaia: ${equipas.size} equipas encontradas nas competições, IDs:`, Array.from(equipas.keys()))
 
                 // Step 2: fetch individual pages in parallel batches (5 at a time)
                 const ids = Array.from(equipas.keys())
@@ -129,24 +133,24 @@ export function useTeamPhotos(clubId: number, clubName: string): { teamData: Dat
                             escalao: r.escalao || compData?.nome || '',
                             photo: compData?.photo || null,
                         }
+                        // Also add normalized escalão as lookup key
+                        const esc = norm(r.escalao)
+                        if (esc && !dataMap[esc]) dataMap[esc] = dataMap[r.equipaId]
                     }
                 }
 
-                // Fallback: any equipas not yet fetched keep competition data
+                // Fallback: any equipas not yet fetched keep comp data
                 for (const [id, compData] of equipas) {
                     if (!dataMap[id]) {
                         dataMap[id] = { nome: compData.nome, escalao: '', photo: compData.photo }
-                    }
-                    // Also add normalized escalão as a lookup key
-                    const esc = norm(dataMap[id].escalao)
-                    if (esc && !dataMap[esc]) {
-                        dataMap[esc] = dataMap[id]
+                        const esc = norm(dataMap[id].escalao)
+                        if (esc && !dataMap[esc]) dataMap[esc] = dataMap[id]
                     }
                 }
 
-                if (!cancelled && Object.keys(dataMap).length > 0) {
-                    setCache(key, dataMap)
+                if (!cancelled) {
                     setTeamData(dataMap)
+                    console.log(`📸 FC Gaia final: ${Object.keys(dataMap).length} entries`, Object.keys(dataMap))
                 }
             } catch {} finally { if (!cancelled) setLoading(false) }
         }
