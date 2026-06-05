@@ -218,11 +218,11 @@ function ClubTeams() {
                             className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 transition-all duration-200"
                         >
                             {photoUrl && (
-                                <div className="relative h-44 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                                <div className="relative h-48 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                                     <img
                                         src={photoUrl}
                                         alt=""
-                                        className="absolute inset-0 w-full h-full object-contain"
+                                        className="absolute inset-0 w-full h-full object-cover object-top"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                                 </div>

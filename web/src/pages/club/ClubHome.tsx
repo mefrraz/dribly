@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { Calendar, Trophy, ChevronRight, Clock, MapPin, RefreshCw, AlertCircle, Heart } from 'lucide-react'
+import { Calendar, Trophy, ChevronRight, Clock, MapPin, RefreshCw, AlertCircle, Heart, ExternalLink } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
 import { useFollows } from '../../hooks/useFollows'
 import { useAuth } from '../../lib/AuthContext'
@@ -116,6 +116,11 @@ function ClubHome() {
                 </div>
                 <h1 className="text-lg font-bold text-zinc-900 dark:text-white truncate flex-1">{displayName(club)}</h1>
                 <div className="flex items-center gap-1">
+                    <a href={`https://www.fpb.pt/equipas/clube_${club.id}/`} target="_blank" rel="noopener noreferrer"
+                        className="p-2 rounded-full text-zinc-400 hover:text-dribly-purple hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
+                        title="Ver na FPB">
+                        <ExternalLink size={16} />
+                    </a>
                     <button onClick={handleFollow} data-tour="follow"
                         className={`p-2 rounded-full transition-all active:scale-[0.9] ${
                             followLoading ? 'opacity-50' : ''
