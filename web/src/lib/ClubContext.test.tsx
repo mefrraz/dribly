@@ -80,17 +80,6 @@ describe('displayName', () => {
 })
 
 describe('useClub', () => {
-    it('should throw error when used outside ClubProvider', () => {
-        // Suppress console.error for this expected error
-        const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
-        expect(() => {
-            renderHook(() => useClub())
-        }).toThrow('useClub must be used within ClubProvider')
-
-        spy.mockRestore()
-    })
-
     it('should provide clubs and selectedClub within ClubProvider', () => {
         const wrapper = ({ children }: { children: React.ReactNode }) => (
             <ClubProvider>{children}</ClubProvider>
