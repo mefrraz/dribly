@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { Star, Heart, LogIn } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Star, Heart, LogIn, Search, Bookmark, X } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 import { useFollows } from '../hooks/useFollows'
 import { LoadingSpinner } from '../components/LoadingSpinner'
