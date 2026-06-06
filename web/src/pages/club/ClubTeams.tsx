@@ -4,7 +4,7 @@ import { Users, ChevronRight, Calendar } from 'lucide-react'
 import { PageHeader } from '../../components/PageHeader'
 import { useGames } from '../../hooks/useGames'
 import { useTeamPhotos } from '../../lib/useTeamPhotos'
-import { SkeletonGameGrid } from '../../components/Skeleton'
+import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { type Club, displayName } from '../../lib/ClubContext'
 import { type Match } from '../../components/types'
 
@@ -67,7 +67,7 @@ function ClubTeams() {
     }, [games, clubNameUpper, club.name])
 
     if (gamesLoading || teamDataLoading) {
-        return <div className="max-w-xl mx-auto px-3 pt-4"><SkeletonGameGrid days={3} count={2} /></div>
+        return <LoadingSpinner />
     }
 
     // Sort: oldest escalão first, same escalão: A before B
@@ -127,7 +127,7 @@ function ClubTeams() {
                 {displayTeams.map(team => {
                     const norm = (s: string) => s.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim()
                     const escNorm = norm(team.escalao || '')
-                    const nameWords = team.nome.split(/[\s\-]+/).map(w => norm(w)).filter(w => w.length > 2 && !/^(FC|SL|SC|CD|GD|UD|AD)$/i.test(w))
+                    const nameWords = team.nome.split(/[\s-]+/).map(w => norm(w)).filter(w => w.length > 2 && !/^(FC|SL|SC|CD|GD|UD|AD)$/i.test(w))
 
                     let stats: TeamStats | undefined
                     let bestScore = 0

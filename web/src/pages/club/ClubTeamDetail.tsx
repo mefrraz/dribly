@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useParams, useSearchParams, useOutletContext } from 'react-router-dom'
-import { ArrowLeft, Calendar, Trophy, Users, Info, TrendingUp, ChevronRight, MapPin } from 'lucide-react'
+import { ArrowLeft, Calendar, CalendarDays, Trophy, Users, Info } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
 import { useEquipaGames } from '../../hooks/useEquipaGames'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
@@ -95,16 +95,6 @@ function ClubTeamDetail() {
     const total = wins + losses + draws
     const pct = total > 0 ? Math.round(wins / (wins + losses || 1) * 100) : null
 
-    const maxWin = useMemo(() => {
-        const winsList = finished.filter(g => (clubHome(g) ? g.resultado_casa! > g.resultado_fora! : g.resultado_fora! > g.resultado_casa!))
-        if (winsList.length === 0) return null
-        return winsList.reduce((a, b) => {
-            const aDiff = Math.abs((clubHome(a) ? a.resultado_casa! : a.resultado_fora!) - (clubHome(a) ? a.resultado_fora! : a.resultado_casa!))
-            const bDiff = Math.abs((clubHome(b) ? b.resultado_casa! : b.resultado_fora!) - (clubHome(b) ? b.resultado_fora! : b.resultado_casa!))
-            return bDiff > aDiff ? b : a
-        })
-    }, [finished])
-
     const filteredMatches = tab === 'agenda' ? upcoming : tab === 'resultados' ? finished : teamGames
 
     const groupedMatches = filteredMatches.reduce((groups, match) => {
@@ -187,91 +177,84 @@ function ClubTeamDetail() {
 
             {/* Vista Geral tab */}
             {tab === 'geral' && (
-                <div className="px-3 space-y-3">
-                    {/* Club card + Maior Vitória side by side */}
-                    <div className="flex gap-3 items-stretch">
-                        {/* Club card — compact, blur glow behind logo */}
-                        <Link to={`/clube/${club.slug}`}
-                            className="w-[38%] flex-shrink-0 flex flex-col items-center justify-center gap-2 p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:shadow-md transition-all group">
-                            <div className="relative w-20 h-20 flex items-center justify-center">
-                                <div className="absolute inset-0 rounded-full bg-[var(--club-color)]/15 blur-xl" />
-                                <div className="absolute inset-1 rounded-full bg-[var(--club-color)]/10" />
-                                <div className="relative z-10 w-16 h-16 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-700">
-                                    {club.logo_url ? (
-                                        <img src={club.logo_url} alt="" className="w-12 h-12 object-contain" />
-                                    ) : (
-                                        <span className="text-xl font-black text-zinc-400">{club.name.charAt(0).toUpperCase()}</span>
-                                    )}
+                <div className="px-3 space-y-5">
+                    {/* Row 1 — Team card + Stat cards */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                        {/* Team card */}
+                        <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center gap-4">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-700/50 overflow-hidden">
+                                {club.logo_url ? (
+                                    <img src={club.logo_url} alt="" className="w-14 h-14 sm:w-[72px] sm:h-[72px] object-contain" />
+                                ) : (
+                                    <span className="text-2xl font-bold text-zinc-500">{club.name.charAt(0)}</span>
+                                )}
+                            </div>
+                            <div className="min-w-0">
+                                <div className="flex items-center gap-2 mb-0.5">
+                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{escalao || 'Equipa'}</span>
                                 </div>
+                                <p className="text-sm sm:text-base font-black text-zinc-900 dark:text-white truncate leading-tight">{teamName}</p>
+                                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                                    <span className="tabular-nums">{total} jogos</span>
+                                    <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+                                    <span className="text-emerald-600 dark:text-emerald-400 tabular-nums font-bold">{wins}V</span>
+                                    <span className="text-red-500 dark:text-red-400 tabular-nums font-bold">{losses}D</span>
+                                </p>
                             </div>
-                            <div className="text-center">
-                                <p className="text-[9px] text-zinc-400 uppercase tracking-wide">Equipa do</p>
-                                <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300 truncate max-w-[90px]">{club.name}</p>
-                            </div>
-                        </Link>
+                        </div>
 
-                        {/* Maior Vitória — exact GameCard result style */}
-                        {maxWin ? (() => {
-                            const isHome = clubHome(maxWin)
-                            const winTeam = isHome ? maxWin.equipa_casa : maxWin.equipa_fora
-                            const winLogo = isHome ? maxWin.logotipo_casa : maxWin.logotipo_fora
-                            const winScore = isHome ? maxWin.resultado_casa! : maxWin.resultado_fora!
-                            const loseTeam = isHome ? maxWin.equipa_fora : maxWin.equipa_casa
-                            const loseLogo = isHome ? maxWin.logotipo_fora : maxWin.logotipo_casa
-                            const loseScore = isHome ? maxWin.resultado_fora! : maxWin.resultado_casa!
-                            return (
-                                <Link to={`/jogo/${maxWin.slug || maxWin.id}?clube=${club.slug}`}
-                                    className="flex-1 min-w-0 glass-card flex flex-col group active:scale-[0.98]">
-                                    <div className="flex justify-between items-center px-4 py-2.5 border-b border-zinc-100 dark:border-white/5">
-                                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400">
-                                            <Trophy size={10} />
-                                            MAIOR VITÓRIA
-                                        </div>
-                                        <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider truncate">
-                                            {maxWin.escalao || ''}
-                                        </span>
-                                    </div>
-                                    <div className="p-4 flex flex-col gap-3">
-                                        <ResultRow name={winTeam} logo={winLogo} score={winScore} won={true} />
-                                        <ResultRow name={loseTeam} logo={loseLogo} score={loseScore} won={false} />
-                                    </div>
-                                    <div className="px-4 pb-4 pt-0 flex justify-between items-center text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
-                                        <div className="flex items-center gap-1.5 truncate max-w-[70%]">
-                                            {maxWin.local ? (
-                                                <>
-                                                    <MapPin size={10} className="shrink-0 text-dribly-purple" />
-                                                    <span className="truncate text-zinc-500">{maxWin.local}</span>
-                                                </>
-                                            ) : (
-                                                <span className="truncate text-zinc-500">{formatDate(maxWin.data)}</span>
-                                            )}
-                                        </div>
-                                        <ChevronRight size={14} className="text-zinc-400 group-hover:text-dribly-blue transition-colors" />
-                                    </div>
-                                </Link>
-                            )
-                        })() : (
-                            <div className="flex-1 min-w-0 glass-card flex flex-col items-center justify-center text-xs text-zinc-400">
-                                <Trophy size={20} className="mb-1 text-zinc-300 dark:text-zinc-600" />
-                                Sem vitórias
-                            </div>
-                        )}
+                        {/* Stat cards — 2×2 */}
+                        <div className="lg:col-span-7 grid grid-cols-2 gap-2.5">
+                            {[
+                                { label: 'Jogos', value: total, sub: `${wins}V · ${losses}D` },
+                                { label: 'Vitórias', value: wins, sub: draws > 0 ? `${draws} empates` : '' },
+                                { label: 'Derrotas', value: losses, sub: '' },
+                                { label: '% Vitórias', value: pct !== null ? pct + '%' : '—', sub: pct !== null && pct >= 50 ? 'Positivo' : pct !== null ? 'Negativo' : '' },
+                            ].map(s => (
+                                <div key={s.label} className="rounded-2xl border p-3 flex flex-col justify-center bg-white dark:bg-zinc-900/60 border-zinc-200/50 dark:border-zinc-800/50">
+                                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{s.label}</p>
+                                    <p className="text-2xl font-black text-dribly-purple tabular-nums mt-1">{s.value}</p>
+                                    {s.sub && <p className="text-[10px] text-zinc-400 mt-0.5">{s.sub}</p>}
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* Stats — 4 cards with colored backgrounds */}
-                    <div className="grid grid-cols-4 gap-2">
-                        {[
-                            { label: 'Jogos', value: total, icon: Calendar, bg: 'bg-zinc-50 dark:bg-zinc-800/50', text: 'text-zinc-700 dark:text-zinc-200', border: 'border-zinc-100 dark:border-zinc-700' },
-                            { label: 'Vitórias', value: wins, icon: Trophy, bg: 'bg-green-50 dark:bg-green-900/20', text: 'text-green-700 dark:text-green-400', border: 'border-green-100 dark:border-green-900/30' },
-                            { label: 'Derrotas', value: losses, icon: Info, bg: 'bg-red-50 dark:bg-red-900/20', text: 'text-red-600 dark:text-red-400', border: 'border-red-100 dark:border-red-900/30' },
-                            { label: 'PCT', value: pct !== null ? pct + '%' : '—', icon: TrendingUp, bg: pct !== null && pct >= 50 ? 'bg-green-50 dark:bg-green-900/20' : pct !== null ? 'bg-red-50 dark:bg-red-900/20' : 'bg-zinc-50 dark:bg-zinc-800/50', text: pct !== null && pct >= 50 ? 'text-green-700 dark:text-green-400' : pct !== null ? 'text-red-600 dark:text-red-400' : 'text-zinc-400', border: pct !== null && pct >= 50 ? 'border-green-100 dark:border-green-900/30' : pct !== null ? 'border-red-100 dark:border-red-900/30' : 'border-zinc-100 dark:border-zinc-700' },
-                        ].map(s => (
-                            <div key={s.label} className={`${s.bg} ${s.border} border rounded-2xl p-3.5 text-center`}>
-                                <s.icon size={16} className={`mx-auto mb-1.5 ${s.text}`} />
-                                <p className={`text-xl font-black ${s.text}`}>{s.value}</p>
-                                <p className="text-[9px] text-zinc-400 uppercase tracking-wider mt-0.5">{s.label}</p>
-                            </div>
-                        ))}
+                    {/* Row 2 — Próximos Jogos + Últimos Resultados */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                        {/* Próximos Jogos */}
+                        <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-4">
+                            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <CalendarDays size={14} className="text-dribly-purple" />
+                                Próximos Jogos
+                            </h3>
+                            {upcoming.length > 0 ? (
+                                <div className="space-y-2">
+                                    {upcoming.slice(0, 3).map((m, i) => (
+                                        <GameCard key={i} match={m} mode="agenda" clubName={club.name} clubSlug={club.slug} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-xs text-zinc-400 py-4 text-center">Sem jogos agendados.</p>
+                            )}
+                        </div>
+
+                        {/* Últimos Resultados */}
+                        <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-4">
+                            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <Trophy size={14} className="text-dribly-purple" />
+                                Últimos Resultados
+                            </h3>
+                            {finished.length > 0 ? (
+                                <div className="space-y-2">
+                                    {finished.slice(0, 3).map((m, i) => (
+                                        <GameCard key={i} match={m} mode="results" clubName={club.name} clubSlug={club.slug} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-xs text-zinc-400 py-4 text-center">Sem resultados disponíveis.</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
@@ -330,27 +313,6 @@ function ClubTeamDetail() {
                     )}
                 </div>
             )}
-        </div>
-    )
-}
-
-function ResultRow({ name, logo, score, won }: { name: string; logo: string | null; score: number; won: boolean }) {
-    const [imgError, setImgError] = useState(false)
-    return (
-        <div className={`flex items-center justify-between ${won ? '' : 'opacity-60'}`}>
-            <div className="flex items-center gap-3 min-w-0">
-                {logo && !imgError ? (
-                    <img src={logo} alt="" className="w-8 h-8 object-contain rounded-full bg-zinc-50 dark:bg-zinc-800" loading="lazy" onError={() => setImgError(true)} />
-                ) : (
-                    <div className="w-8 h-8 bg-zinc-100 dark:bg-white/10 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">{name.charAt(0).toUpperCase()}</span>
-                    </div>
-                )}
-                <span className="text-sm font-bold text-zinc-900 dark:text-white leading-tight truncate">{name.toUpperCase()}</span>
-            </div>
-            <span className={`text-xl font-mono font-bold tabular-nums shrink-0 ml-2 ${won ? 'text-green-700 dark:text-green-300' : 'text-zinc-900 dark:text-white'}`}>
-                {score}
-            </span>
         </div>
     )
 }
