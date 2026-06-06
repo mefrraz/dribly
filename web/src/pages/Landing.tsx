@@ -13,10 +13,10 @@ import { normalize, buildSearchText } from '../lib/clubSearch'
 import type { LandingCompetition } from '../hooks/useLandingData'
 
 const FEATURED_CLUBS = [
-    { name: 'FC Porto', slug: 'fc-porto' },
-    { name: 'SL Benfica', slug: 'sl-benfica' },
-    { name: 'Sporting CP', slug: 'sporting-cp' },
-    { name: 'UD Oliveirense', slug: 'ud-oliveirense' },
+    { name: 'FC Porto', slug: 'futebol-clube-do-porto' },
+    { name: 'SL Benfica', slug: 'sport-lisboa-e-benfica' },
+    { name: 'Sporting CP', slug: 'sporting-clube-de-portugal' },
+    { name: 'UD Oliveirense', slug: 'uni-o-desportiva-oliveirense' },
 ]
 
 // ---- Sub-components ----
