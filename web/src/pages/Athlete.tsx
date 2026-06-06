@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useAthlete } from '../hooks/useAthlete'
-import type { AthleteInscricao, ShootingStats } from '../hooks/useAthlete'
+import type { AthleteInscricao } from '../hooks/useAthlete'
 
 const FPB = 'https://www.fpb.pt/wp-content/themes/fpbasquetebol/assets/images'
-const BG = {
+const IMG = {
     pontos: `${FPB}/athlete/points.png`,
     ressaltos: `${FPB}/athlete/rebounds.png`,
     assistencias: `${FPB}/athlete/assists.png`,
@@ -26,64 +26,42 @@ const BG = {
     outrosDesarme: `${FPB}/stats/background-bloco.png`,
 }
 
-/** Card with prominent FPB photo background + overlay + white text */
-function PhotoCard({ bg, value, label }: { bg: string; value: string | number | null; label: string }) {
+/** Small stat with FPB icon — no card, just image + value + label */
+function MiniStat({ img, value, label }: { img: string; value: string | number | null; label: string }) {
     return (
-        <div className="relative rounded-2xl overflow-hidden aspect-[3/4] bg-zinc-800">
-            <div className="absolute inset-0 bg-center bg-cover"
-                style={{ backgroundImage: `url(${bg})` }} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
-            <div className="relative h-full flex flex-col items-center justify-end pb-4 px-2">
-                <span className="text-2xl font-black tabular-nums text-white">{value ?? '—'}</span>
-                <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider mt-0.5">{label}</span>
+        <div className="flex flex-col items-center gap-1">
+            <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
+                <img src={img} alt="" className="w-8 h-8 object-contain" />
             </div>
+            <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{value ?? '—'}</span>
+            <span className="text-[9px] font-medium text-zinc-400 uppercase tracking-wide">{label}</span>
         </div>
     )
 }
 
-/** Big stat with FPB photo + overlay — wider */
-function BigPhotoCard({ bg, value, label, suffix }: {
-    bg: string; value: string | number | null; label: string; suffix?: string
-}) {
+/** Season stat — number + label, clean */
+function NumStat({ value, label, suffix }: { value: string | number | null; label: string; suffix?: string }) {
     return (
-        <div className="relative rounded-2xl overflow-hidden bg-zinc-800 min-h-[100px]">
-            <div className="absolute inset-0 bg-center bg-cover"
-                style={{ backgroundImage: `url(${bg})` }} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
-            <div className="relative h-full flex flex-col items-center justify-center p-5 min-h-[100px]">
-                <span className="text-3xl font-black tabular-nums text-white">
-                    {value ?? '—'}{suffix || ''}
-                </span>
-                <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider mt-1">{label}</span>
-            </div>
+        <div className="flex flex-col items-center">
+            <span className="text-3xl font-black text-zinc-800 dark:text-zinc-100 tabular-nums">
+                {value ?? '—'}{suffix || ''}
+            </span>
+            <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">{label}</span>
         </div>
     )
 }
 
-/** Shooting bar with subtle FPB background */
-function ShootingCard({ bg, label, stats, color }: {
-    bg: string; label: string; stats: ShootingStats | null; color: string
-}) {
-    if (!stats) return null
-    const pct = stats.percentagem
-    const barColor = pct >= 50 ? 'bg-green-500' : pct >= 35 ? 'bg-amber-500' : 'bg-red-500'
+/** Shooting cell in 2x2 grid — image background + percentage */
+function ShootCell({ img, pct, label }: { img: string; pct: number | null; label: string }) {
+    const v = pct ?? 0
+    const color = v >= 50 ? '#16a34a' : v >= 35 ? '#d97706' : '#dc2626'
     return (
-        <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
-            <div className="absolute inset-0 opacity-[0.12] dark:opacity-[0.15] bg-center bg-cover"
-                style={{ backgroundImage: `url(${bg})` }} />
-            <div className="relative space-y-2">
-                <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-zinc-600 dark:text-zinc-300">{label}</span>
-                    <span className="text-[10px] font-mono font-bold text-zinc-400">{stats.feitos}/{stats.tentados}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-                        <div className={`h-full ${barColor} rounded-full transition-all duration-500`}
-                            style={{ width: `${Math.min(pct, 100)}%` }} />
-                    </div>
-                    <span className="text-sm font-black tabular-nums w-10 text-right"
-                        style={{ color }}>{pct}%</span>
-                </div>
+        <div className="relative rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-800/50 min-h-[90px]">
+            <div className="absolute inset-0 bg-center bg-cover opacity-40 dark:opacity-30"
+                style={{ backgroundImage: `url(${img})` }} />
+            <div className="relative h-full flex flex-col items-center justify-center p-3">
+                <span className="text-2xl font-black tabular-nums" style={{ color }}>{v}%</span>
+                <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 text-center leading-tight mt-0.5">{label}</span>
             </div>
         </div>
     )
@@ -102,8 +80,8 @@ export default function AthletePage() {
                         <div className="flex-1 h-32 bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />
                         <div className="w-28 h-32 bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />
                     </div>
-                    <div className="grid grid-cols-4 gap-2">
-                        {[1, 2, 3, 4].map(i => <div key={i} className="aspect-[3/4] bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />)}
+                    <div className="flex justify-center gap-6">
+                        {[1, 2, 3, 4].map(i => <div key={i} className="w-14 h-14 bg-zinc-200 dark:bg-zinc-800 rounded-full" />)}
                     </div>
                 </div>
             </div>
@@ -124,10 +102,8 @@ export default function AthletePage() {
         { key: 'inscricoes' as const, label: 'Inscrições', show: data.inscricoes.length > 0 },
     ].filter(t => t.show)
 
-    const pctColor = (pct: number) => pct >= 50 ? '#16a34a' : pct >= 35 ? '#d97706' : '#dc2626'
-
     return (
-        <div className="max-w-6xl mx-auto space-y-4 pb-24">
+        <div className="max-w-6xl mx-auto space-y-5 pb-24">
             {/* Top bar */}
             <div className="flex items-center justify-between pt-3 px-3">
                 <button onClick={() => window.history.back()} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
@@ -178,13 +154,13 @@ export default function AthletePage() {
                 </div>
             </div>
 
-            {/* Quick stats — photo cards with FPB action images */}
+            {/* Quick stats — small icons, no cards */}
             <div className="px-3">
-                <div className="grid grid-cols-4 gap-2">
-                    <PhotoCard bg={BG.pontos} value={data.pontos} label="Pontos" />
-                    <PhotoCard bg={BG.ressaltos} value={data.ressaltos} label="Ressaltos" />
-                    <PhotoCard bg={BG.assistencias} value={data.assistencias} label="Assist." />
-                    <PhotoCard bg={BG.desarmes} value={data.desarmes} label="Desarmes" />
+                <div className="flex justify-center gap-6">
+                    <MiniStat img={IMG.pontos} value={data.pontos} label="Pontos" />
+                    <MiniStat img={IMG.ressaltos} value={data.ressaltos} label="Ressaltos" />
+                    <MiniStat img={IMG.assistencias} value={data.assistencias} label="Assist." />
+                    <MiniStat img={IMG.desarmes} value={data.desarmes} label="Desarmes" />
                 </div>
             </div>
 
@@ -205,66 +181,66 @@ export default function AthletePage() {
             {/* Tab content */}
             <div className="px-3">
                 {tab === 'epoca' && data.epoca && (
-                    <div className="space-y-4">
-                        <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                    <div className="space-y-6">
+                        <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider text-center">
                             Época {data.epoca.epoca}
                         </h3>
 
-                        {/* Jogos / Min / Pontos */}
-                        <div className="grid grid-cols-3 gap-2">
-                            <BigPhotoCard bg={BG.jogos} value={data.epoca.jogos} label="Jogos" />
-                            <BigPhotoCard bg={BG.media} value={data.epoca.mediaMinutos} label="Min/jogo" suffix="'" />
-                            <BigPhotoCard bg={BG.pontosEpoca} value={data.epoca.pontos} label="Pontos" />
+                        {/* Jogos / Min / Pontos — clean numbers */}
+                        <div className="flex justify-center gap-8">
+                            <NumStat value={data.epoca.jogos} label="Jogos" />
+                            <NumStat value={data.epoca.mediaMinutos} label="Min/jogo" suffix="'" />
+                            <NumStat value={data.epoca.pontos} label="Pontos" />
                         </div>
 
-                        {/* Shooting */}
+                        {/* Shooting — 2x2 grid with images */}
                         <div>
                             <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Lançamentos</h4>
-                            <div className="space-y-2">
-                                <ShootingCard bg={BG.shooting1} label="Lançamentos de campo" stats={data.epoca.lancamentosCampo} color={data.epoca.lancamentosCampo ? pctColor(data.epoca.lancamentosCampo.percentagem) : '#7C3AED'} />
-                                <ShootingCard bg={BG.shooting2} label="2 Pontos" stats={data.epoca.lancamentos2} color={data.epoca.lancamentos2 ? pctColor(data.epoca.lancamentos2.percentagem) : '#7C3AED'} />
-                                <ShootingCard bg={BG.shooting3} label="3 Pontos" stats={data.epoca.lancamentos3} color={data.epoca.lancamentos3 ? pctColor(data.epoca.lancamentos3.percentagem) : '#7C3AED'} />
-                                <ShootingCard bg={BG.shooting4} label="Lances Livres" stats={data.epoca.lancesLivres} color={data.epoca.lancesLivres ? pctColor(data.epoca.lancesLivres.percentagem) : '#7C3AED'} />
+                            <div className="grid grid-cols-2 gap-2">
+                                <ShootCell img={IMG.shooting1} pct={data.epoca.lancamentosCampo?.percentagem ?? null} label="Campo" />
+                                <ShootCell img={IMG.shooting2} pct={data.epoca.lancamentos2?.percentagem ?? null} label="2 Pontos" />
+                                <ShootCell img={IMG.shooting3} pct={data.epoca.lancamentos3?.percentagem ?? null} label="3 Pontos" />
+                                <ShootCell img={IMG.shooting4} pct={data.epoca.lancesLivres?.percentagem ?? null} label="L. Livres" />
                             </div>
                         </div>
 
-                        {/* Rebounds */}
+                        {/* Rebounds — mini stats */}
                         <div>
                             <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Ressaltos</h4>
-                            <div className="grid grid-cols-3 gap-2">
-                                <BigPhotoCard bg={BG.rebound3} value={data.epoca.ressaltosTotal} label="Total" />
-                                <BigPhotoCard bg={BG.rebound1} value={data.epoca.ressaltosOfensivos} label="Ofensivos" />
-                                <BigPhotoCard bg={BG.rebound2} value={data.epoca.ressaltosDefensivos} label="Defensivos" />
+                            <div className="flex justify-center gap-6">
+                                <MiniStat img={IMG.rebound3} value={data.epoca.ressaltosTotal} label="Total" />
+                                <MiniStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="Ofensivos" />
+                                <MiniStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="Defensivos" />
                             </div>
                         </div>
 
-                        {/* Outros */}
+                        {/* Outros — mini stats */}
                         <div>
                             <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Outros</h4>
-                            <div className="grid grid-cols-4 gap-2">
-                                <PhotoCard bg={BG.outrosAssist} value={data.epoca.assistencias} label="Assist." />
-                                <PhotoCard bg={BG.outrosPerda} value={data.epoca.perdasBola} label="Perdas" />
-                                <PhotoCard bg={BG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos" />
-                                <PhotoCard bg={BG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" />
+                            <div className="flex justify-center gap-6">
+                                <MiniStat img={IMG.outrosAssist} value={data.epoca.assistencias} label="Assist." />
+                                <MiniStat img={IMG.outrosPerda} value={data.epoca.perdasBola} label="Perdas" />
+                                <MiniStat img={IMG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos" />
+                                <MiniStat img={IMG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" />
                             </div>
                         </div>
                     </div>
                 )}
 
                 {tab === 'carreira' && data.carreira && (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-2">
-                            <BigPhotoCard bg={BG.jogos} value={data.carreira.jogos} label="Jogos" />
-                            <BigPhotoCard bg={BG.media} value={data.carreira.tacasPortugal} label="Taças Portugal" />
+                    <div className="space-y-6">
+                        <div className="flex justify-center gap-8">
+                            <NumStat value={data.carreira.jogos} label="Jogos" />
+                            <NumStat value={data.carreira.tacasPortugal} label="Taças Portugal" />
                         </div>
 
                         <div>
                             <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Lançamentos</h4>
-                            <div className="space-y-2">
-                                <ShootingCard bg={BG.shooting1} label="Lançamentos de campo" stats={data.carreira.lancamentosCampo} color={data.carreira.lancamentosCampo ? pctColor(data.carreira.lancamentosCampo.percentagem) : '#7C3AED'} />
-                                <ShootingCard bg={BG.shooting2} label="2 Pontos" stats={data.carreira.lancamentos2} color={data.carreira.lancamentos2 ? pctColor(data.carreira.lancamentos2.percentagem) : '#7C3AED'} />
-                                <ShootingCard bg={BG.shooting3} label="3 Pontos" stats={data.carreira.lancamentos3} color={data.carreira.lancamentos3 ? pctColor(data.carreira.lancamentos3.percentagem) : '#7C3AED'} />
-                                <ShootingCard bg={BG.shooting4} label="Lances Livres" stats={data.carreira.lancesLivres} color={data.carreira.lancesLivres ? pctColor(data.carreira.lancesLivres.percentagem) : '#7C3AED'} />
+                            <div className="grid grid-cols-2 gap-2">
+                                <ShootCell img={IMG.shooting1} pct={data.carreira.lancamentosCampo?.percentagem ?? null} label="Campo" />
+                                <ShootCell img={IMG.shooting2} pct={data.carreira.lancamentos2?.percentagem ?? null} label="2 Pontos" />
+                                <ShootCell img={IMG.shooting3} pct={data.carreira.lancamentos3?.percentagem ?? null} label="3 Pontos" />
+                                <ShootCell img={IMG.shooting4} pct={data.carreira.lancesLivres?.percentagem ?? null} label="L. Livres" />
                             </div>
                         </div>
                     </div>
