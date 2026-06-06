@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useAthlete } from '../hooks/useAthlete'
-import { useClub } from '../lib/ClubContext'
 import type { AthleteInscricao } from '../hooks/useAthlete'
 
 const FPB = 'https://www.fpb.pt/wp-content/themes/fpbasquetebol/assets/images'
@@ -72,21 +71,7 @@ export default function AthletePage() {
     const [searchParams] = useSearchParams()
     const { data, loading, error } = useAthlete(id || '')
     const [tab, setTab] = useState<'epoca' | 'carreira' | 'inscricoes'>('epoca')
-    const { clubs, getClubBySlug } = useClub()
-    const clubSlug = searchParams.get('clube') || ''
-    const [clubLogo, setClubLogo] = useState<string | null>(null)
-
-    useEffect(() => {
-        if (!clubSlug) return
-        const cached = clubs.find(c => c.slug === clubSlug)
-        if (cached?.logo_url) {
-            setClubLogo(cached.logo_url)
-        } else {
-            getClubBySlug(clubSlug).then(c => {
-                if (c?.logo_url) setClubLogo(c.logo_url)
-            })
-        }
-    }, [clubSlug, clubs, getClubBySlug])
+    const clubLogo = searchParams.get('logo') || null
 
     if (loading) {
         return (
