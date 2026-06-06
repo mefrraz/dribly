@@ -47,9 +47,11 @@ function parseGames(html: string, isCalendar: boolean): Match[] {
             const escalao = partes[0]?.trim() || ''
             const competicao = partes[1]?.trim() || compRaw
 
-            // Status: calendar=todos AGENDADO, results=todos FINALIZADO
+            // Status: calendar keeps only upcoming, results keeps all finished
             const hasScore = scores[0] !== undefined && scores[1] !== undefined
-            const status: Match['status'] = isCalendar ? (hasScore ? 'FINALIZADO' : 'AGENDADO') : 'FINALIZADO'
+            const status: Match['status'] = hasScore ? 'FINALIZADO' : 'AGENDADO'
+            // In calendar section, skip games that already happened
+            if (isCalendar && hasScore) continue
 
             games.push({
                 id: internalId,
