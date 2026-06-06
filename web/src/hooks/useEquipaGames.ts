@@ -35,7 +35,9 @@ function parseGames(html: string, isCalendar: boolean): Match[] {
 
             const siglas = [...block.matchAll(/<span class="sigla">([^<]+)<\/span>/g)].map(m => m[1].trim())
             const scores = [...block.matchAll(/<h3 class="results_text[^"]*">\s*(\d+)\s*<\/h3>/g)].map(m => parseInt(m[1]))
-            const logos = [...block.matchAll(/<img alt="Logo[^"]*" src="([^"]+)"/g)].map(m => m[1].replace(/^FPB%20-%20Equipa_files\//, ''))
+            const logos = [...block.matchAll(/<img[^>]*src="([^"]+)"[^>]*>/g)].map(m => m[1].replace(/^FPB%20-%20Equipa_files\//, ''))
+            const hourMatch = block.match(/<span class="hour">\s*(\d{2}:\d{2})\s*<\/span>/)
+            const hora = hourMatch?.[1] || ''
             const localMatch = block.match(/<b>\s*([^<]+?)\s*<\/b>/)
             const local = localMatch?.[1]?.trim() || null
             const compMatch = block.match(/<div class="competition">[\s\S]*?<span>\s*([^<]+)\s*<\/span>/)
@@ -53,7 +55,7 @@ function parseGames(html: string, isCalendar: boolean): Match[] {
                 id: internalId,
                 slug: `${date}-${siglas[0]?.toLowerCase().replace(/\s+/g, '-') || 'x'}-${siglas[1]?.toLowerCase().replace(/\s+/g, '-') || 'y'}`,
                 data: date,
-                hora: '',
+                hora,
                 equipa_casa: siglas[0] || '',
                 equipa_fora: siglas[1] || '',
                 resultado_casa: scores[0] ?? null,
