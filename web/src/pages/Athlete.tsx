@@ -24,11 +24,11 @@ const IMG = {
 }
 
 /** Stat with FPB image above, value + label below */
-function BgStat({ img, value, label, size = 48, darkImg }: { img: string; value: string | number | null; label: string; size?: number; darkImg?: boolean }) {
+function BgStat({ img, value, label, size = 48, darkImg, imgClass }: { img: string; value: string | number | null; label: string; size?: number; darkImg?: boolean; imgClass?: string }) {
     return (
         <div className="flex flex-col items-center gap-2 py-2 px-2">
             <div className="flex items-center justify-center" style={{ width: size, height: size }}>
-                <img src={img} alt="" className={`max-w-full max-h-full object-contain ${darkImg ? 'brightness-[0.2] dark:brightness-100' : ''}`} />
+                <img src={img} alt="" className={`max-w-full max-h-full object-contain ${darkImg ? 'brightness-[0.2] dark:brightness-100' : ''} ${imgClass || ''}`} />
             </div>
             <div className="text-center">
                 <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{value ?? '—'}</span>
@@ -172,7 +172,7 @@ export default function AthletePage() {
                 {/* Stats card — attached below: Pontos | Época | Assistências */}
                 <div className="bg-white dark:bg-zinc-900 border border-t-0 border-zinc-200 dark:border-zinc-800 rounded-b-2xl shadow-sm overflow-hidden">
                     <div className="flex items-center justify-around py-4 px-3">
-                        <BgStat img={IMG.pontos} value={data.pontos} label="Pontos" size={56} />
+                        <BgStat img={IMG.pontos} value={data.pontos} label="Pontos" size={56} imgClass="dark:brightness-0 dark:invert" />
                         {data.epoca && (
                             <div className="flex flex-col items-center gap-2 px-3">
                                 <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">{data.epoca.epoca}</span>
@@ -192,7 +192,7 @@ export default function AthletePage() {
                                 </div>
                             </div>
                         )}
-                        <BgStat img={IMG.assistencias} value={data.assistencias} label="Assistências" size={56} />
+                        <BgStat img={IMG.assistencias} value={data.assistencias} label="Assistências" size={56} imgClass="dark:brightness-0 dark:invert" />
                     </div>
                 </div>
             </div>
