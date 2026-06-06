@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import { ErrorBoundary } from './ErrorBoundary'
 
@@ -19,7 +19,7 @@ describe('ErrorBoundary', () => {
         // Suppress React's error logging for this test
         const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
         
-        function Broken() { throw new Error('boom') }
+        function Broken(): never { throw new Error('boom') }
         
         render(
             <ErrorBoundary>
