@@ -6,7 +6,6 @@ import { useEquipaGames } from '../../hooks/useEquipaGames'
 import { SkeletonGameGrid } from '../../components/Skeleton'
 import { EmptyState } from '../../components/EmptyState'
 import { GameCard } from '../../components/GameCard'
-import { TeamBlock } from '../../components/TeamBlock'
 import type { Match } from '../../components/types'
 import type { Club } from '../../lib/ClubContext'
 
@@ -331,6 +330,21 @@ function ClubTeamDetail() {
                     )}
                 </div>
             )}
+        </div>
+    )
+}
+
+function TeamBlock({ name, logo }: { name: string; logo: string | null }) {
+    return (
+        <div className="flex-1 flex flex-col items-center text-center gap-2 min-w-0">
+            <div className="w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
+                {logo ? (
+                    <img src={logo} alt={name} className="w-full h-full object-contain p-1.5" />
+                ) : (
+                    <span className="text-base font-bold text-zinc-400">{name.charAt(0).toUpperCase()}</span>
+                )}
+            </div>
+            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 leading-tight line-clamp-2">{name}</span>
         </div>
     )
 }
