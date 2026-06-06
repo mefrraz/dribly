@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Calendar, Trophy, Filter, RefreshCw, AlertCircle } from 'lucide-react'
 import { Link, useSearchParams, useOutletContext } from 'react-router-dom'
 import { useGames } from '../../hooks/useGames'

@@ -39,24 +39,26 @@ import { slugify } from '../lib/fpbUtils'
 
 function mapFPBData(fresh: Record<string, unknown>[], season: string): Match[] {
   return fresh.map(g => {
-    const slug = `${g.data}-${slugify(g.equipa_casa)}-${slugify(g.equipa_fora)}`
+    const data = String(g.data || '')
+    const casa = String(g.equipa_casa || '')
+    const fora = String(g.equipa_fora || '')
+    const slug = `${data}-${slugify(casa)}-${slugify(fora)}`
     return {
-      ...g,
-      id: g.id || '',
-      data: g.data,
-      hora: g.hora || '',
-      equipa_casa: g.equipa_casa || '',
-      equipa_fora: g.equipa_fora || '',
-      resultado_casa: g.resultado_casa,
-      resultado_fora: g.resultado_fora,
-      escalao: g.escalao || '',
-      competicao: g.competicao || '',
-      local: g.local || null,
-      logotipo_casa: g.logotipo_casa || null,
-      logotipo_fora: g.logotipo_fora || null,
-      status: g.status,
-      epoca: season,
+      id: String(g.id || ''),
       slug,
+      data,
+      hora: String(g.hora || ''),
+      equipa_casa: casa,
+      equipa_fora: fora,
+      resultado_casa: (g.resultado_casa ?? null) as number | null,
+      resultado_fora: (g.resultado_fora ?? null) as number | null,
+      escalao: String(g.escalao || ''),
+      competicao: String(g.competicao || ''),
+      local: (g.local as string) || null,
+      logotipo_casa: (g.logotipo_casa as string) || null,
+      logotipo_fora: (g.logotipo_fora as string) || null,
+      status: g.status as Match['status'],
+      epoca: season,
     }
   })
 }

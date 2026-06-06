@@ -412,7 +412,7 @@ export default function CompetitionDetail() {
                                                         ? [...playerStats].filter(p => Number(p[cat.key] || 0) > 0).sort((a, b) => Number(b[cat.key] || 0) - Number(a[cat.key] || 0))
                                                         : []
                                                     const best = sorted[0]
-                                                    const photoUrl = best ? (best as Record<string, unknown>).photoUrl as string || null : null
+                                                    const photoUrl = best ? (best as unknown as Record<string, unknown>).photoUrl as string || null : null
                                                     return (
                                                         <div key={cat.key} className={`rounded-2xl border p-3 flex items-center gap-3 ${hasStats ? 'bg-white dark:bg-zinc-900/60 border-zinc-200/50 dark:border-zinc-800/50' : 'bg-zinc-50 dark:bg-zinc-900/30 border-zinc-100 dark:border-zinc-800/30'}`}>
                                                             {hasStats && best ? (
@@ -758,7 +758,7 @@ function StatsLeaderboard({ playerStats }: { playerStats: FPBPlayerStat[] }) {
                 {sorted.map((p, i) => {
                     const val = p[STAT_TYPES[statType].key]
                     const displayVal = typeof val === 'number' ? (Number.isInteger(val) ? val : val.toFixed(1)) : '—'
-                    const photoUrl = (p as Record<string, unknown>).photoUrl as string || null
+                    const photoUrl = (p as unknown as Record<string, unknown>).photoUrl as string || null
 
                     return (
                         <div key={p.atleta_id} className="bg-white dark:bg-zinc-900/90 border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 text-center hover:border-dribly-purple/30 transition-all group">

@@ -16,6 +16,7 @@ import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { Search, X, MapPin, Navigation, Filter } from 'lucide-react'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { SeoHead } from '../components/SeoHead'
 import { fetchPavilions, type Pavilion, displayPavilionName } from '../lib/mapData'
 import { PavilionSheet } from '../components/PavilionSheet'
 import { supabase } from '../lib/supabase'
@@ -201,7 +202,7 @@ export default function Mapa() {
             // Build set of pavilion IDs that have upcoming games (match by name)
             if (gamesData) {
                 const activeIds = new Set<number>()
-                const gameLocals = new Set((gamesData as { local: string | null }[]).map((g) => g.local?.toLowerCase().trim()))
+                const gameLocals = new Set((gamesData as { local: string | null }[]).map((g) => g.local?.toLowerCase().trim()).filter(Boolean) as string[])
                 for (const p of pavs) {
                     const cleanName = p.nome.replace(/^Pavilhão\s+/i, '').replace(/^Pav\.\s*/i, '').toLowerCase().trim()
                     if (gameLocals.has(cleanName) || Array.from(gameLocals).some(l => l.includes(cleanName) || cleanName.includes(l))) {
@@ -270,6 +271,7 @@ export default function Mapa() {
 
     return (
         <>
+        <SeoHead title="Mapa de Pavilhões" description="Mais de 400 pavilhões de basquetebol em Portugal. Encontra jogos perto de ti." />
         <div style={{ position: 'fixed', top: '3.5rem', bottom: 0, left: 0, right: 0, zIndex: 10 }} className="md:top-16">
 
             {/* Top bar: search + locate + filter */}
