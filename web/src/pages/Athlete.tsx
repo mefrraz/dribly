@@ -23,11 +23,11 @@ const IMG = {
 }
 
 /** Stat with FPB image above, value + label below */
-function BgStat({ img, value, label, size = 48 }: { img: string; value: string | number | null; label: string; size?: number }) {
+function BgStat({ img, value, label, size = 48, darkImg }: { img: string; value: string | number | null; label: string; size?: number; darkImg?: boolean }) {
     return (
         <div className="flex flex-col items-center gap-2 py-2 px-2">
             <div className="flex items-center justify-center" style={{ width: size, height: size }}>
-                <img src={img} alt="" className="max-w-full max-h-full object-contain" />
+                <img src={img} alt="" className={`max-w-full max-h-full object-contain ${darkImg ? 'brightness-0 dark:brightness-100 dark:invert' : ''}`} />
             </div>
             <div className="text-center">
                 <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{value ?? '—'}</span>
@@ -222,12 +222,12 @@ export default function AthletePage() {
                         <div>
                             <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-2">Ressaltos & Outros</h4>
                             <div className="flex justify-around flex-wrap gap-3">
-                                <BgStat img={IMG.rebound3} value={rebTotal} label="R. Total" />
-                                <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="R. Ofensivos" />
-                                <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="R. Defensivos" />
-                                <BgStat img={IMG.outrosPerda} value={data.epoca.perdasBola} label="Perdas de bola" />
-                                <BgStat img={IMG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos de bola" />
-                                <BgStat img={IMG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" />
+                                <BgStat img={IMG.rebound3} value={rebTotal} label="R. Total" darkImg />
+                                <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="R. Ofensivos" darkImg />
+                                <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="R. Defensivos" darkImg />
+                                <BgStat img={IMG.outrosPerda} value={data.epoca.perdasBola} label="Perdas de bola" darkImg />
+                                <BgStat img={IMG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos de bola" darkImg />
+                                <BgStat img={IMG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" darkImg />
                             </div>
                         </div>
                     </div>
