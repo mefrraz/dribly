@@ -67,6 +67,84 @@
 
 ---
 
+## [v7.24] — 2026-06-04
+
+### Feat
+- **Página de atleta redesenhada:** scraping FPB com header (foto + stats), 4 tabs (Época/Carreira/Inscrições/Biografia), PhotoCards com imagens FPB (aspect 3:4), barras nos lançamentos 2x2, donuts SVG interativos
+- **Página de equipa redesenhada:** ClubTeams e ClubTeamDetail com cards, stats, agenda/resultados em tabs, plantel com fotos 3:4 e links FPB
+- **Team photos:** scraping direto de `/equipas/clube_XX` FPB, multi-key matching, gender labels coloridos (Masculino=azul, Feminino=rosa), filtro de placeholder photos
+- **Dark mode images:** ajustes de brightness nas imagens dos atletas para legibilidade em ambos os temas
+
+### Fix
+- **Cache localStorage:** `useAthlete` (30min), `useEquipaGames` (15min)
+- **npm audit fix:** 15→2 vulnerabilidades (restantes são esbuild dev-server apenas)
+- **Testes:** 111 passam, ruído de console suprimido nos testes (`vitest onConsoleLog: false`)
+
+---
+
+## [v7.23] — 2026-06-04
+
+### Feat
+- **Athlete page FPB scraping:** header com foto/stats, bio inline, tabs de época/carreira
+- **Plantel tab:** nomes, fotos, links FPB para cada jogador na página de detalhe da equipa
+- **ClubTeams/ClubTeamDetail:** routes novas, loading skeletons melhorados, cards com slug URLs
+- **Carrosséis infinitos:** animação `translateX` + blur edges + wrap silencioso com 3 cópias no landing
+
+### Fix
+- **Scraper competições:** URL direta FPB (WP AJAX dava erro 400), User-Agent de browser real (FPB bloqueava Dribly-Bot)
+- **Scraper diário:** `SUPABASE_SERVICE_ROLE_KEY` em vez de `SUPABASE_KEY`
+- **Zoom no mobile:** `user-scalable=no, maximum-scale=1.0`
+- **SplashScreen:** movido para `App.tsx` (só corre 1× por sessão globalmente)
+- **AuthModal:** z-index 2000 para overlay no mapa
+
+---
+
+## [v7.22] — 2026-06-03
+
+### Feat
+- **H2H refinements:** logo do visitante ao lado do nome, data empurrada para a direita com flex spacer
+- **Pavilion page:** mini-mapa Leaflet real no card de localização do jogo, back button, dark/light tiles
+- **Competition logos reais** no dropdown de pesquisa do hero da landing
+
+---
+
+## [v7.21] — 2026-06-03
+
+### Refactor
+- **FPB-first loading:** render único, zero Supabase no caminho de display, zero flicker de nomes. Nomes formatados sempre com `semiAbrev` — sem ALL CAPS flicker
+
+---
+
+## [v7.20] — 2026-06-03
+
+### Fix
+- **Single `setGames`:** previne flicker de nomes ao carregar jogos
+- **Perf-test script:** PowerShell para testar performance de scraping com `PSCustomObject`
+
+---
+
+## [v7.19] — 2026-06-03
+
+### Perf
+- **Índice `pg_trgm`** no Supabase para pesquisa fuzzy de clubes
+- **FPB cache no Service Worker:** dados da FPB cacheados offline
+- **Club prefetch on hover:** pré-carregamento ao passar o rato sobre cards de clubes
+
+---
+
+## [v7.18] — 2026-06-02
+
+### Feat
+- **Mapa de pavilhões melhorado:** marcadores coloridos por atividade (roxo = jogos futuros, cinza = sem jogos), botão "Localizar-me" com geolocalização, filtro por distrito, footer bar com contagem de atividade
+- **Page transitions:** fade-in global em todas as páginas
+
+### Fix
+- **Zoom controls no mobile:** visíveis, `z-index` aumentado, botões redesenhados 36×36px
+- **Bottom nav escondida no mapa:** footer e bottom nav ocultos na página do mapa para vista fullscreen
+- **Leaflet attribution:** texto de atribuição escondido, CSS importado via npm
+
+---
+
 ## [v7.17] — 2026-06-02
 
 ### Fix
@@ -217,6 +295,43 @@
 - **Zoom controls à esquerda** centrados verticalmente
 - **Tiles adaptativos** (claro/escuro conforme tema)
 - Dados via Supabase com join pavilions ↔ games_2025_2026
+
+---
+
+## [v5.44] — 2026-05-31
+
+### Feat
+- **Favoritos sync Supabase:** sync bidirecional entre localStorage e Supabase, upsert de follows corrigido
+- **RLS policies:** `auth.uid()::text` para compatibilidade com Clerk JWT, migration `user_favorites` com TEXT
+- **DROP TABLE before CREATE** para resolver conflitos de foreign key
+
+### Fix
+- **Top clube inteligente:** vencedor = último jogo da última fase (final do playoff), líder da tabela ou destaque. Corrigida comparação de datas PT (MAI/JUN) no `findTopTeam`
+
+---
+
+## [v5.39] — 2026-05-31
+
+### Feat
+- **Estatísticas para TODAS as competições** (remove restrição TOP_LEAGUES)
+
+### Fix
+- **Search bar:** nomes das ligas corrigidos via `competitions_meta`, redireciona para `/competicao/:id` em vez de `/standings`
+- **Search logos:** gradiente + abreviatura como fallback no SearchModal
+
+---
+
+## [v5.35] — 2026-05-31
+
+### Fix
+- **Splash screen refinements (v5–v8):** múltiplas iterações com GPU slide (`translateX`), animações CSS keyframes, DOM unificado sem lag, `requestAnimationFrame` gate para zero flash inicial, modo claro/escuro automático, fade-out em 2 passos
+
+---
+
+## [v5.15] — 2026-05-31
+
+### Feat
+- **Splash screen v6:** logo desliza para a esquerda com GPU, texto "Dribly" emerge de trás do logo com animação CSS sincronizada
 
 ---
 
@@ -1978,7 +2093,8 @@ Layout antigo + seletor de clube modal + navegação Meu Clube/Jogos.
 | `v5.x` | Auth completa, password recovery, sessões |
 | `v6.x` | Mapa de pavilhões interativo (Leaflet) |
 | `v7.x` | Estabilização: backend, scraper, SEO, a11y, performance, CI/CD |
+| `v8.x` | Qualidade de código, SEO 10 páginas, a11y, Playwright E2E, Vite 6, CSP |
 
 ---
 
-*Gerado a partir do histórico de git com 180+ tags e 470+ commits.*
+*Gerado a partir do histórico de git com 270+ tags e 660+ commits.*

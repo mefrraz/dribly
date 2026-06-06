@@ -22,7 +22,7 @@
   </a>
 </p>
 
-> **v7.18.0** — 🛠️ Estabilização: backend, scraper, SEO, a11y, CI/CD · [dribly.pt](https://dribly.pt)
+> **v8.0.0** — 🧹 Qualidade de código, SEO 10 páginas, a11y, PWA maskable, Playwright E2E, Vite 6, 111 testes · [dribly.pt](https://dribly.pt)
 
 ---
 
@@ -55,6 +55,9 @@ O Dribly nasceu da frustração de não existir uma plataforma única, rápida e
 | 🧪 **Testes unitários** | v7.6 | Vitest com lógica de parsing testável |
 | 🔍 **SEO dinâmico** | v7.15 | Meta tags por página, robots.txt, sitemap |
 | ♿ **Acessibilidade** | v7.16 | Alt text, breadcrumbs, indicadores de scroll acessíveis |
+| 🎭 **Testes E2E Playwright** | v8.0 | Smoke tests: Landing, Clubes, Mapa |
+| 🧹 **ESLint 0 erros** | v8.0 | Qualidade de código, zero `any` types |
+| 🔒 **Content-Security-Policy** | v8.0 | Headers CSP no vercel.json contra XSS |
 | 🛡️ **ErrorBoundary global** | v7.9 | Fallback amigável em vez de ecrã branco |
 | ⚡ **Pre-warming de cache** | v7.12 | Dados pré-carregados antes do pico de utilização |
 | 🎨 **Tema dinâmico** | v2.9 | Cada clube com accent color própria |
@@ -123,7 +126,7 @@ powershell -ExecutionPolicy Bypass -File scripts/rate-limit-test.ps1 -RequestsPe
 | Camada | Tecnologia |
 |---|---|
 | Frontend | React 18 + TypeScript |
-| Build | Vite 5 |
+| Build | Vite 6 |
 | Estilos | Tailwind CSS 3 |
 | Auth | Clerk (email/password, username único, recuperação de password) |
 | Base de dados | Supabase (PostgreSQL) |
