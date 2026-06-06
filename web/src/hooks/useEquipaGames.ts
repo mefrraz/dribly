@@ -36,8 +36,8 @@ function parseGames(html: string, isCalendar: boolean): Match[] {
             const siglas = [...block.matchAll(/<span class="sigla">([^<]+)<\/span>/g)].map(m => m[1].trim())
             const scores = [...block.matchAll(/results_text[^>]*>[\s\S]*?(\d+)[\s\S]*?<\/h3>/g)].map(m => parseInt(m[1]))
             const logos = [...block.matchAll(/<img[^>]*src="([^"]+)"[^>]*>/g)].map(m => m[1].replace(/^FPB%20-%20Equipa_files\//, ''))
-            const hourMatch = block.match(/<span class="hour">\s*(\d{2}:\d{2})\s*<\/span>/)
-            const hora = hourMatch?.[1] || ''
+            const hourMatch = block.match(/hour[^>]*>[\s\S]*?(\d{1,2})H(\d{2})/i)
+            const hora = hourMatch ? `${hourMatch[1].padStart(2, '0')}:${hourMatch[2]}` : ''
             const localMatch = block.match(/<b>\s*([^<]+?)\s*<\/b>/)
             const local = localMatch?.[1]?.trim() || null
             const compMatch = block.match(/<div class="competition">[\s\S]*?<span>\s*([^<]+)\s*<\/span>/)
