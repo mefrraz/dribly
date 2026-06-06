@@ -288,24 +288,31 @@ function ClubTeamDetail() {
                         <p className="text-sm text-zinc-400 text-center py-8">Plantel não disponível.</p>
                     ) : (
                         <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
-                            {plantel.map((p, i) => (
-                                <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center">
-                                    <div className="relative w-full pb-[133%] bg-zinc-100 dark:bg-zinc-800 rounded-xl overflow-hidden mb-2">
-                                        {p.foto ? (
-                                            <img src={p.foto} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                                        ) : (
-                                            <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-zinc-400">{p.nome.charAt(0).toUpperCase()}</span>
-                                        )}
+                            {plantel.map((p, i) => {
+                                const athleteId = (p.atletaUrl?.match(/atletas\/(\d+)/) || [])[1] || ''
+                                const inner = (
+                                    <>
+                                        <div className="relative w-full pb-[133%] bg-zinc-100 dark:bg-zinc-800 rounded-xl overflow-hidden mb-2">
+                                            {p.foto ? (
+                                                <img src={p.foto} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                                            ) : (
+                                                <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-zinc-400">{p.nome.charAt(0).toUpperCase()}</span>
+                                            )}
+                                        </div>
+                                        <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-dribly-purple truncate">{p.nome}</p>
+                                    </>
+                                )
+                                return athleteId ? (
+                                    <Link key={i} to={`/atleta/${athleteId}?clube=${club.slug}`}
+                                        className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center hover:shadow-md hover:border-dribly-purple/30 transition-all">
+                                        {inner}
+                                    </Link>
+                                ) : (
+                                    <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center">
+                                        {inner}
                                     </div>
-                                    {p.atletaUrl ? (
-                                        <Link to={`/atleta/${(p.atletaUrl.match(/atletas\/(\d+)/) || [])[1] || ''}?clube=${club.slug}`} className="text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-dribly-purple truncate block">
-                                            {p.nome}
-                                        </Link>
-                                    ) : (
-                                        <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate">{p.nome}</p>
-                                    )}
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     )}
                 </div>

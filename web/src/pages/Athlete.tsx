@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
 import { useAthlete } from '../hooks/useAthlete'
 import { useClub } from '../lib/ClubContext'
 import type { AthleteInscricao } from '../hooks/useAthlete'
@@ -125,7 +125,10 @@ export default function AthletePage() {
                 <button onClick={() => window.history.back()} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
                     <ArrowLeft size={22} />
                 </button>
-                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">Atleta</span>
+                <a href={`https://www.fpb.pt/atletas/${id}/`} target="_blank" rel="noopener noreferrer"
+                    className="text-[10px] font-bold text-zinc-400 hover:text-dribly-purple transition-colors inline-flex items-center gap-1">
+                    Atleta <ExternalLink size={10} />
+                </a>
                 <div className="w-10" />
             </div>
 
