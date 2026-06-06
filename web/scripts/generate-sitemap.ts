@@ -1,5 +1,5 @@
 /**
- * Generates a full sitemap.xml including all clubs and competitions from Supabase.
+ * Generates a full sitemap.xml including ALL discoverable pages from Supabase.
  *
  * Usage:  npx tsx scripts/generate-sitemap.ts
  *
@@ -25,9 +25,6 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-interface Club { slug: string; name: string; priority: number | null }
-interface Competition { competition_id: number; competition_name: string }
-
 const BASE = 'https://dribly.pt'
 
 function url(loc: string, changefreq: string, priority: string): string {
@@ -39,7 +36,9 @@ function url(loc: string, changefreq: string, priority: string): string {
 }
 
 async function main() {
-    // Static pages
+    console.log('🔍 Fetching data from Supabase...')
+
+    // ── Static pages ──
     const staticUrls = [
         url(`${BASE}/`, 'daily', '1.0'),
         url(`${BASE}/clubes`, 'weekly', '0.8'),
@@ -51,27 +50,87 @@ async function main() {
         url(`${BASE}/instalar`, 'monthly', '0.3'),
     ]
 
-    // Fetch clubs
+    // ── Clubs (281+) ──
     const { data: clubs } = await supabase
         .from('clubs')
-        .select('slug, name, priority')
+        .select('slug, priority')
         .order('priority', { ascending: true, nullsFirst: false })
 
-    const clubUrls = (clubs || []).map((c: Club) =>
+    const clubUrls = (clubs || []).map((c: { slug: string; priority: number | null }) =>
         url(`${BASE}/clube/${c.slug}/home`, 'weekly', c.priority ? '0.7' : '0.5')
     )
+    console.log(`  ✅ ${clubUrls.length} clubes`)
 
-    // Fetch competitions
+    // ── Competitions (50+) ──
     const { data: comps } = await supabase
         .from('competitions')
-        .select('competition_id, competition_name')
+        .select('competition_id, association_id')
         .eq('season', '2025/2026')
 
-    const compUrls = (comps || []).map((c: Competition) =>
+    const compUrls = (comps || []).map((c: { competition_id: number }) =>
         url(`${BASE}/competicao/${c.competition_id}`, 'daily', '0.6')
     )
+    console.log(`  ✅ ${compUrls.length} competições`)
 
-    const allUrls = [...staticUrls, ...clubUrls, ...compUrls]
+    // ── Games (current season) ──
+    const { data: games } = await supabase
+        .from('games_2025_2026')
+        .select('slug')
+        .limit(5000)
+
+    const gameUrls = (games || []).map((g: { slug: string }) =>
+        url(`${BASE}/jogo/${g.slug}`, 'weekly', '0.5')
+    )
+    console.log(`  ✅ ${gameUrls.length} jogos`)
+
+    // ── Pavilions (400+) ──
+    const { data: pavs } = await supabase
+        .from('pavilions')
+        .select('recinto_id')
+        .not('recinto_id', 'is', null)
+        .order('recinto_id')
+
+    // Deduplicate recinto_id
+    const seenPav = new Set<number>()
+    const pavUrls: string[] = []
+    for (const p of (pavs || []) as { recinto_id: number }[]) {
+        if (!seenPav.has(p.recinto_id)) {
+            seenPav.add(p.recinto_id)
+            pavUrls.push(url(`${BASE}/pavilhao/${p.recinto_id}`, 'monthly', '0.4'))
+        }
+    }
+    console.log(`  ✅ ${pavUrls.length} pavilhões`)
+
+    // ── Associations + phases ──
+    const assocIds = new Set<number>()
+    const phaseUrls: string[] = []
+    for (const c of (comps || []) as { competition_id: number; association_id: number }[]) {
+        if (c.association_id && !assocIds.has(c.association_id)) {
+            assocIds.add(c.association_id)
+            phaseUrls.push(url(`${BASE}/classificacoes/${c.association_id}`, 'weekly', '0.6'))
+        }
+        if (c.association_id) {
+            phaseUrls.push(url(`${BASE}/classificacoes/${c.association_id}/${c.competition_id}`, 'daily', '0.6'))
+        }
+    }
+    console.log(`  ✅ ${assocIds.size} associações com ${phaseUrls.length} fases`)
+
+    // ── Athletes — from game detail internal IDs (top 100 recent games) ──
+    // Athlete IDs come from FPB scraping, not stored in Supabase.
+    // We include a note that athlete pages are discoverable via game pages.
+    const athleteUrls: string[] = []
+    console.log(`  ⚠️  ${athleteUrls.length} atletas (não disponíveis no Supabase — descobertos via páginas de jogos)`)
+
+    // ── Assemble ──
+    const allUrls = [
+        ...staticUrls,
+        ...clubUrls,
+        ...compUrls,
+        ...gameUrls,
+        ...pavUrls,
+        ...phaseUrls,
+        ...athleteUrls,
+    ]
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -81,7 +140,7 @@ ${allUrls.join('\n')}
 
     const outPath = join(__dirname, '..', 'public', 'sitemap.xml')
     writeFileSync(outPath, xml, 'utf-8')
-    console.log(`✅ Sitemap written to public/sitemap.xml (${allUrls.length} URLs)`)
+    console.log(`\n📄 Sitemap written to public/sitemap.xml (${allUrls.length} total URLs)`)
 }
 
 main().catch(err => {
