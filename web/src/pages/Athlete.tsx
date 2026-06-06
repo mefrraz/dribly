@@ -4,84 +4,89 @@ import { ArrowLeft } from 'lucide-react'
 import { useAthlete } from '../hooks/useAthlete'
 import type { AthleteInscricao, ShootingStats } from '../hooks/useAthlete'
 
-/** SVG donut chart: colored arc + value in center */
-function Donut({ pct, size = 64, stroke = 6, color = '#7C3AED', label, detail }: {
-    pct: number; size?: number; stroke?: number; color?: string; label: string; detail?: string
+// FPB background images for stat cards
+const FPB = 'https://www.fpb.pt/wp-content/themes/fpbasquetebol/assets/images'
+const BG = {
+    pontos: `${FPB}/athlete/points.png`,
+    ressaltos: `${FPB}/athlete/rebounds.png`,
+    assistencias: `${FPB}/athlete/assists.png`,
+    desarmes: `${FPB}/athlete/blocks.png`,
+    jogos: `${FPB}/athlete/atleta-jogos.png`,
+    media: `${FPB}/athlete/atleta-media.png`,
+    pontosEpoca: `${FPB}/athlete/atleta-pontos.png`,
+    shooting1: `${FPB}/stats/background-shooting-1.png`,
+    shooting2: `${FPB}/stats/background-shooting-2.png`,
+    shooting3: `${FPB}/stats/background-shooting-3.png`,
+    shooting4: `${FPB}/stats/background-shooting-4.png`,
+    rebound1: `${FPB}/stats/background-rebounds-1.png`,
+    rebound2: `${FPB}/stats/background-rebounds-2.png`,
+    rebound3: `${FPB}/stats/background-rebounds-3.png`,
+    outrosAssist: `${FPB}/stats/background-assists.png`,
+    outrosPerda: `${FPB}/stats/background-perda.png`,
+    outrosRoubo: `${FPB}/stats/topPerformers-right.png`,
+    outrosDesarme: `${FPB}/stats/background-bloco.png`,
+}
+
+/** Card with FPB background image */
+function ImgCard({ bg, value, label }: {
+    bg: string; value: string | number | null; label: string
 }) {
-    const r = (size - stroke) / 2
-    const c = size / 2
-    const circ = 2 * Math.PI * r
-    const offset = circ - (pct / 100) * circ
     return (
-        <div className="flex flex-col items-center gap-1">
-            <svg width={size} height={size} className="shrink-0">
-                <circle cx={c} cy={c} r={r} fill="none" stroke="currentColor"
-                    className="text-zinc-200 dark:text-zinc-700" strokeWidth={stroke} />
-                <circle cx={c} cy={c} r={r} fill="none" stroke={color}
-                    strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={offset}
-                    strokeLinecap="round" transform={`rotate(-90 ${c} ${c})`}
-                    className="transition-all duration-700" />
-                <text x={c} y={c} textAnchor="middle" dominantBaseline="central"
-                    className="fill-zinc-700 dark:fill-zinc-200 text-[10px] font-black"
-                    style={{ fontSize: size < 60 ? 10 : 13 }}>{pct}%</text>
-            </svg>
-            <span className="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 text-center leading-tight">{label}</span>
-            {detail && <span className="text-[8px] text-zinc-400">{detail}</span>}
+        <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+            <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.10] bg-center bg-cover"
+                style={{ backgroundImage: `url(${bg})` }} />
+            <div className="relative flex flex-col items-center justify-center p-4">
+                <span className="text-2xl font-black tabular-nums text-zinc-800 dark:text-zinc-100">{value ?? '—'}</span>
+                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mt-0.5">{label}</span>
+            </div>
         </div>
     )
 }
 
-/** Big stat pill with donut-style ring */
-function StatPill({ value, label, color = '#7C3AED' }: { value: number | null; label: string; color?: string }) {
-    return (
-        <div className="relative flex flex-col items-center justify-center p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 group">
-            <div className="absolute inset-0 rounded-2xl opacity-5 group-hover:opacity-10 transition-opacity"
-                style={{ backgroundColor: color }} />
-            <span className="text-2xl font-black tabular-nums" style={{ color }}>{value ?? '—'}</span>
-            <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mt-0.5">{label}</span>
-        </div>
-    )
-}
-
-/** Small stat with circle ring */
-function StatCircle({ value, label, color = '#7C3AED', max = 100 }: {
-    value: number | null; label: string; color?: string; max?: number
+/** Shooting stat with FPB background + bar */
+function ShootingCard({ bg, label, stats, color }: {
+    bg: string; label: string; stats: ShootingStats | null; color: string
 }) {
-    const pct = value !== null && max > 0 ? Math.min((value / max) * 100, 100) : 0
-    const size = 56
-    const stroke = 5
-    const r = (size - stroke) / 2
-    const c = size / 2
-    const circ = 2 * Math.PI * r
-    const offset = circ - (pct / 100) * circ
-    return (
-        <div className="flex flex-col items-center gap-1">
-            <svg width={size} height={size} className="shrink-0">
-                <circle cx={c} cy={c} r={r} fill="none" stroke="currentColor"
-                    className="text-zinc-200 dark:text-zinc-700" strokeWidth={stroke} />
-                <circle cx={c} cy={c} r={r} fill="none" stroke={color}
-                    strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={offset}
-                    strokeLinecap="round" transform={`rotate(-90 ${c} ${c})`}
-                    className="transition-all duration-700" />
-                <text x={c} y={c - 1} textAnchor="middle" dominantBaseline="central"
-                    className="fill-zinc-800 dark:fill-zinc-100 text-[11px] font-black">{value ?? '—'}</text>
-            </svg>
-            <span className="text-[8px] font-bold text-zinc-400 uppercase text-center leading-tight">{label}</span>
-        </div>
-    )
-}
-
-function ShootingDonut({ label, stats, color = '#7C3AED' }: { label: string; stats: ShootingStats | null; color?: string }) {
     if (!stats) return null
+    const pct = stats.percentagem
+    const barColor = pct >= 50 ? 'bg-green-500' : pct >= 35 ? 'bg-amber-500' : 'bg-red-500'
     return (
-        <Donut
-            pct={stats.percentagem}
-            size={72}
-            stroke={7}
-            color={color}
-            label={label}
-            detail={`${stats.feitos}/${stats.tentados}`}
-        />
+        <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+            <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.08] bg-center bg-cover"
+                style={{ backgroundImage: `url(${bg})` }} />
+            <div className="relative space-y-2">
+                <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-zinc-500">{label}</span>
+                    <span className="text-[10px] font-mono font-bold text-zinc-400">{stats.feitos}/{stats.tentados}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="flex-1 h-2.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                        <div className={`h-full ${barColor} rounded-full transition-all duration-500`}
+                            style={{ width: `${Math.min(pct, 100)}%` }} />
+                    </div>
+                    <span className="text-sm font-black tabular-nums w-10 text-right"
+                        style={{ color }}>{pct}%</span>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+/** Big stat for jogos/min/pontos — no circle, just bold value + label + subtle bg */
+function BigStat({ bg, value, label, suffix }: {
+    bg: string; value: string | number | null; label: string; suffix?: string
+}) {
+    return (
+        <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+            <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.10] bg-center bg-cover"
+                style={{ backgroundImage: `url(${bg})` }} />
+            <div className="relative flex flex-col items-center justify-center p-5">
+                <span className="text-3xl font-black tabular-nums text-zinc-800 dark:text-zinc-100">
+                    {value ?? '—'}{suffix || ''}
+                </span>
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mt-1">{label}</span>
+            </div>
+        </div>
     )
 }
 
@@ -129,69 +134,70 @@ export default function AthletePage() {
                 <button onClick={() => window.history.back()} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
                     <ArrowLeft size={22} />
                 </button>
-                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">ATLETA</span>
+                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">ATLETA</span>
                 <div className="w-10" />
             </div>
 
-            {/* Header: info left, photo right */}
+            {/* Header card */}
             <div className="max-w-xl mx-auto px-3">
-                <div className="flex gap-4">
-                    {/* Info */}
-                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <h1 className="text-2xl font-black text-zinc-900 dark:text-white truncate leading-tight">
-                            {data.nome}
-                        </h1>
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5">
-                            {data.numero && (
-                                <span className="text-sm font-black text-[var(--club-color)]">#{data.numero}</span>
-                            )}
-                            {data.posicao && (
-                                <span className="text-xs font-bold text-zinc-500">{data.posicao}</span>
-                            )}
-                            {data.clube && (
-                                <span className="text-xs text-zinc-400">· {data.clube}</span>
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="flex gap-4 p-4">
+                        {/* Info */}
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                            <h1 className="text-xl font-black text-zinc-900 dark:text-white truncate leading-tight">
+                                {data.nome}
+                            </h1>
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
+                                {data.numero && (
+                                    <span className="text-sm font-bold text-zinc-500">#{data.numero}</span>
+                                )}
+                                {data.posicao && (
+                                    <span className="text-xs font-bold text-zinc-500">{data.posicao}</span>
+                                )}
+                                {data.clube && (
+                                    <span className="text-xs text-zinc-400">· {data.clube}</span>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1.5">
+                                {data.bandeiraUrl && (
+                                    <img src={data.bandeiraUrl} alt="" className="w-4 h-3 object-cover rounded-sm" />
+                                )}
+                                {data.nacionalidade && (
+                                    <span className="text-[10px] font-medium text-zinc-400">{data.nacionalidade}</span>
+                                )}
+                            </div>
+                            {data.biografia && (
+                                <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                                    {data.biografia.dataNascimento && (
+                                        <span className="text-[10px] text-zinc-400">
+                                            <span className="font-bold text-zinc-500">Nasc:</span> {data.biografia.dataNascimento}
+                                        </span>
+                                    )}
+                                    {data.biografia.nrLicenca && (
+                                        <span className="text-[10px] text-zinc-400">
+                                            <span className="font-bold text-zinc-500">Lic:</span> {data.biografia.nrLicenca}
+                                        </span>
+                                    )}
+                                </div>
                             )}
                         </div>
-                        <div className="flex items-center gap-1.5 mt-1.5">
-                            {data.bandeiraUrl && (
-                                <img src={data.bandeiraUrl} alt="" className="w-4 h-3 object-cover rounded-sm" />
-                            )}
-                            {data.nacionalidade && (
-                                <span className="text-[10px] font-medium text-zinc-400">{data.nacionalidade}</span>
-                            )}
-                        </div>
-                        {/* Biography inline */}
-                        {data.biografia && (
-                            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                                {data.biografia.dataNascimento && (
-                                    <span className="text-[10px] text-zinc-400">
-                                        <span className="font-bold text-zinc-500">Nasc:</span> {data.biografia.dataNascimento}
-                                    </span>
-                                )}
-                                {data.biografia.nrLicenca && (
-                                    <span className="text-[10px] text-zinc-400">
-                                        <span className="font-bold text-zinc-500">Lic:</span> {data.biografia.nrLicenca}
-                                    </span>
-                                )}
+                        {/* Photo */}
+                        {data.foto && (
+                            <div className="w-28 h-32 shrink-0 rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                                <img src={data.foto} alt="" className="w-full h-full object-cover object-top" />
                             </div>
                         )}
                     </div>
-                    {/* Photo */}
-                    {data.foto && (
-                        <div className="w-28 h-32 shrink-0 rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
-                            <img src={data.foto} alt="" className="w-full h-full object-cover object-top" />
-                        </div>
-                    )}
                 </div>
             </div>
 
-            {/* Quick stats — stat pills */}
+            {/* Quick stats with FPB background images */}
             <div className="px-3">
                 <div className="grid grid-cols-4 gap-2">
-                    <StatPill value={data.pontos} label="Pontos" color="#f59e0b" />
-                    <StatPill value={data.ressaltos} label="Ressaltos" color="#3b82f6" />
-                    <StatPill value={data.assistencias} label="Assist." color="#22c55e" />
-                    <StatPill value={data.desarmes} label="Desarmes" color="#ef4444" />
+                    <ImgCard bg={BG.pontos} value={data.pontos} label="Pontos" />
+                    <ImgCard bg={BG.ressaltos} value={data.ressaltos} label="Ressaltos" />
+                    <ImgCard bg={BG.assistencias} value={data.assistencias} label="Assist." />
+                    <ImgCard bg={BG.desarmes} value={data.desarmes} label="Desarmes" />
                 </div>
             </div>
 
@@ -213,61 +219,67 @@ export default function AthletePage() {
             <div className="px-3">
                 {/* Época */}
                 {tab === 'epoca' && data.epoca && (
-                    <div className="space-y-5">
+                    <div className="space-y-4">
                         <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                             Época {data.epoca.epoca}
                         </h3>
 
-                        {/* Top 3 circles */}
-                        <div className="flex justify-center gap-6">
-                            <StatCircle value={data.epoca.jogos} label="Jogos" color="#7C3AED" max={40} />
-                            <StatCircle value={data.epoca.mediaMinutos} label="Min/jogo" color="#06b6d4" max={40} />
-                            <StatCircle value={data.epoca.pontos} label="Pontos" color="#f59e0b" max={data.epoca.pontos ? data.epoca.pontos + 20 : 100} />
+                        {/* Jogos / Min / Pontos — big stats with FPB images */}
+                        <div className="grid grid-cols-3 gap-2">
+                            <BigStat bg={BG.jogos} value={data.epoca.jogos} label="Jogos" />
+                            <BigStat bg={BG.media} value={data.epoca.mediaMinutos} label="Min/jogo" suffix="'" />
+                            <BigStat bg={BG.pontosEpoca} value={data.epoca.pontos} label="Pontos" />
                         </div>
 
-                        {/* Shooting donuts */}
+                        {/* Shooting — bars with FPB backgrounds */}
                         <div>
-                            <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Lançamentos</h4>
-                            <div className="flex justify-center gap-4 flex-wrap">
-                                <ShootingDonut label="Campo" stats={data.epoca.lancamentosCampo} color={data.epoca.lancamentosCampo ? pctColor(data.epoca.lancamentosCampo.percentagem) : '#7C3AED'} />
-                                <ShootingDonut label="2 Pontos" stats={data.epoca.lancamentos2} color={data.epoca.lancamentos2 ? pctColor(data.epoca.lancamentos2.percentagem) : '#7C3AED'} />
-                                <ShootingDonut label="3 Pontos" stats={data.epoca.lancamentos3} color={data.epoca.lancamentos3 ? pctColor(data.epoca.lancamentos3.percentagem) : '#7C3AED'} />
-                                <ShootingDonut label="L.Livres" stats={data.epoca.lancesLivres} color={data.epoca.lancesLivres ? pctColor(data.epoca.lancesLivres.percentagem) : '#7C3AED'} />
+                            <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Lançamentos</h4>
+                            <div className="space-y-2">
+                                <ShootingCard bg={BG.shooting1} label="Lançamentos de campo" stats={data.epoca.lancamentosCampo} color={data.epoca.lancamentosCampo ? pctColor(data.epoca.lancamentosCampo.percentagem) : '#7C3AED'} />
+                                <ShootingCard bg={BG.shooting2} label="2 Pontos" stats={data.epoca.lancamentos2} color={data.epoca.lancamentos2 ? pctColor(data.epoca.lancamentos2.percentagem) : '#7C3AED'} />
+                                <ShootingCard bg={BG.shooting3} label="3 Pontos" stats={data.epoca.lancamentos3} color={data.epoca.lancamentos3 ? pctColor(data.epoca.lancamentos3.percentagem) : '#7C3AED'} />
+                                <ShootingCard bg={BG.shooting4} label="Lances Livres" stats={data.epoca.lancesLivres} color={data.epoca.lancesLivres ? pctColor(data.epoca.lancesLivres.percentagem) : '#7C3AED'} />
                             </div>
                         </div>
 
-                        {/* Rebounds */}
-                        <div className="flex justify-center gap-6">
-                            <StatCircle value={data.epoca.ressaltosTotal} label="R.Total" color="#3b82f6" max={data.epoca.ressaltosTotal ? data.epoca.ressaltosTotal + 10 : 50} />
-                            <StatCircle value={data.epoca.ressaltosOfensivos} label="R.Ofen" color="#60a5fa" max={data.epoca.ressaltosOfensivos ? data.epoca.ressaltosOfensivos + 5 : 20} />
-                            <StatCircle value={data.epoca.ressaltosDefensivos} label="R.Defen" color="#1d4ed8" max={data.epoca.ressaltosDefensivos ? data.epoca.ressaltosDefensivos + 10 : 50} />
+                        {/* Rebounds — with FPB backgrounds */}
+                        <div>
+                            <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Ressaltos</h4>
+                            <div className="grid grid-cols-3 gap-2">
+                                <ImgCard bg={BG.rebound3} value={data.epoca.ressaltosTotal} label="Total" />
+                                <ImgCard bg={BG.rebound1} value={data.epoca.ressaltosOfensivos} label="Ofensivos" />
+                                <ImgCard bg={BG.rebound2} value={data.epoca.ressaltosDefensivos} label="Defensivos" />
+                            </div>
                         </div>
 
-                        {/* Other stats */}
-                        <div className="grid grid-cols-4 gap-2">
-                            <StatPill value={data.epoca.assistencias} label="Assist." color="#22c55e" />
-                            <StatPill value={data.epoca.perdasBola} label="Perdas" color="#ef4444" />
-                            <StatPill value={data.epoca.roubosBola} label="Roubos" color="#f59e0b" />
-                            <StatPill value={data.epoca.desarmes} label="Desarmes" color="#a855f7" />
+                        {/* Outros — with FPB backgrounds */}
+                        <div>
+                            <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Outros</h4>
+                            <div className="grid grid-cols-4 gap-2">
+                                <ImgCard bg={BG.outrosAssist} value={data.epoca.assistencias} label="Assist." />
+                                <ImgCard bg={BG.outrosPerda} value={data.epoca.perdasBola} label="Perdas" />
+                                <ImgCard bg={BG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos" />
+                                <ImgCard bg={BG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" />
+                            </div>
                         </div>
                     </div>
                 )}
 
                 {/* Carreira */}
                 {tab === 'carreira' && data.carreira && (
-                    <div className="space-y-5">
-                        <div className="flex justify-center gap-6">
-                            <StatCircle value={data.carreira.jogos} label="Jogos" color="#7C3AED" max={data.carreira.jogos ? data.carreira.jogos + 20 : 100} />
-                            <StatCircle value={data.carreira.tacasPortugal} label="Taças" color="#f59e0b" max={data.carreira.tacasPortugal ? data.carreira.tacasPortugal + 5 : 20} />
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-2">
+                            <BigStat bg={BG.jogos} value={data.carreira.jogos} label="Jogos" />
+                            <BigStat bg={BG.media} value={data.carreira.tacasPortugal} label="Taças Portugal" />
                         </div>
 
                         <div>
-                            <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Lançamentos</h4>
-                            <div className="flex justify-center gap-4 flex-wrap">
-                                <ShootingDonut label="Campo" stats={data.carreira.lancamentosCampo} color={data.carreira.lancamentosCampo ? pctColor(data.carreira.lancamentosCampo.percentagem) : '#7C3AED'} />
-                                <ShootingDonut label="2 Pontos" stats={data.carreira.lancamentos2} color={data.carreira.lancamentos2 ? pctColor(data.carreira.lancamentos2.percentagem) : '#7C3AED'} />
-                                <ShootingDonut label="3 Pontos" stats={data.carreira.lancamentos3} color={data.carreira.lancamentos3 ? pctColor(data.carreira.lancamentos3.percentagem) : '#7C3AED'} />
-                                <ShootingDonut label="L.Livres" stats={data.carreira.lancesLivres} color={data.carreira.lancesLivres ? pctColor(data.carreira.lancesLivres.percentagem) : '#7C3AED'} />
+                            <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Lançamentos</h4>
+                            <div className="space-y-2">
+                                <ShootingCard bg={BG.shooting1} label="Lançamentos de campo" stats={data.carreira.lancamentosCampo} color={data.carreira.lancamentosCampo ? pctColor(data.carreira.lancamentosCampo.percentagem) : '#7C3AED'} />
+                                <ShootingCard bg={BG.shooting2} label="2 Pontos" stats={data.carreira.lancamentos2} color={data.carreira.lancamentos2 ? pctColor(data.carreira.lancamentos2.percentagem) : '#7C3AED'} />
+                                <ShootingCard bg={BG.shooting3} label="3 Pontos" stats={data.carreira.lancamentos3} color={data.carreira.lancamentos3 ? pctColor(data.carreira.lancamentos3.percentagem) : '#7C3AED'} />
+                                <ShootingCard bg={BG.shooting4} label="Lances Livres" stats={data.carreira.lancesLivres} color={data.carreira.lancesLivres ? pctColor(data.carreira.lancesLivres.percentagem) : '#7C3AED'} />
                             </div>
                         </div>
                     </div>
