@@ -4,7 +4,6 @@ import { ArrowLeft } from 'lucide-react'
 import { useAthlete } from '../hooks/useAthlete'
 import type { AthleteInscricao, ShootingStats } from '../hooks/useAthlete'
 
-// FPB background images for stat cards
 const FPB = 'https://www.fpb.pt/wp-content/themes/fpbasquetebol/assets/images'
 const BG = {
     pontos: `${FPB}/athlete/points.png`,
@@ -27,23 +26,41 @@ const BG = {
     outrosDesarme: `${FPB}/stats/background-bloco.png`,
 }
 
-/** Card with FPB background image */
-function ImgCard({ bg, value, label }: {
-    bg: string; value: string | number | null; label: string
-}) {
+/** Card with prominent FPB photo background + overlay + white text */
+function PhotoCard({ bg, value, label }: { bg: string; value: string | number | null; label: string }) {
     return (
-        <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-            <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.10] bg-center bg-cover"
+        <div className="relative rounded-2xl overflow-hidden aspect-[3/4] bg-zinc-800">
+            <div className="absolute inset-0 bg-center bg-cover"
                 style={{ backgroundImage: `url(${bg})` }} />
-            <div className="relative flex flex-col items-center justify-center p-4">
-                <span className="text-2xl font-black tabular-nums text-zinc-800 dark:text-zinc-100">{value ?? '—'}</span>
-                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider mt-0.5">{label}</span>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
+            <div className="relative h-full flex flex-col items-center justify-end pb-4 px-2">
+                <span className="text-2xl font-black tabular-nums text-white">{value ?? '—'}</span>
+                <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider mt-0.5">{label}</span>
             </div>
         </div>
     )
 }
 
-/** Shooting stat with FPB background + bar */
+/** Big stat with FPB photo + overlay — wider */
+function BigPhotoCard({ bg, value, label, suffix }: {
+    bg: string; value: string | number | null; label: string; suffix?: string
+}) {
+    return (
+        <div className="relative rounded-2xl overflow-hidden bg-zinc-800 min-h-[100px]">
+            <div className="absolute inset-0 bg-center bg-cover"
+                style={{ backgroundImage: `url(${bg})` }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
+            <div className="relative h-full flex flex-col items-center justify-center p-5 min-h-[100px]">
+                <span className="text-3xl font-black tabular-nums text-white">
+                    {value ?? '—'}{suffix || ''}
+                </span>
+                <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider mt-1">{label}</span>
+            </div>
+        </div>
+    )
+}
+
+/** Shooting bar with subtle FPB background */
 function ShootingCard({ bg, label, stats, color }: {
     bg: string; label: string; stats: ShootingStats | null; color: string
 }) {
@@ -52,11 +69,11 @@ function ShootingCard({ bg, label, stats, color }: {
     const barColor = pct >= 50 ? 'bg-green-500' : pct >= 35 ? 'bg-amber-500' : 'bg-red-500'
     return (
         <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
-            <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.08] bg-center bg-cover"
+            <div className="absolute inset-0 opacity-[0.12] dark:opacity-[0.15] bg-center bg-cover"
                 style={{ backgroundImage: `url(${bg})` }} />
             <div className="relative space-y-2">
                 <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-zinc-500">{label}</span>
+                    <span className="text-[10px] font-bold text-zinc-600 dark:text-zinc-300">{label}</span>
                     <span className="text-[10px] font-mono font-bold text-zinc-400">{stats.feitos}/{stats.tentados}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -67,24 +84,6 @@ function ShootingCard({ bg, label, stats, color }: {
                     <span className="text-sm font-black tabular-nums w-10 text-right"
                         style={{ color }}>{pct}%</span>
                 </div>
-            </div>
-        </div>
-    )
-}
-
-/** Big stat for jogos/min/pontos — no circle, just bold value + label + subtle bg */
-function BigStat({ bg, value, label, suffix }: {
-    bg: string; value: string | number | null; label: string; suffix?: string
-}) {
-    return (
-        <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-            <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.10] bg-center bg-cover"
-                style={{ backgroundImage: `url(${bg})` }} />
-            <div className="relative flex flex-col items-center justify-center p-5">
-                <span className="text-3xl font-black tabular-nums text-zinc-800 dark:text-zinc-100">
-                    {value ?? '—'}{suffix || ''}
-                </span>
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mt-1">{label}</span>
             </div>
         </div>
     )
@@ -104,7 +103,7 @@ export default function AthletePage() {
                         <div className="w-28 h-32 bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />
                     </div>
                     <div className="grid grid-cols-4 gap-2">
-                        {[1, 2, 3, 4].map(i => <div key={i} className="h-20 bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />)}
+                        {[1, 2, 3, 4].map(i => <div key={i} className="aspect-[3/4] bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />)}
                     </div>
                 </div>
             </div>
@@ -142,29 +141,18 @@ export default function AthletePage() {
             <div className="max-w-xl mx-auto px-3">
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
                     <div className="flex gap-4 p-4">
-                        {/* Info */}
                         <div className="flex-1 min-w-0 flex flex-col justify-center">
                             <h1 className="text-xl font-black text-zinc-900 dark:text-white truncate leading-tight">
                                 {data.nome}
                             </h1>
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
-                                {data.numero && (
-                                    <span className="text-sm font-bold text-zinc-500">#{data.numero}</span>
-                                )}
-                                {data.posicao && (
-                                    <span className="text-xs font-bold text-zinc-500">{data.posicao}</span>
-                                )}
-                                {data.clube && (
-                                    <span className="text-xs text-zinc-400">· {data.clube}</span>
-                                )}
+                                {data.numero && <span className="text-sm font-bold text-zinc-500">#{data.numero}</span>}
+                                {data.posicao && <span className="text-xs font-bold text-zinc-500">{data.posicao}</span>}
+                                {data.clube && <span className="text-xs text-zinc-400">· {data.clube}</span>}
                             </div>
                             <div className="flex items-center gap-1.5 mt-1.5">
-                                {data.bandeiraUrl && (
-                                    <img src={data.bandeiraUrl} alt="" className="w-4 h-3 object-cover rounded-sm" />
-                                )}
-                                {data.nacionalidade && (
-                                    <span className="text-[10px] font-medium text-zinc-400">{data.nacionalidade}</span>
-                                )}
+                                {data.bandeiraUrl && <img src={data.bandeiraUrl} alt="" className="w-4 h-3 object-cover rounded-sm" />}
+                                {data.nacionalidade && <span className="text-[10px] font-medium text-zinc-400">{data.nacionalidade}</span>}
                             </div>
                             {data.biografia && (
                                 <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
@@ -181,7 +169,6 @@ export default function AthletePage() {
                                 </div>
                             )}
                         </div>
-                        {/* Photo */}
                         {data.foto && (
                             <div className="w-28 h-32 shrink-0 rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
                                 <img src={data.foto} alt="" className="w-full h-full object-cover object-top" />
@@ -191,13 +178,13 @@ export default function AthletePage() {
                 </div>
             </div>
 
-            {/* Quick stats with FPB background images */}
+            {/* Quick stats — photo cards with FPB action images */}
             <div className="px-3">
                 <div className="grid grid-cols-4 gap-2">
-                    <ImgCard bg={BG.pontos} value={data.pontos} label="Pontos" />
-                    <ImgCard bg={BG.ressaltos} value={data.ressaltos} label="Ressaltos" />
-                    <ImgCard bg={BG.assistencias} value={data.assistencias} label="Assist." />
-                    <ImgCard bg={BG.desarmes} value={data.desarmes} label="Desarmes" />
+                    <PhotoCard bg={BG.pontos} value={data.pontos} label="Pontos" />
+                    <PhotoCard bg={BG.ressaltos} value={data.ressaltos} label="Ressaltos" />
+                    <PhotoCard bg={BG.assistencias} value={data.assistencias} label="Assist." />
+                    <PhotoCard bg={BG.desarmes} value={data.desarmes} label="Desarmes" />
                 </div>
             </div>
 
@@ -217,21 +204,20 @@ export default function AthletePage() {
 
             {/* Tab content */}
             <div className="px-3">
-                {/* Época */}
                 {tab === 'epoca' && data.epoca && (
                     <div className="space-y-4">
                         <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                             Época {data.epoca.epoca}
                         </h3>
 
-                        {/* Jogos / Min / Pontos — big stats with FPB images */}
+                        {/* Jogos / Min / Pontos */}
                         <div className="grid grid-cols-3 gap-2">
-                            <BigStat bg={BG.jogos} value={data.epoca.jogos} label="Jogos" />
-                            <BigStat bg={BG.media} value={data.epoca.mediaMinutos} label="Min/jogo" suffix="'" />
-                            <BigStat bg={BG.pontosEpoca} value={data.epoca.pontos} label="Pontos" />
+                            <BigPhotoCard bg={BG.jogos} value={data.epoca.jogos} label="Jogos" />
+                            <BigPhotoCard bg={BG.media} value={data.epoca.mediaMinutos} label="Min/jogo" suffix="'" />
+                            <BigPhotoCard bg={BG.pontosEpoca} value={data.epoca.pontos} label="Pontos" />
                         </div>
 
-                        {/* Shooting — bars with FPB backgrounds */}
+                        {/* Shooting */}
                         <div>
                             <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Lançamentos</h4>
                             <div className="space-y-2">
@@ -242,35 +228,34 @@ export default function AthletePage() {
                             </div>
                         </div>
 
-                        {/* Rebounds — with FPB backgrounds */}
+                        {/* Rebounds */}
                         <div>
                             <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Ressaltos</h4>
                             <div className="grid grid-cols-3 gap-2">
-                                <ImgCard bg={BG.rebound3} value={data.epoca.ressaltosTotal} label="Total" />
-                                <ImgCard bg={BG.rebound1} value={data.epoca.ressaltosOfensivos} label="Ofensivos" />
-                                <ImgCard bg={BG.rebound2} value={data.epoca.ressaltosDefensivos} label="Defensivos" />
+                                <BigPhotoCard bg={BG.rebound3} value={data.epoca.ressaltosTotal} label="Total" />
+                                <BigPhotoCard bg={BG.rebound1} value={data.epoca.ressaltosOfensivos} label="Ofensivos" />
+                                <BigPhotoCard bg={BG.rebound2} value={data.epoca.ressaltosDefensivos} label="Defensivos" />
                             </div>
                         </div>
 
-                        {/* Outros — with FPB backgrounds */}
+                        {/* Outros */}
                         <div>
                             <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Outros</h4>
                             <div className="grid grid-cols-4 gap-2">
-                                <ImgCard bg={BG.outrosAssist} value={data.epoca.assistencias} label="Assist." />
-                                <ImgCard bg={BG.outrosPerda} value={data.epoca.perdasBola} label="Perdas" />
-                                <ImgCard bg={BG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos" />
-                                <ImgCard bg={BG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" />
+                                <PhotoCard bg={BG.outrosAssist} value={data.epoca.assistencias} label="Assist." />
+                                <PhotoCard bg={BG.outrosPerda} value={data.epoca.perdasBola} label="Perdas" />
+                                <PhotoCard bg={BG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos" />
+                                <PhotoCard bg={BG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" />
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Carreira */}
                 {tab === 'carreira' && data.carreira && (
                     <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-2">
-                            <BigStat bg={BG.jogos} value={data.carreira.jogos} label="Jogos" />
-                            <BigStat bg={BG.media} value={data.carreira.tacasPortugal} label="Taças Portugal" />
+                            <BigPhotoCard bg={BG.jogos} value={data.carreira.jogos} label="Jogos" />
+                            <BigPhotoCard bg={BG.media} value={data.carreira.tacasPortugal} label="Taças Portugal" />
                         </div>
 
                         <div>
@@ -285,7 +270,6 @@ export default function AthletePage() {
                     </div>
                 )}
 
-                {/* Inscrições */}
                 {tab === 'inscricoes' && data.inscricoes.length > 0 && (
                     <div className="overflow-x-auto">
                         <table className="w-full text-xs">
