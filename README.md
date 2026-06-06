@@ -257,15 +257,17 @@ npm run test:e2e                # end-to-end (Playwright)
 
 ## 🤝 Contribuir
 
-PRs são bem-vindos! Antes de abrir um PR:
+PRs são bem-vindos! Lê o [CONTRIBUTING.md](CONTRIBUTING.md) para um guia completo (explica o que são PRs, issues, forks — mesmo que nunca tenhas contribuído para open source).
 
-1. **Escolhe uma issue** ou cria uma nova a descrever o que queres fazer
-2. **Segue o style guide** do projeto — `npm run lint:fix` para alinhar com ESLint
-3. **Adiciona testes** se a mudança tocar em lógica de parsing, hooks ou componentes
-4. **Garante que `npm run build` passa** — faz tsc + testes + build
-5. **Usa commits descritivos** — vê o [CHANGELOG.md](CHANGELOG.md) para o estilo
+Resumo rápido:
+1. **Escolhe uma [issue](https://github.com/mefrraz/dribly/issues)** ou cria uma nova
+2. **Faz fork, clone, branch** — mexe no que quiseres
+3. **`npm run lint:fix`** para alinhar com ESLint
+4. **Adiciona testes** se mexeres em lógica de parsing, hooks ou componentes
+5. **`npm run build`** tem de passar — faz tsc + testes + build
+6. **Abre o PR** — eu revejo em 1-2 dias
 
-Para reportar bugs ou sugerir features, abre uma [issue](https://github.com/mefrraz/dribly/issues).
+Não sabes o que é um PR? Sem stress — o [CONTRIBUTING.md](CONTRIBUTING.md) explica tudo, com glossário e passo a passo.
 
 ---
 
