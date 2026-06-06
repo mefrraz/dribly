@@ -77,7 +77,10 @@ function parseGames(html: string, isCalendar: boolean): Match[] {
 
 function extractTeamPhoto(html: string): string | null {
     const m = html.match(/<div class="team-right[^"]*">\s*<img\s+src="([^"]+)"\s*\/>/)
-    return m?.[1]?.trim() || null
+    const url = m?.[1]?.trim() || null
+    // Filter out FPB default placeholder images
+    if (url && /ass_highlight_default|noplayer/i.test(url)) return null
+    return url
 }
 
 function extractTeamInfo(html: string): { nome: string; escalao: string } {
