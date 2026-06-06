@@ -27,7 +27,7 @@ function BgStat({ img, value, label, size = 48 }: { img: string; value: string |
     return (
         <div className="flex flex-col items-center gap-2 py-2 px-2">
             <div className="flex items-center justify-center" style={{ width: size, height: size }}>
-                <img src={img} alt="" className="max-w-full max-h-full object-contain dark:brightness-110 dark:invert" />
+                <img src={img} alt="" className="max-w-full max-h-full object-contain dark:brightness-200 dark:invert" />
             </div>
             <div className="text-center">
                 <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{value ?? '—'}</span>
@@ -212,15 +212,26 @@ export default function AthletePage() {
 
                         {/* Ressaltos & Outros — 7 columns, no cards */}
                         <div>
-                            <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-2">Ressaltos & Outros</h4>
-                            <div className="flex justify-around flex-wrap gap-2">
-                                <BgStat img={IMG.rebound3} value={rebTotal} label="R. Total" />
-                                <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="R. Ofensivos" />
-                                <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="R. Defensivos" />
-                                <BgStat img={IMG.outrosAssist} value={data.epoca.assistencias} label="Assistências" />
-                                <BgStat img={IMG.outrosPerda} value={data.epoca.perdasBola} label="Perdas de bola" />
-                                <BgStat img={IMG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos de bola" />
-                                <BgStat img={IMG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" />
+                            <div className="flex flex-col gap-2">
+                                {/* Ressaltos row */}
+                                <div>
+                                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Ressaltos</h4>
+                                    <div className="flex justify-around flex-wrap gap-2">
+                                        <BgStat img={IMG.rebound3} value={rebTotal} label="Total" />
+                                        <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="Ofensivos" />
+                                        <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="Defensivos" />
+                                    </div>
+                                </div>
+                                {/* Outros row */}
+                                <div>
+                                    <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Outros</h4>
+                                    <div className="flex justify-around flex-wrap gap-2">
+                                        <BgStat img={IMG.outrosAssist} value={data.epoca.assistencias} label="Assistências" />
+                                        <BgStat img={IMG.outrosPerda} value={data.epoca.perdasBola} label="Perdas de bola" />
+                                        <BgStat img={IMG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos de bola" />
+                                        <BgStat img={IMG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
