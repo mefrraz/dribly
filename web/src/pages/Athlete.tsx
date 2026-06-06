@@ -156,30 +156,28 @@ export default function AthletePage() {
                 </div>
                 {/* Stats card — attached below: Pontos | Época | Assistências */}
                 <div className="bg-white dark:bg-zinc-900 border border-t-0 border-zinc-200 dark:border-zinc-800 rounded-b-2xl shadow-sm overflow-hidden">
-                    <div className="flex items-center justify-around py-3 px-2">
-                        <BgStat img={IMG.pontos} value={data.pontos} label="Pontos" />
+                    <div className="flex items-center justify-around py-4 px-3">
+                        <BgStat img={IMG.pontos} value={data.pontos} label="Pontos" size={56} />
                         {data.epoca && (
-                            <div className="flex flex-col items-center gap-1 px-2">
+                            <div className="flex flex-col items-center gap-2 px-3">
                                 <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">{data.epoca.epoca}</span>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-4">
                                     <div className="text-center">
-                                        <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{data.epoca.jogos ?? '—'}</span>
+                                        <span className="text-xl font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{data.epoca.jogos ?? '—'}</span>
                                         <span className="block text-[8px] font-bold text-zinc-400 uppercase tracking-wide">Jogos</span>
                                     </div>
                                     <div className="text-center">
-                                        <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{data.epoca.mediaMinutos ?? '—'}′</span>
+                                        <span className="text-xl font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{data.epoca.mediaMinutos ?? '—'}′</span>
                                         <span className="block text-[8px] font-bold text-zinc-400 uppercase tracking-wide">Min/jogo</span>
                                     </div>
                                     <div className="text-center">
-                                        <span className="text-lg font-black tabular-nums" style={{ color: data.epoca.lancamentosCampo ? (data.epoca.lancamentosCampo.percentagem >= 50 ? '#16a34a' : data.epoca.lancamentosCampo.percentagem >= 35 ? '#d97706' : '#dc2626') : '#7C3AED' }}>
-                                            {data.epoca.lancamentosCampo?.percentagem ?? '—'}%
-                                        </span>
-                                        <span className="block text-[8px] font-bold text-zinc-400 uppercase tracking-wide">Lançamentos</span>
+                                        <span className="text-xl font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{data.epoca.lancamentosCampo?.percentagem ?? '—'}%</span>
+                                        <span className="block text-[8px] font-bold text-zinc-400 uppercase tracking-wide">% FG</span>
                                     </div>
                                 </div>
                             </div>
                         )}
-                        <BgStat img={IMG.assistencias} value={data.assistencias} label="Assistências" />
+                        <BgStat img={IMG.assistencias} value={data.assistencias} label="Assistências" size={56} />
                     </div>
                 </div>
             </div>
