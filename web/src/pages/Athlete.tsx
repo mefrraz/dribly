@@ -27,7 +27,7 @@ function BgStat({ img, value, label, size = 48 }: { img: string; value: string |
     return (
         <div className="flex flex-col items-center gap-2 py-2 px-2">
             <div className="flex items-center justify-center" style={{ width: size, height: size }}>
-                <img src={img} alt="" className="max-w-full max-h-full object-contain dark:brightness-[0.6] dark:grayscale-[0.5]" />
+                <img src={img} alt="" className="max-w-full max-h-full object-contain dark:brightness-110 dark:invert" />
             </div>
             <div className="text-center">
                 <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{value ?? '—'}</span>
@@ -210,30 +210,17 @@ export default function AthletePage() {
                             </div>
                         </div>
 
-                        {/* Ressaltos & Outros — side by side */}
-                        <div className="grid grid-cols-2 gap-3">
-                            {/* Ressaltos */}
-                            <div>
-                                <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-2">Ressaltos</h4>
-                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden">
-                                    <div className="flex justify-around py-3">
-                                        <BgStat img={IMG.rebound3} value={rebTotal} label="Total" size={14} />
-                                        <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="Ofensivos" size={14} />
-                                        <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="Defensivos" size={14} />
-                                    </div>
-                                </div>
-                            </div>
-                            {/* Outros */}
-                            <div>
-                                <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-2">Outros</h4>
-                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden">
-                                    <div className="grid grid-cols-2 py-2">
-                                        <BgStat img={IMG.outrosAssist} value={data.epoca.assistencias} label="Assistências" size={14} />
-                                        <BgStat img={IMG.outrosPerda} value={data.epoca.perdasBola} label="Perdas de bola" size={14} />
-                                        <BgStat img={IMG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos de bola" size={14} />
-                                        <BgStat img={IMG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" size={14} />
-                                    </div>
-                                </div>
+                        {/* Ressaltos & Outros — 7 columns, no cards */}
+                        <div>
+                            <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-2">Ressaltos & Outros</h4>
+                            <div className="flex justify-around flex-wrap gap-2">
+                                <BgStat img={IMG.rebound3} value={rebTotal} label="R. Total" />
+                                <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="R. Ofensivos" />
+                                <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="R. Defensivos" />
+                                <BgStat img={IMG.outrosAssist} value={data.epoca.assistencias} label="Assistências" />
+                                <BgStat img={IMG.outrosPerda} value={data.epoca.perdasBola} label="Perdas de bola" />
+                                <BgStat img={IMG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos de bola" />
+                                <BgStat img={IMG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" />
                             </div>
                         </div>
                     </div>
