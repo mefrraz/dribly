@@ -13,13 +13,14 @@ function slugify(text: string): string {
         .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/-+/g, '-')
 }
 
-function extractTeamId(fullTeamName: string, clubName: string, fallbackEscalao: string): string {
+function extractTeamId(fullTeamName: string, clubName: string, _fallbackEscalao: string): string {
     const upperTeam = fullTeamName.toUpperCase()
     const upperClub = clubName.toUpperCase()
     let suffix = upperTeam
         .replace(new RegExp(upperClub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '')
         .replace(/^[\s\-–—/]+/, '').replace(/[\s\-–—/]+$/, '').trim()
-    if (!suffix || suffix.length < 2) suffix = fallbackEscalao || fullTeamName
+    // If suffix is too short (e.g. "A", "B"), use the full team name so they don't get merged
+    if (!suffix || suffix.length < 2) suffix = upperTeam.replace(/\s+/g, ' ').trim()
     return suffix
 }
 
@@ -131,11 +132,14 @@ function ClubTeams() {
 
                     let stats: TeamStats | undefined
                     let bestScore = 0
+                    const teamNameNorm = norm(team.nome).replace(norm(club.name), '').trim()
                     for (const [key, s] of gameStats) {
                         const kn = norm(key)
-                        // Exact match on full escalão = best
-                        if (kn === escNorm || kn.includes(escNorm) || escNorm.includes(kn)) { stats = s; break }
-                        // Count matching words
+                        // 1. Exact match on escalão
+                        if (escNorm && (kn === escNorm || kn.includes(escNorm) || escNorm.includes(kn))) { stats = s; break }
+                        // 2. Match FPB team name suffix against game key
+                        if (teamNameNorm && (kn === teamNameNorm || kn.includes(teamNameNorm) || teamNameNorm.includes(kn))) { stats = s; break }
+                        // 3. Word matching
                         let score = 0
                         for (const w of nameWords) { if (kn.includes(w) || w.includes(kn)) score++ }
                         const escWords = escNorm.split(/\s+/).filter(w => w.length > 2)
