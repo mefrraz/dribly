@@ -51,7 +51,9 @@ function Landing() {
     const [selectedIdx, setSelectedIdx] = useState(-1)
     const [assoOffset, setAssoOffset] = useState(0)
     const [compResults, setCompResults] = useState<LandingCompetition[]>([])
-    const [gameIdx, setGameIdx] = useState(() => Math.floor(Math.random() * 3))
+    const [gameIdx, setGameIdx] = useState(0)
+    const [animating, setAnimating] = useState(false)
+    const [instant, setInstant] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
     const dropdownRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
@@ -64,6 +66,14 @@ function Landing() {
     )
 
     useEffect(() => { loadClubs() }, [loadClubs])
+
+    // Start carousel at middle copy once games are loaded
+    useEffect(() => {
+        if (games.length > 0) {
+            const startIdx = games.length + Math.floor(Math.random() * games.length)
+            setGameIdx(startIdx)
+        }
+    }, [games.length])
 
 
 
@@ -177,8 +187,46 @@ function Landing() {
         setShowDropdown(false)
     }
 
-    const prevGame = () => setGameIdx(i => (i - 1 + games.length * 100) % games.length)
-    const nextGame = () => setGameIdx(i => (i + 1) % games.length)
+    const prevGame = () => {
+        if (animating || games.length === 0) return
+        setAnimating(true)
+        const next = gameIdx - 1
+        if (next < games.length) {
+            // Silent jump to equivalent position in copy2
+            setInstant(true)
+            setGameIdx(next + games.length)
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setInstant(false)
+                    setGameIdx(next + games.length - 1)
+                    setTimeout(() => setAnimating(false), 350)
+                })
+            })
+        } else {
+            setGameIdx(next)
+            setTimeout(() => setAnimating(false), 350)
+        }
+    }
+    const nextGame = () => {
+        if (animating || games.length === 0) return
+        setAnimating(true)
+        const next = gameIdx + 1
+        if (next >= games.length * 2) {
+            // Silent jump to equivalent position in copy2
+            setInstant(true)
+            setGameIdx(next - games.length)
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setInstant(false)
+                    setGameIdx(next - games.length + 1)
+                    setTimeout(() => setAnimating(false), 350)
+                })
+            })
+        } else {
+            setGameIdx(next)
+            setTimeout(() => setAnimating(false), 350)
+        }
+    }
 
     return (
         <div className="pb-24">
@@ -388,21 +436,22 @@ function Landing() {
                     ) : games.length === 0 ? (
                         <p className="text-xs text-zinc-400 text-center py-8">Nenhum jogo em destaque de momento.</p>
                     ) : (
-                        <div className="flex justify-center gap-3 items-stretch">
-                            {[0, 1, 2].map(offset => {
-                                const idx = (gameIdx + offset) % games.length
-                                const match = games[idx]
-                                return (
-                                    <div key={match.slug || match.id + '-' + offset}
-                                        className="w-[320px] shrink-0 hidden md:block"
+                        <div className="relative overflow-hidden">
+                            {/* Gradient overlays */}
+                            <div className="absolute left-0 top-0 bottom-2 w-24 sm:w-32 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
+                            <div className="absolute right-0 top-0 bottom-2 w-24 sm:w-32 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
+                            <div
+                                className={`flex gap-3 ${instant ? '' : 'transition-transform duration-300 ease-out'}`}
+                                style={{ transform: `translateX(calc(-${gameIdx} * (320px + 0.75rem)))` }}
+                            >
+                                {[...games, ...games, ...games].map((match, i) => (
+                                    <div
+                                        key={match.slug || match.id + '-' + i}
+                                        className="w-[80vw] md:w-[320px] shrink-0"
                                     >
                                         <GameCard match={match} mode="agenda" />
                                     </div>
-                                )
-                            })}
-                            {/* Mobile: show current + next */}
-                            <div className="w-[80vw] shrink-0 md:hidden">
-                                <GameCard match={games[gameIdx % games.length]} mode="agenda" />
+                                ))}
                             </div>
                         </div>
                     )}
