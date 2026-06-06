@@ -21,9 +21,14 @@ const MAIN_COMPETITIONS = [
 ]
 
 async function fetchHtml(page, competicao) {
-    const url = `https://www.fpb.pt/${page}/${competicao}`
+    const url = `https://www.fpb.pt/${page}/${competicao}/`
     const res = await fetch(url, {
-        headers: { 'User-Agent': USER_AGENT, 'Accept': 'text/html,application/xhtml+xml' }
+        headers: {
+            'User-Agent': USER_AGENT,
+            'Accept': 'text/html,application/xhtml+xml',
+            'Accept-Language': 'pt-PT,pt;q=0.9',
+            'Referer': 'https://www.fpb.pt/',
+        }
     })
     if (!res.ok) throw new Error(`FPB error: ${res.status} from ${url}`)
     return await res.text()
