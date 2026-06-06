@@ -438,8 +438,8 @@ function Landing() {
                     ) : (
                         <div className="relative overflow-hidden">
                             {/* Gradient overlays */}
-                            <div className="absolute left-0 top-0 bottom-2 w-24 sm:w-32 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
-                            <div className="absolute right-0 top-0 bottom-2 w-24 sm:w-32 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
+                            <div className="absolute left-0 top-0 bottom-0 w-32 sm:w-44 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
+                            <div className="absolute right-0 top-0 bottom-0 w-32 sm:w-44 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
                             <div
                                 className={`flex gap-3 ${instant ? '' : 'transition-transform duration-300 ease-out'}`}
                                 style={{ transform: `translateX(calc(-${gameIdx} * (320px + 0.75rem)))` }}

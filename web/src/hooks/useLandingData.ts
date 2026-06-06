@@ -41,10 +41,9 @@ export function useLandingData() {
             .select('*')
             .or(orClauses)
             .neq('status', 'FINALIZADO')
-            .not('escalao', 'ilike', '%Sub%')
             .gte('data', new Date().toISOString().split('T')[0])
             .order('data', { ascending: true })
-            .then(({ data }: { data: any }) => {
+            .then(({ data }: { data: unknown }) => {
                 if (data) {
                     let arr = data as Match[]
                     const counts: Record<string, number> = {}
@@ -67,10 +66,10 @@ export function useLandingData() {
                             )
                             if (!key) return false
                             counts[key] = (counts[key] || 0) + 1
-                            return counts[key] <= 2
+                            return counts[key] <= 3
                         })
                         .sort(() => Math.random() - 0.5)
-                        .slice(0, 8)
+                        .slice(0, 12)
                     setGames(arr)
                 }
                 setGamesLoading(false)
@@ -120,10 +119,10 @@ export function useLandingData() {
             .from('competitions_meta')
             .select('id, name, logo_url')
             .then(
-                ({ data: md }: { data: any[] | null }) => {
+                ({ data: md }: { data: Record<string, unknown>[] | null }) => {
                     if (md) {
                         const cm = new Map<number, CompMeta>()
-                        ;(md as any[]).forEach((r: any) =>
+                        ;(md as { id: number; name: string; logo_url: string | null }[]).forEach((r) =>
                             cm.set(r.id, { name: r.name, logo: r.logo_url })
                         )
                         setCompMetaMap(cm)
