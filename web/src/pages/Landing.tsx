@@ -17,10 +17,6 @@ const FEATURED_CLUBS = [
     { name: 'SL Benfica', slug: 'sl-benfica' },
     { name: 'Sporting CP', slug: 'sporting-cp' },
     { name: 'UD Oliveirense', slug: 'ud-oliveirense' },
-    { name: 'Galitos', slug: 'clube-galitos' },
-    { name: 'Ovarense', slug: 'ovarense-basquetebol' },
-    { name: 'CAB Madeira', slug: 'cab-madeira' },
-    { name: 'Vitória SC', slug: 'vitoria-sc' },
 ]
 
 // ---- Sub-components ----
@@ -228,14 +224,14 @@ function Landing() {
 
                     {/* Featured club pills */}
                     <div className="flex flex-wrap justify-center gap-2 mb-6 ">
-                        {FEATURED_CLUBS.map(({ name, slug }, i) => {
+                        {FEATURED_CLUBS.map(({ name, slug }) => {
                             const c = clubs.find(x => x.slug === slug)
                             if (!c) return null
                             return (
                                 <button
                                     key={c.slug}
                                     onClick={() => selectClub(c)}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all ${i >= 3 ? 'hidden sm:flex' : ''}`}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all ${slug === 'ud-oliveirense' ? 'hidden sm:flex' : ''}`}
                                 >
                                     <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
                                         {c.logo_url ? (
