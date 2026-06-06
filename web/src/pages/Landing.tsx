@@ -17,8 +17,8 @@ const FEATURED_CLUBS = [
     { name: 'SL Benfica', slug: 'sl-benfica' },
     { name: 'Sporting CP', slug: 'sporting-cp' },
     { name: 'UD Oliveirense', slug: 'ud-oliveirense' },
-    { name: 'Galitos', slug: 'galitos' },
-    { name: 'Ovarense', slug: 'ovarense' },
+    { name: 'Galitos', slug: 'clube-galitos' },
+    { name: 'Ovarense', slug: 'ovarense-basquetebol' },
     { name: 'CAB Madeira', slug: 'cab-madeira' },
     { name: 'Vitória SC', slug: 'vitoria-sc' },
 ]
