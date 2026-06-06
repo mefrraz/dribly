@@ -19,7 +19,7 @@ function TokenProviderSetup() {
     useEffect(() => {
         if (isLoaded && !isSignedIn && !oauthChecked) {
             clerk
-                .handleRedirectCallback()
+                .handleRedirectCallback({} as Record<string, never>)
                 .then(() => {
                     setOauthChecked(true)
                 })

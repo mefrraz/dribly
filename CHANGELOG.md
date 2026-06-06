@@ -59,7 +59,7 @@
 
 ---
 
-## [v7.18] — 2026-06-03
+## [v7.25] — 2026-06-05
 
 ### Fix
 - **Zoom controls visíveis no mobile:** `z-index` dos controlos Leaflet aumentado de 2 para 1000, com `visibility: visible !important`. Botões redesenhados: 36x36px, cantos arredondados 12px, fundo dark translúcido.

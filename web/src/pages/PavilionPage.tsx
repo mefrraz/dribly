@@ -101,7 +101,7 @@ export default function PavilionPage() {
 
     const address = [pavilion?.rua, pavilion?.codigo_postal, pavilion?.cidade].filter(Boolean).join(', ')
 
-    const tabs: { value: Tab; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
+    const tabs: { value: Tab; label: string; icon: React.ComponentType<Record<string, unknown>> }[] = [
         { value: 'geral', label: 'Geral', icon: Info },
         { value: 'agenda', label: 'Agenda', icon: CalendarDays },
         { value: 'resultados', label: 'Resultados', icon: Trophy },

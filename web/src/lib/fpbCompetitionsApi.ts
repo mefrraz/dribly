@@ -763,7 +763,7 @@ function scrapePlayerStats(html: string): FPBPlayerStat[] {
 
 export async function fetchMVP(provaId: number): Promise<FPBPlayerStat[]> {
     const data = await fetchFromProxy(`mvp/prova/${provaId}`)
-    return data || []
+    return (data as FPBPlayerStat[]) || []
 }
 
 // ---- Game Detail via HTML scraping ----
