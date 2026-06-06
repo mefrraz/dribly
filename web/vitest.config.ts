@@ -8,8 +8,9 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    exclude: ['e2e/**', 'node_modules/**'],
     // Silencia erros esperados (ErrorBoundary, ClubContext, network mocks)
-    onConsoleLog: (log: string) => {
+    onConsoleLog: () => {
       return false
     },
   },

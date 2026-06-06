@@ -15,23 +15,28 @@ export function useFollows() {
     const { user } = useAuth()
     const [follows, setFollows] = useState<Follow[]>([])
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     const loadFollows = useCallback(async () => {
         if (!user) {
             setFollows([])
+            setError(null)
             return
         }
         setLoading(true)
+        setError(null)
         try {
-            const { data, error } = await supabase
+            const { data, error: dbError } = await supabase
                 .from('user_follows')
                 .select('*')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false })
-            if (error) throw error
+            if (dbError) throw dbError
             setFollows((data as Follow[]) || [])
-        } catch {
-            // Table may not exist yet — fail silently
+        } catch (err) {
+            // Table may not exist yet or network error
+            logger.warn('Failed to load follows:', err)
+            setError(err instanceof Error ? err.message : 'Erro ao carregar seguidos')
             setFollows([])
         }
         setLoading(false)
@@ -102,5 +107,5 @@ export function useFollows() {
     const followedClubIds = follows.filter(f => f.entity_type === 'club').map(f => f.entity_id)
     const followedCompIds = follows.filter(f => f.entity_type === 'competition').map(f => f.entity_id)
 
-    return { follows, loading, isFollowing, toggleFollow, followedClubIds, followedCompIds, refresh: loadFollows }
+    return { follows, loading, error, isFollowing, toggleFollow, followedClubIds, followedCompIds, refresh: loadFollows }
 }

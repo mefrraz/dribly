@@ -17,8 +17,8 @@ interface LoadingSpinnerProps {
  */
 export function LoadingSpinner({ message = 'A carregar...', size = 24 }: LoadingSpinnerProps) {
     return (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <Loader2 size={size} className="animate-spin text-dribly-purple" />
+        <div role="status" aria-live="polite" className="flex flex-col items-center justify-center py-16 gap-3">
+            <Loader2 size={size} className="animate-spin text-dribly-purple" aria-hidden="true" />
             <span className="text-xs font-medium text-zinc-400">{message}</span>
         </div>
     )

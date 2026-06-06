@@ -49,7 +49,7 @@ export function useTeamPhotos(clubId: number, clubName: string): { teams: TeamDa
                 const allTeams = await fetchBatch(ids)
 
                 if (!cancelled) setTeams(allTeams)
-            } catch {} finally { if (!cancelled) setLoading(false) }
+            } catch { /* network error — teams remain empty */ } finally { if (!cancelled) setLoading(false) }
         }
         run()
         return () => { cancelled = true }

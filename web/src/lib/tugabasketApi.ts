@@ -15,14 +15,16 @@ export async function fetchStandingsFromSource(
 ): Promise<Standing[]> {
     if (!competitions || competitions.length === 0) return []
 
-    const results = await Promise.all(competitions.map(async (comp) => {
+    const results = await Promise.allSettled(competitions.map(async (comp) => {
         const html = await fetchFromProxy('/getCompetitionDetails', { competitionId: comp.id })
         const standings = parseAccordionStandings(html, comp.displayName)
         markFinishedGroups(standings, html)
         return standings
     }))
 
-    return results.flat()
+    return results
+        .filter((r): r is PromiseFulfilledResult<Standing[]> => r.status === 'fulfilled')
+        .flatMap(r => r.value)
 }
 
 function parseAccordionStandings(html: string, displayName: string): Standing[] {

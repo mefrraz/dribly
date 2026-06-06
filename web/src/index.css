@@ -50,6 +50,12 @@
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
+  /* Off-screen items are skipped by the browser until they scroll near the viewport.
+     Reduces initial paint cost for long lists (clubes, equipas, jogos). */
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 80px;
+  }
 }
 
 .match-gradient {

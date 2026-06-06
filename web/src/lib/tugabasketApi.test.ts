@@ -119,9 +119,10 @@ describe('fetchStandingsFromSource', () => {
             text: () => Promise.resolve(''),
         } as Response)
 
-        await expect(
-            fetchStandingsFromSource([{ id: 1, displayName: 'Liga' }])
-        ).rejects.toThrow()
+        // With Promise.allSettled, a single failing competition is silently skipped
+        // rather than rejecting the whole batch.
+        const result = await fetchStandingsFromSource([{ id: 1, displayName: 'Liga' }])
+        expect(result).toEqual([])
     })
 
     it('should handle HTML with no standings tables', async () => {

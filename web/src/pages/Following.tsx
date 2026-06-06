@@ -32,6 +32,7 @@ export default function Following() {
         }
         setLoading(true)
         loadData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, follows])
 
     async function loadData() {

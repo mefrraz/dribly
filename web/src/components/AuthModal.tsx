@@ -101,10 +101,11 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     setStatus('error')
                 }
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             setStatus('error')
             // Normalize Clerk error messages to PT
-            const msg = err?.errors?.[0]?.message || err?.message || ''
+            const clerkErr = err as { errors?: { message: string }[]; message?: string }
+            const msg = clerkErr?.errors?.[0]?.message || clerkErr?.message || ''
             if (msg.includes('identifier is invalid') || msg.includes('no user') || msg.includes('Invalid'))
                 setErrorMsg('Email ou palavra-passe incorretos.')
             else if (msg.includes('password'))
@@ -175,7 +176,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
     }
 
     return (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={mode === 'forgot' ? 'Recuperar palavra-passe' : mode === 'signin' ? 'Iniciar sessão' : 'Criar conta'}>
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
 
             <div className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-white/10 p-6 ">

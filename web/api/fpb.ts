@@ -162,9 +162,10 @@ export default async function handler(request: Request) {
                 'Access-Control-Allow-Origin': '*'
             }
         })
-    } catch (err: any) {
+    } catch (err: unknown) {
         clearTimeout(timeout)
-        const message = err?.name === 'AbortError' ? 'FPB request timed out' : 'Failed to fetch FPB'
+        const e = err as { name?: string }
+        const message = e?.name === 'AbortError' ? 'FPB request timed out' : 'Failed to fetch FPB'
         return new Response(JSON.stringify({ error: message }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Heart, Search } from 'lucide-react'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { SeoHead } from '../components/SeoHead'
 import { useFollows } from '../hooks/useFollows'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -35,6 +36,7 @@ export default function Leagues() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
+            <SeoHead title="Ligas" description="Todas as competições da Federação Portuguesa de Basquetebol — masculinas e femininas." />
             <div className="max-w-4xl mx-auto px-3 sm:px-5 pt-6 sm:pt-8 pb-16">
                 <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight mb-2 text-center">Ligas</h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-6 max-w-md mx-auto">
@@ -73,7 +75,11 @@ export default function Leagues() {
 }
 
 function Section({ title, comps, user, isFollowing, toggleFollow }: {
-    title: string; comps: CompMeta[]; user: any; isFollowing: any; toggleFollow: any
+    title: string
+    comps: CompMeta[]
+    user: ReturnType<typeof useAuth>['user']
+    isFollowing: ReturnType<typeof useFollows>['isFollowing']
+    toggleFollow: ReturnType<typeof useFollows>['toggleFollow']
 }) {
     return (
         <div>

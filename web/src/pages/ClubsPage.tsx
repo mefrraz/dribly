@@ -29,7 +29,7 @@ export default function ClubsPage() {
 
     useEffect(() => {
         loadClubs().then(() => setLoading(false))
-    }, [])
+    }, [loadClubs])
 
     const q = normalize(search)
     const filtered = q
@@ -75,7 +75,7 @@ export default function ClubsPage() {
                         {filtered.map(club => {
                             const isFol = user ? isFollowing('club', club.id) : false
                             return (
-                                <div key={club.id} className="group relative">
+                                <div key={club.id} className="group relative content-visibility-auto">
                                     <Link
                                         to={`/clube/${club.slug}/home`}
                                         onMouseEnter={() => prefetchClubGames(club.id, club.name)}

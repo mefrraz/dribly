@@ -85,7 +85,7 @@ export default function AthletePage() {
             const found = clubs.find(c => c.slug === clubSlug)
             if (found?.logo_url) setClubLogo(found.logo_url)
         })
-    }, [clubSlug])
+    }, [clubSlug, loadClubs, clubs])
 
     if (loading) {
         return (

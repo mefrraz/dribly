@@ -1,36 +1,19 @@
 import { useState, useEffect, useCallback } from 'react'
+import { type ToastItem, subscribeToasts } from './toastState'
 
-interface Toast {
-    id: number
-    message: string
-    type: 'success' | 'error'
-}
-
-let toastId = 0
-let listeners: ((toast: Toast) => void)[] = []
-
-export const toast = {
-    success: (message: string) => {
-        const t = { id: ++toastId, message, type: 'success' as const }
-        listeners.forEach(fn => fn(t))
-    },
-    error: (message: string) => {
-        const t = { id: ++toastId, message, type: 'error' as const }
-        listeners.forEach(fn => fn(t))
-    }
-}
+// eslint-disable-next-line react-refresh/only-export-components
+export { toast } from './toastState'
 
 export function ToastContainer() {
-    const [toasts, setToasts] = useState<Toast[]>([])
+    const [toasts, setToasts] = useState<ToastItem[]>([])
 
     useEffect(() => {
-        listeners.push((t) => {
+        return subscribeToasts((t) => {
             setToasts(prev => [...prev, t])
             setTimeout(() => {
                 setToasts(prev => prev.filter(x => x.id !== t.id))
             }, 3000)
         })
-        return () => { listeners = [] }
     }, [])
 
     const removeToast = useCallback((id: number) => {

@@ -211,7 +211,7 @@ export function useEquipaGames(equipaId: string) {
         }
         load()
         return () => { cancelled = true }
-    }, [equipaId])
+    }, [equipaId, cached])
 
     return { games, photo, teamInfo, plantel, loading, error }
 }

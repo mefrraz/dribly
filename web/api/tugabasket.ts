@@ -25,7 +25,7 @@ export default async function handler(request: Request) {
                 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=60'
             }
         })
-    } catch (err) {
+    } catch {
         return new Response(JSON.stringify({ error: 'Failed to fetch tugabasket' }), {
             status: 502,
             headers: { 'Content-Type': 'application/json' }

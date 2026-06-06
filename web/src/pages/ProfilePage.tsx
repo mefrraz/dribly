@@ -76,9 +76,10 @@ export default function ProfilePage() {
             setCurrentPassword('')
             setNewPw('')
             setTimeout(() => setPwStatus('idle'), 2000)
-        } catch (err: any) {
+        } catch (err: unknown) {
             setPwStatus('error')
-            const msg = err?.errors?.[0]?.message || ''
+            const e = err as { errors?: { message: string }[] }
+            const msg = e?.errors?.[0]?.message || ''
             if (msg.includes('incorrect'))
                 setPwError('Palavra-passe atual incorreta.')
             else if (msg.includes('weak') || msg.includes('too short'))
@@ -282,8 +283,8 @@ export default function ProfilePage() {
                                             {session.id === currentSession?.id ? 'Sessão atual' : 'Outro dispositivo'}
                                         </p>
                                         <p className="text-[10px] text-zinc-400">
-                                            {(session as any).lastActiveAt
-                                                ? new Date((session as any).lastActiveAt).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                                            {session.lastActiveAt
+                                                ? new Date(session.lastActiveAt).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
                                                 : ''}
                                         </p>
                                     </div>

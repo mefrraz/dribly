@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Star, Heart, LogIn, UserPlus, ArrowRight, X, Check } from 'lucide-react'
+import { type TourTrigger, markOnboardingDone } from './onboardingState'
 
-export type TourTrigger = 'signup' | 'login' | 'manual'
+// Re-export for backward compatibility
+// eslint-disable-next-line react-refresh/only-export-components
+export { type TourTrigger, isOnboardingDone, markOnboardingDone, triggerOnboarding } from './onboardingState'
 
 interface TourStep {
     /** Icon component */
@@ -12,20 +15,6 @@ interface TourStep {
     accent?: string
     /** Optional background gradient for the icon circle */
     bgGradient?: string
-}
-
-const ONBOARDING_KEY = 'dribly_onboarding_done'
-
-export function isOnboardingDone(): boolean {
-    return localStorage.getItem(ONBOARDING_KEY) === 'true'
-}
-
-export function markOnboardingDone(): void {
-    localStorage.setItem(ONBOARDING_KEY, 'true')
-}
-
-export function triggerOnboarding(): void {
-    localStorage.removeItem(ONBOARDING_KEY)
 }
 
 function buildSteps(trigger: TourTrigger): TourStep[] {
@@ -140,6 +129,9 @@ export function OnboardingTour({ onComplete, trigger = 'manual' }: OnboardingTou
             className={`fixed inset-0 z-[200] flex items-center justify-center p-4 transition-all duration-400 ${
                 exiting ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
             }`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Tour de introdução"
         >
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />

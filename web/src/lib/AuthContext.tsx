@@ -1,34 +1,12 @@
-import { useEffect, useState, useMemo, useCallback, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useUser, useAuth as useClerkAuth, useClerk } from '@clerk/clerk-react'
 import { setClerkTokenProvider } from './supabase'
 
-interface NormalizedUser {
-    id: string
-    email: string
-    username: string | null
-    firstName: string | null
-    lastName: string | null
-    imageUrl: string | null
-    bio: string | null
-}
-
-interface AuthContextType {
-    user: NormalizedUser | null
-    loading: boolean
-    signOut: () => Promise<void>
-}
-
-function normalizeUser(clerkUser: NonNullable<ReturnType<typeof useUser>['user']>): NormalizedUser {
-    return {
-        id: clerkUser.id,
-        email: clerkUser.primaryEmailAddress?.emailAddress || '',
-        username: clerkUser.username || null,
-        firstName: clerkUser.firstName || null,
-        lastName: clerkUser.lastName || null,
-        imageUrl: clerkUser.imageUrl || null,
-        bio: (clerkUser.unsafeMetadata?.bio as string) || null,
-    }
-}
+// Re-export useAuth from the dedicated module so AuthContext.tsx only exports components,
+// keeping Fast Refresh working. All existing imports from './AuthContext' still resolve.
+// eslint-disable-next-line react-refresh/only-export-components
+export { useAuth } from './useAuth'
+export type { NormalizedUser, AuthContextType } from './useAuth'
 
 /** Syncs Clerk session to Supabase token provider for RLS */
 function TokenProviderSetup() {
@@ -41,7 +19,7 @@ function TokenProviderSetup() {
     useEffect(() => {
         if (isLoaded && !isSignedIn && !oauthChecked) {
             clerk
-                .handleRedirectCallback({} as any)
+                .handleRedirectCallback()
                 .then(() => {
                     setOauthChecked(true)
                 })
@@ -72,20 +50,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             {children}
         </>
     )
-}
-
-export function useAuth(): AuthContextType {
-    const { isLoaded, isSignedIn, user: clerkUser } = useUser()
-    const clerk = useClerk()
-
-    const normalizedUser = useMemo(() => {
-        if (!isSignedIn || !clerkUser) return null
-        return normalizeUser(clerkUser)
-    }, [isSignedIn, clerkUser])
-
-    return {
-        user: normalizedUser,
-        loading: !isLoaded,
-        signOut: useCallback(() => clerk.signOut(), [clerk]),
-    }
 }

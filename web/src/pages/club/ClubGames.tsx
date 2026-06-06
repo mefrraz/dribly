@@ -23,7 +23,7 @@ function ClubGames() {
     const [escaloes, setEscaloes] = useState<string[]>([])
 
     const { games: allGames, loading, lastUpdated, error, refresh } = useGames('2025/2026', club.id, club.name)
-    const matches = allGames || []
+    const matches = useMemo(() => allGames || [], [allGames])
     const timeAgo = useTimeAgo(lastUpdated)
 
     useEffect(() => {

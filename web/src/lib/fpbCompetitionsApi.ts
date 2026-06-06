@@ -78,7 +78,7 @@ import { parseDatePt, slugify } from './fpbUtils'
 
 // ---- API proxy helpers ----
 
-async function fetchFromProxy(path: string): Promise<any> {
+async function fetchFromProxy(path: string): Promise<unknown> {
     const res = await fetch(`${FPB_PROXY}?endpoint=${encodeURIComponent(path)}`)
     if (!res.ok) throw new Error(`FPB API error: ${res.status}`)
     return res.json()

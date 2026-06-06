@@ -5,6 +5,7 @@ import { useGames } from '../../hooks/useGames'
 import { useFollows } from '../../hooks/useFollows'
 import { useAuth } from '../../lib/AuthContext'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
+import { SeoHead } from '../../components/SeoHead'
 import { type Club, displayName } from '../../lib/ClubContext'
 
 function ClubHome() {
@@ -13,7 +14,7 @@ function ClubHome() {
 
     const { isFollowing, toggleFollow } = useFollows()
     const { games: allGames, loading, error, refresh } = useGames('2025/2026', club.id, club.name)
-    const games = allGames || []
+    const games = useMemo(() => allGames || [], [allGames])
 
     const nextGame = useMemo(() => {
         if (games.length === 0) return null
@@ -83,6 +84,7 @@ function ClubHome() {
 
     return (
         <div className="max-w-xl mx-auto space-y-5 pb-20 px-3">
+            <SeoHead title={displayName(club)} description={`Jogos, resultados e informações do ${displayName(club)} — Basquetebol Português.`} />
             {/* Club header bar with actions */}
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">

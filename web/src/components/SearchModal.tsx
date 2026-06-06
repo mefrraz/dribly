@@ -48,7 +48,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 const names = new Map<number, string>()
                 const abreviations = new Map<number, string>()
                 const gradients = new Map<number, {from:string,to:string}>()
-                ;(data as any[]).forEach(r => {
+                ;(data as { id: number; name: string; logo_url: string | null; abrev: string | null; gradient_from: string | null; gradient_to: string | null }[]).forEach(r => {
                     names.set(r.id, r.name)
                     if (r.logo_url) logos.set(r.id, r.logo_url)
                     if (r.abrev) abreviations.set(r.id, r.abrev)
@@ -75,7 +75,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             if (allComps.length > 0) setCompResults(allComps.filter(c => normalize(c.competition_name).includes(q)).slice(0, 15))
         }, 150)
         return () => clearTimeout(timeout)
-    }, [query, clubs])
+    }, [query, clubs]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const totalResults = clubResults.length + compResults.length
 
@@ -95,7 +95,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]">
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]" role="dialog" aria-modal="true" aria-label="Pesquisar clubes e competições">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
             <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-white/10 overflow-hidden ">
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-100 dark:border-white/5">

@@ -15,6 +15,7 @@ import { logger } from '../lib/logger'
 import { TeamBlock } from '../components/TeamBlock'
 import { GameDueloCard } from '../components/GameDueloCard'
 import { GameLeadersCard } from '../components/GameLeadersCard'
+import { SeoHead } from '../components/SeoHead'
 
 function detailToMatch(detail: FPBGameDetail): Match {
     return {
@@ -74,14 +75,12 @@ function Game() {
         setLoading(true)
 
         const tryLoad = async () => {
-            // 1) Try all Supabase seasons first
+            // 1) Try all Supabase seasons in parallel
             const tables = ['games_2025_2026', 'games_2024_2025', 'games_2023_2024', 'games_2022_2023']
-            for (const table of tables) {
-                const { data, error } = await supabase
-                    .from(table)
-                    .select('*')
-                    .eq('slug', slug)
-                    .single()
+            const results = await Promise.all(tables.map(table =>
+                supabase.from(table).select('*').eq('slug', slug).single()
+            ))
+            for (const { data, error } of results) {
                 if (!error && data) {
                     const m = data as Match
                     setMatch(m)
@@ -141,6 +140,7 @@ function Game() {
         }
 
         tryLoad()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [slug, club])
 
     useEffect(() => {
@@ -287,6 +287,7 @@ function Game() {
 
     return (
         <div className="max-w-xl mx-auto pb-24 px-3 space-y-3">
+            <SeoHead title={match ? `${match.equipa_casa} vs ${match.equipa_fora}` : 'Jogo'} description={match ? `${match.equipa_casa} vs ${match.equipa_fora} — ${match.competicao || 'Basquetebol Português'}` : 'Ficha de jogo detalhada — Basquetebol Português.'} />
             {/* Header */}
             <div className="flex items-center justify-between pt-3 ">
                 <button onClick={() => window.history.back()} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">

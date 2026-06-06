@@ -37,7 +37,7 @@ function getTableName(season: string): string {
 
 import { slugify } from '../lib/fpbUtils'
 
-function mapFPBData(fresh: any[], season: string): Match[] {
+function mapFPBData(fresh: Record<string, unknown>[], season: string): Match[] {
   return fresh.map(g => {
     const slug = `${g.data}-${slugify(g.equipa_casa)}-${slugify(g.equipa_fora)}`
     return {
@@ -166,6 +166,7 @@ export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
 
     loadData()
     return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // only on mount
 
   return { games, loading, lastUpdated, error, refresh }

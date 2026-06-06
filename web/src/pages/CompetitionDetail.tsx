@@ -8,6 +8,7 @@ import { useFollows } from '../hooks/useFollows'
 import { useAuth } from '../lib/AuthContext'
 import { useClub } from '../lib/ClubContext'
 import { supabase } from '../lib/supabase'
+import { SeoHead } from '../components/SeoHead'
 import {
     fetchStandings, fetchSchedule, fetchResults, fetchTeams, fetchPlayerStats,
     type FPBStandingPhase, type FPBGame, type FPBTeam, type FPBPlayerStat
@@ -178,6 +179,7 @@ export default function CompetitionDetail() {
     const CACHE_TTL = 15 * 60 * 1000 // 15 minutes
 
     const [loading, setLoading] = useState(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { loadClubs() }, [])
 
     // Fetch competition name from Supabase (much larger catalogue than COMP_NAMES)
@@ -228,6 +230,7 @@ export default function CompetitionDetail() {
             setLoading(false)
         }
         loadAll()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [provaId]) // ← only depends on provaId, NOT tab
 
     const isFollowed = user ? isFollowing('competition', provaId) : false
@@ -290,6 +293,7 @@ export default function CompetitionDetail() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
+            <SeoHead title={compName || 'Competição'} description={compName ? `Classificação, jogos e estatísticas da ${compName} — Basquetebol Português.` : undefined} />
             <div className="max-w-6xl mx-auto px-3 sm:px-5 pt-6 pb-24">
                 <PageHeader
                     backTo="/ligas"
@@ -408,7 +412,7 @@ export default function CompetitionDetail() {
                                                         ? [...playerStats].filter(p => Number(p[cat.key] || 0) > 0).sort((a, b) => Number(b[cat.key] || 0) - Number(a[cat.key] || 0))
                                                         : []
                                                     const best = sorted[0]
-                                                    const photoUrl = best ? (best as any).photoUrl || null : null
+                                                    const photoUrl = best ? (best as Record<string, unknown>).photoUrl as string || null : null
                                                     return (
                                                         <div key={cat.key} className={`rounded-2xl border p-3 flex items-center gap-3 ${hasStats ? 'bg-white dark:bg-zinc-900/60 border-zinc-200/50 dark:border-zinc-800/50' : 'bg-zinc-50 dark:bg-zinc-900/30 border-zinc-100 dark:border-zinc-800/30'}`}>
                                                             {hasStats && best ? (
@@ -754,7 +758,7 @@ function StatsLeaderboard({ playerStats }: { playerStats: FPBPlayerStat[] }) {
                 {sorted.map((p, i) => {
                     const val = p[STAT_TYPES[statType].key]
                     const displayVal = typeof val === 'number' ? (Number.isInteger(val) ? val : val.toFixed(1)) : '—'
-                    const photoUrl = (p as any).photoUrl || null
+                    const photoUrl = (p as Record<string, unknown>).photoUrl as string || null
 
                     return (
                         <div key={p.atleta_id} className="bg-white dark:bg-zinc-900/90 border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-4 text-center hover:border-dribly-purple/30 transition-all group">

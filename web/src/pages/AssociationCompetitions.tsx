@@ -43,6 +43,7 @@ export default function AssociationCompetitions() {
         if (!id) return
         setLoading(true)
         loadData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id])
 
     async function loadData() {

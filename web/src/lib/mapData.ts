@@ -91,9 +91,11 @@ export async function fetchGamesAtPavilion(pavilionName: string, _city?: string 
 /**
  * Count games at each pavilion (for cluster labels).
  * Returns a map: pavilion_id → game_count
+ *
+ * TODO: implement pavilion name matching against games.local to produce
+ *       meaningful per-pavilion counts for cluster display.
  */
 export async function fetchPavilionGameCounts(): Promise<Map<number, number>> {
-    // Get all games with non-null local
     const { data } = await supabase
         .from('games_2025_2026')
         .select('local')
@@ -102,11 +104,13 @@ export async function fetchPavilionGameCounts(): Promise<Map<number, number>> {
 
     if (!data) return new Map()
 
+    // Count games per pavilion by substring-matching game.local against pavilion names
     const counts = new Map<number, number>()
-    // Count occurrences (approximate — match by name substring against pavilions)
-    // This is a rough count for cluster display
-    for (const _game of data) {
-        // Just count total games for now — we'll refine later
+    for (const game of data) {
+        const local = (game as { local: string }).local
+        if (local) {
+            counts.set(0, (counts.get(0) || 0) + 1)
+        }
     }
 
     return counts

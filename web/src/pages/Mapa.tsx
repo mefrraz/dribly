@@ -182,7 +182,7 @@ export default function Mapa() {
     const [searchOpen, setSearchOpen] = useState(false)
     const [showFilters, setShowFilters] = useState(false)
     const [selectedDistrict, setSelectedDistrict] = useState('')
-    const mapRef = useRef<any>(null)
+    const mapRef = useRef<L.Map | null>(null)
 
     useEffect(() => {
         const observer = new MutationObserver(() => {
@@ -201,7 +201,7 @@ export default function Mapa() {
             // Build set of pavilion IDs that have upcoming games (match by name)
             if (gamesData) {
                 const activeIds = new Set<number>()
-                const gameLocals = new Set((gamesData as any[]).map((g: any) => g.local?.toLowerCase().trim()))
+                const gameLocals = new Set((gamesData as { local: string | null }[]).map((g) => g.local?.toLowerCase().trim()))
                 for (const p of pavs) {
                     const cleanName = p.nome.replace(/^Pavilhão\s+/i, '').replace(/^Pav\.\s*/i, '').toLowerCase().trim()
                     if (gameLocals.has(cleanName) || Array.from(gameLocals).some(l => l.includes(cleanName) || cleanName.includes(l))) {

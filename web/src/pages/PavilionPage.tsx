@@ -76,7 +76,7 @@ export default function PavilionPage() {
                 .limit(100)
 
             if (gamesRes.data) {
-                setGames(gamesRes.data.map((g: any) => ({
+                setGames(gamesRes.data.map((g: Record<string, unknown>) => ({
                     ...g, id: g.id || g.slug, status: g.status as Match['status'],
                 })) as Match[])
             }
@@ -101,7 +101,7 @@ export default function PavilionPage() {
 
     const address = [pavilion?.rua, pavilion?.codigo_postal, pavilion?.cidade].filter(Boolean).join(', ')
 
-    const tabs: { value: Tab; label: string; icon: any }[] = [
+    const tabs: { value: Tab; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
         { value: 'geral', label: 'Geral', icon: Info },
         { value: 'agenda', label: 'Agenda', icon: CalendarDays },
         { value: 'resultados', label: 'Resultados', icon: Trophy },

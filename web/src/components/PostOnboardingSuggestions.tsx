@@ -3,21 +3,16 @@ import { Star, Heart, Trophy, ArrowRight, Loader2, Check, X, Search } from 'luci
 import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { useFollows } from '../hooks/useFollows'
 import { supabase } from '../lib/supabase'
+import { markSuggestionsDone } from './suggestionsState'
+
+// Re-export for backward compatibility
+// eslint-disable-next-line react-refresh/only-export-components
+export { isSuggestionsDone, markSuggestionsDone } from './suggestionsState'
 
 interface Competition {
     competition_id: number
     competition_name: string
     association_name: string
-}
-
-const KEY = 'dribly_suggestions_done'
-
-export function isSuggestionsDone(): boolean {
-    return localStorage.getItem(KEY) === 'true'
-}
-
-export function markSuggestionsDone(): void {
-    localStorage.setItem(KEY, 'true')
 }
 
 const FAVORITE_SUGGESTIONS = ['fc-porto', 'sl-benfica', 'sporting-cp', 'ud-oliveirense']
@@ -56,7 +51,7 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
     const [clubQuery, setClubQuery] = useState('')
     const [compQuery, setCompQuery] = useState('')
 
-    useEffect(() => { loadClubs() }, [])
+    useEffect(() => { loadClubs() }, [loadClubs])
 
     useEffect(() => {
         supabase
@@ -122,7 +117,11 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
         await toggleFollow('club', clubId)
         setFollowedClubIds(prev => {
             const next = new Set(prev)
-            next.has(clubId) ? next.delete(clubId) : next.add(clubId)
+            if (next.has(clubId)) {
+                next.delete(clubId)
+            } else {
+                next.add(clubId)
+            }
             return next
         })
     }
@@ -131,7 +130,11 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
         await toggleFollow('competition', compId)
         setFollowedCompIds(prev => {
             const next = new Set(prev)
-            next.has(compId) ? next.delete(compId) : next.add(compId)
+            if (next.has(compId)) {
+                next.delete(compId)
+            } else {
+                next.add(compId)
+            }
             return next
         })
     }
