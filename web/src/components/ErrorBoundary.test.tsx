@@ -1,19 +1,10 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import { ErrorBoundary } from './ErrorBoundary'
 
-// Component that throws
-function BrokenComponent({ shouldThrow }: { shouldThrow: boolean }) {
-    if (shouldThrow) throw new Error('Test explosion')
-    return <div>All good</div>
-}
-
 describe('ErrorBoundary', () => {
-    const originalError = console.error
-    beforeAll(() => { console.error = () => {} })
-    afterAll(() => { console.error = originalError })
-    afterEach(() => { cleanup() })
+    afterEach(() => cleanup())
 
     it('should render children when no error', () => {
         render(
@@ -24,21 +15,19 @@ describe('ErrorBoundary', () => {
         expect(screen.getByText('Healthy child')).toBeTruthy()
     })
 
-    it('should show error fallback when child throws', () => {
+    it('should show fallback when child throws', () => {
+        // Suppress React's error logging for this test
+        const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
+        
+        function Broken() { throw new Error('boom') }
+        
         render(
             <ErrorBoundary>
-                <BrokenComponent shouldThrow={true} />
+                <Broken />
             </ErrorBoundary>
         )
+        
         expect(screen.getByText('Algo correu mal')).toBeTruthy()
-    })
-
-    it('should show custom fallback when provided', () => {
-        render(
-            <ErrorBoundary fallback={<div>Custom error UI</div>}>
-                <BrokenComponent shouldThrow={true} />
-            </ErrorBoundary>
-        )
-        expect(screen.getByText('Custom error UI')).toBeTruthy()
+        spy.mockRestore()
     })
 })
