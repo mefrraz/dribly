@@ -13,10 +13,6 @@ const IMG = {
     jogos: `${FPB}/athlete/atleta-jogos.png`,
     media: `${FPB}/athlete/atleta-media.png`,
     pontosEpoca: `${FPB}/athlete/atleta-pontos.png`,
-    shooting1: `${FPB}/stats/background-shooting-1.png`,
-    shooting2: `${FPB}/stats/background-shooting-2.png`,
-    shooting3: `${FPB}/stats/background-shooting-3.png`,
-    shooting4: `${FPB}/stats/background-shooting-4.png`,
     rebound1: `${FPB}/stats/background-rebounds-1.png`,
     rebound2: `${FPB}/stats/background-rebounds-2.png`,
     rebound3: `${FPB}/stats/background-rebounds-3.png`,
@@ -26,23 +22,22 @@ const IMG = {
     outrosDesarme: `${FPB}/stats/background-bloco.png`,
 }
 
-/** Stat with FPB image as centered background, value + label on top — no card */
-function BgStat({ img, value, label, size = 48 }: { img: string; value: string | number | null; label: string; size?: number }) {
+/** Stat with FPB image centered above, value + label below */
+function BgStat({ img, value, label }: { img: string; value: string | number | null; label: string }) {
     return (
-        <div className="relative flex flex-col items-center justify-center py-3 px-2"
-            style={{
-                backgroundImage: `url(${img})`,
-                backgroundPosition: 'center',
-                backgroundSize: `${size}px`,
-                backgroundRepeat: 'no-repeat',
-            }}>
-            <span className="relative text-xl font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{value ?? '—'}</span>
-            <span className="relative text-[10px] font-bold text-zinc-400 uppercase tracking-wider mt-0.5">{label}</span>
+        <div className="flex flex-col items-center gap-2 py-3 px-3">
+            <div className="w-12 h-12 flex items-center justify-center">
+                <img src={img} alt="" className="max-w-full max-h-full object-contain dark:brightness-[0.6] dark:grayscale-[0.5]" />
+            </div>
+            <div className="text-center">
+                <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{value ?? '—'}</span>
+                <span className="block text-[9px] font-bold text-zinc-400 uppercase tracking-wide mt-0.5">{label}</span>
+            </div>
         </div>
     )
 }
 
-/** Big number stat — no image, just clean */
+/** Big number stat */
 function BigNum({ value, label, suffix }: { value: string | number | null; label: string; suffix?: string }) {
     return (
         <div className="flex flex-col items-center py-3">
@@ -54,27 +49,19 @@ function BigNum({ value, label, suffix }: { value: string | number | null; label
     )
 }
 
-/** Shooting cell: small centered image + bar + percentage — no card */
-function ShootCell({ img, pct, label }: { img: string; pct: number | null; label: string }) {
+/** Clean shooting bar — no image, just bar + % */
+function ShootBar({ pct, label }: { pct: number | null; label: string }) {
     const v = pct ?? 0
     const barColor = v >= 50 ? '#16a34a' : v >= 35 ? '#d97706' : '#dc2626'
     return (
-        <div className="relative py-4 px-3 flex flex-col items-center gap-2"
-            style={{
-                backgroundImage: `url(${img})`,
-                backgroundPosition: 'center 30%',
-                backgroundSize: '60px',
-                backgroundRepeat: 'no-repeat',
-            }}>
-            <div className="relative z-10 flex flex-col items-center gap-2 w-full max-w-[180px]">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wide">{label}</span>
-                <div className="w-full flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-500"
-                            style={{ width: `${Math.min(v, 100)}%`, backgroundColor: barColor }} />
-                    </div>
-                    <span className="text-sm font-black tabular-nums w-10 text-right" style={{ color: barColor }}>{v}%</span>
+        <div className="py-3 px-3 flex flex-col gap-2">
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wide">{label}</span>
+            <div className="flex items-center gap-2">
+                <div className="flex-1 h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(v, 100)}%`, backgroundColor: barColor }} />
                 </div>
+                <span className="text-sm font-black tabular-nums w-10 text-right" style={{ color: barColor }}>{v}%</span>
             </div>
         </div>
     )
@@ -167,9 +154,9 @@ export default function AthletePage() {
                 </div>
             </div>
 
-            {/* Quick stats — FPB images as centered backgrounds, no cards */}
+            {/* Quick stats — image above, value below */}
             <div className="px-3">
-                <div className="flex justify-center gap-2 flex-wrap">
+                <div className="flex justify-center gap-3 flex-wrap">
                     <BgStat img={IMG.pontos} value={data.pontos} label="Pontos" />
                     <BgStat img={IMG.ressaltos} value={data.ressaltos} label="Ressaltos" />
                     <BgStat img={IMG.assistencias} value={data.assistencias} label="Assistências" />
@@ -199,38 +186,37 @@ export default function AthletePage() {
                             {data.epoca.epoca}
                         </h3>
 
-                        {/* Jogos / Minutos / Pontos */}
                         <div className="flex justify-center gap-8">
                             <BigNum value={data.epoca.jogos} label="Jogos" />
                             <BigNum value={data.epoca.mediaMinutos} label="Minutos por jogo" suffix="'" />
                             <BigNum value={data.epoca.pontos} label="Pontos" />
                         </div>
 
-                        {/* Lançamentos — 2x2 grid with bar + small centered image, no cards */}
+                        {/* Lançamentos — clean bars, no images */}
                         <div>
-                            <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-3">Lançamentos</h4>
-                            <div className="grid grid-cols-2 gap-1">
-                                <ShootCell img={IMG.shooting1} pct={data.epoca.lancamentosCampo?.percentagem ?? null} label="Lançamentos de campo" />
-                                <ShootCell img={IMG.shooting2} pct={data.epoca.lancamentos2?.percentagem ?? null} label="2 Pontos" />
-                                <ShootCell img={IMG.shooting3} pct={data.epoca.lancamentos3?.percentagem ?? null} label="3 Pontos" />
-                                <ShootCell img={IMG.shooting4} pct={data.epoca.lancesLivres?.percentagem ?? null} label="Lances Livres" />
+                            <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-1">Lançamentos</h4>
+                            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                                <ShootBar pct={data.epoca.lancamentosCampo?.percentagem ?? null} label="Lançamentos de campo" />
+                                <ShootBar pct={data.epoca.lancamentos2?.percentagem ?? null} label="2 Pontos" />
+                                <ShootBar pct={data.epoca.lancamentos3?.percentagem ?? null} label="3 Pontos" />
+                                <ShootBar pct={data.epoca.lancesLivres?.percentagem ?? null} label="Lances Livres" />
                             </div>
                         </div>
 
                         {/* Ressaltos */}
                         <div>
-                            <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-2">Ressaltos</h4>
-                            <div className="flex justify-center gap-4">
-                                <BgStat img={IMG.rebound3} value={data.epoca.ressaltosTotal} label="Total" size={56} />
-                                <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="Ofensivos" size={56} />
-                                <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="Defensivos" size={56} />
+                            <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-1">Ressaltos</h4>
+                            <div className="flex justify-center gap-3">
+                                <BgStat img={IMG.rebound3} value={data.epoca.ressaltosTotal} label="Total" />
+                                <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="Ofensivos" />
+                                <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="Defensivos" />
                             </div>
                         </div>
 
                         {/* Outros */}
                         <div>
-                            <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-2">Outros</h4>
-                            <div className="flex justify-center gap-4 flex-wrap">
+                            <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-1">Outros</h4>
+                            <div className="flex justify-center gap-3 flex-wrap">
                                 <BgStat img={IMG.outrosAssist} value={data.epoca.assistencias} label="Assistências" />
                                 <BgStat img={IMG.outrosPerda} value={data.epoca.perdasBola} label="Perdas de bola" />
                                 <BgStat img={IMG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos de bola" />
@@ -248,12 +234,12 @@ export default function AthletePage() {
                         </div>
 
                         <div>
-                            <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-3">Lançamentos</h4>
-                            <div className="grid grid-cols-2 gap-1">
-                                <ShootCell img={IMG.shooting1} pct={data.carreira.lancamentosCampo?.percentagem ?? null} label="Lançamentos de campo" />
-                                <ShootCell img={IMG.shooting2} pct={data.carreira.lancamentos2?.percentagem ?? null} label="2 Pontos" />
-                                <ShootCell img={IMG.shooting3} pct={data.carreira.lancamentos3?.percentagem ?? null} label="3 Pontos" />
-                                <ShootCell img={IMG.shooting4} pct={data.carreira.lancesLivres?.percentagem ?? null} label="Lances Livres" />
+                            <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-1">Lançamentos</h4>
+                            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                                <ShootBar pct={data.carreira.lancamentosCampo?.percentagem ?? null} label="Lançamentos de campo" />
+                                <ShootBar pct={data.carreira.lancamentos2?.percentagem ?? null} label="2 Pontos" />
+                                <ShootBar pct={data.carreira.lancamentos3?.percentagem ?? null} label="3 Pontos" />
+                                <ShootBar pct={data.carreira.lancesLivres?.percentagem ?? null} label="Lances Livres" />
                             </div>
                         </div>
                     </div>
