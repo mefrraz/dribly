@@ -6,6 +6,7 @@ import { useEquipaGames } from '../../hooks/useEquipaGames'
 import { SkeletonGameGrid } from '../../components/Skeleton'
 import { EmptyState } from '../../components/EmptyState'
 import { GameCard } from '../../components/GameCard'
+import { TeamBlock } from '../../components/TeamBlock'
 import type { Match } from '../../components/types'
 import type { Club } from '../../lib/ClubContext'
 
@@ -228,17 +229,25 @@ function ClubTeamDetail() {
                                 {maxWin && (
                                     <Link to={`/game/${maxWin.slug || maxWin.id}?clube=${club.slug}`}
                                         className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all">
-                                        <div className="p-5">
-                                            <p className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wider mb-3">Maior vitória</p>
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex-1 text-right"><p className="text-sm font-bold text-zinc-900 dark:text-white truncate">{maxWin.equipa_casa}</p></div>
-                                                <div className="text-center shrink-0">
-                                                    <p className="text-2xl font-black text-zinc-900 dark:text-white tabular-nums">{maxWin.resultado_casa} - {maxWin.resultado_fora}</p>
+                                        <div className="bg-gradient-to-r from-green-50 via-white to-green-50 dark:from-green-900/10 dark:via-zinc-900 dark:to-green-900/10 border-b border-zinc-100 dark:border-white/5 p-3">
+                                            <span className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wide">Maior Vitória</span>
+                                        </div>
+                                        <div className="px-6 py-8">
+                                            <div className="flex items-center justify-between gap-4">
+                                                <TeamBlock name={maxWin.equipa_casa} logo={maxWin.logotipo_casa} />
+                                                <div className="flex flex-col items-center gap-1 shrink-0">
+                                                    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl px-3 py-1.5">
+                                                        <p className="text-xl font-black text-green-700 dark:text-green-300 tabular-nums">{maxWin.resultado_casa} - {maxWin.resultado_fora}</p>
+                                                    </div>
                                                     <p className="text-[10px] font-bold text-green-600">+{Math.abs((clubHome(maxWin)?maxWin.resultado_casa!:maxWin.resultado_fora!) - (clubHome(maxWin)?maxWin.resultado_fora!:maxWin.resultado_casa!))}</p>
                                                 </div>
-                                                <div className="flex-1"><p className="text-sm font-bold text-zinc-900 dark:text-white truncate">{maxWin.equipa_fora}</p></div>
+                                                <TeamBlock name={maxWin.equipa_fora} logo={maxWin.logotipo_fora} />
                                             </div>
-                                            <p className="text-[10px] text-zinc-400 text-center mt-2">{formatDate(maxWin.data)}</p>
+                                            <div className="mt-6 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                                                <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
+                                                <span className="capitalize font-medium">{formatDate(maxWin.data)}</span>
+                                                <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
+                                            </div>
                                         </div>
                                     </Link>
                                 )}
