@@ -182,7 +182,7 @@ function ClubTeamDetail() {
             <div className="px-3 mt-2">
                 <div className="flex gap-1.5 overflow-x-auto">
                     {([
-                        { value: 'geral' as Tab, label: 'Geral', icon: Info },
+                        { value: 'geral' as Tab, label: 'Vista Geral', icon: Info },
                         { value: 'agenda' as Tab, label: 'Agenda', icon: Calendar },
                         { value: 'resultados' as Tab, label: 'Resultados', icon: Trophy },
                         { value: 'plantel' as Tab, label: 'Plantel', icon: Users },
@@ -198,10 +198,10 @@ function ClubTeamDetail() {
                 </div>
             </div>
 
-            {/* Geral tab */}
+            {/* Vista Geral tab */}
             {tab === 'geral' && (
-                <div className="px-3">
-                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 mb-4">
+                <div className="px-3 space-y-3">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5">
                         <div className="grid grid-cols-4 gap-3">
                             <div className="text-center"><p className="text-2xl font-black text-zinc-900 dark:text-white">{total}</p><p className="text-[10px] text-zinc-500">Jogos</p></div>
                             <div className="text-center"><p className="text-2xl font-black text-green-600 dark:text-green-400">{wins}</p><p className="text-[10px] text-zinc-500">Vitórias</p></div>
@@ -209,6 +209,50 @@ function ClubTeamDetail() {
                             <div className="text-center"><p className="text-2xl font-black text-zinc-900 dark:text-white">{pct !== null ? pct + '%' : '—'}</p><p className="text-[10px] text-zinc-500">PCT</p></div>
                         </div>
                     </div>
+                    {(() => {
+                        const clubHome = (g: Match) => g.equipa_casa.toUpperCase().includes(clubNameUpper)
+                        const winsList = finished.filter(g => (clubHome(g) ? g.resultado_casa! > g.resultado_fora! : g.resultado_fora! > g.resultado_casa!))
+                        const maxWin = winsList.length > 0 ? winsList.reduce((a, b) => {
+                            const aDiff = Math.abs((clubHome(a) ? a.resultado_casa! : a.resultado_fora!) - (clubHome(a) ? a.resultado_fora! : a.resultado_casa!))
+                            const bDiff = Math.abs((clubHome(b) ? b.resultado_casa! : b.resultado_fora!) - (clubHome(b) ? b.resultado_fora! : b.resultado_casa!))
+                            return bDiff > aDiff ? b : a
+                        }) : null
+                        const maxScore = finished.length > 0 ? finished.reduce((a, b) => {
+                            const aScore = clubHome(a) ? a.resultado_casa! : a.resultado_fora!
+                            const bScore = clubHome(b) ? b.resultado_casa! : b.resultado_fora!
+                            return bScore > aScore ? b : a
+                        }) : null
+                        if (!maxWin && !maxScore) return null
+                        return (
+                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5">
+                                <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3">Destaques</h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {maxWin && (
+                                        <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-3 text-center">
+                                            <p className="text-[10px] text-green-600 dark:text-green-400 uppercase font-bold">Maior vitória</p>
+                                            <p className="text-lg font-black text-green-700 dark:text-green-300 mt-1">
+                                                +{Math.abs((clubHome(maxWin) ? maxWin.resultado_casa! : maxWin.resultado_fora!) - (clubHome(maxWin) ? maxWin.resultado_fora! : maxWin.resultado_casa!))}
+                                            </p>
+                                            <p className="text-[10px] text-green-600/70 truncate">
+                                                {maxWin.equipa_casa} {maxWin.resultado_casa} - {maxWin.resultado_fora} {maxWin.equipa_fora}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {maxScore && (
+                                        <div className="bg-dribly-purple/10 rounded-xl p-3 text-center">
+                                            <p className="text-[10px] text-dribly-purple uppercase font-bold">Mais pontos</p>
+                                            <p className="text-lg font-black text-dribly-purple mt-1">
+                                                {clubHome(maxScore) ? maxScore.resultado_casa : maxScore.resultado_fora} pts
+                                            </p>
+                                            <p className="text-[10px] text-dribly-purple/70 truncate">
+                                                {maxScore.equipa_casa} {maxScore.resultado_casa} - {maxScore.resultado_fora} {maxScore.equipa_fora}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )
+                    })()}
                 </div>
             )}
 

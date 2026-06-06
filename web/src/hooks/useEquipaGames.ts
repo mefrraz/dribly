@@ -108,24 +108,24 @@ function extractPlantel(html: string): PlantelPlayer[] {
     const section = html.substring(contentStart, nextIndex > 0 ? nextIndex : html.length)
 
     const players: PlantelPlayer[] = []
-    const rowRe = /<tr class="player-row[^"]*">([\s\S]*?)<\/tr>/g
+    const rowRe = /<div class="roster__player">\s*<a href="([^"]*)">([\s\S]*?)<\/a>\s*<\/div>/g
     let rm
     while ((rm = rowRe.exec(section)) !== null) {
-        const row = rm[1]
-        const nameMatch = row.match(/<h5>([^<]+)<\/h5>/)
+        const href = rm[1]
+        const block = rm[2]
+        const nameMatch = block.match(/<h2[^>]*>([^<]+)<\/h2>/)
         if (!nameMatch) continue
         const nome = nameMatch[1].trim()
 
-        // Photo from data-src or src in img
-        const imgMatch = row.match(/<img[^>]*data-src="([^"]+)"[^>]*>/)
-            || row.match(/<img[^>]*src="([^"]+)"[^>]*>/)
-        const foto = imgMatch?.[1] || null
+        // Photo from img in roster__player__photo
+        const imgMatch = block.match(/<img[^>]*data-src="([^"]+)"[^>]*>/)
+            || block.match(/<img[^>]*src="([^"]+)"[^>]*>/)
+        let foto = imgMatch?.[1] || null
+        // Filter placeholder images
+        if (foto && (/noplayer/i.test(foto) || /ass_highlight/i.test(foto))) foto = null
 
-        // Atleta link
-        const linkMatch = row.match(/<a href="(\/atletas\/\d+)">/)
-        const atletaUrl = linkMatch ? `https://www.fpb.pt${linkMatch[1]}` : null
+        const atletaUrl = href ? `https://www.fpb.pt${href}` : null
 
-        // Avoid duplicates
         if (!players.find(p => p.nome === nome)) {
             players.push({ nome, foto, atletaUrl })
         }
