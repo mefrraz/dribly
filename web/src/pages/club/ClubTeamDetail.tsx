@@ -201,14 +201,6 @@ function ClubTeamDetail() {
             {/* Vista Geral tab */}
             {tab === 'geral' && (
                 <div className="px-3 space-y-3">
-                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5">
-                        <div className="grid grid-cols-4 gap-3">
-                            <div className="text-center"><p className="text-2xl font-black text-zinc-900 dark:text-white">{total}</p><p className="text-[10px] text-zinc-500">Jogos</p></div>
-                            <div className="text-center"><p className="text-2xl font-black text-green-600 dark:text-green-400">{wins}</p><p className="text-[10px] text-zinc-500">Vitórias</p></div>
-                            <div className="text-center"><p className="text-2xl font-black text-red-500">{losses}</p><p className="text-[10px] text-zinc-500">Derrotas</p></div>
-                            <div className="text-center"><p className="text-2xl font-black text-zinc-900 dark:text-white">{pct !== null ? pct + '%' : '—'}</p><p className="text-[10px] text-zinc-500">PCT</p></div>
-                        </div>
-                    </div>
                     {(() => {
                         const clubHome = (g: Match) => g.equipa_casa.toUpperCase().includes(clubNameUpper)
                         const winsList = finished.filter(g => (clubHome(g) ? g.resultado_casa! > g.resultado_fora! : g.resultado_fora! > g.resultado_casa!))
@@ -217,43 +209,59 @@ function ClubTeamDetail() {
                             const bDiff = Math.abs((clubHome(b) ? b.resultado_casa! : b.resultado_fora!) - (clubHome(b) ? b.resultado_fora! : b.resultado_casa!))
                             return bDiff > aDiff ? b : a
                         }) : null
-                        const chartData = finished.slice().reverse().slice(-15).map(g => ({
-                            nome: g.data.slice(5),
-                            pts: clubHome(g) ? g.resultado_casa! : g.resultado_fora!,
-                            sof: clubHome(g) ? g.resultado_fora! : g.resultado_casa!,
-                        }))
-                        if (!maxWin) return null
+
+                        // Monthly W/L chart
+                        const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+                        const now = new Date()
+                        const monthly = months.map((m, i) => {
+                            const y = i <= now.getMonth() ? now.getFullYear() : now.getFullYear() - 1
+                            const mo = i + 1
+                            const mg = finished.filter(g => { const d = new Date(g.data); return d.getFullYear() === y && d.getMonth()+1 === mo })
+                            const w = mg.filter(g => (clubHome(g) ? g.resultado_casa! > g.resultado_fora! : g.resultado_fora! > g.resultado_casa!)).length
+                            const l = mg.filter(g => (clubHome(g) ? g.resultado_casa! < g.resultado_fora! : g.resultado_fora! < g.resultado_casa!)).length
+                            return { m, w, l, t: w + l }
+                        })
+                        const maxT = Math.max(...monthly.map(d => d.t), 1)
+
                         return (
                             <>
+                                {maxWin && (
+                                    <Link to={`/game/${maxWin.slug || maxWin.id}?clube=${club.slug}`}
+                                        className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all">
+                                        <div className="p-5">
+                                            <p className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wider mb-3">Maior vitória</p>
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex-1 text-right"><p className="text-sm font-bold text-zinc-900 dark:text-white truncate">{maxWin.equipa_casa}</p></div>
+                                                <div className="text-center shrink-0">
+                                                    <p className="text-2xl font-black text-zinc-900 dark:text-white tabular-nums">{maxWin.resultado_casa} - {maxWin.resultado_fora}</p>
+                                                    <p className="text-[10px] font-bold text-green-600">+{Math.abs((clubHome(maxWin)?maxWin.resultado_casa!:maxWin.resultado_fora!) - (clubHome(maxWin)?maxWin.resultado_fora!:maxWin.resultado_casa!))}</p>
+                                                </div>
+                                                <div className="flex-1"><p className="text-sm font-bold text-zinc-900 dark:text-white truncate">{maxWin.equipa_fora}</p></div>
+                                            </div>
+                                            <p className="text-[10px] text-zinc-400 text-center mt-2">{formatDate(maxWin.data)}</p>
+                                        </div>
+                                    </Link>
+                                )}
                                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5">
-                                    <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Maior vitória</h3>
-                                    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 text-center">
-                                        <p className="text-3xl font-black text-green-700 dark:text-green-300">
-                                            +{Math.abs((clubHome(maxWin) ? maxWin.resultado_casa! : maxWin.resultado_fora!) - (clubHome(maxWin) ? maxWin.resultado_fora! : maxWin.resultado_casa!))}
-                                        </p>
-                                        <p className="text-xs text-green-600 dark:text-green-400/70 mt-1 truncate">
-                                            {maxWin.equipa_casa} {maxWin.resultado_casa} - {maxWin.resultado_fora} {maxWin.equipa_fora}
-                                        </p>
+                                    <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4">Desempenho por mês</h3>
+                                    <div className="flex items-end gap-1 h-32">
+                                        {monthly.map((d, i) => (
+                                            <div key={i} className="flex-1 flex flex-col items-center gap-1 h-full">
+                                                <div className="w-full flex-1 flex flex-col justify-end">
+                                                    {d.t > 0 && (<>
+                                                        <div style={{height:`${(d.l/maxT)*100}%`}} className="w-full bg-red-200 dark:bg-red-900/40 rounded-t" />
+                                                        <div style={{height:`${(d.w/maxT)*100}%`}} className="w-full bg-green-400 dark:bg-green-600 rounded-t" />
+                                                    </>)}
+                                                </div>
+                                                <span className="text-[8px] text-zinc-400">{d.m}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="flex items-center gap-4 mt-3 justify-center">
+                                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-600" /><span className="text-[10px] text-zinc-500">Vitórias ({wins})</span></div>
+                                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-red-200 dark:bg-red-900/40" /><span className="text-[10px] text-zinc-500">Derrotas ({losses})</span></div>
                                     </div>
                                 </div>
-                                {chartData.length > 0 && (
-                                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5">
-                                        <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3">Últimos {chartData.length} jogos</h3>
-                                        <div className="h-40">
-                                            {chartData.map((d, i) => (
-                                                <div key={i} className="flex items-center gap-2 text-[10px] mb-1.5">
-                                                    <span className="w-8 text-right text-zinc-500 shrink-0">{d.nome}</span>
-                                                    <div className="flex-1 flex gap-0.5 h-5">
-                                                        <div className="h-full bg-green-500 rounded-l" style={{ width: `${(d.pts / Math.max(...chartData.map(x => x.pts + x.sof), 1)) * 100}%` }} />
-                                                        <div className="h-full bg-red-400 rounded-r" style={{ width: `${(d.sof / Math.max(...chartData.map(x => x.pts + x.sof), 1)) * 100}%` }} />
-                                                    </div>
-                                                    <span className="w-14 text-right font-mono tabular-nums text-zinc-600 dark:text-zinc-400">{d.pts}-{d.sof}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <p className="text-[10px] text-zinc-400 text-center mt-2">Verde = pontos marcados | Vermelho = pontos sofridos</p>
-                                    </div>
-                                )}
                             </>
                         )
                     })()}
