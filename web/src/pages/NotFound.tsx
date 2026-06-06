@@ -19,12 +19,12 @@ export default function NotFound() {
                     <Home size={16} />
                     Início
                 </Link>
-                <Link to="/search"
+                <Link to="/pesquisa"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm font-bold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-[0.97]">
                     <Search size={16} />
                     Pesquisar
                 </Link>
-                <Link to="/standings"
+                <Link to="/classificacoes"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm font-bold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all active:scale-[0.97]">
                     <BarChart2 size={16} />
                     Classificações

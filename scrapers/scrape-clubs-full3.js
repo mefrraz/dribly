@@ -1,8 +1,12 @@
 ﻿const { createClient } = require("@supabase/supabase-js");
 const fs = require("fs");
 
-const SUPABASE_URL = "https://qdzmwgahencinoucvoop.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkem13Z2FoZW5jaW5vdWN2b29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczNTA5MTMsImV4cCI6MjA2MjkyNjkxM30.uMkyku7r9NsNZ-QSUmGiU1BGhUMBhGzMP5I_iA7BC3U";
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error("Missing SUPABASE_URL or SUPABASE_KEY in .env");
+    process.exit(1);
+}
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function main() {

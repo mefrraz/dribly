@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { fetchStandingsFromSource } from '../lib/tugabasketApi'
 import { Standing } from '../components/types'
+import { logger } from '../lib/logger'
 
 const CACHE_MINUTES = 15
 
@@ -70,7 +71,7 @@ export function useStandings(season: string, competitionId: number | null) {
                 setStandings(withTimestamp)
             } catch (err) {
                 if (!cancelled) {
-                    console.error('Failed to fetch standings:', err)
+                    logger.error('Failed to fetch standings:', err)
                     setError(err instanceof Error ? err.message : 'Erro ao carregar classificações')
                 }
             } finally {

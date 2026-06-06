@@ -14,7 +14,8 @@ import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
-import { Loader2, Search, X, MapPin, Navigation, Filter } from 'lucide-react'
+import { Search, X, MapPin, Navigation, Filter } from 'lucide-react'
+import { LoadingSpinner } from '../components/LoadingSpinner'
 import { fetchPavilions, type Pavilion, displayPavilionName } from '../lib/mapData'
 import { PavilionSheet } from '../components/PavilionSheet'
 import { supabase } from '../lib/supabase'
@@ -262,10 +263,7 @@ export default function Mapa() {
     if (loading) {
         return (
             <div className="fixed inset-0 flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 z-10">
-                <div className="flex flex-col items-center gap-3">
-                    <Loader2 size={32} className="animate-spin text-dribly-purple" />
-                    <span className="text-sm text-zinc-400">A carregar mapa...</span>
-                </div>
+                <LoadingSpinner message="A carregar mapa..." size={32} />
             </div>
         )
     }

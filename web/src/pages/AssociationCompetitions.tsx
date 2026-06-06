@@ -101,7 +101,7 @@ export default function AssociationCompetitions() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
             <div className="max-w-4xl mx-auto px-3 sm:px-5 pt-6 sm:pt-8 pb-16">
-                <Link to="/standings"
+                <Link to="/classificacoes"
                     className="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors mb-6 group">
                     <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                     Associações
@@ -172,7 +172,7 @@ export default function AssociationCompetitions() {
                                 <div className="space-y-2">
                                     {filtered.map(c => (
                                         <button key={c.competition_id}
-                                            onClick={() => navigate(`/standings/${id}/${c.competition_id}`)}
+                                            onClick={() => navigate(`/classificacoes/${id}/${c.competition_id}`)}
                                             className="w-full text-left bg-white dark:bg-zinc-900/90 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60 hover:border-dribly-purple/30 dark:hover:border-dribly-purple/30 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-200 group flex items-center justify-between gap-4">
                                             <div className="min-w-0 flex items-center gap-3">
                                                 <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-zinc-100 dark:border-zinc-700/50">

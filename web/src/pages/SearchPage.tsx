@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
-import { Search, Building2, Trophy, ArrowLeft } from 'lucide-react'
+import { Search, Building2, Trophy } from 'lucide-react'
+import { PageHeader } from '../components/PageHeader'
 import { supabase } from '../lib/supabase'
 import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { associationLogoUrl } from '../lib/associationLogos'
@@ -80,12 +81,7 @@ function SearchPage() {
 
     return (
         <div className="max-w-2xl mx-auto px-4 pb-24">
-            <div className="flex items-center gap-3 pt-2 mb-6">
-                <Link to="/" className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                    <ArrowLeft size={22} />
-                </Link>
-                <h1 className="text-lg font-bold text-zinc-900 dark:text-white">Pesquisar</h1>
-            </div>
+            <PageHeader backTo="/" title="Pesquisar" />
 
             <div className="relative mb-8">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">

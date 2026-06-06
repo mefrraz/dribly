@@ -33,9 +33,9 @@ function BottomNav() {
                             <MapPin size={18} strokeWidth={isActive('/mapa') ? 2.5 : 2} />
                             <span className="text-[10px] font-medium">Mapa</span>
                         </Link>
-                        <Link to="/standings"
-                            className={`flex flex-col items-center justify-center w-full h-full gap-1 ${isActive('/standings') ? 'text-dribly-purple' : 'text-zinc-400 dark:text-zinc-500'}`}>
-                            <BarChart2 size={18} strokeWidth={isActive('/standings') ? 2.5 : 2} />
+                        <Link to="/classificacoes"
+                            className={`flex flex-col items-center justify-center w-full h-full gap-1 ${isActive('/classificacoes') ? 'text-dribly-purple' : 'text-zinc-400 dark:text-zinc-500'}`}>
+                            <BarChart2 size={18} strokeWidth={isActive('/classificacoes') ? 2.5 : 2} />
                             <span className="text-[10px] font-medium">Classificações</span>
                         </Link>
                     </>

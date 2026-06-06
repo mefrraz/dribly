@@ -35,6 +35,12 @@ codewhale-tui.exe
 # Reasonix
 .reasonix/
 
+# CommandCode
+.commandcode/
+
+# Archive (old scripts, temp files)
+archive/
+
 # Project — temp/backup files, source data, scraped pages
 web_antiga/
 scripts/
@@ -56,3 +62,7 @@ tugabasket_api_reference.md
 fpb_api_reference.md
 dribly_logos_finais.html
 dribly.svg
+*.bak
+clerk-email-password-change.html
+test_fpb.html
+populate_short_names.sql

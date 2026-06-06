@@ -1,6 +1,9 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Loader2, Heart, ListOrdered, CalendarDays, Trophy, Users, BarChart4, LayoutDashboard, ExternalLink } from 'lucide-react'
+import { Heart, ListOrdered, CalendarDays, Trophy, Users, BarChart4, LayoutDashboard, ExternalLink } from 'lucide-react'
+import { PageHeader } from '../components/PageHeader'
+import { LoadingSpinner } from '../components/LoadingSpinner'
+import { logger } from '../lib/logger'
 import { useFollows } from '../hooks/useFollows'
 import { useAuth } from '../lib/AuthContext'
 import { useClub } from '../lib/ClubContext'
@@ -96,23 +99,7 @@ function findLogo(teamName: string, maps: LogoMaps): string | null {
     return null
 }
 
-/** Semi-abbreviate team names: "Futebol Clube do Porto" → "FC Porto" */
-function semiAbrev(name: string): string {
-    const rules: [RegExp, string][] = [
-        [/^Futebol\s+Clube\s+(do|da|de)\s+/i, 'FC '],
-        [/^Sporting\s+Clube\s+(de\s+)?/i, 'SC '],
-        [/^Vitória\s+Sport\s+Clube/i, 'Vitória SC'],
-        [/^União\s+Desportiva\s+/i, 'UD '],
-        [/^Clube\s+Desportivo\s+/i, 'CD '],
-        [/^Grupo\s+Desportivo\s+/i, 'GD '],
-        [/^Associação\s+Académica\s+de\s+/i, 'AA '],
-        [/^Sport\s+Lisboa\s+e\s+Benfica/i, 'SL Benfica'],
-    ]
-    for (const [regex, replacement] of rules) {
-        if (regex.test(name)) return name.replace(regex, replacement).trim()
-    }
-    return name
-}
+import { semiAbrev } from '../lib/fpbUtils'
 
 function fpbGameToMatch(g: FPBGame, logoMaps: LogoMaps): Match {
     const slug = g.jogo_id || `${g.data}-${g.equipa_casa.toLowerCase().replace(/\s+/g, '-')}-${g.equipa_fora.toLowerCase().replace(/\s+/g, '-')}`
@@ -237,7 +224,7 @@ export default function CompetitionDetail() {
                 }
                 if (results[2].status === 'fulfilled') setTeams(results[2].value)
                 if (results[3].status === 'fulfilled') setPlayerStats(results[3].value)
-            } catch (e) { console.error('Failed to load competition data:', e) }
+            } catch (e) { logger.error('Failed to load competition data:', e) }
             setLoading(false)
         }
         loadAll()
@@ -304,13 +291,9 @@ export default function CompetitionDetail() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
             <div className="max-w-6xl mx-auto px-3 sm:px-5 pt-6 pb-24">
-                <div className="flex items-center justify-between mb-6">
-                    <Link to="/ligas" className="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors group">
-                        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-                        Voltar
-                    </Link>
-
-                    {user && (
+                <PageHeader
+                    backTo="/ligas"
+                    right={user ? (
                         <button
                             onClick={handleToggleFollow}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all active:scale-[0.97] ${
@@ -322,8 +305,8 @@ export default function CompetitionDetail() {
                             <Heart size={13} strokeWidth={isFollowed ? 2.5 : 2} fill={isFollowed ? 'currentColor' : 'none'} />
                             {isFollowed ? 'A seguir' : 'Seguir'}
                         </button>
-                    )}
-                </div>
+                    ) : undefined}
+                />
 
                 <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white mb-1 tracking-tight">
                     {compName || COMP_NAMES[provaId] || `Competição #${provaId}`}
@@ -364,10 +347,7 @@ export default function CompetitionDetail() {
 
                 <div className="mt-5">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-16 gap-3">
-                            <Loader2 size={24} className="animate-spin text-dribly-purple" />
-                            <span className="text-xs font-medium text-zinc-400">A carregar...</span>
-                        </div>
+                        <LoadingSpinner />
                     ) : (
                         <>
                             {/* Overview */}

@@ -3,7 +3,7 @@ import { Calendar, Trophy, Filter, RefreshCw, AlertCircle } from 'lucide-react'
 import { Link, useSearchParams, useOutletContext } from 'react-router-dom'
 import { useGames } from '../../hooks/useGames'
 import { useTimeAgo } from '../../hooks/useTimeAgo'
-import { SkeletonGameGrid } from '../../components/Skeleton'
+import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { EmptyState } from '../../components/EmptyState'
 import { GameCard } from '../../components/GameCard'
 import { SegmentControl } from '../../components/SegmentControl'
@@ -23,15 +23,6 @@ function ClubGames() {
     const [escaloes, setEscaloes] = useState<string[]>([])
 
     const { games: allGames, loading, lastUpdated, error, refresh } = useGames('2025/2026', club.id, club.name)
-    const [showLoadingMsg, setShowLoadingMsg] = useState(false)
-
-    useEffect(() => {
-        setShowLoadingMsg(false)
-        if (!loading) return
-        const t = setTimeout(() => setShowLoadingMsg(true), 1000)
-        return () => clearTimeout(t)
-    }, [loading])
-
     const matches = allGames || []
     const timeAgo = useTimeAgo(lastUpdated)
 
@@ -102,7 +93,7 @@ function ClubGames() {
                         ))}
                     </select>
                 </div>
-                <Link to="/about" className="shrink-0 flex items-center gap-1 text-[10px] text-zinc-500 dark:text-zinc-500 hover:text-[var(--club-color)] transition-colors uppercase tracking-wide group">
+                <Link to="/sobre" className="shrink-0 flex items-center gap-1 text-[10px] text-zinc-500 dark:text-zinc-500 hover:text-[var(--club-color)] transition-colors uppercase tracking-wide group">
                     <RefreshCw size={10} className="group-hover:animate-spin" />
                     <span>{timeAgo || '--'}</span>
                 </Link>
@@ -119,18 +110,7 @@ function ClubGames() {
                 </div>
             )}
 
-            {/* Loading */}
-            {loading && (
-                <div>
-                    {showLoadingMsg && (
-                        <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 flex items-center justify-center gap-2 pt-4 pb-2">
-                            <RefreshCw size={12} className="animate-spin" />
-                            A atualizar dados...
-                        </div>
-                    )}
-                    <SkeletonGameGrid days={2} count={3} />
-                </div>
-            )}
+            {loading && <LoadingSpinner message="A atualizar dados..." />}
 
             {/* Error + empty */}
             {!loading && error && matches.length === 0 && (

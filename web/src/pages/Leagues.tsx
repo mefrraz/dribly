@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Heart, Loader2, Search } from 'lucide-react'
+import { Heart, Search } from 'lucide-react'
+import { LoadingSpinner } from '../components/LoadingSpinner'
 import { useFollows } from '../hooks/useFollows'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -49,7 +50,7 @@ export default function Leagues() {
                 </div>
 
                 {loading ? (
-                    <div className="flex justify-center py-12"><Loader2 className="animate-spin text-dribly-purple" size={24} /></div>
+                    <LoadingSpinner />
                 ) : (
                     <div className="space-y-8">
                         {masc.length > 0 && (

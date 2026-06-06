@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Loader2 } from 'lucide-react'
+import { LoadingSpinner } from '../components/LoadingSpinner'
 import { supabase } from '../lib/supabase'
 
 const TUGABASKET_ASSETS = 'https://resultados.tugabasket.com/assets/images/logos'
@@ -48,14 +48,11 @@ export default function Standings() {
                 </p>
 
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-16 gap-4">
-                        <Loader2 className="animate-spin text-dribly-purple" size={28} />
-                        <span className="text-sm text-zinc-400 font-medium">A carregar associações...</span>
-                    </div>
+                    <LoadingSpinner message="A carregar associações..." />
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5 sm:gap-3.5">
                         {associations.map(a => (
-                            <Link key={a.association_id} to={`/standings/${a.association_id}`}
+                            <Link key={a.association_id} to={`/classificacoes/${a.association_id}`}
                                 className="group bg-white dark:bg-zinc-900/90 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 p-4 sm:p-5 shadow-sm hover:shadow-xl hover:border-zinc-300 dark:hover:border-zinc-600 hover:-translate-y-0.5 transition-all duration-200 flex flex-col items-center gap-3">
                                 <div className="w-[72px] h-[72px] sm:w-[80px] sm:h-[80px] rounded-2xl bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-800/50 flex items-center justify-center p-3 border border-zinc-100 dark:border-zinc-700/50 shadow-inner group-hover:shadow-md transition-all duration-200">
                                     <img src={logoUrl(a.association_id)} alt={a.association_name}

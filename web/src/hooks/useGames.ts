@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { fetchFPBGames } from '../lib/fpbApi'
 import { Match } from '../components/types'
+import { logger } from '../lib/logger'
 
 const CACHE_MINUTES = 15
 
@@ -34,12 +35,7 @@ function getTableName(season: string): string {
   return `games_${season.replace('/', '_')}`
 }
 
-function slugify(s: string): string {
-  return s.toLowerCase().trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}
+import { slugify } from '../lib/fpbUtils'
 
 function mapFPBData(fresh: any[], season: string): Match[] {
   return fresh.map(g => {
@@ -86,7 +82,7 @@ export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
       unique.map(g => ({ ...g, updated_at: new Date().toISOString() })),
       { onConflict: 'slug' }
     ).then(({ error: upsertError }) => {
-      if (upsertError) console.warn('Supabase upsert:', upsertError.message)
+      if (upsertError) logger.warn('Supabase upsert:', upsertError.message)
     })
   }, [tableName])
 
@@ -121,7 +117,7 @@ export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
       setLastUpdated(new Date())
       persistToSupabase(mapped)
     } catch (err) {
-      console.error('FPB refresh failed:', err)
+      logger.error('FPB refresh failed:', err)
       setError(err instanceof Error ? err.message : 'Erro ao carregar jogos')
     } finally {
       setLoading(false)
@@ -159,7 +155,7 @@ export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
       try {
         await fetchAndSet()
       } catch (err) {
-        console.error('Failed to load games:', err)
+        logger.error('Failed to load games:', err)
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Erro ao carregar dados')
         }

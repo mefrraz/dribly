@@ -9,7 +9,9 @@
  */
 import { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { ArrowLeft, Loader2, MapPin, CalendarDays, Trophy, Info, Navigation, Home, Mail, Building2, Globe } from 'lucide-react'
+import { MapPin, CalendarDays, Trophy, Info, Navigation, Home, Mail, Building2, Globe } from 'lucide-react'
+import { LoadingSpinner } from '../components/LoadingSpinner'
+import { PageHeader } from '../components/PageHeader'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabase'
@@ -107,9 +109,7 @@ export default function PavilionPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 size={28} className="animate-spin text-dribly-purple" />
-            </div>
+            <div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>
         )
     }
 
@@ -117,7 +117,7 @@ export default function PavilionPage() {
         return (
             <div className="max-w-xl mx-auto px-4 py-16 text-center">
                 <p className="text-zinc-500">Pavilhão não encontrado.</p>
-                <button onClick={() => window.history.back()} className="text-dribly-purple text-sm mt-2 inline-block">← Voltar</button>
+                <PageHeader />
             </div>
         )
     }
@@ -125,10 +125,7 @@ export default function PavilionPage() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
             <div className="max-w-6xl mx-auto px-4 pt-6 pb-24">
-                <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 mb-4 group">
-                    <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-                    Voltar
-                </button>
+                <PageHeader />
 
                 <div className="flex items-start gap-4 mb-6">
                     <div className="w-14 h-14 rounded-2xl bg-dribly-purple/10 flex items-center justify-center shrink-0">

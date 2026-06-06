@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { logger } from './logger'
 
 const FPB_PROXY = '/api/fpb'
 
@@ -43,13 +44,9 @@ export function useTeamPhotos(clubId: number, clubName: string): { teams: TeamDa
                 const ids = parseClubTeams(await r.text())
                 if (cancelled || ids.length === 0) { setLoading(false); return }
 
-                console.log(`📸 ${clubName}: ${ids.length} equipas`)
+                logger.log(`📸 ${clubName}: ${ids.length} equipas`)
 
-                const allTeams: TeamData[] = []
-                for (let i = 0; i < ids.length; i += 5) {
-                    if (cancelled) return
-                    allTeams.push(...(await fetchBatch(ids.slice(i, i + 5))))
-                }
+                const allTeams = await fetchBatch(ids)
 
                 if (!cancelled) setTeams(allTeams)
             } catch {} finally { if (!cancelled) setLoading(false) }

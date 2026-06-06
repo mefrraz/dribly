@@ -138,7 +138,7 @@ function PWAInstallBanner() {
         }
 
         return (
-            <Link to="/install" onClick={handleDismiss}
+            <Link to="/instalar" onClick={handleDismiss}
                 className="px-6 py-3 bg-dribly-blue text-white text-sm font-bold rounded-xl hover:bg-dribly-blue-dim transition-colors shadow-md shadow-blue-500/20">
                 Ver instruções
             </Link>

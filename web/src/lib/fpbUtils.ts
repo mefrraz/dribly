@@ -1,0 +1,57 @@
+/** Shared FPB parsing utilities — used by multiple API files and hooks. */
+
+/** Portuguese month abbreviations → number (1-12) */
+export const MONTHS_PT: Record<string, number> = {
+  'JAN': 1, 'FEV': 2, 'MAR': 3, 'ABR': 4, 'MAI': 5, 'JUN': 6,
+  'JUL': 7, 'AGO': 8, 'SET': 9, 'OUT': 10, 'NOV': 11, 'DEZ': 12,
+}
+
+/**
+ * Parse a Portuguese date string like "15 ABR 2026" → "2026-04-15".
+ * Returns null if the string can't be parsed.
+ */
+export function parseDatePt(dateStr: string): string | null {
+  if (!dateStr) return null
+  const cleaned = dateStr.replace(/,/g, '').trim().toUpperCase()
+  const parts = cleaned.split(/\s+/)
+  if (parts.length < 3) return null
+  const day = parseInt(parts[0])
+  if (isNaN(day)) return null
+  const month = MONTHS_PT[parts[1]] || null
+  if (!month) return null
+  const year = parseInt(parts[2])
+  if (isNaN(year)) return null
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+/**
+ * Slugify a string for use in URLs.
+ * "FC Porto" → "fc-porto"
+ */
+export function slugify(s: string): string {
+  return s.toLowerCase().trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+/**
+ * Semi-abbreviate long Portuguese club names.
+ * "Futebol Clube do Porto" → "FC Porto"
+ */
+export function semiAbrev(fullName: string): string {
+    const rules: [RegExp, string][] = [
+        [/^Futebol\s+Clube\s+(do|da|de)\s+/i, 'FC '],
+        [/^Sporting\s+Clube\s+(de\s+)?/i, 'SC '],
+        [/^Vitória\s+Sport\s+Clube/i, 'Vitória SC'],
+        [/^União\s+Desportiva\s+/i, 'UD '],
+        [/^Clube\s+Desportivo\s+/i, 'CD '],
+        [/^Grupo\s+Desportivo\s+/i, 'GD '],
+        [/^Associação\s+Académica\s+de\s+/i, 'AA '],
+        [/^Sport\s+Lisboa\s+e\s+Benfica/i, 'SL Benfica'],
+    ]
+    for (const [regex, replacement] of rules) {
+        if (regex.test(fullName)) return fullName.replace(regex, replacement).trim()
+    }
+    return fullName
+}

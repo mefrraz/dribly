@@ -3,6 +3,7 @@
  * Fetches pavilions and games from Supabase.
  */
 import { supabase } from './supabase'
+import { logger } from './logger'
 
 export interface Pavilion {
     id: number
@@ -49,7 +50,7 @@ export async function fetchPavilions(): Promise<Pavilion[]> {
         .order('nome')
 
     if (error) {
-        console.error('Failed to fetch pavilions:', error)
+        logger.error('Failed to fetch pavilions:', error)
         return []
     }
 
@@ -80,7 +81,7 @@ export async function fetchGamesAtPavilion(pavilionName: string, _city?: string 
     const { data, error } = await query
 
     if (error) {
-        console.error('Failed to fetch games at pavilion:', error)
+        logger.error('Failed to fetch games at pavilion:', error)
         return []
     }
 

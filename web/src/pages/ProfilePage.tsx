@@ -1,17 +1,18 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
-    ArrowLeft, User, AtSign, FileText, Check, Loader2, LogOut,
+    User, AtSign, FileText, Check, Loader2, LogOut,
     Lock, Key, Monitor, X, Trash2, AlertTriangle, Eye, EyeOff,
 } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 import { useUser, useSessionList } from '@clerk/clerk-react'
+import { PageHeader } from '../components/PageHeader'
+import { logger } from '../lib/logger'
 
 export default function ProfilePage() {
     const { user, signOut } = useAuth()
     const { user: clerkUser } = useUser()
     const { sessions } = useSessionList()
-    const navigate = useNavigate()
 
     // Profile fields
     const [firstName, setFirstName] = useState(user?.firstName || '')
@@ -56,7 +57,7 @@ export default function ProfilePage() {
             setSaved(true)
             setTimeout(() => setSaved(false), 2000)
         } catch {
-            console.error('Failed to update profile')
+            logger.error('Failed to update profile')
         }
         setSaving(false)
     }
@@ -102,11 +103,7 @@ export default function ProfilePage() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
             <div className="max-w-xl mx-auto px-3 sm:px-5 pt-6 pb-24">
-                <button onClick={() => navigate(-1)}
-                    className="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors mb-6 group">
-                    <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-                    Voltar
-                </button>
+                <PageHeader />
 
                 <div className="flex items-center gap-4 mb-8">
                     <div className="w-16 h-16 rounded-full bg-dribly-purple text-white flex items-center justify-center text-xl font-bold shrink-0">

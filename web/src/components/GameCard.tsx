@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+﻿import { useState, memo } from 'react'
 import { Link } from 'react-router-dom'
 import { Clock, MapPin, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Match } from './types'
@@ -15,11 +15,11 @@ function hasHora(hora: string | null | undefined): boolean {
   return !!hora && hora.replace(/[^0-9]/g, '').length > 0
 }
 
-export function GameCard({ match, mode, clubName, clubSlug }: GameCardProps) {
+const GameCardInner = ({ match, mode, clubName, clubSlug }: GameCardProps) => {
   const slug = match.slug || `${match.data}-${match.equipa_casa.toLowerCase().replace(/\s+/g, '-')}-${match.equipa_fora.toLowerCase().replace(/\s+/g, '-')}`
   const won = clubName ? isClubWin(match, clubName) : null
   const isLive = match.status === 'A DECORRER'
-  const linkSlug = clubSlug ? `/game/${slug}?clube=${clubSlug}` : `/game/${slug}`
+  const linkSlug = clubSlug ? `/jogo/${slug}?clube=${clubSlug}` : `/jogo/${slug}`
 
   const badge = mode === 'agenda'
     ? null
@@ -120,3 +120,5 @@ function TeamRow({ name, logo, score, dimmed }: { name: string; logo: string | n
     </div>
   )
 }
+
+export const GameCard = memo(GameCardInner)

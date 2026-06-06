@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { Users, ChevronRight, Calendar, ArrowLeft } from 'lucide-react'
+import { Users, ChevronRight, Calendar } from 'lucide-react'
+import { PageHeader } from '../../components/PageHeader'
 import { useGames } from '../../hooks/useGames'
 import { useTeamPhotos } from '../../lib/useTeamPhotos'
 import { SkeletonGameGrid } from '../../components/Skeleton'
@@ -101,10 +102,7 @@ function ClubTeams() {
 
     return (
         <div className="max-w-xl mx-auto space-y-4 pb-20 px-3">
-            <Link to={`/clube/${club.slug}/home`} className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 mb-3 group">
-                <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-                {displayName(club)}
-            </Link>
+            <PageHeader backTo={`/clube/${club.slug}/home`} title={displayName(club)} />
             <div className="pt-1 pb-1">
                 <h2 className="text-xl font-black text-zinc-900 dark:text-white">Equipas</h2>
                 <p className="text-xs text-zinc-500 mt-1">{displayTeams.length} equipas de {displayName(club)} na época 2025/2026</p>

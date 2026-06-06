@@ -1,4 +1,5 @@
-import { ArrowLeft, Smartphone } from 'lucide-react'
+import { Smartphone } from 'lucide-react'
+import { PageHeader } from '../components/PageHeader'
 
 function Install() {
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
@@ -6,13 +7,7 @@ function Install() {
 
     return (
         <div className="max-w-xl mx-auto space-y-5 pb-24 px-3">
-            <div className="flex items-center justify-between pt-3">
-                <button onClick={() => window.history.back()} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                    <ArrowLeft size={22} />
-                </button>
-                <span className="text-xs font-bold tracking-widest uppercase text-zinc-500">INSTALAR APP</span>
-                <div className="w-10" />
-            </div>
+            <PageHeader />
 
             {/* Intro */}
             <div className="glass-card p-6 flex flex-col items-center text-center ">

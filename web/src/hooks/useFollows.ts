@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/AuthContext'
 import { toast } from '../components/Toast'
+import { logger } from '../lib/logger'
 
 export interface Follow {
     id: number
@@ -92,7 +93,7 @@ export function useFollows() {
         } catch (err) {
             // 4. Rollback on failure
             setFollows(previousFollows)
-            console.error('Follow toggle failed:', err)
+            logger.error('Follow toggle failed:', err)
             toast.error('Ocorreu um erro. A reverter...')
             return false
         }

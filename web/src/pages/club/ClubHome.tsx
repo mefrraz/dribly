@@ -4,7 +4,7 @@ import { Calendar, Trophy, ChevronRight, Clock, MapPin, RefreshCw, AlertCircle, 
 import { useGames } from '../../hooks/useGames'
 import { useFollows } from '../../hooks/useFollows'
 import { useAuth } from '../../lib/AuthContext'
-import { SkeletonHero } from '../../components/Skeleton'
+import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { type Club, displayName } from '../../lib/ClubContext'
 
 function ClubHome() {
@@ -13,15 +13,7 @@ function ClubHome() {
 
     const { isFollowing, toggleFollow } = useFollows()
     const { games: allGames, loading, error, refresh } = useGames('2025/2026', club.id, club.name)
-    const [showLoadingMsg, setShowLoadingMsg] = useState(false)
     const games = allGames || []
-
-    useEffect(() => {
-        setShowLoadingMsg(false)
-        if (!loading) return
-        const t = setTimeout(() => setShowLoadingMsg(true), 1000)
-        return () => clearTimeout(t)
-    }, [loading])
 
     const nextGame = useMemo(() => {
         if (games.length === 0) return null
@@ -70,21 +62,7 @@ function ClubHome() {
     }
 
     if (loading) {
-        return (
-            <div className="max-w-xl mx-auto space-y-5 pb-20 px-3">
-                {showLoadingMsg && (
-                    <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 flex items-center justify-center gap-2 pt-2">
-                        <RefreshCw size={12} className="animate-spin" />
-                        A atualizar dados...
-                    </div>
-                )}
-                <SkeletonHero />
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-2xl bg-zinc-100 dark:bg-zinc-900 animate-pulse h-32" />
-                    <div className="rounded-2xl bg-[var(--club-color)]/30 animate-pulse h-32" />
-                </div>
-            </div>
-        )
+        return <LoadingSpinner message="A atualizar dados..." />
     }
 
     if (error && games.length === 0) {
@@ -147,7 +125,7 @@ function ClubHome() {
             )}
             {/* Hero: Next Game */}
             {nextGame && (
-                <Link to={`/game/${nextGame.slug || ''}?clube=${club.slug}`} className="block group ">
+                <Link to={`/jogo/${nextGame.slug || ''}?clube=${club.slug}`} className="block group ">
                     <div className="glass-card overflow-hidden group-hover:border-[var(--club-color)]/30 transition-all duration-200">
                         <div className="bg-gradient-to-r from-[var(--club-color)]/10 via-zinc-50 to-[var(--club-color)]/10 dark:from-[var(--club-color)]/5 dark:via-zinc-900 dark:to-[var(--club-color)]/5 border-b border-zinc-100 dark:border-white/5 p-3 flex justify-between items-center">
                             <span className="text-[10px] font-bold text-[var(--club-color)] uppercase tracking-wide">{nextGame.escalao || 'Sénior Masculino'}</span>
@@ -212,7 +190,7 @@ function ClubHome() {
                         {recentResults.map(match => {
                             const slug = match.slug || ''
                             return (
-                                <Link to={`/game/${slug}?clube=${club.slug}`} key={slug} className="flex items-center gap-3 p-3 glass-card hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
+                                <Link to={`/jogo/${slug}?clube=${club.slug}`} key={slug} className="flex items-center gap-3 p-3 glass-card hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
                                     <div className="w-1.5 h-1.5 rounded-full shrink-0 bg-zinc-300 dark:bg-zinc-600" />
                                     <div className="flex-1 min-w-0">
                                         <span className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate block leading-tight">{match.escalao || 'Sénior Masculino'}</span>
@@ -244,7 +222,7 @@ function ClubHome() {
                         {upcomingGames.map(match => {
                             const slug = match.slug || ''
                             return (
-                                <Link to={`/game/${slug}?clube=${club.slug}`} key={slug} className="flex items-center gap-3 p-3 glass-card hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
+                                <Link to={`/jogo/${slug}?clube=${club.slug}`} key={slug} className="flex items-center gap-3 p-3 glass-card hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
                                     <Clock size={12} className="text-[var(--club-color)] shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <span className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate block leading-tight">{match.escalao || 'Sénior Masculino'}</span>

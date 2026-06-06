@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Outlet, useParams, Link } from 'react-router-dom'
 import { AlertCircle } from 'lucide-react'
 import { useClub, type Club } from '../../lib/ClubContext'
+import { LoadingSpinner } from '../../components/LoadingSpinner'
 
 export default function ClubLayout() {
     const { slug } = useParams<{ slug: string }>()
@@ -42,9 +43,7 @@ export default function ClubLayout() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-32">
-                <div className="w-8 h-8 border-2 border-dribly-blue border-t-transparent rounded-full animate-spin" />
-            </div>
+            <LoadingSpinner />
         )
     }
 

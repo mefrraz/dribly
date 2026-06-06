@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Loader2, ArrowLeft, Search, ExternalLink } from 'lucide-react'
+import { Search, ExternalLink } from 'lucide-react'
+import { PageHeader } from '../components/PageHeader'
+import { LoadingSpinner } from '../components/LoadingSpinner'
 import { supabase } from '../lib/supabase'
 import { useStandings } from '../hooks/useStandings'
 import { StandingsTable } from '../components/StandingsTable'
@@ -78,11 +80,7 @@ export default function CompetitionPhases() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
             <div className="max-w-4xl mx-auto px-3 sm:px-5 pt-6 sm:pt-8 pb-16">
-                <Link to={`/standings/${assocId}`}
-                    className="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors mb-4 group">
-                    <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-                    {assocName || 'Competições'}
-                </Link>
+                <PageHeader backTo={`/classificacoes/${assocId}`} title={assocName || 'Competições'} />
 
                 <div className="mb-6">
                     <div className="flex items-start justify-between gap-3">
@@ -107,12 +105,7 @@ export default function CompetitionPhases() {
                 </div>
 
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-24 gap-4">
-                        <Loader2 className="animate-spin text-dribly-purple" size={32} />
-                        <span className={`text-sm text-zinc-400 font-medium transition-opacity duration-600 ${showLoadingMsg ? 'opacity-100' : 'opacity-0'}`}>
-                            A atualizar classificações...
-                        </span>
-                    </div>
+                    <LoadingSpinner message="A atualizar classificações..." />
                 ) : error ? (
                     <div className="text-center py-20 bg-white dark:bg-zinc-900/50 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60">
                         <p className="text-zinc-500 font-medium">{error}</p>

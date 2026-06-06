@@ -1,10 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
+import { logger } from './logger'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseAnonKey) {
-    console.error("Missing Supabase Variables")
+    logger.error("Missing Supabase Variables")
 }
 
 // Clerk token provider — set by AuthContext when Clerk is ready

@@ -10,24 +10,11 @@ import { SkeletonHero } from '../components/Skeleton'
 import { Match } from '../components/types'
 import { useClub, type Club } from '../lib/ClubContext'
 import { fetchPavilions, type Pavilion } from '../lib/mapData'
-
-/** Converts a long team name to a semi-abbreviated version (e.g. "Futebol Clube do Porto" → "FC Porto") */
-function semiAbrev(fullName: string): string {
-    const rules: [RegExp, string][] = [
-        [/^Futebol\s+Clube\s+(do|da|de)\s+/i, 'FC '],
-        [/^Sporting\s+Clube\s+(de\s+)?/i, 'SC '],
-        [/^Vitória\s+Sport\s+Clube/i, 'Vitória SC'],
-        [/^União\s+Desportiva\s+/i, 'UD '],
-        [/^Clube\s+Desportivo\s+/i, 'CD '],
-        [/^Grupo\s+Desportivo\s+/i, 'GD '],
-        [/^Associação\s+Académica\s+de\s+/i, 'AA '],
-        [/^Sport\s+Lisboa\s+e\s+Benfica/i, 'SL Benfica'],
-    ]
-    for (const [regex, replacement] of rules) {
-        if (regex.test(fullName)) return fullName.replace(regex, replacement).trim()
-    }
-    return fullName
-}
+import { semiAbrev } from '../lib/fpbUtils'
+import { logger } from '../lib/logger'
+import { TeamBlock } from '../components/TeamBlock'
+import { GameDueloCard } from '../components/GameDueloCard'
+import { GameLeadersCard } from '../components/GameLeadersCard'
 
 function detailToMatch(detail: FPBGameDetail): Match {
     return {
@@ -147,7 +134,7 @@ function Game() {
                     }
                 }
             } catch (err) {
-                console.warn('FPB fallback failed:', err)
+                logger.warn('FPB fallback failed:', err)
             }
 
             setLoading(false)
@@ -275,7 +262,10 @@ function Game() {
             <div className="max-w-xl mx-auto px-3 py-32 text-center">
                 <Trophy size={40} className="mx-auto text-zinc-300 dark:text-zinc-700 mb-4" strokeWidth={1} />
                 <p className="text-sm text-zinc-500 mb-4">Jogo não encontrado</p>
-                <button onClick={() => window.history.back()} className="text-xs font-bold text-dribly-blue hover:underline">Voltar</button>
+                <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors group">
+                    <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                    Voltar
+                </button>
             </div>
         )
     }
@@ -462,89 +452,9 @@ function Game() {
                 </div>
             </div>
 
-            {/* Duelo */}
-            {topPerfCasa.nome && topPerfFora.nome && (
-                <div className="glass-card overflow-hidden ">
-                    <div className="p-4 border-b border-zinc-100 dark:border-white/5">
-                        <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />
-                            Duelo
-                        </h3>
-                    </div>
-                    <div className="p-4">
-                        <div className="flex items-center justify-center gap-3 sm:gap-5 mb-5">
-                            <div className="flex flex-col items-center gap-1 text-center min-w-0" style={{ flex: '1 1 0px' }}>
-                                <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
-                                    {topPerfCasa.foto ? <img src={topPerfCasa.foto} alt="" className="w-14 h-14 sm:w-20 sm:h-20 rounded-full object-cover" /> : <span className="text-lg sm:text-xl font-semibold text-zinc-400">{topPerfCasa.nome.charAt(0)}</span>}
-                                </div>
-                                <span className="text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 leading-tight">{topPerfCasa.nome}</span>
-                            </div>
-                            <div className="shrink-0 flex items-center">
-                                <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-[0.15em]">VS</span>
-                            </div>
-                            <div className="flex flex-col items-center gap-1 text-center min-w-0" style={{ flex: '1 1 0px' }}>
-                                <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
-                                    {topPerfFora.foto ? <img src={topPerfFora.foto} alt="" className="w-14 h-14 sm:w-20 sm:h-20 rounded-full object-cover" /> : <span className="text-lg sm:text-xl font-semibold text-zinc-400">{topPerfFora.nome.charAt(0)}</span>}
-                                </div>
-                                <span className="text-[10px] sm:text-sm font-semibold text-zinc-700 dark:text-zinc-200 leading-tight line-clamp-1">{topPerfFora.nome}</span>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            {topPerfStats.map((stat, i) => {
-                                const cv = parseInt(stat.casa) || 0
-                                const fv = parseInt(stat.fora) || 0
-                                const total = cv + fv || 1
-                                const cpct = Math.round((cv / total) * 100)
-                                return (
-                                    <div key={i} className="flex items-center gap-3">
-                                        <span className="text-[10px] sm:text-xs font-medium text-zinc-400 uppercase w-24 shrink-0">{stat.label}</span>
-                                        <span className="text-xs sm:text-sm font-semibold text-dribly-purple tabular-nums w-8 text-right">{stat.casa}</span>
-                                        <div className="flex-1 h-2 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-                                            <div className="h-full bg-dribly-purple/70 rounded-full" style={{ width: cpct + '%' }} />
-                                            <div className="h-full bg-zinc-200 dark:bg-zinc-700" style={{ width: (100 - cpct) + '%' }} />
-                                        </div>
-                                        <span className="text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 tabular-nums w-8">{stat.fora}</span>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-                </div>
-            )}
+            <GameDueloCard topPerfCasa={topPerfCasa} topPerfFora={topPerfFora} topPerfStats={topPerfStats} />
 
-            {/* Top Performers */}
-            {detailLeaders.length > 0 && (
-                <div className="glass-card overflow-hidden ">
-                    <div className="p-4 border-b border-zinc-100 dark:border-white/5">
-                        <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
-                            <span className="w-1 h-1 rounded-full bg-dribly-purple" />
-                            Top Performers
-                        </h3>
-                    </div>
-                    <div className="p-4 space-y-2">
-                        {detailLeaders.map((l, i) => {
-                            const cv = parseInt(l.casa.valor) || 0
-                            const fv = parseInt(l.fora.valor) || 0
-                            const isCasa = cv >= fv
-                            const best = isCasa ? l.casa : l.fora
-                            return (
-                                <div key={i} className="flex items-center gap-3">
-                                    <span className="text-[10px] sm:text-xs font-medium text-zinc-400 uppercase w-20 shrink-0">{l.categoria}</span>
-                                    <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-700">
-                                        {best.foto ? (
-                                            <img src={best.foto} alt="" className="w-7 h-7 sm:w-10 sm:h-10 rounded-full object-cover" />
-                                        ) : (
-                                            <span className="text-[10px] sm:text-xs font-semibold text-zinc-400">{best.nome?.charAt(0)?.toUpperCase() || '?'}</span>
-                                        )}
-                                    </div>
-                                    <span className="text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-300 flex-1 truncate">{best.nome}</span>
-                                    <span className="text-sm sm:text-base font-semibold text-dribly-purple tabular-nums">{best.valor}</span>
-                                </div>
-                            )
-                        })}
-                    </div>
-                </div>
-            )}
+            <GameLeadersCard detailLeaders={detailLeaders} />
 
             {/* H2H History */}
             {recentGames.length > 0 && (
@@ -570,7 +480,7 @@ function Game() {
                             const secondLogo = isHome ? awayLogo : homeLogo
 
                             return (
-                                <Link to={`/game/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
+                                <Link to={`/jogo/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
                                     <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
                                         {firstLogo ? (
                                             <img src={firstLogo} alt="" className="w-5 h-5 object-contain" />
@@ -614,7 +524,7 @@ function Game() {
                             const shortDate = new Date(game.data).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short', year: 'numeric' })
 
                             return (
-                                <Link to={`/game/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-3 p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
+                                <Link to={`/jogo/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-3 p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
                                     <TrendingUp size={12} className="text-dribly-blue shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs text-zinc-900 dark:text-white truncate group-hover:text-dribly-blue transition-colors">
@@ -638,27 +548,6 @@ function Game() {
 function findClubSlug(name: string, clubs: Club[]): string | null {
     const found = clubs.find(c => name.toUpperCase().includes(c.name.toUpperCase()))
     return found ? found.slug : null
-}
-
-function TeamBlock({ name, logo, clubSlug }: { name: string; logo: string | null; clubSlug?: string | null }) {
-    const content = (
-        <div className="flex-1 flex flex-col items-center text-center gap-1 min-w-0">
-            <div className="w-20 h-20 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
-                {logo ? (
-                    <img src={logo} alt="" className="w-14 h-14 object-contain" />
-                ) : (
-                    <span className="text-2xl font-bold text-zinc-500">{semiAbrev(name).charAt(0)}</span>
-                )}
-            </div>
-            <p className="text-xs font-black text-zinc-900 dark:text-white leading-tight truncate w-full">
-                {semiAbrev(name)}
-            </p>
-        </div>
-    );
-    if (clubSlug) {
-        return <Link to={"/clube/" + clubSlug + "/home"} className="flex-1 hover:opacity-80 transition-opacity">{content}</Link>;
-    }
-    return content;
 }
 
 export default Game

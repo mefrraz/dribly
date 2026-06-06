@@ -236,6 +236,29 @@ A Vercel faz auto-deploy. Domínio: **[dribly.pt](https://dribly.pt)**.
 
 ---
 
+## 🧪 Testes
+
+O projeto tem **111 testes** em 14 ficheiros, cobrindo lógica de parsing, hooks, componentes React e utilitários.
+
+```bash
+cd web
+npm test
+```
+
+Os testes correm automaticamente em cada deploy na Vercel. Se algum falhar, o build não publica.
+
+### Cobertura
+
+| Área | Ficheiros | Testes |
+|---|---|---|
+| Parsers FPB/TugaBasket | `fpbApi.test.ts`, `fpbCompetitionsApi.test.ts`, `tugabasketApi.test.ts`, `fetchStandings.test.ts` | 33 |
+| Utilitários | `fpbUtils.test.ts`, `matchUtils.test.ts`, `clubSearch.test.ts` | 46 |
+| Hooks React | `useGames.test.ts`, `useFollows.test.ts` | 7 |
+| Componentes | `GameCard.test.tsx`, `ErrorBoundary.test.tsx`, `StandingsTable.test.tsx`, `Toast.test.tsx` | 20 |
+| Contexto | `ClubContext.test.tsx` | 5 |
+
+---
+
 ## 📜 Licença
 
 GNU AGPLv3 — código aberto, copyleft para serviços web. [LICENSE](LICENSE)

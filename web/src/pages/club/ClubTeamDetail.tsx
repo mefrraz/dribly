@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams, useOutletContext } from 'react-router
 import { ArrowLeft, Calendar, Trophy, Users, Info, TrendingUp, ChevronRight, MapPin } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
 import { useEquipaGames } from '../../hooks/useEquipaGames'
+import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { SkeletonGameGrid } from '../../components/Skeleton'
 import { EmptyState } from '../../components/EmptyState'
 import { GameCard } from '../../components/GameCard'
@@ -220,7 +221,7 @@ function ClubTeamDetail() {
                             const loseLogo = isHome ? maxWin.logotipo_fora : maxWin.logotipo_casa
                             const loseScore = isHome ? maxWin.resultado_fora! : maxWin.resultado_casa!
                             return (
-                                <Link to={`/game/${maxWin.slug || maxWin.id}?clube=${club.slug}`}
+                                <Link to={`/jogo/${maxWin.slug || maxWin.id}?clube=${club.slug}`}
                                     className="flex-1 min-w-0 glass-card flex flex-col group active:scale-[0.98]">
                                     <div className="flex justify-between items-center px-4 py-2.5 border-b border-zinc-100 dark:border-white/5">
                                         <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400">
@@ -279,7 +280,7 @@ function ClubTeamDetail() {
             {/* Agenda / Resultados */}
             {(tab === 'agenda' || tab === 'resultados') && (
                 <>
-                    {loading && <div><SkeletonGameGrid days={2} count={3} /></div>}
+                    {loading && <LoadingSpinner />}
                     {!loading && sortedDates.length === 0 && <EmptyState view={tab === 'agenda' ? 'agenda' : 'results'} />}
                     {!loading && sortedDates.length > 0 && (
                         <div className="space-y-6 px-2 md:px-4">

@@ -74,31 +74,7 @@ export interface FPBPlayerStat {
     min?: number
 }
 
-const MONTHS_PT: Record<string, number> = {
-  'JAN': 1, 'FEV': 2, 'MAR': 3, 'ABR': 4, 'MAI': 5, 'JUN': 6,
-  'JUL': 7, 'AGO': 8, 'SET': 9, 'OUT': 10, 'NOV': 11, 'DEZ': 12,
-}
-
-function parseDatePt(dateStr: string): string | null {
-  if (!dateStr) return null
-  const cleaned = dateStr.replace(/,/g, '').trim().toUpperCase()
-  const parts = cleaned.split(/\s+/)
-  if (parts.length < 3) return null
-  const day = parseInt(parts[0])
-  if (isNaN(day)) return null
-  const month = MONTHS_PT[parts[1]] || null
-  if (!month) return null
-  const year = parseInt(parts[2])
-  if (isNaN(year)) return null
-  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-}
-
-function slugify(s: string): string {
-  return s.toLowerCase().trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}
+import { parseDatePt, slugify } from './fpbUtils'
 
 // ---- API proxy helpers ----
 

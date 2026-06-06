@@ -97,7 +97,7 @@ function Layout() {
                                 <Link to="/mapa" className={`${navPill} ${isActive('/mapa') ? navPillActive : navPillInactive}`}>
                                     <MapPin size={14} /> Mapa
                                 </Link>
-                                <Link to="/standings" className={`${navPill} ${isActive('/standings') ? navPillActive : navPillInactive}`}>
+                                <Link to="/classificacoes" className={`${navPill} ${isActive('/classificacoes') ? navPillActive : navPillInactive}`}>
                                     <BarChart2 size={14} /> Classificações
                                 </Link>
                             </div>
@@ -112,10 +112,10 @@ function Layout() {
                                 <Search size={14} />
                             </button>
 
-                            <Link to="/about" className={`hidden sm:flex ${navIcon} ${isActive('/about') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Sobre">
+                            <Link to="/sobre" className={`hidden sm:flex ${navIcon} ${isActive('/sobre') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Sobre">
                                 <Info size={17} />
                             </Link>
-                            <Link to="/about" className={`sm:hidden ${navIcon} ${isActive('/about') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Sobre">
+                            <Link to="/sobre" className={`sm:hidden ${navIcon} ${isActive('/sobre') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Sobre">
                                 <Info size={18} />
                             </Link>
                             {user ? (

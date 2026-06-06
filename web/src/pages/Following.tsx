@@ -92,8 +92,7 @@ export default function Following() {
     if (loading || followsLoading) {
         return (
             <div className="max-w-xl mx-auto px-3 py-16 text-center">
-                <div className="w-8 h-8 border-2 border-dribly-purple border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-sm text-zinc-500">A carregar...</p>
+                <LoadingSpinner />
             </div>
         )
     }
@@ -109,7 +108,7 @@ export default function Following() {
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 max-w-xs mx-auto">
                     Usa a pesquisa para encontrar clubes e competições e começar a segui-los.
                 </p>
-                <Link to="/search"
+                <Link to="/pesquisa"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-dribly-purple text-white text-sm font-bold hover:bg-dribly-purple/90 transition-all active:scale-[0.97] shadow-sm shadow-dribly-purple/20">
                     <Search size={16} /> Pesquisar
                 </Link>
