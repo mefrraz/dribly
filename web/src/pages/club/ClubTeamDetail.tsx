@@ -318,9 +318,9 @@ function ClubTeamDetail() {
                                         )}
                                     </div>
                                     {p.atletaUrl ? (
-                                        <a href={p.atletaUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-dribly-purple truncate block">
+                                        <Link to={`/atleta/${(p.atletaUrl.match(/atletas\/(\d+)/) || [])[1] || ''}`} className="text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-dribly-purple truncate block">
                                             {p.nome}
-                                        </a>
+                                        </Link>
                                     ) : (
                                         <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate">{p.nome}</p>
                                     )}

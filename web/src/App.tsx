@@ -22,6 +22,7 @@ import Mapa from './pages/Mapa'
 import PavilionPage from './pages/PavilionPage'
 import ClubTeams from './pages/club/ClubTeams'
 import ClubTeamDetail from './pages/club/ClubTeamDetail'
+import AthletePage from './pages/Athlete'
 import NotFound from './pages/NotFound'
 import { ClubProvider } from './lib/ClubContext'
 import { AuthProvider } from './lib/AuthContext'
@@ -58,6 +59,7 @@ function App() {
                         <Route path="mapa" element={<Mapa />} />
                         <Route path="pavilhao/:recintoId" element={<PavilionPage />} />
                         <Route path="competicao/:competitionId" element={<CompetitionDetail />} />
+                        <Route path="atleta/:id" element={<AthletePage />} />
                         <Route path="about" element={<About />} />
                         <Route path="install" element={<Install />} />
                         <Route path="*" element={<NotFound />} />
