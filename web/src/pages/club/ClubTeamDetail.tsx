@@ -4,7 +4,6 @@ import { ArrowLeft, Calendar, Trophy, Users, Info, TrendingUp, ChevronRight, Map
 import { useGames } from '../../hooks/useGames'
 import { useEquipaGames } from '../../hooks/useEquipaGames'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
-import { SkeletonGameGrid } from '../../components/Skeleton'
 import { EmptyState } from '../../components/EmptyState'
 import { GameCard } from '../../components/GameCard'
 import type { Match } from '../../components/types'

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
     User, AtSign, FileText, Check, Loader2, LogOut,
-    Lock, Key, Monitor, X, Trash2, AlertTriangle, Eye, EyeOff,
+    Lock, Key, Monitor, X, Trash2, AlertTriangle, Eye, EyeOff, ArrowLeft,
 } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 import { useUser, useSessionList } from '@clerk/clerk-react'
@@ -13,6 +13,7 @@ export default function ProfilePage() {
     const { user, signOut } = useAuth()
     const { user: clerkUser } = useUser()
     const { sessions } = useSessionList()
+    const navigate = useNavigate()
 
     // Profile fields
     const [firstName, setFirstName] = useState(user?.firstName || '')

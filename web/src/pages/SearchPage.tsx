@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { useSearchParams, useNavigate, Link } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Search, Building2, Trophy } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
 import { supabase } from '../lib/supabase'

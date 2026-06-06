@@ -20,7 +20,6 @@ export default function CompetitionPhases() {
 
     const [compName, setCompName] = useState('')
     const [assocName, setAssocName] = useState('')
-    const [showLoadingMsg, setShowLoadingMsg] = useState(false)
     const [clubSearch, setClubSearch] = useState('')
 
     const { standings, loading, error } = useStandings(season, compId || null)
@@ -37,13 +36,6 @@ export default function CompetitionPhases() {
                 }
             })
     }, [compId])
-
-    useEffect(() => {
-        setShowLoadingMsg(false)
-        if (!loading) return
-        const t = setTimeout(() => setShowLoadingMsg(true), 1500)
-        return () => clearTimeout(t)
-    }, [loading])
 
     const getStatus = (teams: Standing[]): 'active' | 'finished' => {
         if (!teams.length) return 'finished'

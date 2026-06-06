@@ -9,7 +9,6 @@ import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { useLandingData } from '../hooks/useLandingData'
 import { associationLogoUrl } from '../lib/associationLogos'
 import { normalize, buildSearchText } from '../lib/clubSearch'
-import type { Match } from '../components/types'
 import type { LandingCompetition } from '../hooks/useLandingData'
 
 const FEATURED_CLUBS = [

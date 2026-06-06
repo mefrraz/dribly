@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from './supabase'
+import { supabase } from '../lib/supabase'
 import type { Match } from '../components/types'
 
 export interface LandingAssociation {
@@ -84,10 +84,10 @@ export function useLandingData() {
             .select('association_id,association_name')
             .eq('season', '2025/2026')
             .order('association_name')
-            .then(({ data }) => {
+            .then(({ data }: { data: LandingAssociation[] | null }) => {
                 if (data) {
                     const seen = new Map<number, LandingAssociation>()
-                    ;(data as LandingAssociation[]).forEach(a => {
+                    ;data.forEach(a => {
                         if (!seen.has(a.association_id))
                             seen.set(a.association_id, a)
                     })
@@ -106,10 +106,10 @@ export function useLandingData() {
                 'competition_id, competition_name, association_id, association_name'
             )
             .eq('season', '2025/2026')
-            .then(({ data }) => {
+            .then(({ data }: { data: LandingCompetition[] | null }) => {
                 if (data) {
                     const seen: Record<number, LandingCompetition> = {}
-                    ;(data as LandingCompetition[]).forEach(r => {
+                    ;data.forEach(r => {
                         if (!seen[r.competition_id])
                             seen[r.competition_id] = r
                     })
@@ -120,7 +120,7 @@ export function useLandingData() {
             .from('competitions_meta')
             .select('id, name, logo_url')
             .then(
-                ({ data: md }) => {
+                ({ data: md }: { data: any[] | null }) => {
                     if (md) {
                         const cm = new Map<number, CompMeta>()
                         ;(md as any[]).forEach((r: any) =>
