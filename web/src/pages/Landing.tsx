@@ -226,15 +226,14 @@ function Landing() {
                     <div className="flex flex-wrap justify-center gap-2 mb-6 ">
                         {FEATURED_CLUBS.map(({ name, slug }) => {
                             const c = clubs.find(x => x.slug === slug)
-                            if (!c) return null
                             return (
                                 <button
-                                    key={c.slug}
-                                    onClick={() => selectClub(c)}
+                                    key={slug}
+                                    onClick={() => { if (c) selectClub(c); else navigate('/clube/' + slug + '/home') }}
                                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all ${slug === 'ud-oliveirense' ? 'hidden sm:flex' : ''}`}
                                 >
                                     <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
-                                        {c.logo_url ? (
+                                        {c?.logo_url ? (
                                             <img src={c.logo_url} alt="" className="w-3.5 h-3.5 object-contain" />
                                         ) : (
                                             <span className="text-[9px] font-bold text-zinc-500">
@@ -242,7 +241,7 @@ function Landing() {
                                             </span>
                                         )}
                                     </span>
-                                    {displayName(c)}
+                                    {c ? displayName(c) : name}
                                 </button>
                             )
                         })}
