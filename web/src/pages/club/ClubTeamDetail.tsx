@@ -290,11 +290,11 @@ function ClubTeamDetail() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                             {plantel.map((p, i) => (
                                 <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center">
-                                    <div className="w-16 h-16 mx-auto rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden mb-2">
+                                    <div className="relative w-full pb-[133%] bg-zinc-100 dark:bg-zinc-800 rounded-xl overflow-hidden mb-2">
                                         {p.foto ? (
-                                            <img src={p.foto} alt="" className="w-full h-full object-cover" />
+                                            <img src={p.foto} alt="" className="absolute inset-0 w-full h-full object-cover" />
                                         ) : (
-                                            <span className="text-lg font-bold text-zinc-400">{p.nome.charAt(0).toUpperCase()}</span>
+                                            <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-zinc-400">{p.nome.charAt(0).toUpperCase()}</span>
                                         )}
                                     </div>
                                     {p.atletaUrl ? (
