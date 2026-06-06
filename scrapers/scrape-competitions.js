@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SUPABASE_KEY = process.env.SUPABASE_KEY
-const USER_AGENT = 'Mozilla/5.0 (compatible; Dribly-Bot/1.0)'
+const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
     console.error('Missing SUPABASE_URL or SUPABASE_KEY in .env')
@@ -23,7 +23,7 @@ const MAIN_COMPETITIONS = [
 async function fetchHtml(page, competicao) {
     const url = `https://www.fpb.pt/${page}/${competicao}`
     const res = await fetch(url, {
-        headers: { 'User-Agent': USER_AGENT, 'Accept': 'text/html' }
+        headers: { 'User-Agent': USER_AGENT, 'Accept': 'text/html,application/xhtml+xml' }
     })
     if (!res.ok) throw new Error(`FPB error: ${res.status} from ${url}`)
     return await res.text()
