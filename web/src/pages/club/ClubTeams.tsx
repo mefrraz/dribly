@@ -34,7 +34,7 @@ function ClubTeams() {
     const { club } = useOutletContext<{ club: Club }>()
     const { games: allGames, loading: gamesLoading } = useGames('2025/2026', club.id, club.name)
     const { teams: fpbTeams, loading: teamDataLoading } = useTeamPhotos(club.id, club.name)
-    const games = allGames || []
+    const games = useMemo(() => allGames || [], [allGames])
     const clubNameUpper = club.name.toUpperCase()
 
     // Build game stats per team from game data

@@ -47,7 +47,7 @@ function ClubTeamDetail() {
     const { games: equipaGames, photo: equipaPhoto, teamInfo, plantel, loading: equipaLoading } = useEquipaGames(equipaId)
 
     const loading = equipaId ? equipaLoading : clubLoading
-    const games = equipaId && equipaGames.length > 0 ? equipaGames : (clubGames || [])
+    const games = useMemo(() => equipaId && equipaGames.length > 0 ? equipaGames : (clubGames || []), [equipaId, equipaGames, clubGames])
     const clubNameUpper = club.name.toUpperCase()
 
     useEffect(() => {
@@ -194,27 +194,24 @@ function ClubTeamDetail() {
                                     <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{escalao || 'Equipa'}</span>
                                 </div>
                                 <p className="text-sm sm:text-base font-black text-zinc-900 dark:text-white truncate leading-tight">{teamName}</p>
-                                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1.5 flex-wrap">
-                                    <span className="tabular-nums">{total} jogos</span>
-                                    <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
-                                    <span className="text-emerald-600 dark:text-emerald-400 tabular-nums font-bold">{wins}V</span>
-                                    <span className="text-red-500 dark:text-red-400 tabular-nums font-bold">{losses}D</span>
-                                </p>
+                                <Link to={`/clube/${club.slug}`} className="text-[10px] font-bold text-zinc-400 hover:text-dribly-purple transition-colors mt-1 inline-block">
+                                    Ver clube →
+                                </Link>
                             </div>
                         </div>
 
                         {/* Stat cards — 2×2 */}
                         <div className="lg:col-span-7 grid grid-cols-2 gap-2.5">
                             {[
-                                { label: 'Jogos', value: total, sub: `${wins}V · ${losses}D` },
-                                { label: 'Vitórias', value: wins, sub: draws > 0 ? `${draws} empates` : '' },
-                                { label: 'Derrotas', value: losses, sub: '' },
-                                { label: '% Vitórias', value: pct !== null ? pct + '%' : '—', sub: pct !== null && pct >= 50 ? 'Positivo' : pct !== null ? 'Negativo' : '' },
+                                { label: 'Jogos', value: total, detail: `${wins}V · ${losses}D · ${draws}E` },
+                                { label: 'Vitórias', value: wins, detail: '' },
+                                { label: 'Derrotas', value: losses, detail: '' },
+                                { label: '% Vitórias', value: pct !== null ? pct + '%' : '—', detail: total > 0 ? `${total} jogos` : '' },
                             ].map(s => (
                                 <div key={s.label} className="rounded-2xl border p-3 flex flex-col justify-center bg-white dark:bg-zinc-900/60 border-zinc-200/50 dark:border-zinc-800/50">
                                     <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{s.label}</p>
-                                    <p className="text-2xl font-black text-dribly-purple tabular-nums mt-1">{s.value}</p>
-                                    {s.sub && <p className="text-[10px] text-zinc-400 mt-0.5">{s.sub}</p>}
+                                    <p className="text-2xl font-black text-zinc-800 dark:text-zinc-100 tabular-nums mt-1">{s.value}</p>
+                                    {s.detail && <p className="text-[10px] text-zinc-400 mt-0.5">{s.detail}</p>}
                                 </div>
                             ))}
                         </div>
