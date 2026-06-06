@@ -20,19 +20,19 @@ function parseDate(dateStr: string): string {
 
 function parseGames(html: string): Match[] {
     const games: Match[] = []
-    const dayRe = /<div class="day-wrapper[^"]*">([\s\S]*?)<\/div>\s*<\/div>\s*(?=<!-- END DAY ROW|$)/g
-    let dm
-    while ((dm = dayRe.exec(html)) !== null) {
-        const dayBlock = dm[1]
-        const dateMatch = dayBlock.match(/<h3 class="date">\s*([^<]+)\s*<\/h3>/)
-        const date = dateMatch ? parseDate(dateMatch[1]) : ''
-        if (!date) continue
-
-        const gameRe = /<a href="https:\/\/www\.fpb\.pt\/ficha-de-jogo\?internalID=(\d+)"[^>]*>([\s\S]*?)<\/a>/g
-        let gm
-        while ((gm = gameRe.exec(dayBlock)) !== null) {
+    // Extract all game links
+    const gameRe = /<a href="\/ficha-de-jogo\?internalID=(\d+)"[^>]*>([\s\S]*?)<\/a>/g
+    let gm
+    while ((gm = gameRe.exec(html)) !== null) {
             const internalId = gm[1]
             const block = gm[2]
+            const gamePos = gm.index
+
+            // Find date: look backward for nearest <h3 class="date">
+            const before = html.substring(Math.max(0, gamePos - 2000), gamePos)
+            const dateMatch = before.match(/<h3 class="date">\s*([^<]+)\s*<\/h3>/g)
+            const dateStr = dateMatch ? dateMatch[dateMatch.length - 1]?.match(/>([^<]+)</)?.[1]?.trim() : ''
+            const date = dateStr ? parseDate(dateStr) : ''
 
             const siglas = [...block.matchAll(/<span class="sigla">([^<]+)<\/span>/g)].map(m => m[1].trim())
             const scores = [...block.matchAll(/<h3 class="results_text[^"]*">\s*(\d+)\s*<\/h3>/g)].map(m => parseInt(m[1]))
