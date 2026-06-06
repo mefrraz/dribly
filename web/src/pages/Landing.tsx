@@ -51,9 +51,7 @@ function Landing() {
     const [selectedIdx, setSelectedIdx] = useState(-1)
     const [assoOffset, setAssoOffset] = useState(0)
     const [compResults, setCompResults] = useState<LandingCompetition[]>([])
-    const [gameIdx, setGameIdx] = useState(0)
-    const [animating, setAnimating] = useState(false)
-    const [instant, setInstant] = useState(false)
+    const carouselRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
     const dropdownRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
@@ -69,11 +67,13 @@ function Landing() {
 
     // Start carousel at middle copy once games are loaded
     useEffect(() => {
-        if (games.length > 0) {
+        if (games.length > 0 && carouselRef.current) {
+            const card = carouselRef.current.querySelector('.snap-center') as HTMLElement | null
+            const cardWidth = card ? card.offsetWidth + 12 : 332
             const startIdx = games.length + Math.floor(Math.random() * games.length)
-            setGameIdx(startIdx)
+            carouselRef.current.scrollLeft = startIdx * cardWidth
         }
-    }, [games.length])
+    }, [games])
 
 
 
@@ -187,44 +187,21 @@ function Landing() {
         setShowDropdown(false)
     }
 
-    const prevGame = () => {
-        if (animating || games.length === 0) return
-        setAnimating(true)
-        const next = gameIdx - 1
-        if (next < games.length) {
-            // Silent jump to equivalent position in copy2
-            setInstant(true)
-            setGameIdx(next + games.length)
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    setInstant(false)
-                    setGameIdx(next + games.length - 1)
-                    setTimeout(() => setAnimating(false), 350)
-                })
-            })
+    const scrollCarousel = (dir: number) => {
+        if (!carouselRef.current || games.length === 0) return
+        const el = carouselRef.current
+        const card = el.querySelector('.snap-center') as HTMLElement | null
+        const cardWidth = card ? card.offsetWidth + 12 : 332
+        const max = el.scrollWidth - el.clientWidth
+        const half = max / 2
+
+        const next = el.scrollLeft + dir * cardWidth
+        if (next > max - cardWidth) {
+            el.scrollLeft = next - half
+        } else if (next < cardWidth) {
+            el.scrollLeft = next + half
         } else {
-            setGameIdx(next)
-            setTimeout(() => setAnimating(false), 350)
-        }
-    }
-    const nextGame = () => {
-        if (animating || games.length === 0) return
-        setAnimating(true)
-        const next = gameIdx + 1
-        if (next >= games.length * 2) {
-            // Silent jump to equivalent position in copy2
-            setInstant(true)
-            setGameIdx(next - games.length)
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    setInstant(false)
-                    setGameIdx(next - games.length + 1)
-                    setTimeout(() => setAnimating(false), 350)
-                })
-            })
-        } else {
-            setGameIdx(next)
-            setTimeout(() => setAnimating(false), 350)
+            el.scrollBy({ left: dir * cardWidth, behavior: 'smooth' })
         }
     }
 
@@ -412,13 +389,13 @@ function Landing() {
                         </h2>
                         <div className="flex gap-1">
                             <button
-                                onClick={prevGame}
+                                onClick={() => scrollCarousel(-1)}
                                 className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/5 disabled:opacity-30 transition-colors"
                             >
                                 <ChevronLeft size={16} />
                             </button>
                             <button
-                                onClick={nextGame}
+                                onClick={() => scrollCarousel(1)}
                                 className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/5 disabled:opacity-30 transition-colors"
                             >
                                 <ChevronRight size={16} />
@@ -436,23 +413,24 @@ function Landing() {
                     ) : games.length === 0 ? (
                         <p className="text-xs text-zinc-400 text-center py-8">Nenhum jogo em destaque de momento.</p>
                     ) : (
-                        <div className="relative overflow-hidden">
-                            {/* Gradient overlays */}
-                            <div className="absolute left-0 top-0 bottom-0 w-32 sm:w-44 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
-                            <div className="absolute right-0 top-0 bottom-0 w-32 sm:w-44 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
+                        <div className="relative">
                             <div
-                                className={`flex gap-3 ${instant ? '' : 'transition-transform duration-300 ease-out'}`}
-                                style={{ transform: `translateX(calc(-${gameIdx} * (320px + 0.75rem)))` }}
+                                ref={carouselRef}
+                                className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory scroll-smooth items-stretch"
                             >
-                                {[...games, ...games, ...games].map((match, i) => (
+                                <div className="shrink-0 w-[calc(50vw-24px)] md:hidden" />
+                                {[...games, ...games, ...games].map((match, idx) => (
                                     <div
-                                        key={match.slug || match.id + '-' + i}
-                                        className="w-[80vw] md:w-[320px] shrink-0"
+                                        key={match.slug || match.id + '-' + idx}
+                                        className="min-w-[80vw] md:min-w-[320px] shrink-0 snap-center h-full"
                                     >
                                         <GameCard match={match} mode="agenda" />
                                     </div>
                                 ))}
+                                <div className="shrink-0 w-[calc(50vw-24px)] md:hidden" />
                             </div>
+                            <div className="absolute left-0 top-0 bottom-0 w-32 sm:w-44 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
+                            <div className="absolute right-0 top-0 bottom-0 w-32 sm:w-44 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
                         </div>
                     )}
                 </div>
