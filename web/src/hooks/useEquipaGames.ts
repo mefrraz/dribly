@@ -18,9 +18,8 @@ function parseDate(dateStr: string): string {
     return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
-function parseGames(html: string): Match[] {
+function parseGames(html: string, isCalendar: boolean): Match[] {
     const games: Match[] = []
-    // Extract all game links
     const gameRe = /<a href="\/ficha-de-jogo\?internalID=(\d+)"[^>]*>([\s\S]*?)<\/a>/g
     let gm
     while ((gm = gameRe.exec(html)) !== null) {
@@ -36,14 +35,19 @@ function parseGames(html: string): Match[] {
 
             const siglas = [...block.matchAll(/<span class="sigla">([^<]+)<\/span>/g)].map(m => m[1].trim())
             const scores = [...block.matchAll(/<h3 class="results_text[^"]*">\s*(\d+)\s*<\/h3>/g)].map(m => parseInt(m[1]))
-            const logos = [...block.matchAll(/<img alt="Logo[^"]*" src="([^"]+)"/g)].map(m => m[1])
+            const logos = [...block.matchAll(/<img alt="Logo[^"]*" src="([^"]+)"/g)].map(m => m[1].replace(/^FPB%20-%20Equipa_files\//, ''))
             const localMatch = block.match(/<b>\s*([^<]+?)\s*<\/b>/)
             const local = localMatch?.[1]?.trim() || null
             const compMatch = block.match(/<div class="competition">[\s\S]*?<span>\s*([^<]+)\s*<\/span>/)
-            const competicao = compMatch?.[1]?.trim() || ''
+            const compRaw = compMatch?.[1]?.trim() || ''
+            // "Sub 14 Masculino | CD 2DIV S14 MASC" → escalão = first part
+            const partes = compRaw.split('|')
+            const escalao = partes[0]?.trim() || ''
+            const competicao = partes[1]?.trim() || compRaw
 
-            const isResult = block.includes('results_text')
-            const status: Match['status'] = isResult ? 'FINALIZADO' : 'AGENDADO'
+            // Status: calendar=todos AGENDADO, results=todos FINALIZADO
+            const hasScore = scores[0] !== undefined && scores[1] !== undefined
+            const status: Match['status'] = isCalendar ? (hasScore ? 'FINALIZADO' : 'AGENDADO') : 'FINALIZADO'
 
             games.push({
                 id: internalId,
@@ -54,7 +58,7 @@ function parseGames(html: string): Match[] {
                 equipa_fora: siglas[1] || '',
                 resultado_casa: scores[0] ?? null,
                 resultado_fora: scores[1] ?? null,
-                escalao: '',
+                escalao,
                 competicao,
                 local,
                 logotipo_casa: logos[0] || null,
@@ -93,8 +97,8 @@ export function useEquipaGames(equipaId: string) {
                 const calendarHtml = extractSection(2)
                 const resultsHtml = extractSection(3)
 
-                const calendarGames = parseGames(calendarHtml)
-                const resultsGames = parseGames(resultsHtml)
+                const calendarGames = parseGames(calendarHtml, true)
+                const resultsGames = parseGames(resultsHtml, false)
 
                 // Merge, deduplicate by id
                 const map = new Map<string, Match>()
