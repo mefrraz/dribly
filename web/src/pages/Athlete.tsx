@@ -235,7 +235,7 @@ export default function AthletePage() {
                         {/* Ressaltos & Outros */}
                         <div>
                             <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-2">Ressaltos & Outros</h4>
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
                                 <BgStat img={IMG.rebound3} value={rebTotal} label="R. Total" darkImg />
                                 <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="R. Ofensivos" darkImg />
                                 <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="R. Defensivos" darkImg />
