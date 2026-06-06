@@ -154,13 +154,27 @@ export default function AthletePage() {
                         )}
                     </div>
                 </div>
-                {/* Stats card — attached below, rounded bottom only */}
+                {/* Stats card — attached below: Pontos | Época | Assistências */}
                 <div className="bg-white dark:bg-zinc-900 border border-t-0 border-zinc-200 dark:border-zinc-800 rounded-b-2xl shadow-sm overflow-hidden">
-                    <div className="flex justify-around py-3 px-2">
+                    <div className="flex items-center justify-around py-3 px-2">
                         <BgStat img={IMG.pontos} value={data.pontos} label="Pontos" />
-                        <BgStat img={IMG.ressaltos} value={data.ressaltos} label="Ressaltos" />
+                        {data.epoca && (
+                            <div className="flex items-center gap-3 px-2">
+                                <div className="text-center">
+                                    <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{data.epoca.jogos ?? '—'}</span>
+                                    <span className="block text-[8px] font-bold text-zinc-400 uppercase tracking-wide">Jogos</span>
+                                </div>
+                                <div className="text-center">
+                                    <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{data.epoca.mediaMinutos ?? '—'}′</span>
+                                    <span className="block text-[8px] font-bold text-zinc-400 uppercase tracking-wide">Min/jogo</span>
+                                </div>
+                                <div className="text-center">
+                                    <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{data.epoca.pontos ?? '—'}</span>
+                                    <span className="block text-[8px] font-bold text-zinc-400 uppercase tracking-wide">Pontos</span>
+                                </div>
+                            </div>
+                        )}
                         <BgStat img={IMG.assistencias} value={data.assistencias} label="Assistências" />
-                        <BgStat img={IMG.desarmes} value={data.desarmes} label="Desarmes" />
                     </div>
                 </div>
             </div>
@@ -183,16 +197,6 @@ export default function AthletePage() {
             <div className="px-3">
                 {tab === 'epoca' && data.epoca && (
                     <div className="space-y-5">
-                        <h3 className="text-sm font-black text-zinc-800 dark:text-zinc-200 text-center">
-                            {data.epoca.epoca}
-                        </h3>
-
-                        <div className="flex justify-center gap-8">
-                            <BigNum value={data.epoca.jogos} label="Jogos" />
-                            <BigNum value={data.epoca.mediaMinutos} label="Minutos por jogo" suffix="'" />
-                            <BigNum value={data.epoca.pontos} label="Pontos" />
-                        </div>
-
                         {/* Lançamentos — light card */}
                         <div>
                             <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-2">Lançamentos</h4>
@@ -217,7 +221,6 @@ export default function AthletePage() {
                                 <BgStat img={IMG.rebound3} value={rebTotal} label="R. Total" />
                                 <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="R. Ofensivos" />
                                 <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="R. Defensivos" />
-                                <BgStat img={IMG.outrosAssist} value={data.epoca.assistencias} label="Assistências" />
                                 <BgStat img={IMG.outrosPerda} value={data.epoca.perdasBola} label="Perdas de bola" />
                                 <BgStat img={IMG.outrosRoubo} value={data.epoca.roubosBola} label="Roubos de bola" />
                                 <BgStat img={IMG.outrosDesarme} value={data.epoca.desarmes} label="Desarmes" />
