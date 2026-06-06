@@ -217,40 +217,44 @@ function ClubTeamDetail() {
                             const bDiff = Math.abs((clubHome(b) ? b.resultado_casa! : b.resultado_fora!) - (clubHome(b) ? b.resultado_fora! : b.resultado_casa!))
                             return bDiff > aDiff ? b : a
                         }) : null
-                        const maxScore = finished.length > 0 ? finished.reduce((a, b) => {
-                            const aScore = clubHome(a) ? a.resultado_casa! : a.resultado_fora!
-                            const bScore = clubHome(b) ? b.resultado_casa! : b.resultado_fora!
-                            return bScore > aScore ? b : a
-                        }) : null
-                        if (!maxWin && !maxScore) return null
+                        const chartData = finished.slice().reverse().slice(-15).map(g => ({
+                            nome: g.data.slice(5),
+                            pts: clubHome(g) ? g.resultado_casa! : g.resultado_fora!,
+                            sof: clubHome(g) ? g.resultado_fora! : g.resultado_casa!,
+                        }))
+                        if (!maxWin) return null
                         return (
-                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5">
-                                <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3">Destaques</h3>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {maxWin && (
-                                        <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-3 text-center">
-                                            <p className="text-[10px] text-green-600 dark:text-green-400 uppercase font-bold">Maior vitória</p>
-                                            <p className="text-lg font-black text-green-700 dark:text-green-300 mt-1">
-                                                +{Math.abs((clubHome(maxWin) ? maxWin.resultado_casa! : maxWin.resultado_fora!) - (clubHome(maxWin) ? maxWin.resultado_fora! : maxWin.resultado_casa!))}
-                                            </p>
-                                            <p className="text-[10px] text-green-600/70 truncate">
-                                                {maxWin.equipa_casa} {maxWin.resultado_casa} - {maxWin.resultado_fora} {maxWin.equipa_fora}
-                                            </p>
-                                        </div>
-                                    )}
-                                    {maxScore && (
-                                        <div className="bg-dribly-purple/10 rounded-xl p-3 text-center">
-                                            <p className="text-[10px] text-dribly-purple uppercase font-bold">Mais pontos</p>
-                                            <p className="text-lg font-black text-dribly-purple mt-1">
-                                                {clubHome(maxScore) ? maxScore.resultado_casa : maxScore.resultado_fora} pts
-                                            </p>
-                                            <p className="text-[10px] text-dribly-purple/70 truncate">
-                                                {maxScore.equipa_casa} {maxScore.resultado_casa} - {maxScore.resultado_fora} {maxScore.equipa_fora}
-                                            </p>
-                                        </div>
-                                    )}
+                            <>
+                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5">
+                                    <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Maior vitória</h3>
+                                    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 text-center">
+                                        <p className="text-3xl font-black text-green-700 dark:text-green-300">
+                                            +{Math.abs((clubHome(maxWin) ? maxWin.resultado_casa! : maxWin.resultado_fora!) - (clubHome(maxWin) ? maxWin.resultado_fora! : maxWin.resultado_casa!))}
+                                        </p>
+                                        <p className="text-xs text-green-600 dark:text-green-400/70 mt-1 truncate">
+                                            {maxWin.equipa_casa} {maxWin.resultado_casa} - {maxWin.resultado_fora} {maxWin.equipa_fora}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
+                                {chartData.length > 0 && (
+                                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5">
+                                        <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3">Últimos {chartData.length} jogos</h3>
+                                        <div className="h-40">
+                                            {chartData.map((d, i) => (
+                                                <div key={i} className="flex items-center gap-2 text-[10px] mb-1.5">
+                                                    <span className="w-8 text-right text-zinc-500 shrink-0">{d.nome}</span>
+                                                    <div className="flex-1 flex gap-0.5 h-5">
+                                                        <div className="h-full bg-green-500 rounded-l" style={{ width: `${(d.pts / Math.max(...chartData.map(x => x.pts + x.sof), 1)) * 100}%` }} />
+                                                        <div className="h-full bg-red-400 rounded-r" style={{ width: `${(d.sof / Math.max(...chartData.map(x => x.pts + x.sof), 1)) * 100}%` }} />
+                                                    </div>
+                                                    <span className="w-14 text-right font-mono tabular-nums text-zinc-600 dark:text-zinc-400">{d.pts}-{d.sof}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <p className="text-[10px] text-zinc-400 text-center mt-2">Verde = pontos marcados | Vermelho = pontos sofridos</p>
+                                    </div>
+                                )}
+                            </>
                         )
                     })()}
                 </div>
@@ -287,7 +291,7 @@ function ClubTeamDetail() {
                     {plantel.length === 0 ? (
                         <p className="text-sm text-zinc-400 text-center py-8">Plantel não disponível.</p>
                     ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
                             {plantel.map((p, i) => (
                                 <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center">
                                     <div className="relative w-full pb-[133%] bg-zinc-100 dark:bg-zinc-800 rounded-xl overflow-hidden mb-2">
