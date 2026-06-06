@@ -44,7 +44,7 @@ function ClubTeamDetail() {
 
     const equipaId = searchParams.get('eid') || ''
     const { games: clubGames, loading: clubLoading } = useGames('2025/2026', club.id, club.name)
-    const { games: equipaGames, loading: equipaLoading } = useEquipaGames(equipaId)
+    const { games: equipaGames, photo: equipaPhoto, teamInfo, loading: equipaLoading } = useEquipaGames(equipaId)
 
     const loading = equipaId ? equipaLoading : clubLoading
     const games = equipaId && equipaGames.length > 0 ? equipaGames : (clubGames || [])
@@ -56,7 +56,7 @@ function ClubTeamDetail() {
 
     const { teamName, teamGames } = useMemo(() => {
         if (equipaId) {
-            return { teamName: teamSlug?.replace(/-/g, ' ').toUpperCase() || '', teamGames: games }
+            return { teamName: teamInfo.nome || teamSlug?.replace(/-/g, ' ').toUpperCase() || '', teamGames: games }
         }
 
         const filtered = games.filter(g => {
@@ -72,7 +72,7 @@ function ClubTeamDetail() {
             : ''
 
         return { teamName: name, teamGames: filtered }
-    }, [games, teamSlug, clubNameUpper, equipaId])
+    }, [games, teamSlug, clubNameUpper, equipaId, teamInfo.nome])
 
     const finished = useMemo(() =>
         teamGames.filter(g => g.status === 'FINALIZADO').sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),
@@ -109,8 +109,8 @@ function ClubTeamDetail() {
             : new Date(b).getTime() - new Date(a).getTime()
     )
 
-    const genero = detectGender(teamName, teamGames[0]?.escalao || '')
-    const escalao = teamGames[0]?.escalao || ''
+    const genero = detectGender(teamName, teamInfo.escalao || teamGames[0]?.escalao || '')
+    const escalao = teamInfo.escalao || teamGames[0]?.escalao || ''
     const generoLabel = genero === 'M' ? 'Masculino' : genero === 'F' ? 'Feminino' : 'Indefinido'
     const generoClass = genero === 'M'
         ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
@@ -130,6 +130,12 @@ function ClubTeamDetail() {
 
             <div className="max-w-xl mx-auto px-3">
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
+                    {equipaPhoto && (
+                        <div className="relative h-48 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                            <img src={equipaPhoto} alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                        </div>
+                    )}
                     <div className="p-6">
                         <h1 className="text-xl font-black text-zinc-900 dark:text-white truncate">{teamName}</h1>
                         <div className="flex items-center gap-1.5 mt-1.5">

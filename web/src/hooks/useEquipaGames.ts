@@ -75,8 +75,24 @@ function parseGames(html: string, isCalendar: boolean): Match[] {
     return games
 }
 
+function extractTeamPhoto(html: string): string | null {
+    const m = html.match(/<div class="team-right[^"]*">\s*<img\s+src="([^"]+)"\s*\/>/)
+    return m?.[1]?.trim() || null
+}
+
+function extractTeamInfo(html: string): { nome: string; escalao: string } {
+    const nm = html.match(/<div class="team-nome">\s*([^<]+)\s*<\/div>/)
+    const lv = html.match(/<div class="team-level">\s*([^<]+)\s*<\/div>/)
+    return {
+        nome: nm?.[1]?.trim() || '',
+        escalao: (lv?.[1]?.trim() || '').split('|')[0]?.trim() || '',
+    }
+}
+
 export function useEquipaGames(equipaId: string) {
     const [games, setGames] = useState<Match[]>([])
+    const [photo, setPhoto] = useState<string | null>(null)
+    const [teamInfo, setTeamInfo] = useState<{ nome: string; escalao: string }>({ nome: '', escalao: '' })
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -88,6 +104,8 @@ export function useEquipaGames(equipaId: string) {
                 const r = await fetch(`${FPB_PROXY}?page=equipa&equipa_id=${equipaId}`)
                 if (!r.ok || cancelled) { setLoading(false); return }
                 const html = await r.text()
+                setPhoto(extractTeamPhoto(html))
+                setTeamInfo(extractTeamInfo(html))
 
                 // Extract sections by finding start positions and taking content until next team-wrapper
                 function extractSection(tabindex: number): string {
@@ -122,5 +140,5 @@ export function useEquipaGames(equipaId: string) {
         return () => { cancelled = true }
     }, [equipaId])
 
-    return { games, loading }
+    return { games, photo, teamInfo, loading }
 }
