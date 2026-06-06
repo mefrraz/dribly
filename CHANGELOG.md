@@ -4,6 +4,61 @@
 
 ---
 
+## [v8.0.0] — 2026-06-06
+
+### 🧹 Qualidade de Código
+- **ESLint 0 erros, 9 warnings** (eram 6 erros, 83 warnings — redução de 89%)
+- **TypeScript `any` types eliminados do src** (~14 ocorrências → 0 no código de produção)
+- **4 `catch {}` vazios** corrigidos com `error` state ou comentário
+- **Código morto removido:** `fetchPavilionGameCounts()` em `mapData.ts`
+- **React Fast Refresh restaurado** em 5 ficheiros — utilitários extraídos para módulos separados (`toastState.ts`, `onboardingState.ts`, `suggestionsState.ts`, `useAuth.ts`, `useClub.ts`)
+- **`useMemo` corrigido** em 4 ficheiros — `games || []` agora usa `useMemo` evitando re-renders desnecessários
+
+### 🧪 Testes
+- **106 testes unitários** — todos passam
+- **E2E smoke tests com Playwright** — 3 testes: Landing, Clubes, Mapa
+- `npm run test:e2e` — corre os testes end-to-end localmente
+- `npm run lint:fix` — auto-corrige problemas de lint
+
+### 🔍 SEO
+- **10 páginas com `<title>` e meta tags** via `SeoHead` (Helmet): Landing, Clube, Jogo, Competição, Ligas, Mapa, Classificações, Atleta, Pesquisa, Sobre
+- **Open Graph + Twitter cards** em todas as páginas
+- **Sitemap dinâmico** (`npm run sitemap`) — gera URLs para todos os clubes e competições do Supabase
+- Google Search Console pronto para submissão
+
+### ♿ Acessibilidade
+- **3 modais com `role="dialog"` + `aria-modal`**: Auth, Search, Onboarding
+- **BottomNav**: `<nav aria-label>` + `aria-current="page"` + ícones `aria-hidden`
+- **ErrorBoundary**: `role="alert"`
+- **LoadingSpinner**: `role="status"` + `aria-live="polite"`
+
+### 🔒 Segurança
+- **Content-Security-Policy** no `vercel.json` — protege contra XSS
+- **Supabase fail-fast** — erro claro se faltarem env vars em vez de cliente quebrado silencioso
+
+### ⚡ Performance
+- **`Game.tsx` queries paralelas** — `for...of` sequencial → `Promise.all` (4× mais rápido)
+- **`content-visibility: auto`** no `ClubsPage` — browser só renderiza ~20 cards visíveis dos 281
+- **Carrossel da Landing pausa em background** — `visibilitychange` listener
+- **`tugabasketApi` resiliente** — `Promise.allSettled` isola falhas por competição
+
+### 📱 PWA
+- **Ícone maskable corrigido** — PNG 512x512 dedicado para Android adaptive icons
+
+### 🛠️ Tooling
+- **Vite 5 → 6** + `@vitejs/plugin-react` atualizado
+- **Playwright** integrado (config + testes + `.gitignore`)
+- **GitHub Action E2E** (`workflow_dispatch` — manual)
+- **`generate-sitemap.ts`** — script que gera sitemap com dados reais do Supabase
+
+### 📦 Dependências
+- `vite`: ^5.0.8 → ^6.2.0
+- `@vitejs/plugin-react`: ^4.2.1 → ^4.4.0
+- `@playwright/test`: ^1.58.1 (adicionado)
+- `tsx`: adicionado para scripts
+
+---
+
 ## [v7.18] — 2026-06-03
 
 ### Fix

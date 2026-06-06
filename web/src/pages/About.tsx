@@ -1,9 +1,11 @@
 import { Instagram, Github } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
+import { SeoHead } from '../components/SeoHead'
 
 function About() {
     return (
         <div className="max-w-xl mx-auto space-y-5 pb-24 px-3">
+            <SeoHead title="Sobre" description="Dribly — Basquetebol português no teu bolso. App PWA gratuita e open-source." />
             <PageHeader />
 
             {/* Intro + Creator combined */}

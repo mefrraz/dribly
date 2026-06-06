@@ -41,6 +41,11 @@ codewhale-tui.exe
 # Archive (old scripts, temp files)
 archive/
 
+# Playwright
+test-results/
+playwright-report/
+web/playwright/.cache/
+
 # Project — temp/backup files, source data, scraped pages
 web_antiga/
 scripts/

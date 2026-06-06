@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { type Match } from '../components/types'
 import { z } from 'zod'
 

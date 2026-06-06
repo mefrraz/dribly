@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
 import { useAthlete } from '../hooks/useAthlete'
+import { SeoHead } from '../components/SeoHead'
 import { useClub } from '../lib/ClubContext'
 import type { AthleteInscricao } from '../hooks/useAthlete'
 
@@ -120,6 +121,7 @@ export default function AthletePage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-5 pb-24">
+            <SeoHead title={data?.nome || 'Atleta'} description={data ? `Perfil e estatísticas de ${data.nome} — Basquetebol Português.` : undefined} />
             {/* Top bar */}
             <div className="flex items-center justify-between pt-3 px-3">
                 <button onClick={() => window.history.back()} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">

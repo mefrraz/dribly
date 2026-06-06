@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Search, Building2, Trophy } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
+import { SeoHead } from '../components/SeoHead'
 import { supabase } from '../lib/supabase'
 import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { associationLogoUrl } from '../lib/associationLogos'
@@ -82,6 +83,7 @@ function SearchPage() {
 
     return (
         <div className="max-w-2xl mx-auto px-4 pb-24">
+            <SeoHead title="Pesquisa" description="Encontra clubes e competições de basquetebol em Portugal." />
             <PageHeader backTo="/" title="Pesquisar" />
 
             <div className="relative mb-8">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { SeoHead } from '../components/SeoHead'
 import { supabase } from '../lib/supabase'
 
 const TUGABASKET_ASSETS = 'https://resultados.tugabasket.com/assets/images/logos'
@@ -41,6 +42,7 @@ export default function Standings() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
+            <SeoHead title="Classificações" description="Classificações de todas as competições da Federação Portuguesa de Basquetebol." />
             <div className="max-w-6xl mx-auto px-3 sm:px-5 md:px-8 pt-8 sm:pt-10 pb-16">
                 <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight mb-2 text-center">Classificações</h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-8 max-w-md mx-auto">
