@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useAthlete } from '../hooks/useAthlete'
@@ -72,9 +72,21 @@ export default function AthletePage() {
     const [searchParams] = useSearchParams()
     const { data, loading, error } = useAthlete(id || '')
     const [tab, setTab] = useState<'epoca' | 'carreira' | 'inscricoes'>('epoca')
-    const { clubs } = useClub()
+    const { clubs, getClubBySlug } = useClub()
     const clubSlug = searchParams.get('clube') || ''
-    const clubData = clubs.find(c => c.slug === clubSlug)
+    const [clubLogo, setClubLogo] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (!clubSlug) return
+        const cached = clubs.find(c => c.slug === clubSlug)
+        if (cached?.logo_url) {
+            setClubLogo(cached.logo_url)
+        } else {
+            getClubBySlug(clubSlug).then(c => {
+                if (c?.logo_url) setClubLogo(c.logo_url)
+            })
+        }
+    }, [clubSlug, clubs, getClubBySlug])
 
     if (loading) {
         return (
@@ -130,7 +142,7 @@ export default function AthletePage() {
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
                                 {data.numero && <span className="text-sm font-bold text-zinc-500">#{data.numero}</span>}
                                 {data.posicao && <span className="text-xs font-bold text-zinc-500">{data.posicao}</span>}
-                                {data.clube && <span className="text-xs text-zinc-400 inline-flex items-center gap-1">· {clubData?.logo_url && <img src={clubData.logo_url} alt="" className="w-4 h-4 object-contain rounded-full" />}{data.clube}</span>}
+                                {data.clube && <span className="text-xs text-zinc-400 inline-flex items-center gap-1">· {clubLogo && <img src={clubLogo} alt="" className="w-4 h-4 object-contain rounded-full" />}{data.clube}</span>}
                             </div>
                             <div className="flex items-center gap-1.5 mt-1.5">
                                 {data.bandeiraUrl && <img src={data.bandeiraUrl} alt="" className="w-4 h-3 object-cover rounded-sm" />}
