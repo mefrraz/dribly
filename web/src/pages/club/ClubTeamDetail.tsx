@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useParams, useSearchParams, useOutletContext } from 'react-router-dom'
-import { ArrowLeft, Calendar, Trophy, Users, Info } from 'lucide-react'
+import { ArrowLeft, Calendar, Trophy, Users, Info, ChevronRight, TrendingUp, MapPin } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
 import { useEquipaGames } from '../../hooks/useEquipaGames'
 import { SkeletonGameGrid } from '../../components/Skeleton'
@@ -84,16 +84,26 @@ function ClubTeamDetail() {
         teamGames.filter(g => g.status !== 'FINALIZADO').sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime()),
     [teamGames])
 
+    const clubHome = (g: Match) => g.equipa_casa.toUpperCase().includes(clubNameUpper)
     let wins = 0, losses = 0, draws = 0
     finished.forEach(g => {
-        const clubHome = g.equipa_casa.toUpperCase().includes(clubNameUpper)
         if (g.resultado_casa === null || g.resultado_fora === null) return
         if (g.resultado_casa === g.resultado_fora) { draws++; return }
-        if (clubHome ? g.resultado_casa > g.resultado_fora : g.resultado_fora > g.resultado_casa) wins++
+        if (clubHome(g) ? g.resultado_casa > g.resultado_fora : g.resultado_fora > g.resultado_casa) wins++
         else losses++
     })
     const total = wins + losses + draws
     const pct = total > 0 ? Math.round(wins / (wins + losses || 1) * 100) : null
+
+    const maxWin = useMemo(() => {
+        const winsList = finished.filter(g => (clubHome(g) ? g.resultado_casa! > g.resultado_fora! : g.resultado_fora! > g.resultado_casa!))
+        if (winsList.length === 0) return null
+        return winsList.reduce((a, b) => {
+            const aDiff = Math.abs((clubHome(a) ? a.resultado_casa! : a.resultado_fora!) - (clubHome(a) ? a.resultado_fora! : a.resultado_casa!))
+            const bDiff = Math.abs((clubHome(b) ? b.resultado_casa! : b.resultado_fora!) - (clubHome(b) ? b.resultado_fora! : b.resultado_casa!))
+            return bDiff > aDiff ? b : a
+        })
+    }, [finished])
 
     const filteredMatches = tab === 'agenda' ? upcoming : tab === 'resultados' ? finished : teamGames
 
@@ -152,29 +162,6 @@ function ClubTeamDetail() {
                         </div>
                         <p className="text-xs text-zinc-500 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">{club.name}</p>
                     </div>
-
-                    <div className="px-5 pb-5">
-                        <div className="grid grid-cols-4 gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                            <div className="text-center">
-                                <p className="text-2xl font-black text-zinc-900 dark:text-white">{total}</p>
-                                <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Jogos</p>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-2xl font-black text-green-600 dark:text-green-400">{wins}</p>
-                                <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Vitórias</p>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-2xl font-black text-red-500">{losses}</p>
-                                <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Derrotas</p>
-                            </div>
-                            <div className="text-center">
-                                <p className={`text-2xl font-black ${pct !== null && pct >= 50 ? 'text-green-600 dark:text-green-400' : pct !== null ? 'text-red-500' : 'text-zinc-400'}`}>
-                                    {pct !== null ? pct + '%' : '—'}
-                                </p>
-                                <p className="text-[10px] text-zinc-500 uppercase tracking-wide">PCT</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -201,78 +188,72 @@ function ClubTeamDetail() {
             {/* Vista Geral tab */}
             {tab === 'geral' && (
                 <div className="px-3 space-y-3">
-                    {(() => {
-                        const clubHome = (g: Match) => g.equipa_casa.toUpperCase().includes(clubNameUpper)
-                        const winsList = finished.filter(g => (clubHome(g) ? g.resultado_casa! > g.resultado_fora! : g.resultado_fora! > g.resultado_casa!))
-                        const maxWin = winsList.length > 0 ? winsList.reduce((a, b) => {
-                            const aDiff = Math.abs((clubHome(a) ? a.resultado_casa! : a.resultado_fora!) - (clubHome(a) ? a.resultado_fora! : a.resultado_casa!))
-                            const bDiff = Math.abs((clubHome(b) ? b.resultado_casa! : b.resultado_fora!) - (clubHome(b) ? b.resultado_fora! : b.resultado_casa!))
-                            return bDiff > aDiff ? b : a
-                        }) : null
+                    {/* Club card */}
+                    <Link to={`/clube/${club.slug}`}
+                        className="flex items-center gap-4 p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all group">
+                        <div className="w-14 h-14 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
+                            {club.logo_url ? (
+                                <img src={club.logo_url} alt="" className="w-10 h-10 object-contain" />
+                            ) : (
+                                <span className="text-lg font-bold text-zinc-400">{club.name.charAt(0).toUpperCase()}</span>
+                            )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-xs text-zinc-500">Equipa do</p>
+                            <p className="text-sm font-bold text-zinc-900 dark:text-white truncate">{club.name}</p>
+                        </div>
+                        <ChevronRight size={16} className="text-zinc-400 group-hover:text-[var(--club-color)] shrink-0" />
+                    </Link>
 
-                        // Monthly W/L chart
-                        const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
-                        const now = new Date()
-                        const monthly = months.map((m, i) => {
-                            const y = i <= now.getMonth() ? now.getFullYear() : now.getFullYear() - 1
-                            const mo = i + 1
-                            const mg = finished.filter(g => { const d = new Date(g.data); return d.getFullYear() === y && d.getMonth()+1 === mo })
-                            const w = mg.filter(g => (clubHome(g) ? g.resultado_casa! > g.resultado_fora! : g.resultado_fora! > g.resultado_casa!)).length
-                            const l = mg.filter(g => (clubHome(g) ? g.resultado_casa! < g.resultado_fora! : g.resultado_fora! < g.resultado_casa!)).length
-                            return { m, w, l, t: w + l }
-                        })
-                        const maxT = Math.max(...monthly.map(d => d.t), 1)
+                    {/* Stats */}
+                    <div className="grid grid-cols-4 gap-2">
+                        {[
+                            { label: 'Jogos', value: total, icon: Calendar, color: 'text-zinc-600 dark:text-zinc-300' },
+                            { label: 'Vitórias', value: wins, icon: Trophy, color: 'text-green-600 dark:text-green-400' },
+                            { label: 'Derrotas', value: losses, icon: Info, color: 'text-red-500' },
+                            { label: 'PCT', value: pct !== null ? pct + '%' : '—', icon: TrendingUp, color: pct !== null && pct >= 50 ? 'text-green-600 dark:text-green-400' : pct !== null ? 'text-red-500' : 'text-zinc-400' },
+                        ].map(s => (
+                            <div key={s.label} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-center">
+                                <s.icon size={14} className={`mx-auto mb-1 ${s.color}`} />
+                                <p className={`text-lg font-black ${s.color}`}>{s.value}</p>
+                                <p className="text-[9px] text-zinc-400 uppercase tracking-wide">{s.label}</p>
+                            </div>
+                        ))}
+                    </div>
 
-                        return (
-                            <>
-                                {maxWin && (
-                                    <Link to={`/game/${maxWin.slug || maxWin.id}?clube=${club.slug}`}
-                                        className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all">
-                                        <div className="bg-gradient-to-r from-green-50 via-white to-green-50 dark:from-green-900/10 dark:via-zinc-900 dark:to-green-900/10 border-b border-zinc-100 dark:border-white/5 p-3">
-                                            <span className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wide">Maior Vitória</span>
+                    {/* Maior Vitória */}
+                    {maxWin && (
+                        <Link to={`/game/${maxWin.slug || maxWin.id}?clube=${club.slug}`}
+                            className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all group">
+                            <div className="bg-gradient-to-r from-[var(--club-color)]/10 via-zinc-50 to-[var(--club-color)]/10 dark:from-[var(--club-color)]/5 dark:via-zinc-900 dark:to-[var(--club-color)]/5 border-b border-zinc-100 dark:border-white/5 p-3 flex justify-between items-center">
+                                <span className="text-[10px] font-bold text-[var(--club-color)] uppercase tracking-wide">Maior Vitória</span>
+                                <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase truncate ml-2">{maxWin.competicao || ''}</span>
+                            </div>
+                            <div className="px-6 py-6">
+                                <div className="flex items-center justify-between gap-4">
+                                    <TeamBlock name={maxWin.equipa_casa} logo={maxWin.logotipo_casa} />
+                                    <div className="flex flex-col items-center gap-1 shrink-0">
+                                        <div className="bg-green-50 dark:bg-green-900/20 rounded-xl px-3 py-1.5">
+                                            <p className="text-xl font-black text-green-700 dark:text-green-300 tabular-nums">{maxWin.resultado_casa} - {maxWin.resultado_fora}</p>
                                         </div>
-                                        <div className="px-6 py-8">
-                                            <div className="flex items-center justify-between gap-4">
-                                                <TeamBlock name={maxWin.equipa_casa} logo={maxWin.logotipo_casa} />
-                                                <div className="flex flex-col items-center gap-1 shrink-0">
-                                                    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl px-3 py-1.5">
-                                                        <p className="text-xl font-black text-green-700 dark:text-green-300 tabular-nums">{maxWin.resultado_casa} - {maxWin.resultado_fora}</p>
-                                                    </div>
-                                                    <p className="text-[10px] font-bold text-green-600">+{Math.abs((clubHome(maxWin)?maxWin.resultado_casa!:maxWin.resultado_fora!) - (clubHome(maxWin)?maxWin.resultado_fora!:maxWin.resultado_casa!))}</p>
-                                                </div>
-                                                <TeamBlock name={maxWin.equipa_fora} logo={maxWin.logotipo_fora} />
-                                            </div>
-                                            <div className="mt-6 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                                                <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
-                                                <span className="capitalize font-medium">{formatDate(maxWin.data)}</span>
-                                                <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
-                                            </div>
-                                        </div>
-                                    </Link>
-                                )}
-                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5">
-                                    <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4">Desempenho por mês</h3>
-                                    <div className="flex items-end gap-1 h-32">
-                                        {monthly.map((d, i) => (
-                                            <div key={i} className="flex-1 flex flex-col items-center gap-1 h-full">
-                                                <div className="w-full flex-1 flex flex-col justify-end">
-                                                    {d.t > 0 && (<>
-                                                        <div style={{height:`${(d.l/maxT)*100}%`}} className="w-full bg-red-200 dark:bg-red-900/40 rounded-t" />
-                                                        <div style={{height:`${(d.w/maxT)*100}%`}} className="w-full bg-green-400 dark:bg-green-600 rounded-t" />
-                                                    </>)}
-                                                </div>
-                                                <span className="text-[8px] text-zinc-400">{d.m}</span>
-                                            </div>
-                                        ))}
+                                        <p className="text-[10px] font-bold text-green-600">+{Math.abs((clubHome(maxWin) ? maxWin.resultado_casa! : maxWin.resultado_fora!) - (clubHome(maxWin) ? maxWin.resultado_fora! : maxWin.resultado_casa!))}</p>
                                     </div>
-                                    <div className="flex items-center gap-4 mt-3 justify-center">
-                                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-600" /><span className="text-[10px] text-zinc-500">Vitórias ({wins})</span></div>
-                                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-red-200 dark:bg-red-900/40" /><span className="text-[10px] text-zinc-500">Derrotas ({losses})</span></div>
-                                    </div>
+                                    <TeamBlock name={maxWin.equipa_fora} logo={maxWin.logotipo_fora} />
                                 </div>
-                            </>
-                        )
-                    })()}
+                                <div className="mt-5 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                                    <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
+                                    <span className="capitalize font-medium">{formatDate(maxWin.data)}</span>
+                                    <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
+                                </div>
+                                {maxWin.local && (
+                                    <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400">
+                                        <MapPin size={10} className="text-[var(--club-color)]" />
+                                        <span className="truncate max-w-[220px]">{maxWin.local}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </Link>
+                    )}
                 </div>
             )}
 
