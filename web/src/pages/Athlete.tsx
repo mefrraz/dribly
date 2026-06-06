@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useAthlete } from '../hooks/useAthlete'
+import { useClub } from '../lib/ClubContext'
 import type { AthleteInscricao } from '../hooks/useAthlete'
 
 const FPB = 'https://www.fpb.pt/wp-content/themes/fpbasquetebol/assets/images'
@@ -27,7 +28,7 @@ function BgStat({ img, value, label, size = 48, darkImg }: { img: string; value:
     return (
         <div className="flex flex-col items-center gap-2 py-2 px-2">
             <div className="flex items-center justify-center" style={{ width: size, height: size }}>
-                <img src={img} alt="" className={`max-w-full max-h-full object-contain ${darkImg ? 'brightness-[0.1] dark:brightness-100' : ''}`} />
+                <img src={img} alt="" className={`max-w-full max-h-full object-contain ${darkImg ? 'brightness-[0.2] dark:brightness-100' : ''}`} />
             </div>
             <div className="text-center">
                 <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{value ?? '—'}</span>
@@ -71,7 +72,20 @@ export default function AthletePage() {
     const [searchParams] = useSearchParams()
     const { data, loading, error } = useAthlete(id || '')
     const [tab, setTab] = useState<'epoca' | 'carreira' | 'inscricoes'>('epoca')
-    const clubLogo = searchParams.get('logo') || null
+    const { clubs, loadClubs } = useClub()
+    const clubSlug = searchParams.get('clube') || ''
+    const [clubLogo, setClubLogo] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (!clubSlug) return
+        const cached = clubs.find(c => c.slug === clubSlug)
+        if (cached?.logo_url) { setClubLogo(cached.logo_url); return }
+        // Trigger load if cache empty, then retry
+        loadClubs().then(() => {
+            const found = clubs.find(c => c.slug === clubSlug)
+            if (found?.logo_url) setClubLogo(found.logo_url)
+        })
+    }, [clubSlug])
 
     if (loading) {
         return (
@@ -221,7 +235,7 @@ export default function AthletePage() {
                         {/* Ressaltos & Outros */}
                         <div>
                             <h4 className="text-sm font-black text-zinc-800 dark:text-zinc-200 mb-2">Ressaltos & Outros</h4>
-                            <div className="flex justify-around flex-wrap gap-3">
+                            <div className="grid grid-cols-3 gap-2">
                                 <BgStat img={IMG.rebound3} value={rebTotal} label="R. Total" darkImg />
                                 <BgStat img={IMG.rebound1} value={data.epoca.ressaltosOfensivos} label="R. Ofensivos" darkImg />
                                 <BgStat img={IMG.rebound2} value={data.epoca.ressaltosDefensivos} label="R. Defensivos" darkImg />
