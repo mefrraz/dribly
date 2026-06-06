@@ -27,7 +27,7 @@ function BgStat({ img, value, label, size = 48, darkImg }: { img: string; value:
     return (
         <div className="flex flex-col items-center gap-2 py-2 px-2">
             <div className="flex items-center justify-center" style={{ width: size, height: size }}>
-                <img src={img} alt="" className={`max-w-full max-h-full object-contain ${darkImg ? 'dark:brightness-200' : ''}`} />
+                <img src={img} alt="" className={`max-w-full max-h-full object-contain ${darkImg ? 'brightness-0 dark:brightness-100' : ''}`} />
             </div>
             <div className="text-center">
                 <span className="text-lg font-black text-zinc-800 dark:text-zinc-100 tabular-nums">{value ?? '—'}</span>
