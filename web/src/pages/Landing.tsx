@@ -5,6 +5,7 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Search, ChevronRight, ChevronLeft, ArrowRight, Trophy, Clock } from 'lucide-react'
 import { GameCard } from '../components/GameCard'
+import { SeoHead } from '../components/SeoHead'
 import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { useLandingData } from '../hooks/useLandingData'
 import { associationLogoUrl } from '../lib/associationLogos'
@@ -64,25 +65,51 @@ function Landing() {
 
     useEffect(() => { loadClubs() }, [loadClubs])
 
-    // Auto-scroll featured games carousel on load
+    // Auto-scroll featured games carousel on load (start at random position in copy1)
     useEffect(() => {
         if (games.length > 0 && carouselRef.current) {
+            const el = carouselRef.current
+            const card = el.querySelector('.snap-center') as HTMLElement | null
+            const cardWidth = card ? card.offsetWidth + 12 : 332
+            // Start in the first copy, at a random card position
             const idx = Math.floor(Math.random() * games.length)
-            carouselRef.current.scrollLeft = idx * 312
+            el.scrollLeft = idx * cardWidth
         }
     }, [games])
 
-    // Auto-scroll associations carousel
+    // Auto-scroll associations carousel (pauses when tab is hidden to save battery)
     useEffect(() => {
         if (associations.length === 0) return
-        const id = setInterval(() => {
-            setAssoOffset(prev => {
-                const next = prev - 1
-                const totalWidth = associations.length * 200
-                return next < -totalWidth ? 0 : next
-            })
-        }, 40)
-        return () => clearInterval(id)
+
+        let id: ReturnType<typeof setInterval> | null = null
+
+        const start = () => {
+            if (id !== null) return
+            id = setInterval(() => {
+                setAssoOffset(prev => {
+                    const next = prev - 1
+                    const totalWidth = associations.length * 200
+                    return next < -totalWidth ? 0 : next
+                })
+            }, 40)
+        }
+
+        const stop = () => {
+            if (id !== null) { clearInterval(id); id = null }
+        }
+
+        const onVisibility = () => {
+            if (document.visibilityState === 'visible') start()
+            else stop()
+        }
+
+        document.addEventListener('visibilitychange', onVisibility)
+        start()
+
+        return () => {
+            stop()
+            document.removeEventListener('visibilitychange', onVisibility)
+        }
     }, [associations.length])
 
     // Search logic
@@ -161,18 +188,33 @@ function Landing() {
     const scrollCarousel = (dir: number) => {
         if (!carouselRef.current) return
         const el = carouselRef.current
+        const card = el.querySelector('.snap-center') as HTMLElement | null
+        const cardWidth = card ? card.offsetWidth + 12 : 332 // 320 + gap-3 (12px)
         const max = el.scrollWidth - el.clientWidth
-        if (dir > 0 && el.scrollLeft >= max - 10) {
-            el.scrollTo({ left: 0, behavior: 'smooth' })
-        } else if (dir < 0 && el.scrollLeft <= 10) {
-            el.scrollTo({ left: max, behavior: 'smooth' })
+        const half = max / 2 // midpoint between copy1 and copy2
+
+        if (dir > 0) {
+            const next = el.scrollLeft + cardWidth
+            if (next >= max - 10) {
+                // Wrapping forward: jump to equivalent position in copy1 (instant, invisible)
+                el.scrollTo({ left: next - half, behavior: 'instant' })
+            } else {
+                el.scrollBy({ left: cardWidth, behavior: 'smooth' })
+            }
         } else {
-            el.scrollBy({ left: dir * 312, behavior: 'smooth' })
+            const next = el.scrollLeft - cardWidth
+            if (next <= 10) {
+                // Wrapping backward: jump to equivalent position in copy2 (instant)
+                el.scrollTo({ left: next + half, behavior: 'instant' })
+            } else {
+                el.scrollBy({ left: -cardWidth, behavior: 'smooth' })
+            }
         }
     }
 
     return (
         <div className="pb-24">
+            <SeoHead title="Basquetebol Português" description="Acompanha jogos, resultados e classificações de todos os clubes de basquetebol em Portugal. App PWA gratuita e open-source." />
             {/* Hero */}
             <div className="relative z-30 bg-gradient-to-b from-dribly-purple/5 via-transparent to-transparent dark:from-dribly-purple/10 dark:via-transparent dark:to-transparent -mt-4 md:-mt-6">
                 <div className="max-w-2xl mx-auto px-4 pt-20 md:pt-36 pb-14 md:pb-20 text-center relative">
@@ -436,7 +478,7 @@ function Landing() {
                                                 className="w-full h-full object-contain"
                                                 loading="lazy"
                                                 onError={e => {
-                                                    ;(e.target as HTMLImageElement).style.display = 'none'
+                                                    (e.target as HTMLImageElement).style.display = 'none'
                                                 }}
                                             />
                                         ) : (
