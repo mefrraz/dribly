@@ -88,6 +88,17 @@ export interface PlantelPlayer {
     atletaUrl: string | null
 }
 
+/** Extract an HTML section by tabindex anchor. 0 = info, 2 = calendar, 3 = results */
+function extractSection(html: string, tabindex: number): string {
+    const startTag = `<div class="team-wrapper" tabindex=${tabindex}>`
+    const start = html.indexOf(startTag)
+    if (start < 0) return ''
+    const contentStart = start + startTag.length
+    const nextIndex = html.indexOf('<div class="team-wrapper" tabindex=', contentStart)
+    const end = nextIndex > 0 ? nextIndex : html.length
+    return html.substring(contentStart, end)
+}
+
 function extractPlantel(html: string): PlantelPlayer[] {
     // Find plantel section (tabindex=1)
     const startTag = '<div class="team-wrapper" tabindex=1>'
@@ -123,15 +134,45 @@ function extractPlantel(html: string): PlantelPlayer[] {
     return players
 }
 
+const EQUIPA_CACHE_TTL = 15 * 60_000 // 15 min
+const EQUIPA_CACHE_KEY = (id: string) => `equipa_cache_${id}`
+
+interface EquipaCache {
+    games: Match[]
+    photo: string | null
+    teamInfo: { nome: string; escalao: string }
+    plantel: PlantelPlayer[]
+}
+
+function loadEquipaCache(id: string): EquipaCache | null {
+    try {
+        const raw = localStorage.getItem(EQUIPA_CACHE_KEY(id))
+        if (!raw) return null
+        const { data, ts } = JSON.parse(raw)
+        if (ts && Date.now() - ts < EQUIPA_CACHE_TTL) return data as EquipaCache
+    } catch { /* ignore */ }
+    return null
+}
+
+function saveEquipaCache(id: string, data: EquipaCache) {
+    try {
+        localStorage.setItem(EQUIPA_CACHE_KEY(id), JSON.stringify({ data, ts: Date.now() }))
+    } catch { /* ignore */ }
+}
+
 export function useEquipaGames(equipaId: string) {
-    const [games, setGames] = useState<Match[]>([])
-    const [photo, setPhoto] = useState<string | null>(null)
-    const [teamInfo, setTeamInfo] = useState<{ nome: string; escalao: string }>({ nome: '', escalao: '' })
-    const [plantel, setPlantel] = useState<PlantelPlayer[]>([])
-    const [loading, setLoading] = useState(true)
+    const cached = equipaId ? loadEquipaCache(equipaId) : null
+    const [games, setGames] = useState<Match[]>(cached?.games || [])
+    const [photo, setPhoto] = useState<string | null>(cached?.photo || null)
+    const [teamInfo, setTeamInfo] = useState<{ nome: string; escalao: string }>(cached?.teamInfo || { nome: '', escalao: '' })
+    const [plantel, setPlantel] = useState<PlantelPlayer[]>(cached?.plantel || [])
+    const [loading, setLoading] = useState(!cached && !!equipaId)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         if (!equipaId) { setLoading(false); return }
+        // If cache loaded, skip fetch
+        if (cached) { setLoading(false); return }
 
         let cancelled = false
         async function load() {
@@ -139,42 +180,38 @@ export function useEquipaGames(equipaId: string) {
                 const r = await fetch(`${FPB_PROXY}?page=equipa&equipa_id=${equipaId}`)
                 if (!r.ok || cancelled) { setLoading(false); return }
                 const html = await r.text()
-                setPhoto(extractTeamPhoto(html))
-                setTeamInfo(extractTeamInfo(html))
-                setPlantel(extractPlantel(html))
+                const p = extractTeamPhoto(html)
+                const ti = extractTeamInfo(html)
+                const pl = extractPlantel(html)
 
-                // Extract sections by finding start positions and taking content until next team-wrapper
-                function extractSection(tabindex: number): string {
-                    const startTag = `<div class="team-wrapper" tabindex=${tabindex}>`
-                    const start = html.indexOf(startTag)
-                    if (start < 0) return ''
-                    const contentStart = start + startTag.length
-                    // Find the next team-wrapper after this one
-                    const nextIndex = html.indexOf('<div class="team-wrapper" tabindex=', contentStart)
-                    const end = nextIndex > 0 ? nextIndex : html.length
-                    return html.substring(contentStart, end)
-                }
-                const calendarHtml = extractSection(2)
-                const resultsHtml = extractSection(3)
+                const calendarGames = parseGames(extractSection(html, 2), true)
+                const resultsGames = parseGames(extractSection(html, 3), false)
 
-                const calendarGames = parseGames(calendarHtml, true)
-                const resultsGames = parseGames(resultsHtml, false)
-
-                // Merge, deduplicate by id
                 const map = new Map<string, Match>()
                 for (const g of [...calendarGames, ...resultsGames]) {
                     if (!map.has(g.id)) map.set(g.id, g)
                 }
+                const merged = Array.from(map.values())
+
+                saveEquipaCache(equipaId, { games: merged, photo: p, teamInfo: ti, plantel: pl })
 
                 if (!cancelled) {
-                    setGames(Array.from(map.values()))
+                    setPhoto(p)
+                    setTeamInfo(ti)
+                    setPlantel(pl)
+                    setGames(merged)
                     setLoading(false)
                 }
-            } catch { if (!cancelled) setLoading(false) }
+            } catch (err) {
+                if (!cancelled) {
+                    setError(err instanceof Error ? err.message : 'Erro ao carregar dados da equipa')
+                    setLoading(false)
+                }
+            }
         }
         load()
         return () => { cancelled = true }
     }, [equipaId])
 
-    return { games, photo, teamInfo, plantel, loading }
+    return { games, photo, teamInfo, plantel, loading, error }
 }

@@ -287,13 +287,43 @@ function parseAthleteHTML(html: string): AthleteData {
     }
 }
 
+const ATHLETE_CACHE_TTL = 30 * 60_000 // 30 min
+const ATHLETE_LS_KEY = (id: string) => `athlete_cache_${id}`
+const ATHLETE_LS_TS = (id: string) => `athlete_cache_ts_${id}`
+
+function loadAthleteCache(id: string): AthleteData | null {
+    try {
+        const raw = localStorage.getItem(ATHLETE_LS_KEY(id))
+        const ts = localStorage.getItem(ATHLETE_LS_TS(id))
+        if (raw && ts && Date.now() - parseInt(ts) < ATHLETE_CACHE_TTL) {
+            return JSON.parse(raw) as AthleteData
+        }
+    } catch { /* ignore */ }
+    return null
+}
+
+function saveAthleteCache(id: string, data: AthleteData) {
+    try {
+        localStorage.setItem(ATHLETE_LS_KEY(id), JSON.stringify(data))
+        localStorage.setItem(ATHLETE_LS_TS(id), Date.now().toString())
+    } catch { /* ignore */ }
+}
+
 export function useAthlete(athleteId: string) {
-    const [data, setData] = useState<AthleteData | null>(null)
-    const [loading, setLoading] = useState(true)
+    const [data, setData] = useState<AthleteData | null>(() => athleteId ? loadAthleteCache(athleteId) : null)
+    const [loading, setLoading] = useState(() => !athleteId ? false : !loadAthleteCache(athleteId))
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         if (!athleteId) {
+            setLoading(false)
+            return
+        }
+
+        // If we already have cached data, skip fetch
+        const cached = loadAthleteCache(athleteId)
+        if (cached) {
+            setData(cached)
             setLoading(false)
             return
         }
@@ -310,6 +340,7 @@ export function useAthlete(athleteId: string) {
             .then(html => {
                 if (cancelled) return
                 const parsed = parseAthleteHTML(html)
+                saveAthleteCache(athleteId, parsed)
                 setData(parsed)
                 setLoading(false)
             })
