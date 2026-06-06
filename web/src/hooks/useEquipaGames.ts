@@ -80,12 +80,22 @@ export function useEquipaGames(equipaId: string) {
                 if (!r.ok || cancelled) { setLoading(false); return }
                 const html = await r.text()
 
-                // Extract calendar (tabindex=2) and results (tabindex=3) sections
-                const calendarSection = html.match(/<div class="team-wrapper[^"]*"[^>]*tabindex="2"[^>]*>([\s\S]*?)<\/section>\s*<\/div>/)
-                const resultsSection = html.match(/<div class="team-wrapper[^"]*"[^>]*tabindex="3"[^>]*>([\s\S]*?)<\/section>\s*<\/div>/)
+                // Extract sections by finding start positions and taking content until next team-wrapper
+                function extractSection(tabindex: number): string {
+                    const startTag = `<div class="team-wrapper" tabindex=${tabindex}>`
+                    const start = html.indexOf(startTag)
+                    if (start < 0) return ''
+                    const contentStart = start + startTag.length
+                    // Find the next team-wrapper after this one
+                    const nextIndex = html.indexOf('<div class="team-wrapper" tabindex=', contentStart)
+                    const end = nextIndex > 0 ? nextIndex : html.length
+                    return html.substring(contentStart, end)
+                }
+                const calendarHtml = extractSection(2)
+                const resultsHtml = extractSection(3)
 
-                const calendarGames = calendarSection ? parseGames(calendarSection[1]) : []
-                const resultsGames = resultsSection ? parseGames(resultsSection[1]) : []
+                const calendarGames = parseGames(calendarHtml)
+                const resultsGames = parseGames(resultsHtml)
 
                 // Merge, deduplicate by id
                 const map = new Map<string, Match>()
