@@ -188,23 +188,75 @@ function ClubTeamDetail() {
             {/* Vista Geral tab */}
             {tab === 'geral' && (
                 <div className="px-3 space-y-3">
-                    {/* Club card — horizontal with bigger logo */}
-                    <Link to={`/clube/${club.slug}`}
-                        className="flex items-center gap-4 p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--club-color)] rounded-r" />
-                        <div className="w-16 h-16 rounded-2xl bg-[var(--club-color)]/10 flex items-center justify-center overflow-hidden shrink-0 border border-[var(--club-color)]/20">
-                            {club.logo_url ? (
-                                <img src={club.logo_url} alt="" className="w-12 h-12 object-contain" />
-                            ) : (
-                                <span className="text-xl font-black text-[var(--club-color)]">{club.name.charAt(0).toUpperCase()}</span>
-                            )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[10px] text-zinc-400 uppercase tracking-wide">Equipa do</p>
-                            <p className="text-base font-black text-zinc-900 dark:text-white truncate">{club.name}</p>
-                        </div>
-                        <ChevronRight size={18} className="text-zinc-300 group-hover:text-[var(--club-color)] shrink-0 transition-colors" />
-                    </Link>
+                    {/* Club card + Maior Vitória side by side */}
+                    <div className="flex gap-3 items-stretch">
+                        {/* Club card — compact, blur glow behind logo */}
+                        <Link to={`/clube/${club.slug}`}
+                            className="w-[38%] flex-shrink-0 flex flex-col items-center justify-center gap-2 p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:shadow-md transition-all group">
+                            <div className="relative w-20 h-20 flex items-center justify-center">
+                                <div className="absolute inset-0 rounded-full bg-[var(--club-color)]/15 blur-xl" />
+                                <div className="absolute inset-1 rounded-full bg-[var(--club-color)]/10" />
+                                <div className="relative z-10 w-16 h-16 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-700">
+                                    {club.logo_url ? (
+                                        <img src={club.logo_url} alt="" className="w-12 h-12 object-contain" />
+                                    ) : (
+                                        <span className="text-xl font-black text-zinc-400">{club.name.charAt(0).toUpperCase()}</span>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-[9px] text-zinc-400 uppercase tracking-wide">Equipa do</p>
+                                <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300 truncate max-w-[90px]">{club.name}</p>
+                            </div>
+                        </Link>
+
+                        {/* Maior Vitória — exact GameCard result style */}
+                        {maxWin ? (() => {
+                            const isHome = clubHome(maxWin)
+                            const winTeam = isHome ? maxWin.equipa_casa : maxWin.equipa_fora
+                            const winLogo = isHome ? maxWin.logotipo_casa : maxWin.logotipo_fora
+                            const winScore = isHome ? maxWin.resultado_casa! : maxWin.resultado_fora!
+                            const loseTeam = isHome ? maxWin.equipa_fora : maxWin.equipa_casa
+                            const loseLogo = isHome ? maxWin.logotipo_fora : maxWin.logotipo_casa
+                            const loseScore = isHome ? maxWin.resultado_fora! : maxWin.resultado_casa!
+                            return (
+                                <Link to={`/game/${maxWin.slug || maxWin.id}?clube=${club.slug}`}
+                                    className="flex-1 min-w-0 glass-card flex flex-col group active:scale-[0.98]">
+                                    <div className="flex justify-between items-center px-4 py-2.5 border-b border-zinc-100 dark:border-white/5">
+                                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400">
+                                            <Trophy size={10} />
+                                            MAIOR VITÓRIA
+                                        </div>
+                                        <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider truncate">
+                                            {maxWin.escalao || ''}
+                                        </span>
+                                    </div>
+                                    <div className="p-4 flex flex-col gap-3">
+                                        <ResultRow name={winTeam} logo={winLogo} score={winScore} won={true} />
+                                        <ResultRow name={loseTeam} logo={loseLogo} score={loseScore} won={false} />
+                                    </div>
+                                    <div className="px-4 pb-4 pt-0 flex justify-between items-center text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+                                        <div className="flex items-center gap-1.5 truncate max-w-[70%]">
+                                            {maxWin.local ? (
+                                                <>
+                                                    <MapPin size={10} className="shrink-0 text-dribly-purple" />
+                                                    <span className="truncate text-zinc-500">{maxWin.local}</span>
+                                                </>
+                                            ) : (
+                                                <span className="truncate text-zinc-500">{formatDate(maxWin.data)}</span>
+                                            )}
+                                        </div>
+                                        <ChevronRight size={14} className="text-zinc-400 group-hover:text-dribly-blue transition-colors" />
+                                    </div>
+                                </Link>
+                            )
+                        })() : (
+                            <div className="flex-1 min-w-0 glass-card flex flex-col items-center justify-center text-xs text-zinc-400">
+                                <Trophy size={20} className="mb-1 text-zinc-300 dark:text-zinc-600" />
+                                Sem vitórias
+                            </div>
+                        )}
+                    </div>
 
                     {/* Stats — 4 cards with colored backgrounds */}
                     <div className="grid grid-cols-4 gap-2">
@@ -221,40 +273,6 @@ function ClubTeamDetail() {
                             </div>
                         ))}
                     </div>
-
-                    {/* Maior Vitória — full width with team logos */}
-                    {maxWin && (
-                        <Link to={`/game/${maxWin.slug || maxWin.id}?clube=${club.slug}`}
-                            className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all group">
-                            <div className="bg-gradient-to-r from-[var(--club-color)]/10 via-zinc-50 to-[var(--club-color)]/10 dark:from-[var(--club-color)]/5 dark:via-zinc-900 dark:to-[var(--club-color)]/5 border-b border-zinc-100 dark:border-white/5 p-3 flex justify-between items-center">
-                                <span className="text-[10px] font-bold text-[var(--club-color)] uppercase tracking-wide">⭐ Maior Vitória</span>
-                                <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase truncate ml-2">{maxWin.competicao || ''}</span>
-                            </div>
-                            <div className="px-5 py-5">
-                                <div className="flex items-center justify-between gap-3">
-                                    <TeamBlock name={maxWin.equipa_casa} logo={maxWin.logotipo_casa} />
-                                    <div className="flex flex-col items-center gap-1 shrink-0">
-                                        <div className="bg-green-50 dark:bg-green-900/20 rounded-xl px-3.5 py-2">
-                                            <p className="text-xl font-black text-green-700 dark:text-green-300 tabular-nums">{maxWin.resultado_casa} - {maxWin.resultado_fora}</p>
-                                        </div>
-                                        <p className="text-[10px] font-bold text-green-600">+{Math.abs((clubHome(maxWin) ? maxWin.resultado_casa! : maxWin.resultado_fora!) - (clubHome(maxWin) ? maxWin.resultado_fora! : maxWin.resultado_casa!))}</p>
-                                    </div>
-                                    <TeamBlock name={maxWin.equipa_fora} logo={maxWin.logotipo_fora} />
-                                </div>
-                                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                                    <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
-                                    <span className="capitalize font-medium">{formatDate(maxWin.data)}</span>
-                                    <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
-                                </div>
-                                {maxWin.local && (
-                                    <div className="mt-2.5 flex items-center justify-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400">
-                                        <MapPin size={10} className="text-[var(--club-color)]" />
-                                        <span className="truncate max-w-[220px]">{maxWin.local}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </Link>
-                    )}
                 </div>
             )}
 
@@ -316,17 +334,23 @@ function ClubTeamDetail() {
     )
 }
 
-function TeamBlock({ name, logo }: { name: string; logo: string | null }) {
+function ResultRow({ name, logo, score, won }: { name: string; logo: string | null; score: number; won: boolean }) {
+    const [imgError, setImgError] = useState(false)
     return (
-        <div className="flex-1 flex flex-col items-center text-center gap-2 min-w-0">
-            <div className="w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
-                {logo ? (
-                    <img src={logo} alt={name} className="w-full h-full object-contain p-1.5" />
+        <div className={`flex items-center justify-between ${won ? '' : 'opacity-60'}`}>
+            <div className="flex items-center gap-3 min-w-0">
+                {logo && !imgError ? (
+                    <img src={logo} alt="" className="w-8 h-8 object-contain rounded-full bg-zinc-50 dark:bg-zinc-800" loading="lazy" onError={() => setImgError(true)} />
                 ) : (
-                    <span className="text-base font-bold text-zinc-400">{name.charAt(0).toUpperCase()}</span>
+                    <div className="w-8 h-8 bg-zinc-100 dark:bg-white/10 rounded-full flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">{name.charAt(0).toUpperCase()}</span>
+                    </div>
                 )}
+                <span className="text-sm font-bold text-zinc-900 dark:text-white leading-tight truncate">{name.toUpperCase()}</span>
             </div>
-            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 leading-tight line-clamp-2">{name}</span>
+            <span className={`text-xl font-mono font-bold tabular-nums shrink-0 ml-2 ${won ? 'text-green-700 dark:text-green-300' : 'text-zinc-900 dark:text-white'}`}>
+                {score}
+            </span>
         </div>
     )
 }
