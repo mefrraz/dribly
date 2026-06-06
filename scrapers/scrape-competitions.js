@@ -21,15 +21,11 @@ const MAIN_COMPETITIONS = [
 ]
 
 async function fetchHtml(page, competicao) {
-    const params = new URLSearchParams({
-        page,
-        competicao: String(competicao),
-        _t: String(Date.now())
+    const url = `https://www.fpb.pt/${page}/${competicao}`
+    const res = await fetch(url, {
+        headers: { 'User-Agent': USER_AGENT, 'Accept': 'text/html' }
     })
-    const res = await fetch(`https://www.fpb.pt/wp-admin/admin-ajax.php?${params.toString()}`, {
-        headers: { 'User-Agent': USER_AGENT }
-    })
-    if (!res.ok) throw new Error(`FPB error: ${res.status}`)
+    if (!res.ok) throw new Error(`FPB error: ${res.status} from ${url}`)
     return await res.text()
 }
 
