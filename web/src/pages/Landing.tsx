@@ -88,8 +88,10 @@ function Landing() {
             id = setInterval(() => {
                 setAssoOffset(prev => {
                     const next = prev - 1
-                    const totalWidth = associations.length * 200
-                    return next < -totalWidth ? 0 : next
+                    const totalWidth = associations.length * 132 // single copy width (110 card + 22 gap)
+                    // Seamless wrap: when past the end of copy1, jump to equivalent position
+                    if (next <= -totalWidth) return next + totalWidth
+                    return next
                 })
             }, 40)
         }
@@ -195,17 +197,17 @@ function Landing() {
 
         if (dir > 0) {
             const next = el.scrollLeft + cardWidth
-            if (next >= max - 10) {
-                // Wrapping forward: jump to equivalent position in copy1 (instant, invisible)
-                el.scrollTo({ left: next - half, behavior: 'instant' })
+            if (next >= max - cardWidth) {
+                // Wrapping forward: jump to equivalent position in copy1 (silent)
+                el.scrollLeft = next - half
             } else {
                 el.scrollBy({ left: cardWidth, behavior: 'smooth' })
             }
         } else {
             const next = el.scrollLeft - cardWidth
-            if (next <= 10) {
-                // Wrapping backward: jump to equivalent position in copy2 (instant)
-                el.scrollTo({ left: next + half, behavior: 'instant' })
+            if (next <= cardWidth) {
+                // Wrapping backward: jump to equivalent position in copy2 (silent)
+                el.scrollLeft = next + half
             } else {
                 el.scrollBy({ left: -cardWidth, behavior: 'smooth' })
             }
@@ -544,7 +546,7 @@ function Landing() {
                             <div className="w-10 h-10 rounded-xl bg-dribly-purple/30 flex items-center justify-center mb-4">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                             </div>
-                            <h3 className="text-sm font-bold mb-1 text-white">79 Clubes</h3>
+                            <h3 className="text-sm font-bold mb-1 text-white">{clubs.length} Clubes</h3>
                             <p className="text-[11px] text-zinc-400 leading-relaxed">De todas as divisões e associações</p>
                         </div>
                     </div>
