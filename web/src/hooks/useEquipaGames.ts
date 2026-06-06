@@ -92,10 +92,52 @@ function extractTeamInfo(html: string): { nome: string; escalao: string } {
     }
 }
 
+export interface PlantelPlayer {
+    nome: string
+    foto: string | null
+    atletaUrl: string | null
+}
+
+function extractPlantel(html: string): PlantelPlayer[] {
+    // Find plantel section (tabindex=1)
+    const startTag = '<div class="team-wrapper" tabindex=1>'
+    const start = html.indexOf(startTag)
+    if (start < 0) return []
+    const contentStart = start + startTag.length
+    const nextIndex = html.indexOf('<div class="team-wrapper" tabindex=', contentStart)
+    const section = html.substring(contentStart, nextIndex > 0 ? nextIndex : html.length)
+
+    const players: PlantelPlayer[] = []
+    const rowRe = /<tr class="player-row[^"]*">([\s\S]*?)<\/tr>/g
+    let rm
+    while ((rm = rowRe.exec(section)) !== null) {
+        const row = rm[1]
+        const nameMatch = row.match(/<h5>([^<]+)<\/h5>/)
+        if (!nameMatch) continue
+        const nome = nameMatch[1].trim()
+
+        // Photo from data-src or src in img
+        const imgMatch = row.match(/<img[^>]*data-src="([^"]+)"[^>]*>/)
+            || row.match(/<img[^>]*src="([^"]+)"[^>]*>/)
+        const foto = imgMatch?.[1] || null
+
+        // Atleta link
+        const linkMatch = row.match(/<a href="(\/atletas\/\d+)">/)
+        const atletaUrl = linkMatch ? `https://www.fpb.pt${linkMatch[1]}` : null
+
+        // Avoid duplicates
+        if (!players.find(p => p.nome === nome)) {
+            players.push({ nome, foto, atletaUrl })
+        }
+    }
+    return players
+}
+
 export function useEquipaGames(equipaId: string) {
     const [games, setGames] = useState<Match[]>([])
     const [photo, setPhoto] = useState<string | null>(null)
     const [teamInfo, setTeamInfo] = useState<{ nome: string; escalao: string }>({ nome: '', escalao: '' })
+    const [plantel, setPlantel] = useState<PlantelPlayer[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -109,6 +151,7 @@ export function useEquipaGames(equipaId: string) {
                 const html = await r.text()
                 setPhoto(extractTeamPhoto(html))
                 setTeamInfo(extractTeamInfo(html))
+                setPlantel(extractPlantel(html))
 
                 // Extract sections by finding start positions and taking content until next team-wrapper
                 function extractSection(tabindex: number): string {
@@ -143,5 +186,5 @@ export function useEquipaGames(equipaId: string) {
         return () => { cancelled = true }
     }, [equipaId])
 
-    return { games, photo, teamInfo, loading }
+    return { games, photo, teamInfo, plantel, loading }
 }

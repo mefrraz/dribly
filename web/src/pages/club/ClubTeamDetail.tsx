@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useParams, useSearchParams, useOutletContext } from 'react-router-dom'
-import { ArrowLeft, Calendar, Trophy } from 'lucide-react'
+import { ArrowLeft, Calendar, Trophy, Users, Info } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
-import { useEquipaGames } from '../../hooks/useEquipaGames'
+import { useEquipaGames, type PlantelPlayer } from '../../hooks/useEquipaGames'
 import { SkeletonGameGrid } from '../../components/Skeleton'
 import { EmptyState } from '../../components/EmptyState'
 import { GameCard } from '../../components/GameCard'
-import { SegmentControl } from '../../components/SegmentControl'
 import type { Match } from '../../components/types'
 import type { Club } from '../../lib/ClubContext'
 
@@ -37,22 +36,25 @@ function ClubTeamDetail() {
     const { teamId: teamSlug } = useParams<{ teamId: string }>()
     const [searchParams, setSearchParams] = useSearchParams()
 
-    const [view, setView] = useState<'agenda' | 'results'>(() => {
-        const v = searchParams.get('view')
-        return v === 'results' ? 'results' : 'agenda'
+    type Tab = 'geral' | 'agenda' | 'resultados' | 'plantel'
+    const [tab, setTab] = useState<Tab>(() => {
+        const v = searchParams.get('tab')
+        return (v === 'resultados' || v === 'agenda' || v === 'plantel') ? v : 'geral'
     })
 
     const equipaId = searchParams.get('eid') || ''
     const { games: clubGames, loading: clubLoading } = useGames('2025/2026', club.id, club.name)
-    const { games: equipaGames, photo: equipaPhoto, teamInfo, loading: equipaLoading } = useEquipaGames(equipaId)
+    const { games: equipaGames, photo: equipaPhoto, teamInfo, plantel, loading: equipaLoading } = useEquipaGames(equipaId)
 
     const loading = equipaId ? equipaLoading : clubLoading
     const games = equipaId && equipaGames.length > 0 ? equipaGames : (clubGames || [])
     const clubNameUpper = club.name.toUpperCase()
 
     useEffect(() => {
-        setSearchParams({ view, ...(equipaId ? { eid: equipaId } : {}) })
-    }, [view, setSearchParams, equipaId])
+        const params: Record<string, string> = { tab }
+        if (equipaId) params.eid = equipaId
+        setSearchParams(params)
+    }, [tab, setSearchParams, equipaId])
 
     const { teamName, teamGames } = useMemo(() => {
         if (equipaId) {
@@ -93,7 +95,7 @@ function ClubTeamDetail() {
     const total = wins + losses + draws
     const pct = total > 0 ? Math.round(wins / (wins + losses || 1) * 100) : null
 
-    const filteredMatches = view === 'agenda' ? upcoming : finished
+    const filteredMatches = tab === 'agenda' ? upcoming : tab === 'resultados' ? finished : teamGames
 
     const groupedMatches = filteredMatches.reduce((groups, match) => {
         const date = match.data
@@ -104,7 +106,7 @@ function ClubTeamDetail() {
     Object.values(groupedMatches).forEach(g => g.sort((a, b) => (a.hora || '99:99').localeCompare(b.hora || '99:99')))
 
     const sortedDates = Object.keys(groupedMatches).sort((a, b) =>
-        view === 'agenda'
+        tab === 'agenda'
             ? new Date(a).getTime() - new Date(b).getTime()
             : new Date(b).getTime() - new Date(a).getTime()
     )
@@ -176,42 +178,92 @@ function ClubTeamDetail() {
                 </div>
             </div>
 
+            {/* Tab bar */}
             <div className="px-3 mt-2">
-                <SegmentControl
-                    options={[
-                        { value: 'agenda', label: 'AGENDA', icon: Calendar },
-                        { value: 'results', label: 'RESULTADOS', icon: Trophy },
-                    ]}
-                    value={view}
-                    onChange={(v) => setView(v as 'agenda' | 'results')}
-                />
+                <div className="flex gap-1.5 overflow-x-auto">
+                    {([
+                        { value: 'geral' as Tab, label: 'Geral', icon: Info },
+                        { value: 'agenda' as Tab, label: 'Agenda', icon: Calendar },
+                        { value: 'resultados' as Tab, label: 'Resultados', icon: Trophy },
+                        { value: 'plantel' as Tab, label: 'Plantel', icon: Users },
+                    ]).map(t => (
+                        <button key={t.value} onClick={() => setTab(t.value)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                                tab === t.value ? 'bg-dribly-purple text-white' : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/5'
+                            }`}>
+                            <t.icon size={14} />
+                            {t.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            {loading && (
-                <div>
-                    <SkeletonGameGrid days={2} count={3} />
+            {/* Geral tab */}
+            {tab === 'geral' && (
+                <div className="px-3">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 mb-4">
+                        <div className="grid grid-cols-4 gap-3">
+                            <div className="text-center"><p className="text-2xl font-black text-zinc-900 dark:text-white">{total}</p><p className="text-[10px] text-zinc-500">Jogos</p></div>
+                            <div className="text-center"><p className="text-2xl font-black text-green-600 dark:text-green-400">{wins}</p><p className="text-[10px] text-zinc-500">Vitórias</p></div>
+                            <div className="text-center"><p className="text-2xl font-black text-red-500">{losses}</p><p className="text-[10px] text-zinc-500">Derrotas</p></div>
+                            <div className="text-center"><p className="text-2xl font-black text-zinc-900 dark:text-white">{pct !== null ? pct + '%' : '—'}</p><p className="text-[10px] text-zinc-500">PCT</p></div>
+                        </div>
+                    </div>
                 </div>
             )}
 
-            {!loading && sortedDates.length === 0 && (
-                <EmptyState view={view} />
+            {/* Agenda / Resultados */}
+            {(tab === 'agenda' || tab === 'resultados') && (
+                <>
+                    {loading && <div><SkeletonGameGrid days={2} count={3} /></div>}
+                    {!loading && sortedDates.length === 0 && <EmptyState view={tab === 'agenda' ? 'agenda' : 'results'} />}
+                    {!loading && sortedDates.length > 0 && (
+                        <div className="space-y-6 px-2 md:px-4">
+                            {sortedDates.map(date => (
+                                <div key={date}>
+                                    <div className="flex items-center gap-3 mb-3 px-2">
+                                        <h3 className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">{formatDate(date)}</h3>
+                                        <div className="flex-1 h-px bg-zinc-200 dark:bg-white/5" />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        {groupedMatches[date].map(match => (
+                                            <GameCard key={match.id || match.slug} match={match} mode={tab === 'agenda' ? 'agenda' : 'results'} clubName={club.name} clubSlug={club.slug} />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </>
             )}
 
-            {!loading && sortedDates.length > 0 && (
-                <div className="space-y-6 px-2 md:px-4">
-                    {sortedDates.map(date => (
-                        <div key={date}>
-                            <div className="flex items-center gap-3 mb-3 px-2">
-                                <h3 className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">{formatDate(date)}</h3>
-                                <div className="flex-1 h-px bg-zinc-200 dark:bg-white/5" />
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {groupedMatches[date].map(match => (
-                                    <GameCard key={match.id || match.slug} match={match} mode={view === 'agenda' ? 'agenda' : 'results'} clubName={club.name} clubSlug={club.slug} />
-                                ))}
-                            </div>
+            {/* Plantel tab */}
+            {tab === 'plantel' && (
+                <div className="px-3">
+                    {plantel.length === 0 ? (
+                        <p className="text-sm text-zinc-400 text-center py-8">Plantel não disponível.</p>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            {plantel.map((p, i) => (
+                                <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 text-center">
+                                    <div className="w-16 h-16 mx-auto rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden mb-2">
+                                        {p.foto ? (
+                                            <img src={p.foto} alt="" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="text-lg font-bold text-zinc-400">{p.nome.charAt(0).toUpperCase()}</span>
+                                        )}
+                                    </div>
+                                    {p.atletaUrl ? (
+                                        <a href={p.atletaUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-dribly-purple truncate block">
+                                            {p.nome}
+                                        </a>
+                                    ) : (
+                                        <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate">{p.nome}</p>
+                                    )}
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    )}
                 </div>
             )}
         </div>
