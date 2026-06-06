@@ -51,7 +51,7 @@ function Landing() {
     const [selectedIdx, setSelectedIdx] = useState(-1)
     const [assoOffset, setAssoOffset] = useState(0)
     const [compResults, setCompResults] = useState<LandingCompetition[]>([])
-    const carouselRef = useRef<HTMLDivElement>(null)
+    const [gameIdx, setGameIdx] = useState(() => Math.floor(Math.random() * 3))
     const inputRef = useRef<HTMLInputElement>(null)
     const dropdownRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
@@ -65,17 +65,7 @@ function Landing() {
 
     useEffect(() => { loadClubs() }, [loadClubs])
 
-    // Auto-scroll featured games carousel on load (start at random position in copy1)
-    useEffect(() => {
-        if (games.length > 0 && carouselRef.current) {
-            const el = carouselRef.current
-            const card = el.querySelector('.snap-center') as HTMLElement | null
-            const cardWidth = card ? card.offsetWidth + 12 : 332
-            // Start in the first copy, at a random card position
-            const idx = Math.floor(Math.random() * games.length)
-            el.scrollLeft = idx * cardWidth
-        }
-    }, [games])
+
 
     // Auto-scroll associations carousel (pauses when tab is hidden to save battery)
     useEffect(() => {
@@ -187,32 +177,8 @@ function Landing() {
         setShowDropdown(false)
     }
 
-    const scrollCarousel = (dir: number) => {
-        if (!carouselRef.current) return
-        const el = carouselRef.current
-        const card = el.querySelector('.snap-center') as HTMLElement | null
-        const cardWidth = card ? card.offsetWidth + 12 : 332 // 320 + gap-3 (12px)
-        const max = el.scrollWidth - el.clientWidth
-        const half = max / 2 // midpoint between copy1 and copy2
-
-        if (dir > 0) {
-            const next = el.scrollLeft + cardWidth
-            if (next >= max - cardWidth) {
-                // Wrapping forward: jump to equivalent position in copy1 (silent)
-                el.scrollLeft = next - half
-            } else {
-                el.scrollBy({ left: cardWidth, behavior: 'smooth' })
-            }
-        } else {
-            const next = el.scrollLeft - cardWidth
-            if (next <= cardWidth) {
-                // Wrapping backward: jump to equivalent position in copy2 (silent)
-                el.scrollLeft = next + half
-            } else {
-                el.scrollBy({ left: -cardWidth, behavior: 'smooth' })
-            }
-        }
-    }
+    const prevGame = () => setGameIdx(i => (i - 1 + games.length * 100) % games.length)
+    const nextGame = () => setGameIdx(i => (i + 1) % games.length)
 
     return (
         <div className="pb-24">
@@ -398,13 +364,13 @@ function Landing() {
                         </h2>
                         <div className="flex gap-1">
                             <button
-                                onClick={() => scrollCarousel(-1)}
+                                onClick={prevGame}
                                 className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/5 disabled:opacity-30 transition-colors"
                             >
                                 <ChevronLeft size={16} />
                             </button>
                             <button
-                                onClick={() => scrollCarousel(1)}
+                                onClick={nextGame}
                                 className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/5 disabled:opacity-30 transition-colors"
                             >
                                 <ChevronRight size={16} />
@@ -422,24 +388,22 @@ function Landing() {
                     ) : games.length === 0 ? (
                         <p className="text-xs text-zinc-400 text-center py-8">Nenhum jogo em destaque de momento.</p>
                     ) : (
-                        <div className="relative">
-                            <div
-                                ref={carouselRef}
-                                className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory scroll-smooth items-stretch"
-                            >
-                                <div className="shrink-0 w-[calc(50vw-24px)] md:hidden" />
-                                {[...games, ...games].map((match, idx) => (
-                                    <div
-                                        key={match.slug || match.id + '-' + idx}
-                                        className="min-w-[80vw] md:min-w-[320px] shrink-0 snap-center h-full"
+                        <div className="flex justify-center gap-3 items-stretch">
+                            {[0, 1, 2].map(offset => {
+                                const idx = (gameIdx + offset) % games.length
+                                const match = games[idx]
+                                return (
+                                    <div key={match.slug || match.id + '-' + offset}
+                                        className="w-[320px] shrink-0 hidden md:block"
                                     >
                                         <GameCard match={match} mode="agenda" />
                                     </div>
-                                ))}
-                                <div className="shrink-0 w-[calc(50vw-24px)] md:hidden" />
+                                )
+                            })}
+                            {/* Mobile: show current + next */}
+                            <div className="w-[80vw] shrink-0 md:hidden">
+                                <GameCard match={games[gameIdx % games.length]} mode="agenda" />
                             </div>
-                            <div className="absolute left-0 top-0 bottom-2 w-24 sm:w-32 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
-                            <div className="absolute right-0 top-0 bottom-2 w-24 sm:w-32 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
                         </div>
                     )}
                 </div>
