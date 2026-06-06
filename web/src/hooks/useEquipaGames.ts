@@ -62,7 +62,6 @@ function parseGames(html: string): Match[] {
                 status,
             })
         }
-    }
     return games
 }
 
