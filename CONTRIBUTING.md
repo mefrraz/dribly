@@ -1,6 +1,6 @@
 # Contribuir para o Dribly 🏀
 
-Antes de mais: **obrigado por quereres ajudar!** Este projeto foi feito por uma pessoa de 14 anos em 3 semanas com menos de 25€ em APIs de IA. Se eu consegui, tu também consegues contribuir.
+Antes de mais: **obrigado por quereres ajudar!** Não interessa se tens experiência ou não — toda a gente começa em algum lado e qualquer contribuição é bem-vinda.
 
 ---
 
@@ -164,4 +164,4 @@ Se estiveres perdido com Git, PRs, ou qualquer coisa técnica — abre um issue 
 
 ---
 
-*Feito com ❤️ e basquetebol por um miúdo de 14 anos que não sabia o que era um PR há 3 semanas.*
+*Feito com ❤️ e basquetebol. Obrigado a todos os que contribuem.*
