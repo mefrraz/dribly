@@ -393,6 +393,7 @@ export default async function handler(request: Request) {
             case 'getStats':
                 return await handleGetStats()
             case 'getCredentials':
+                console.log('[admin] getCredentials — SUPABASE_URL:', process.env.SUPABASE_URL, 'SERVICE_ROLE:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'present' : 'MISSING')
                 return json({
                     supabaseUrl: process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '',
                     supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
