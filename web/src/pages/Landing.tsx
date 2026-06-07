@@ -207,7 +207,7 @@ function Landing() {
 
     return (
         <div className="pb-24">
-            <SeoHead title="Basquetebol Português" description="Acompanha jogos, resultados e classificações de todos os clubes de basquetebol em Portugal. App PWA gratuita e open-source." />
+            <SeoHead title="Basquetebol Português" description="Resultados, jogos e classificações de todos os clubes de basquetebol em Portugal. Grátis, rápido e sempre atualizado." />
             {/* Hero */}
             <div className="relative z-30 bg-gradient-to-b from-dribly-purple/5 via-transparent to-transparent dark:from-dribly-purple/10 dark:via-transparent dark:to-transparent -mt-4 md:-mt-6">
                 <div className="max-w-2xl mx-auto px-4 pt-20 md:pt-36 pb-14 md:pb-20 text-center relative">
@@ -593,7 +593,7 @@ function Landing() {
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-3xl p-8 shadow-sm">
                     <h2 className="text-xl font-black text-zinc-900 dark:text-white mb-3">Pronto para começar?</h2>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 max-w-sm mx-auto">
-                        O Dribly é a única plataforma gratuita, mobile-first e com suporte offline para acompanhares todo o basquetebol português com dados sempre atualizados.
+                        Resultados, jogos e classificações de todos os clubes de basquetebol em Portugal. Grátis, rápido e sempre atualizado.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <Link

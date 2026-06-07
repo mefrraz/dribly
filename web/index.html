@@ -21,20 +21,47 @@
     
     <!-- SEO & Social Sharing -->
     <title>Dribly — Basquetebol Português</title>
-    <meta name="description" content="Acompanha jogos, resultados e classificações de todos os clubes de basquetebol em Portugal." />
-    
+    <meta name="description" content="Resultados, jogos e classificações de todos os clubes de basquetebol em Portugal. Grátis, rápido e sempre atualizado." />
+
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://dribly.pt/" />
     <meta property="og:title" content="Dribly — Basquetebol Português" />
-    <meta property="og:description" content="Resultados ao vivo, agenda de jogos e classificações do basquetebol português." />
+    <meta property="og:description" content="Resultados, jogos e classificações de todos os clubes de basquetebol em Portugal. Grátis, rápido e sempre atualizado." />
     <meta property="og:image" content="https://dribly.pt/logo.png" />
-    
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Dribly — Basquetebol Português" />
-    <meta name="twitter:description" content="Resultados e agenda do basquetebol português." />
+    <meta name="twitter:description" content="Resultados, jogos e classificações de todos os clubes de basquetebol em Portugal." />
     <meta name="twitter:image" content="https://dribly.pt/logo.png" />
+
+    <!-- Structured data for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Dribly",
+      "url": "https://dribly.pt",
+      "description": "Resultados, jogos e classificações de todos os clubes de basquetebol em Portugal.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dribly.pt/pesquisa?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Dribly",
+      "url": "https://dribly.pt",
+      "logo": "https://dribly.pt/logo.png"
+    }
+    </script>
 
     <!-- Google Fonts for premium look -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">

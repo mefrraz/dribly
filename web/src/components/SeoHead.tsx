@@ -9,7 +9,7 @@ interface SeoHeadProps {
 
 export function SeoHead({ title, description, image, url }: SeoHeadProps) {
     const fullTitle = title ? `${title} · Dribly` : 'Dribly — Basquetebol Português'
-    const defaultDesc = 'Acompanha jogos, resultados e classificações de todos os clubes de basquetebol em Portugal.'
+    const defaultDesc = 'Resultados, jogos e classificações de todos os clubes de basquetebol em Portugal. Grátis, rápido e sempre atualizado.'
     const baseUrl = 'https://dribly.pt'
 
     return (
