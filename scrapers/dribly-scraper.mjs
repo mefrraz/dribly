@@ -350,10 +350,12 @@ async function main() {
                     log(`    FIRST 200 CHARS: ${html.substring(0, 200)}`)
                 }
                 const games = []
+                let parsedDates = 0, failedDates = 0, parsedLinks = 0
                 dayWrappers.each((_, dw) => {
                 const dateStr = $(dw).find('h3.date').text().trim()
                 const iso = parseDatePt(dateStr)
-                if (!iso) return
+                if (!iso) { failedDates++; if (failedDates === 1) log(`    FAILED dateStr: "${dateStr}"`); return }
+                parsedDates++
 
                 $(dw).find('a.game-wrapper-a').each((__, link) => {
                     const $link = $(link)
@@ -401,6 +403,7 @@ async function main() {
                     })
                 })
             })
+            log(`    parsed: ${parsedDates} dates (${failedDates} failed), ${parsedLinks} games total`)
             return games
             } catch (e) {
                 log(`    PARSE ERROR: ${e.message}`)
