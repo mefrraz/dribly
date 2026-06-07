@@ -48,7 +48,7 @@ web/playwright/.cache/
 
 # Project — temp/backup files, source data, scraped pages
 web_antiga/
-scripts/
+/scripts/
 scrapers/scraped_*.json
 scrapers/*.js
 fpb_clubes*.json
