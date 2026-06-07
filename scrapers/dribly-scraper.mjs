@@ -493,7 +493,8 @@ async function main() {
             logoAsciiCache.set(clubId, lines)
             return lines
         } catch (e) {
-            log(`  Logo ASCII failed: ${e.message}`)
+            log(`  Logo ASCII failed: ${JSON.stringify(String(e))}`)
+            if (e.stack) log(`  Stack: ${e.stack}`)
             return null
         }
     }
