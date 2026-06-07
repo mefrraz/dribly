@@ -8,6 +8,8 @@ on:
 jobs:
   sitemap:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -22,19 +24,17 @@ jobs:
         working-directory: web
         run: npm install
 
-      - name: Debug secrets
-        run: |
-          echo "URL length: ${#VITE_SUPABASE_URL}"
-          echo "KEY length: ${#VITE_SUPABASE_ANON_KEY}"
-
       - name: Generate sitemap
         working-directory: web
         run: npm run sitemap
 
       - name: Commit & push sitemap
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
           git add web/public/sitemap.xml
           if git diff --staged --quiet; then
             echo "No changes to sitemap"
