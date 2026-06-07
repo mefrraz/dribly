@@ -7,7 +7,7 @@
 <p align="center">
   <b>Basquetebol português no teu bolso</b>
   <br />
-  PWA gratuita e open-source para acompanhar todos os clubes e competições da Federação Portuguesa de Basquetebol
+  App gratuita e open-source para acompanhar todos os clubes e competições da Federação Portuguesa de Basquetebol
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/PRs-welcome-7C3AED" alt="PRs Welcome" />
 </p>
 
-> **v8.1** — 🧹 ESLint 0 erros · SEO 10 páginas · a11y · Playwright E2E · Vite 6 · CSP · 111 testes · [dribly.pt](https://dribly.pt)
+> **v9** — 🛡️ Painel admin · 🔐 Client Trust 2FA · ✉️ Verificação email · ⚡ Speed Insights · CSP completo · [dribly.pt](https://dribly.pt)
 
 ---
 
@@ -38,7 +38,7 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 | Funcionalidade | Dribly | FPB.pt | Swish | TugaBasket |
 |---|---|---|---|---|
 | Mobile-first | ✅ | ✅ | ✅ | ❌ |
-| PWA instalável | ✅ | ❌ | ✅ | ❌ |
+| App instalável | ✅ | ❌ | ✅ | ❌ |
 | **Open source** | ✅ | ❌ | ❌ | ❌ |
 | **100% gratuito** | ✅ | ✅ | ❌ | ✅ |
 | Multi-clube | ✅ | ✅ | ⚠️ | ❌ |
@@ -47,7 +47,9 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 | Ficha de jogo detalhada | ✅ | ✅ | ✅ | ❌ |
 | Estatísticas individuais | ✅ | ✅ | ✅ | ❌ |
 | Contas / Seguir clubes | ✅ | ❌ | ✅ | ❌ |
-| Perfil + Segurança | ✅ | ❌ | ❌ | ❌ |
+| Perfil + Segurança | ✅ | ❌ | ✅ | ❌ |
+| Mapa de pavilhões | ✅ | ❌ | ❌ | ❌ |
+| Pavilhões (detalhe) | ✅ | ✅ | ❌ | ❌ |
 
 ---
 
@@ -76,13 +78,16 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 | Funcionalidade | v | Descrição |
 |---|---|---|
 | 🌓 Modo claro/escuro | 1.0 | Transição suave, segue prefers-color-scheme |
-| 📱 PWA instalável | 1.2 | App nativa no telemóvel |
+| 📱 App instalável | 1.2 | App nativa no telemóvel (PWA) |
 | 🔌 Offline parcial | 3.0 | Service Worker + cache inteligente |
 | 🔐 Contas email/password | 5.0 | Login + registo com username único (Clerk) |
+| ✉️ Verificação de email | 9.0 | Código de 6 dígitos enviado por email |
 | 🔑 Recuperar password | 5.0 | Email com código de 6 dígitos |
+| 🔐 Client Trust 2FA | 9.0 | Código email em novos dispositivos (Clerk) |
 | 👤 Perfil completo | 5.0 | Editar username, nome, bio, mudar password |
 | 🔒 Sessões ativas | 5.0 | Ver e terminar sessões remotas |
 | 🗑️ Apagar conta | 5.0 | Auto-remoção com confirmação |
+| 🛡️ Painel admin | 9.0 | Gerir clubes, users, jogos e competições |
 | 🌍 Domínio próprio | 5.0 | [dribly.pt](https://dribly.pt) |
 
 ### 🛡️ Qualidade e Robustez
@@ -90,6 +95,7 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 |---|---|---|
 | 🧹 ESLint 0 erros | 8.0 | Qualidade de código, zero `any` types |
 | 🔒 Content-Security-Policy | 8.0 | Headers CSP no `vercel.json` contra XSS |
+| ⚡ Speed Insights | 9.0 | Core Web Vitals reais em produção (Vercel) |
 | 🎭 Testes E2E Playwright | 8.0 | Smoke tests: Landing, Clubes, Mapa |
 | 🧪 Testes unitários | 7.6 | Vitest, 111 testes, gate no build |
 | 🔍 SEO dinâmico | 7.15 | Meta tags por página, Open Graph, sitemap |
@@ -204,7 +210,8 @@ web/
 │       └── club/                   #   Nested routes: /clube/:slug/*
 ├── api/                            # Vercel Edge Functions
 │   ├── fpb.ts                      #   Proxy FPB
-│   └── tugabasket.ts               #   Proxy TugaBasket
+│   ├── tugabasket.ts               #   Proxy TugaBasket
+│   └── admin.ts                    #   Painel admin (Clerk + Supabase)
 └── public/
     ├── logo.svg
     └── logo.png                    # PWA maskable icon
