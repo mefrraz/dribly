@@ -88,9 +88,14 @@ async function countClub(clubId, clubName, season) {
 }
 
 async function main() {
+    // Log setup
+    const LOG = resolve(DEPS_DIR, 'count-games.log')
+    mkdirSync(DEPS_DIR, { recursive: true })
+    const log = (msg) => { const ts = new Date().toISOString(); writeFileSync(LOG, `[${ts}] ${msg}\n`, { flag: 'a' }) }
+
     console.log(C.clear)
     console.log(C.bold + C.purple + '  Contador de Jogos FPB' + C.reset)
-    console.log(C.dim + '  Direto da FPB — sem Supabase' + C.reset)
+    console.log(C.dim + '  Direto da FPB — sem Supabase  |  Log: ' + LOG + C.reset)
     console.log()
 
     // Season selection
@@ -115,9 +120,11 @@ async function main() {
     console.log(C.clear)
     console.log(C.bold + C.purple + '  Contador de Jogos' + C.reset + C.dim + ` — ${seasons.length} épocas` + C.reset)
     console.log()
-    CLUBS.forEach(([id, name], i) => {
-        console.log(`  ${C.purple}[${String(i+1).padStart(2)}]${C.reset} ${name.padEnd(20)} ${C.dim}#${id}${C.reset}`)
+    const preview = CLUBS.slice(0, 20)
+    preview.forEach(([id, name], i) => {
+        console.log(`  ${C.purple}[${String(i+1).padStart(2)}]${C.reset} ${name.slice(0, 35).padEnd(36)} ${C.dim}#${id}${C.reset}`)
     })
+    if (CLUBS.length > 20) console.log(`  ${C.dim}  ... +${CLUBS.length - 20} clubes${C.reset}`)
     console.log(`  ${C.purple}[A]${C.reset} Todos (${CLUBS.length} clubes)`)
     console.log()
 
@@ -129,33 +136,51 @@ async function main() {
     if (cChoice.toUpperCase() === 'A') targets = CLUBS
     else { const i = parseInt(cChoice) - 1; if (i >= 0 && i < CLUBS.length) targets = [CLUBS[i]]; else { console.log(C.red + 'Inválido' + C.reset); process.exit(1) } }
 
+    // Ctrl+C handler — saves progress
+    let stopped = false
+    process.on('SIGINT', () => {
+        stopped = true
+        console.log(C.yellow + '\n\n  ⏸️  Interrompido. Resultados parciais guardados em:' + C.reset)
+        console.log(C.dim + `  ${LOG}` + C.reset)
+        console.log()
+        process.exit(0)
+    })
+
     // Count!
     console.log(C.clear)
     console.log(C.bold + C.purple + '  A contar...' + C.reset)
-    console.log(C.dim + `  ${targets.length} clubes × ${seasons.length} épocas` + C.reset)
+    console.log(C.dim + `  ${targets.length} clubes × ${seasons.length} épocas  |  Ctrl+C para parar` + C.reset)
     console.log()
 
+    log(`START: ${targets.length} clubes × ${seasons.length} épocas`)
     let grandTotal = 0
     const totalOps = targets.length * seasons.length
     let done = 0
 
     for (const season of seasons) {
+        if (stopped) break
         let seasonTotal = 0
         console.log(C.cyan + `\n  📅 ${season}` + C.reset)
+        log(`--- ${season} ---`)
 
         for (const [id, name] of targets) {
+            if (stopped) break
             const n = await countClub(id, name, season)
             done++
             seasonTotal += n
             grandTotal += n
+            log(`${season} | ${name} (#${id}) | ${n} jogos`)
             const pct = Math.round((done / totalOps) * 100)
             const bar = '█'.repeat(Math.floor(pct / 4)) + '░'.repeat(25 - Math.floor(pct / 4))
-            process.stdout.write(`\r  [${C.purple}${bar}${C.reset}] ${pct}%  ${name.padEnd(22)} ${C.bold}${n}${C.reset} jogos`)
+            process.stdout.write(`\r  [${C.purple}${bar}${C.reset}] ${pct}%  ${name.padEnd(25)} ${C.bold}${n}${C.reset} jogos  |  Total: ${grandTotal}`)
         }
-        console.log(`\n  ${C.green}✅ ${season}: ${seasonTotal} jogos${C.reset}`)
+        console.log(`\n  ${C.green}✅ ${season}: ${seasonTotal} jogos${C.reset}  |  Acumulado: ${grandTotal}`)
+        log(`${season} TOTAL: ${seasonTotal} | ACUMULADO: ${grandTotal}`)
     }
 
+    log(`FINAL: ${grandTotal} jogos em ${done} operações`)
     console.log(C.bold + C.green + `\n  🏀 Total: ${grandTotal} jogos` + C.reset)
+    console.log(C.dim + `  Resultados guardados em: ${LOG}` + C.reset)
     console.log()
 }
 
