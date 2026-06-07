@@ -28,7 +28,6 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
     // Client Trust 2FA — email code second factor
     const [secondFactorNeeded, setSecondFactorNeeded] = useState(false)
     const [secondFactorCode, setSecondFactorCode] = useState('')
-    const [isClientTrust, setIsClientTrust] = useState(false)
     // Sign-up email verification code
     const [signUpVerificationNeeded, setSignUpVerificationNeeded] = useState(false)
     const [signUpVerificationCode, setSignUpVerificationCode] = useState('')
@@ -50,7 +49,6 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
         setShowNewPassword(false)
         setSecondFactorNeeded(false)
         setSecondFactorCode('')
-        setIsClientTrust(false)
         setSignUpVerificationNeeded(false)
         setSignUpVerificationCode('')
     }
@@ -105,76 +103,38 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     setErrorMsg('')
                 }
             } else {
-                // Sign-in — identifier first, password after client trust check
-                const idResult = await Promise.race([
+                // Sign-in — send both identifier + password, Clerk handles client trust
+                const result = await Promise.race([
                     signIn!.create({
                         identifier: email.trim(),
+                        password,
                     }),
                     new Promise<never>((_, reject) =>
                         setTimeout(() => reject(new Error('timeout')), 15000)
                     ),
                 ])
-                console.log('[AuthModal] signIn idResult:', JSON.stringify({
-                    status: idResult.status,
-                    supportedFirstFactors: idResult.supportedFirstFactors?.map((f: { strategy: string }) => f.strategy),
+                console.log('[AuthModal] signIn result:', JSON.stringify({
+                    status: result.status,
+                    supportedFirstFactors: result.supportedFirstFactors?.map((f: { strategy: string }) => f.strategy),
+                    supportedSecondFactors: result.supportedSecondFactors?.map((f: { strategy: string }) => f.strategy),
                 }))
 
-                if (idResult.status === 'complete') {
-                    // No client trust needed — now send the password
-                    const pwResult = await signIn!.attemptFirstFactor({
-                        strategy: 'password',
-                        password,
-                    })
-                    console.log('[AuthModal] password attempt (complete):', JSON.stringify({ status: pwResult.status }))
-                    if (pwResult.status === 'complete') {
-                        await setActive!({ session: pwResult.createdSessionId! })
-                        reset()
-                        onClose()
-                        onAuthSuccess?.('signin')
-                    } else if ((pwResult.status as string) === 'needs_client_trust') {
-                        setIsClientTrust(true)
-                        setSecondFactorNeeded(true)
-                        setStatus('sent')
-                        setErrorMsg('')
-                    } else {
-                        setErrorMsg('Palavra-passe incorreta.')
-                        setStatus('error')
-                    }
-                } else if ((idResult.status as string) === 'needs_client_trust') {
-                    // Client Trust — Clerk auto-sends email code
-                    setIsClientTrust(true)
+                if (result.status === 'complete') {
+                    await setActive!({ session: result.createdSessionId! })
+                    reset()
+                    onClose()
+                    onAuthSuccess?.('signin')
+                } else if ((result.status as string) === 'needs_client_trust') {
+                    // Client Trust — Clerk should auto-send the email code
                     setSecondFactorNeeded(true)
                     setStatus('sent')
                     setErrorMsg('')
-                } else if (idResult.status === 'needs_first_factor') {
-                    // Try password, may trigger client trust after
-                    try {
-                        const pwResult = await signIn!.attemptFirstFactor({
-                            strategy: 'password',
-                            password,
-                        })
-                        console.log('[AuthModal] password attempt:', JSON.stringify({ status: pwResult.status }))
-                        if (pwResult.status === 'complete') {
-                            await setActive!({ session: pwResult.createdSessionId! })
-                            reset()
-                            onClose()
-                            onAuthSuccess?.('signin')
-                        } else if ((pwResult.status as string) === 'needs_client_trust') {
-                            // Password correct, but device needs verification
-                            setIsClientTrust(true)
-                            setSecondFactorNeeded(true)
-                            setStatus('sent')
-                            setErrorMsg('')
-                        } else {
-                            setErrorMsg('Palavra-passe incorreta.')
-                            setStatus('error')
-                        }
-                    } catch {
-                        setErrorMsg('Palavra-passe incorreta.')
-                        setStatus('error')
-                    }
+                } else if (result.status === 'needs_first_factor') {
+                    // Needs password (shouldn't happen with both sent, but handle it)
+                    setErrorMsg('Email ou palavra-passe incorretos.')
+                    setStatus('error')
                 } else {
-                    setErrorMsg('Verificação adicional necessária.')
+                    setErrorMsg('Email ou palavra-passe incorretos.')
                     setStatus('error')
                 }
             }
@@ -205,41 +165,17 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
         setStatus('loading')
         setErrorMsg('')
         try {
-            const result = isClientTrust
-                ? await signIn.attemptFirstFactor({
-                      strategy: 'email_code',
-                      code: secondFactorCode.trim(),
-                  })
-                : await signIn.attemptSecondFactor({
-                      strategy: 'email_code',
-                      code: secondFactorCode.trim(),
-                  })
+            // Password was already verified in signIn.create — this is a second factor
+            const result = await signIn.attemptSecondFactor({
+                strategy: 'email_code',
+                code: secondFactorCode.trim(),
+            })
 
             if (result.status === 'complete') {
                 await setActive!({ session: result.createdSessionId! })
                 reset()
                 onClose()
                 onAuthSuccess?.('signin')
-            } else if (result.status === 'needs_first_factor' && isClientTrust) {
-                // Client trust passed, now verify password
-                try {
-                    const pwResult = await signIn.attemptFirstFactor({
-                        strategy: 'password',
-                        password,
-                    })
-                    if (pwResult.status === 'complete') {
-                        await setActive!({ session: pwResult.createdSessionId! })
-                        reset()
-                        onClose()
-                        onAuthSuccess?.('signin')
-                    } else {
-                        setStatus('error')
-                        setErrorMsg('Palavra-passe incorreta.')
-                    }
-                } catch {
-                    setStatus('error')
-                    setErrorMsg('Palavra-passe incorreta.')
-                }
             } else {
                 setStatus('error')
                 setErrorMsg('Código inválido. Tenta novamente.')
@@ -578,7 +514,6 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                         onClick={() => {
                                             setSecondFactorNeeded(false)
                                             setSecondFactorCode('')
-                                            setIsClientTrust(false)
                                             setStatus('idle')
                                             setErrorMsg('')
                                         }}
@@ -591,7 +526,6 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                         onClick={() => {
                                             setSecondFactorNeeded(false)
                                             setSecondFactorCode('')
-                                            setIsClientTrust(false)
                                             setStatus('idle')
                                             setErrorMsg('')
                                         }}
