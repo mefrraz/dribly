@@ -67,6 +67,7 @@ async function callAdmin<T>(
     getToken: () => Promise<string | null>,
 ): Promise<T> {
     const token = await getToken()
+    console.log('[adminApi] token obtained:', token ? `${token.substring(0, 20)}... (${token.length} chars)` : 'NULL')
     if (!token) throw new Error('Not authenticated')
 
     const res = await fetch('/api/admin', {

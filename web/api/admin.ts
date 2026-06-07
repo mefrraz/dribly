@@ -75,8 +75,12 @@ function supabaseRest(table: string, init?: RequestInit) {
 
 async function verifyAdmin(request: Request): Promise<string | null> {
     const auth = request.headers.get('Authorization')
-    if (!auth?.startsWith('Bearer ')) return null
+    if (!auth?.startsWith('Bearer ')) {
+        console.log('[admin] no Bearer token')
+        return null
+    }
     const token = auth.slice(7)
+    console.log('[admin] token prefix:', token.substring(0, 20) + '...')
 
     try {
         // Verify session token via Clerk Backend API
@@ -85,16 +89,24 @@ async function verifyAdmin(request: Request): Promise<string | null> {
             body: JSON.stringify({ token }),
         })
 
-        if (!res.ok) return null
+        if (!res.ok) {
+            console.log('[admin] token verification failed:', res.status, await res.text().catch(() => ''))
+            return null
+        }
 
         const data = (await res.json()) as {
             id?: string
             public_metadata?: { role?: string }
         }
+        console.log('[admin] verified user:', data.id, 'role:', data.public_metadata?.role)
 
-        if (data.public_metadata?.role !== 'admin') return null
+        if (data.public_metadata?.role !== 'admin') {
+            console.log('[admin] user is not admin')
+            return null
+        }
         return data.id ?? null
-    } catch {
+    } catch (err) {
+        console.error('[admin] verifyAdmin exception:', err)
         return null
     }
 }
