@@ -522,6 +522,8 @@ async function main() {
         }
     }
 
+    function clr() { process.stdout.write('\x1b[K') } // clear to end of line
+
     async function drawScreen(club, gameDone, total, clubIdx, searching) {
         if (clubIdx === 1 && searching) {
             process.stdout.write(C.clear)
@@ -531,48 +533,49 @@ async function main() {
         }
 
         // Header
-        console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
-        console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset)
-        console.log('')
+        process.stdout.write(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset); clr(); console.log()
+        process.stdout.write(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset); clr(); console.log()
+        clr(); console.log()
 
         // Club info
-        console.log(C.bold + club.name + C.reset + C.dim + `  #${club.id}` + C.reset)
-        console.log('')
+        process.stdout.write(C.bold + club.name + C.reset + C.dim + `  #${club.id}` + C.reset + '                    '); clr(); console.log()
+        clr(); console.log()
 
         const logoArt = await getLogoAscii(club.id, club.logo_url)
         if (logoArt) {
-            for (const l of logoArt) console.log('  ' + l)
+            for (const l of logoArt) { process.stdout.write('  ' + l); clr(); console.log() }
         }
-        console.log('')
+        clr(); console.log()
 
         // Progress bar OR searching — same position, alternating
         if (searching) {
             const barW = Math.min(60, termWidth - 20)
-            console.log(`  ${C.cyan}🔍 A pesquisar jogos...${C.reset}  ${C.dim}${'─'.repeat(barW)}${C.reset}`)
+            process.stdout.write(`  ${C.cyan}🔍 A pesquisar jogos...${C.reset}  ${C.dim}${'─'.repeat(barW)}${C.reset}`); clr(); console.log()
         } else {
             const gameBar = progressBar(gameDone, total, Math.min(50, termWidth - 20))
             const pct = total > 0 ? Math.round((gameDone / total) * 100) : 0
-            console.log(`  Jogos: ${gameBar} ${gameDone}/${total} (${pct}%)`)
+            process.stdout.write(`  Jogos: ${gameBar} ${gameDone}/${total} (${pct}%)`); clr(); console.log()
         }
-        console.log('')
+        clr(); console.log()
 
         // ── Histórico (always visible) ──────────────────
         if (recentGames.length > 0) {
-            console.log(`  ${C.bold}📋 Histórico${C.reset}`)
-            console.log(`  ${C.dim}${'─'.repeat(Math.min(60, termWidth - 4))}${C.reset}`)
+            process.stdout.write(`  ${C.bold}📋 Histórico${C.reset}`); clr(); console.log()
+            process.stdout.write(`  ${C.dim}${'─'.repeat(Math.min(60, termWidth - 4))}${C.reset}`); clr(); console.log()
             const toShow = recentGames.slice(0, Math.min(8, recentGames.length))
             for (const g of toShow) {
                 const icon = g.status === 'FINALIZADO' ? C.green + '●' + C.reset : C.yellow + '○' + C.reset
-                console.log(('  ' + icon + ' ' + g.text).slice(0, termWidth - 2))
+                const text = ('  ' + icon + ' ' + g.text).padEnd(termWidth - 2)
+                process.stdout.write(text); clr(); console.log()
             }
         } else {
-            console.log(`  ${C.dim}📋 Histórico — aguardando jogos...${C.reset}`)
+            process.stdout.write(`  ${C.dim}📋 Histórico — aguardando jogos...${C.reset}`); clr(); console.log()
         }
-        console.log('')
+        clr(); console.log()
 
         // Overall progress
         const overallBar = progressBar(clubIdx, selectedClubs.length, Math.min(40, termWidth - 15))
-        console.log(`  ${overallBar} ${C.dim}${clubIdx}/${selectedClubs.length} clubes${C.reset}`)
+        process.stdout.write(`  ${overallBar} ${C.dim}${clubIdx}/${selectedClubs.length} clubes${C.reset}`); clr(); console.log()
     }
 
     // Initial draw
