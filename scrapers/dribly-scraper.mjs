@@ -120,34 +120,6 @@ async function ensureDeps() {
     }
 }
 
-// ── Load env ───────────────────────────────────────────
-
-function loadEnv() {
-    // Try multiple locations
-    const paths = [
-        resolve(DEPS_DIR, '.env'),
-        resolve(__dirname, '..', 'web', '.env'),
-        resolve(process.cwd(), '.env'),
-        resolve(process.cwd(), '..', 'web', '.env'),
-    ]
-    for (const envPath of paths) {
-        if (existsSync(envPath)) {
-            const content = readFileSync(envPath, 'utf-8')
-            for (const line of content.split('\n')) {
-                const trimmed = line.trim()
-                if (!trimmed || trimmed.startsWith('#')) continue
-                const eq = trimmed.indexOf('=')
-                if (eq === -1) continue
-                const key = trimmed.slice(0, eq)
-                const val = trimmed.slice(eq + 1)
-                if (!process.env[key]) process.env[key] = val
-            }
-            return true
-        }
-    }
-    return false
-}
-
 async function askCredentials() {
     const rl = createInterface({ input: process.stdin, output: process.stdout })
 
@@ -192,12 +164,10 @@ async function main() {
     const cheerioModule = loadModuleSync('cheerio')
     const cheerio = cheerioModule.default || cheerioModule
 
-    // Load env or ask for credentials
-    if (!loadEnv()) {
-        const creds = await askCredentials()
-        process.env.SUPABASE_URL = creds.url
-        process.env.SUPABASE_SERVICE_ROLE_KEY = creds.key
-    }
+    // Always ask for credentials (never read from .env)
+    const creds = await askCredentials()
+    process.env.SUPABASE_URL = creds.url
+    process.env.SUPABASE_SERVICE_ROLE_KEY = creds.key
 
     const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
     const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
