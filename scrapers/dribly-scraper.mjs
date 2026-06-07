@@ -296,18 +296,40 @@ async function main() {
 
     function parseDatePt(str) {
         if (!str) return null
-        const months = {
+        // New FPB format: "7 JUN 2026" or "20 MAR 2026"
+        // Old format: "7 de junho de 2026"
+        const shortMonths = {
+            'jan': '01', 'fev': '02', 'mar': '03', 'abr': '04',
+            'mai': '05', 'jun': '06', 'jul': '07', 'ago': '08',
+            'set': '09', 'out': '10', 'nov': '11', 'dez': '12',
+        }
+        const longMonths = {
             'janeiro': '01', 'fevereiro': '02', 'março': '03', 'marco': '03',
             'abril': '04', 'maio': '05', 'junho': '06',
             'julho': '07', 'agosto': '08', 'setembro': '09',
             'outubro': '10', 'novembro': '11', 'dezembro': '12',
         }
-        const parts = str.toLowerCase().trim().split(' de ')
-        if (parts.length !== 3) return null
-        const day = parts[0].padStart(2, '0')
-        const month = months[parts[1]]
-        const year = parts[2]
-        return month ? `${year}-${month}-${day}` : null
+        const s = str.trim()
+
+        // Try new format: "7 JUN 2026"
+        const shortMatch = s.match(/^(\d{1,2})\s+([A-Z]{3})\s+(\d{4})$/i)
+        if (shortMatch) {
+            const day = shortMatch[1].padStart(2, '0')
+            const month = shortMonths[shortMatch[2].toLowerCase()]
+            const year = shortMatch[3]
+            if (month) return `${year}-${month}-${day}`
+        }
+
+        // Try old format: "7 de junho de 2026"
+        const parts = s.toLowerCase().split(' de ')
+        if (parts.length === 3) {
+            const day = parts[0].trim().padStart(2, '0')
+            const month = longMonths[parts[1].trim()]
+            const year = parts[2].trim()
+            if (month) return `${year}-${month}-${day}`
+        }
+
+        return null
     }
 
     async function scrapeClub(clubId) {
