@@ -76,6 +76,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                         setTimeout(() => reject(new Error('timeout')), 15000)
                     ),
                 ])
+                console.log('[AuthModal] signUp result:', JSON.stringify({ status: result.status, missingFields: result.missingFields, hasSession: !!result.createdSessionId }))
                 if (result.status === 'complete') {
                     await setActive!({ session: result.createdSessionId! })
                     reset()
@@ -97,6 +98,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                         setTimeout(() => reject(new Error('timeout')), 15000)
                     ),
                 ])
+                console.log('[AuthModal] signIn result:', JSON.stringify({ status: result.status, supportedSecondFactors: result.supportedSecondFactors?.map((f: { strategy: string }) => f.strategy) }))
 
                 if (result.status === 'complete') {
                     await setActive!({ session: result.createdSessionId! })
@@ -114,6 +116,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                 }
             }
         } catch (err: unknown) {
+            console.error('[AuthModal] caught error:', err)
             setStatus('error')
             // Normalize Clerk error messages to PT
             const clerkErr = err as { errors?: { message: string }[]; message?: string }
