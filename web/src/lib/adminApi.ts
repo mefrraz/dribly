@@ -59,6 +59,11 @@ export interface AdminStats {
     games: number
 }
 
+export interface AdminCredentials {
+    supabaseUrl: string
+    supabaseServiceRoleKey: string
+}
+
 // ── API client ─────────────────────────────────────────
 
 async function callAdmin<T>(
@@ -97,6 +102,9 @@ export function useAdminApi() {
     return {
         getStats: () =>
             callAdmin<AdminStats>('getStats', undefined, getAdminToken),
+
+        getCredentials: () =>
+            callAdmin<AdminCredentials>('getCredentials', undefined, getAdminToken),
 
         listUsers: (limit = 50, offset = 0) =>
             callAdmin<{ users: AdminUser[]; total: number }>(

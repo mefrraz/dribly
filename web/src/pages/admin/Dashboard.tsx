@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Building2, Users, Heart, Calendar } from 'lucide-react'
-import { useAdminApi, type AdminStats } from '../../lib/adminApi'
+import { Building2, Users, Heart, Calendar, Key, Eye, EyeOff } from 'lucide-react'
+import { useAdminApi, type AdminStats, type AdminCredentials } from '../../lib/adminApi'
 
 function StatCard({
     icon: Icon,
@@ -35,6 +35,8 @@ function StatCard({
 export default function Dashboard() {
     const api = useAdminApi()
     const [stats, setStats] = useState<AdminStats | null>(null)
+    const [creds, setCreds] = useState<AdminCredentials | null>(null)
+    const [showCreds, setShowCreds] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
@@ -121,6 +123,52 @@ export default function Dashboard() {
                         🏆 Competições
                     </a>
                 </div>
+            </div>
+
+            {/* Credentials */}
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 mt-4">
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                        <Key size={14} className="text-amber-500" />
+                        Credenciais
+                    </h3>
+                    {!creds ? (
+                        <button
+                            onClick={() => api.getCredentials().then(setCreds)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/40 transition-colors"
+                        >
+                            Mostrar
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => setShowCreds(!showCreds)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1"
+                        >
+                            {showCreds ? <EyeOff size={12} /> : <Eye size={12} />}
+                            {showCreds ? 'Esconder' : 'Ver'}
+                        </button>
+                    )}
+                </div>
+
+                {creds && showCreds && (
+                    <div className="space-y-2">
+                        <div>
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">SUPABASE_URL</p>
+                            <code className="block text-[11px] font-mono bg-zinc-50 dark:bg-zinc-800 px-3 py-2 rounded-lg text-zinc-700 dark:text-zinc-300 break-all">
+                                {creds.supabaseUrl}
+                            </code>
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">SUPABASE_SERVICE_ROLE_KEY</p>
+                            <code className="block text-[11px] font-mono bg-zinc-50 dark:bg-zinc-800 px-3 py-2 rounded-lg text-zinc-700 dark:text-zinc-300 break-all">
+                                {creds.supabaseServiceRoleKey}
+                            </code>
+                        </div>
+                        <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                            ⚠️ Estas credenciais são sensíveis. Usa apenas para o script local.
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     )

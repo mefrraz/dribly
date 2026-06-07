@@ -17,6 +17,7 @@ export const config = { runtime: 'edge' }
 
 type AdminAction =
     | 'getStats'
+    | 'getCredentials'
     | 'listUsers'
     | 'getUserFollows'
     | 'deleteUser'
@@ -391,6 +392,11 @@ export default async function handler(request: Request) {
         switch (action) {
             case 'getStats':
                 return await handleGetStats()
+            case 'getCredentials':
+                return json({
+                    supabaseUrl: process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '',
+                    supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+                })
             case 'listUsers':
                 return await handleListUsers(payload)
             case 'getUserFollows':
