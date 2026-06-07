@@ -197,27 +197,30 @@ async function main() {
 
     // ── Season selection ────────────────────────────────
 
-    const seasons = [
+    const ALL_SEASONS = [
         '2025/2026', '2024/2025', '2023/2024', '2022/2023', '2021/2022', '2020/2021',
         '2019/2020', '2018/2019', '2017/2018', '2016/2017', '2015/2016', '2014/2015',
         '2013/2014', '2012/2013', '2011/2012', '2010/2011', '2009/2010', '2008/2009',
         '2007/2008', '2006/2007', '2005/2006', '2004/2005', '2003/2004',
     ]
-    console.log(C.bold + '  📅 Escolhe a época:' + C.reset)
-    seasons.forEach((s, i) => {
-        console.log(`     ${C.purple}[${i + 1}]${C.reset} ${s}`)
-    })
+    console.log(C.bold + '  📅 Época:' + C.reset)
+    console.log(`     ${C.purple}[A]${C.reset} Todas (23 épocas)`)
+    ALL_SEASONS.slice(0, 5).forEach((s, i) => console.log(`     ${C.purple}[${i + 1}]${C.reset} ${s}`))
+    console.log(`     ${C.dim}... +18 épocas (escolhe 1-23)${C.reset}`)
     console.log()
 
     const rl = createInterface({ input: process.stdin, output: process.stdout })
-    const seasonIdx = await new Promise(resolve => {
-        rl.question(C.cyan + '  > ' + C.reset, (ans) => {
-            const idx = parseInt(ans) - 1
-            resolve(idx >= 0 && idx < seasons.length ? idx : 0)
-        })
-    })
-    const season = seasons[seasonIdx]
-    const seasonTable = 'games_' + season.replace('/', '_')
+    const sChoice = await new Promise(resolve => rl.question(C.cyan + '  > ' + C.reset, resolve))
+    let selectedSeasons = []
+    if (sChoice.toUpperCase() === 'A') {
+        selectedSeasons = [...ALL_SEASONS]
+    } else {
+        const idx = parseInt(sChoice) - 1
+        if (idx >= 0 && idx < ALL_SEASONS.length) selectedSeasons = [ALL_SEASONS[idx]]
+        else { console.log(C.red + '\n  ❌ Inválido.' + C.reset); process.exit(1) }
+    }
+    const firstSeason = selectedSeasons[0]
+    const season = firstSeason
 
     // ── Club selection ──────────────────────────────────
 
@@ -397,8 +400,9 @@ async function main() {
         return null
     }
 
-    async function scrapeClub(clubId) {
-        const url = (page) => `https://www.fpb.pt/${page}/clube_${clubId}/?epoca=${encodeURIComponent(season)}&escalao=S%C3%A9nior&genero=masculino`
+    async function scrapeClub(clubId, szn) {
+        const s = szn || season
+        const url = (page) => `https://www.fpb.pt/${page}/clube_${clubId}/?epoca=${encodeURIComponent(s)}&escalao=S%C3%A9nior&genero=masculino`
 
         log(`Scraping club ${clubId} — ${season}`)
 
@@ -415,6 +419,7 @@ async function main() {
 
         const calHtml = await calRes.text()
         const resHtml = await resRes.text()
+        const epocaForGame = s
         log(`  Calendar HTML: ${calHtml.length} chars, Results HTML: ${resHtml.length} chars`)
 
         // DEBUG: always save HTML of first club with games
@@ -507,7 +512,7 @@ async function main() {
                         escalao, competicao, local: locText || null,
                         status: (scoreCasa !== null && scoreFora !== null) ? 'FINALIZADO' : 'AGENDADO',
                         logotipo_casa: logos[0] || null, logotipo_fora: logos[1] || null,
-                        epoca: season,
+                        epoca: epocaForGame,
                     })
                 })
             })
@@ -663,36 +668,40 @@ async function main() {
         process.stdout.write(`  ${overallBar} ${C.dim}${clubIdx}/${selectedClubs.length} clubes${C.reset}`); clr(); console.log()
     }
 
-    // Initial draw
-    process.stdout.write(C.clear)
-    process.stdout.write(C.hideCursor)
-    console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
-    console.log(C.dim + `  A iniciar scrape de ${selectedClubs.length} clubes...` + C.reset)
-    console.log(C.bold + C.yellow + `  Ctrl+C para parar` + C.reset)
-    console.log()
+    for (const currentSeason of selectedSeasons) {
+        if (stopped) break
+        const seasonTable = 'games_' + currentSeason.replace('/', '_')
 
-    for (let i = 0; i < selectedClubs.length && !stopped; i += 4) {
-        const batch = selectedClubs.slice(i, i + 4)
+        // Initial draw
+        process.stdout.write(C.clear)
+        process.stdout.write(C.hideCursor)
+        console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${currentSeason}` + C.reset)
+        console.log(C.dim + `  ${selectedClubs.length} clubes` + C.reset)
+        console.log(C.bold + C.yellow + `  Ctrl+C para parar  |  Época ${selectedSeasons.indexOf(currentSeason)+1}/${selectedSeasons.length}` + C.reset)
+        console.log()
 
-        for (const club of batch) {
-            if (stopped) break
-            done++
-            const clubIdx = done
+        for (let i = 0; i < selectedClubs.length && !stopped; i += 4) {
+            const batch = selectedClubs.slice(i, i + 4)
 
-            // Show searching screen (with logo, progress 0%, histórico)
-            await drawScreen(club, 0, 0, clubIdx, true)
+            for (const club of batch) {
+                if (stopped) break
+                done++
+                const clubIdx = done
 
-            let games = []
-            try {
-                games = await scrapeClub(club.id)
-            } catch (e) {
-                errors.push(club.name)
-                process.stdout.write(C.clear)
-                console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
-                console.log(C.red + `  ❌ ${club.name}: ${e.message}` + C.reset)
-                console.log()
-                continue
-            }
+                // Show searching screen (with logo, progress 0%, histórico)
+                await drawScreen(club, 0, 0, clubIdx, true)
+
+                let games = []
+                try {
+                    games = await scrapeClub(club.id, currentSeason)
+                } catch (e) {
+                    errors.push(club.name)
+                    process.stdout.write(C.clear)
+                    console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${currentSeason}` + C.reset)
+                    console.log(C.red + `  ❌ ${club.name}: ${e.message}` + C.reset)
+                    console.log()
+                    continue
+                }
 
             const total = games.length
             let gameDone = 0
