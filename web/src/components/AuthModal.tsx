@@ -28,6 +28,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
     // Client Trust 2FA — email code second factor
     const [secondFactorNeeded, setSecondFactorNeeded] = useState(false)
     const [secondFactorCode, setSecondFactorCode] = useState('')
+    const [isClientTrust, setIsClientTrust] = useState(false)
     // Sign-up email verification code
     const [signUpVerificationNeeded, setSignUpVerificationNeeded] = useState(false)
     const [signUpVerificationCode, setSignUpVerificationCode] = useState('')
@@ -49,6 +50,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
         setShowNewPassword(false)
         setSecondFactorNeeded(false)
         setSecondFactorCode('')
+        setIsClientTrust(false)
         setSignUpVerificationNeeded(false)
         setSignUpVerificationCode('')
     }
@@ -120,8 +122,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     reset()
                     onClose()
                     onAuthSuccess?.('signin')
-                } else if (result.status === 'needs_second_factor') {
-                    // Client Trust — email code was sent automatically by Clerk
+                } else if (result.status === 'needs_second_factor' || (result.status as string) === 'needs_client_trust') {
+                    // Client Trust / 2FA — email code needed
+                    setIsClientTrust((result.status as string) === 'needs_client_trust')
                     setSecondFactorNeeded(true)
                     setStatus('sent')
                     setErrorMsg('')
@@ -157,10 +160,15 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
         setStatus('loading')
         setErrorMsg('')
         try {
-            const result = await signIn.attemptSecondFactor({
-                strategy: 'email_code',
-                code: secondFactorCode.trim(),
-            })
+            const result = isClientTrust
+                ? await signIn.attemptFirstFactor({
+                      strategy: 'email_code',
+                      code: secondFactorCode.trim(),
+                  })
+                : await signIn.attemptSecondFactor({
+                      strategy: 'email_code',
+                      code: secondFactorCode.trim(),
+                  })
             if (result.status === 'complete') {
                 await setActive!({ session: result.createdSessionId! })
                 reset()
