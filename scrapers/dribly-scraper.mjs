@@ -392,11 +392,11 @@ async function main() {
         const resHtml = await resRes.text()
         log(`  Calendar HTML: ${calHtml.length} chars, Results HTML: ${resHtml.length} chars`)
 
-        // DEBUG: save first club HTML to disk
+        // DEBUG: always save HTML of first club with games
         if (!existsSync(resolve(DEPS_DIR, 'debug_cal.html'))) {
             writeFileSync(resolve(DEPS_DIR, 'debug_cal.html'), calHtml)
             writeFileSync(resolve(DEPS_DIR, 'debug_res.html'), resHtml)
-            log(`  Saved debug HTML to ${DEPS_DIR}/debug_cal.html and debug_res.html`)
+            log(`  Saved debug HTML to ${DEPS_DIR}`)
         }
 
         function parse(html) {
@@ -420,6 +420,7 @@ async function main() {
                 parsedDates++
 
                 $(dw).find('a.game-wrapper-a').each((__, link) => {
+                    parsedLinks++
                     const $link = $(link)
                     const href = $link.attr('href') || ''
                     const internalId = href.match(/internalID=(\d+)/)?.[1] || ''
@@ -440,8 +441,12 @@ async function main() {
 
                     const resultText = $link.find('.result span').text().trim()
                     const scoreMatch = resultText.match(/(\d+)\s*-\s*(\d+)/)
-                    const timeText = $link.find('.time').text().trim()
-                    const locText = $link.find('.location').text().trim()
+                    const timeText = $link.find('.time').text().trim() || $link.find('.hour').text().trim()
+                    const locText = $link.find('.location').text().trim() || $link.find('.place').text().trim()
+                    // Debug first game of each club
+                    if (parsedLinks === 0) {
+                        log(`    DEBUG game: resultText="${resultText}" timeText="${timeText}" locText="${locText}"`)
+                    }
 
                     const logos = []
                     $link.find('.image-container img').each((___, img) => {
