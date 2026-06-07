@@ -105,45 +105,63 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     setErrorMsg('')
                 }
             } else {
-                // Sign-in — may trigger Client Trust (email code 2FA)
-                const result = await Promise.race([
+                // Sign-in — identifier first, password after client trust check
+                const idResult = await Promise.race([
                     signIn!.create({
                         identifier: email.trim(),
-                        password,
                     }),
                     new Promise<never>((_, reject) =>
                         setTimeout(() => reject(new Error('timeout')), 15000)
                     ),
                 ])
-                console.log('[AuthModal] signIn result:', JSON.stringify({ status: result.status, supportedSecondFactors: result.supportedSecondFactors?.map((f: { strategy: string }) => f.strategy) }))
+                console.log('[AuthModal] signIn idResult:', JSON.stringify({
+                    status: idResult.status,
+                    supportedFirstFactors: idResult.supportedFirstFactors?.map((f: { strategy: string }) => f.strategy),
+                }))
 
-                if (result.status === 'complete') {
-                    await setActive!({ session: result.createdSessionId! })
-                    reset()
-                    onClose()
-                    onAuthSuccess?.('signin')
-                } else if (result.status === 'needs_second_factor' || (result.status as string) === 'needs_client_trust') {
-                    // Client Trust / 2FA — email code needed
-                    const isCT = (result.status as string) === 'needs_client_trust'
-                    setIsClientTrust(isCT)
-                    // For client trust, explicitly trigger the email sending
-                    if (isCT) {
-                        try {
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            await (signIn as any).prepareFirstFactor({ strategy: 'email_code' })
-                            console.log('[AuthModal] client trust email code sent')
-                        } catch (ctErr) {
-                            console.error('[AuthModal] client trust email failed:', ctErr)
-                            setErrorMsg('Erro ao enviar código. Tenta novamente.')
-                            setStatus('error')
-                            return
-                        }
+                if (idResult.status === 'complete') {
+                    // No client trust needed — now send the password
+                    const pwResult = await signIn!.attemptFirstFactor({
+                        strategy: 'password',
+                        password,
+                    })
+                    if (pwResult.status === 'complete') {
+                        await setActive!({ session: pwResult.createdSessionId! })
+                        reset()
+                        onClose()
+                        onAuthSuccess?.('signin')
+                    } else {
+                        setErrorMsg('Palavra-passe incorreta.')
+                        setStatus('error')
                     }
+                } else if ((idResult.status as string) === 'needs_client_trust') {
+                    // Client Trust — Clerk auto-sends email code
+                    setIsClientTrust(true)
                     setSecondFactorNeeded(true)
                     setStatus('sent')
                     setErrorMsg('')
+                } else if (idResult.status === 'needs_first_factor') {
+                    // Old flow — try password directly
+                    try {
+                        const pwResult = await signIn!.attemptFirstFactor({
+                            strategy: 'password',
+                            password,
+                        })
+                        if (pwResult.status === 'complete') {
+                            await setActive!({ session: pwResult.createdSessionId! })
+                            reset()
+                            onClose()
+                            onAuthSuccess?.('signin')
+                        } else {
+                            setErrorMsg('Palavra-passe incorreta.')
+                            setStatus('error')
+                        }
+                    } catch {
+                        setErrorMsg('Palavra-passe incorreta.')
+                        setStatus('error')
+                    }
                 } else {
-                    setErrorMsg('Verificação adicional necessária. Verifica o teu email.')
+                    setErrorMsg('Verificação adicional necessária.')
                     setStatus('error')
                 }
             }
@@ -183,11 +201,32 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                       strategy: 'email_code',
                       code: secondFactorCode.trim(),
                   })
+
             if (result.status === 'complete') {
                 await setActive!({ session: result.createdSessionId! })
                 reset()
                 onClose()
                 onAuthSuccess?.('signin')
+            } else if (result.status === 'needs_first_factor' && isClientTrust) {
+                // Client trust passed, now verify password
+                try {
+                    const pwResult = await signIn.attemptFirstFactor({
+                        strategy: 'password',
+                        password,
+                    })
+                    if (pwResult.status === 'complete') {
+                        await setActive!({ session: pwResult.createdSessionId! })
+                        reset()
+                        onClose()
+                        onAuthSuccess?.('signin')
+                    } else {
+                        setStatus('error')
+                        setErrorMsg('Palavra-passe incorreta.')
+                    }
+                } catch {
+                    setStatus('error')
+                    setErrorMsg('Palavra-passe incorreta.')
+                }
             } else {
                 setStatus('error')
                 setErrorMsg('Código inválido. Tenta novamente.')
@@ -523,15 +562,12 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                 <div className="flex gap-3 justify-center">
                                     <button
                                         type="button"
-                                        onClick={async () => {
-                                            setStatus('loading')
-                                            try {
-                                                if (isClientTrust) {
-                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                    await (signIn as any).prepareFirstFactor({ strategy: 'email_code' })
-                                                }
-                                            } catch { /* ignore */ }
-                                            setStatus('sent')
+                                        onClick={() => {
+                                            setSecondFactorNeeded(false)
+                                            setSecondFactorCode('')
+                                            setIsClientTrust(false)
+                                            setStatus('idle')
+                                            setErrorMsg('')
                                         }}
                                         className="text-[11px] text-dribly-purple hover:underline"
                                     >
@@ -542,6 +578,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                         onClick={() => {
                                             setSecondFactorNeeded(false)
                                             setSecondFactorCode('')
+                                            setIsClientTrust(false)
                                             setStatus('idle')
                                             setErrorMsg('')
                                         }}
