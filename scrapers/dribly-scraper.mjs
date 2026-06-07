@@ -535,11 +535,8 @@ async function main() {
         console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset)
         console.log('')
 
-        // Club info + logo + status
+        // Club info
         console.log(C.bold + club.name + C.reset + C.dim + `  #${club.id}` + C.reset)
-        if (searching) {
-            console.log(C.cyan + `  🔍 A pesquisar...` + C.reset)
-        }
         console.log('')
 
         const logoArt = await getLogoAscii(club.id, club.logo_url)
@@ -548,10 +545,15 @@ async function main() {
         }
         console.log('')
 
-        // Progress bar (always visible)
-        const gameBar = progressBar(gameDone, total, Math.min(40, termWidth - 15))
-        const pct = total > 0 ? Math.round((gameDone / total) * 100) : 0
-        console.log(`  Jogos: ${gameBar} ${gameDone}/${total} (${pct}%)`)
+        // Progress bar OR searching — same position, alternating
+        if (searching) {
+            const barW = Math.min(60, termWidth - 20)
+            console.log(`  ${C.cyan}🔍 A pesquisar jogos...${C.reset}  ${C.dim}${'─'.repeat(barW)}${C.reset}`)
+        } else {
+            const gameBar = progressBar(gameDone, total, Math.min(50, termWidth - 20))
+            const pct = total > 0 ? Math.round((gameDone / total) * 100) : 0
+            console.log(`  Jogos: ${gameBar} ${gameDone}/${total} (${pct}%)`)
+        }
         console.log('')
 
         // ── Histórico (always visible) ──────────────────
