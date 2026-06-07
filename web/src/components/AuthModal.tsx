@@ -83,7 +83,13 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     onClose()
                     onAuthSuccess?.('signup')
                 } else {
-                    // email verification pending — show as info, not error
+                    // Prepare email verification — Clerk needs this explicit call to send the email
+                    try {
+                        await signUp!.prepareVerification({ strategy: 'email_code' })
+                        console.log('[AuthModal] verification email prepared successfully')
+                    } catch (prepErr) {
+                        console.error('[AuthModal] prepareVerification failed:', prepErr)
+                    }
                     setErrorMsg('Verifica o teu email para confirmares o registo.')
                     setStatus('pending')
                 }
