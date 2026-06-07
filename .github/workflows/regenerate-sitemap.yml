@@ -8,6 +8,9 @@ on:
 jobs:
   sitemap:
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -19,11 +22,13 @@ jobs:
         working-directory: web
         run: npm install
 
+      - name: Debug secrets
+        run: |
+          echo "URL length: ${#VITE_SUPABASE_URL}"
+          echo "KEY length: ${#VITE_SUPABASE_ANON_KEY}"
+
       - name: Generate sitemap
         working-directory: web
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: npm run sitemap
 
       - name: Commit & push sitemap
