@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Search, Play, Square, Clock, Star } from 'lucide-react'
+import { Search, Play, Square, Clock, Star, Download } from 'lucide-react'
 import { useAdminApi, type AdminClub } from '../../lib/adminApi'
 import { useScraper } from '../../hooks/useScraper'
 
@@ -82,6 +82,15 @@ export default function ScrapeAdmin() {
                 </label>
 
                 <div className="flex-1" />
+
+                <a
+                    href="https://raw.githubusercontent.com/mefrraz/dribly/main/scrapers/scrape-games.mjs"
+                    download="scrape-games.mjs"
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-dribly-purple/10 hover:text-dribly-purple transition-colors flex items-center gap-1"
+                    title="Descarrega o script para correr no teu PC (Node.js). Não gasta cota Vercel."
+                >
+                    <Download size={11} /> Script
+                </a>
 
                 <span className="text-xs text-zinc-400">
                     {selected.size}/{clubs.length} clubes
