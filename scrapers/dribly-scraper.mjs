@@ -467,7 +467,7 @@ async function main() {
         if (!logoUrl) return null
 
         try {
-            const JimpModule = await import(pathToFileURL(resolve(DEPS_DIR, 'node_modules', 'jimp')).href)
+            const JimpModule = await import(pathToFileURL(resolve(DEPS_DIR, 'node_modules', 'jimp', 'dist', 'commonjs', 'index.js')).href)
             const Jimp = JimpModule.default || JimpModule
             const res = await fetch(logoUrl)
             if (!res.ok) { log(`  Logo fetch failed: ${res.status} for ${logoUrl}`); return null }
