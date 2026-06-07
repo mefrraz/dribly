@@ -464,18 +464,38 @@ async function main() {
     const asciiCache = new Map()
     const { PNG } = loadModuleSync('pngjs')
 
-    async function getLogoAscii(clubId, logoUrl) {
-        if (asciiCache.has(clubId)) return asciiCache.get(clubId)
-        if (!logoUrl) return null
-
+    // Cache for fallback logo
+    let fallbackLogo = null
+    async function getFallbackLogo() {
+        if (fallbackLogo) return fallbackLogo
         try {
-            const res = await fetch(logoUrl)
+            const res = await fetch('https://dribly.pt/logo.png')
             if (!res.ok) return null
             const buffer = Buffer.from(await res.arrayBuffer())
             const png = PNG.sync.read(buffer)
+            fallbackLogo = png
+            return png
+        } catch { return null }
+    }
 
-            const w = Math.min(60, termWidth - 4)
-            const h = Math.round(w * (png.height / png.width) * 0.45)
+    async function getLogoAscii(clubId, logoUrl) {
+        if (asciiCache.has(clubId)) return asciiCache.get(clubId)
+
+        const SIZE = 30 // square
+        try {
+            let png
+            if (logoUrl) {
+                const res = await fetch(logoUrl)
+                if (!res.ok) throw new Error('fetch failed')
+                const buffer = Buffer.from(await res.arrayBuffer())
+                png = PNG.sync.read(buffer)
+            } else {
+                png = await getFallbackLogo()
+                if (!png) return null
+            }
+
+            const w = SIZE
+            const h = SIZE
 
             const result = []
             for (let y = 0; y < h; y++) {
@@ -489,7 +509,6 @@ async function main() {
                     const b = png.data[idx + 2]
                     const a = png.data[idx + 3]
                     if (a < 128) { line += '  '; continue }
-                    // True color ANSI block
                     line += `\x1b[48;2;${r};${g};${b}m  \x1b[0m`
                 }
                 result.push(line)
@@ -497,6 +516,8 @@ async function main() {
             asciiCache.set(clubId, result)
             return result
         } catch {
+            // Try fallback
+            if (logoUrl) return getLogoAscii(clubId, null)
             return null
         }
     }
@@ -565,10 +586,22 @@ async function main() {
             done++
             const clubIdx = done
 
-            // Show current club before starting
-            process.stdout.write(C.clear)
+            // Show current club — smooth update (no full clear)
+            if (clubIdx === 1) {
+                process.stdout.write(C.clear)
+                process.stdout.write(C.hideCursor)
+            } else {
+                process.stdout.write('\x1b[H') // cursor home, no clear
+            }
             console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
             console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset)
+            console.log()
+
+            // Show logo while searching
+            const searchLogo = await getLogoAscii(club.id, club.logo_url)
+            if (searchLogo) {
+                for (const l of searchLogo) console.log('  ' + l)
+            }
             console.log()
             console.log(C.cyan + `  🔍 A pesquisar: ` + C.reset + C.bold + club.name + C.reset)
             console.log()
