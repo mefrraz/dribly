@@ -406,46 +406,72 @@ async function main() {
     const errors = []
     const CONCURRENCY = 4
 
+    // Track active batch for per-game progress display
+    let activeClubs = []
+
     for (let i = 0; i < selectedClubs.length; i += CONCURRENCY) {
         const batch = selectedClubs.slice(i, i + CONCURRENCY)
-        const results = await Promise.all(
-            batch.map(async (club) => {
-                try {
-                    const games = await scrapeClub(club.id)
-                    for (const g of games) {
-                        await supabase.from(seasonTable).upsert(g, { onConflict: 'slug' })
-                    }
-                    return { club, count: games.length }
-                } catch (e) {
-                    return { club, count: 0, error: e.message }
-                }
-            }),
-        )
 
-        for (const r of results) {
+        // Scrape clubs in parallel, but upsert games sequentially per club for progress
+        const results = []
+        for (const club of batch) {
             done++
-            totalGames += r.count
-            if (r.error) errors.push(r.club.name)
+            const clubIdx = done
+            const clubPct = Math.round((clubIdx / selectedClubs.length) * 100)
 
-            const pct = Math.round((done / selectedClubs.length) * 100)
-            const bar = progressBar(done, selectedClubs.length, 35)
-            const pctStr = padLeft(String(pct), 3)
-            const clubStr = padRight(r.club.name.slice(0, 28), 28)
-            const gameStr = padLeft(String(r.count), 4)
-            const errStr = r.error ? ' ' + C.red + '✗' + C.reset : ''
+            // Fetch games
+            let games = []
+            let error = null
+            try {
+                games = await scrapeClub(club.id)
+            } catch (e) {
+                error = e.message
+            }
 
-            process.stdout.write(
-                `\r  ${bar} ${C.bold}${pctStr}%${C.reset}  ${clubStr} ${C.purple}${gameStr} jogos${C.reset}${errStr}`,
-            )
+            // Upsert with per-game progress
+            let gameDone = 0
+            const total = games.length
+
+            for (const g of games) {
+                try {
+                    await supabase.from(seasonTable).upsert(g, { onConflict: 'slug' })
+                } catch { /* continue */ }
+                gameDone++
+
+                // Draw per-game progress
+                const gamePct = Math.round((gameDone / total) * 100)
+                const gameBar = progressBar(gameDone, total, 20)
+                const clubStr = padRight(club.name.slice(0, 25), 25)
+
+                process.stdout.write(C.clear)
+                console.log(C.bold + C.purple + '  Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
+                console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length} — ${clubPct}%` + C.reset)
+                console.log()
+                console.log(`  ${C.cyan}📋 ${club.name}${C.reset}`)
+                console.log(`  ${gameBar} ${gameDone}/${total} jogos`)
+                console.log()
+
+                // Show overall progress
+                const overallBar = progressBar(clubIdx, selectedClubs.length, 35)
+                console.log(`  ${overallBar} ${C.dim}Geral: ${clubIdx}/${selectedClubs.length} clubes — ${totalGames + gameDone} jogos${C.reset}`)
+            }
+
+            totalGames += games.length
+            if (error) errors.push(club.name)
+
+            results.push({ club, count: games.length, error })
         }
     }
 
-    console.log('\n')
+    console.log(C.clear)
+    console.log(C.bold + C.purple + '  Dribly Scraper' + C.reset)
+    console.log()
     console.log(C.bold + C.green + `  ✅ Concluído!` + C.reset)
     console.log(C.dim + `     ${totalGames} jogos em ${done} clubes` + C.reset)
+    console.log(C.dim + `     ${selectedClubs.length - errors.length} sucesso, ${errors.length} com erros` + C.reset)
 
     if (errors.length > 0) {
-        console.log(C.red + `     ${errors.length} erros: ${errors.join(', ')}` + C.reset)
+        console.log(C.red + `     Erros: ${errors.slice(0, 5).join(', ')}${errors.length > 5 ? '...' : ''}` + C.reset)
     }
 
     console.log()

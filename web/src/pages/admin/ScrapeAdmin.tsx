@@ -19,6 +19,7 @@ export default function ScrapeAdmin() {
     const [error, setError] = useState<string | null>(null)
     const [showDates, setShowDates] = useState(false)
     const [showScriptModal, setShowScriptModal] = useState(false)
+    const [scriptCreds, setScriptCreds] = useState<{ supabaseUrl: string; supabaseServiceRoleKey: string } | null>(null)
 
     const {
         selected, progress, running, summary,
@@ -249,21 +250,59 @@ export default function ScrapeAdmin() {
 
                         {/* Credentials */}
                         <div className="bg-amber-50 dark:bg-amber-900/10 rounded-xl p-3 mb-3 border border-amber-200 dark:border-amber-800">
-                            <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase mb-1.5">Credenciais necessárias</p>
-                            <p className="text-xs text-amber-700 dark:text-amber-300">
-                                O script pede-te estas variáveis se não encontrar o <code className="text-amber-800 dark:text-amber-200">.env</code>:
-                            </p>
-                            <div className="mt-2 space-y-1">
-                                <code className="block text-[11px] font-mono bg-amber-100 dark:bg-amber-900/20 px-2 py-1 rounded">
-                                    SUPABASE_URL
-                                </code>
-                                <code className="block text-[11px] font-mono bg-amber-100 dark:bg-amber-900/20 px-2 py-1 rounded">
-                                    SUPABASE_SERVICE_ROLE_KEY
-                                </code>
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">Credenciais</p>
+                                {!scriptCreds ? (
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                const c = await api.getCredentials()
+                                                setScriptCreds(c)
+                                            } catch { /* ignore */ }
+                                        }}
+                                        className="px-2 py-1 rounded-lg text-[10px] font-bold bg-amber-200 dark:bg-amber-800 text-amber-700 dark:text-amber-300 hover:bg-amber-300 dark:hover:bg-amber-700 transition-colors"
+                                    >
+                                        Mostrar
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => setScriptCreds(null)}
+                                        className="px-2 py-1 rounded-lg text-[10px] font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors"
+                                    >
+                                        Esconder
+                                    </button>
+                                )}
                             </div>
-                            <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-1.5">
-                                Vercel → Dribly → Settings → Environment Variables
-                            </p>
+                            {scriptCreds ? (
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <code className="flex-1 text-[10px] font-mono bg-amber-100 dark:bg-amber-900/20 px-2 py-1.5 rounded break-all text-amber-900 dark:text-amber-200">
+                                            {scriptCreds.supabaseUrl}
+                                        </code>
+                                        <button
+                                            onClick={() => navigator.clipboard.writeText(scriptCreds.supabaseUrl)}
+                                            className="text-[10px] font-bold text-amber-600 hover:text-amber-800 shrink-0"
+                                        >
+                                            Copiar
+                                        </button>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <code className="flex-1 text-[10px] font-mono bg-amber-100 dark:bg-amber-900/20 px-2 py-1.5 rounded break-all text-amber-900 dark:text-amber-200">
+                                            {scriptCreds.supabaseServiceRoleKey}
+                                        </code>
+                                        <button
+                                            onClick={() => navigator.clipboard.writeText(scriptCreds.supabaseServiceRoleKey)}
+                                            className="text-[10px] font-bold text-amber-600 hover:text-amber-800 shrink-0"
+                                        >
+                                            Copiar
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                                    Clica em Mostrar para ver as credenciais do Supabase.
+                                </p>
+                            )}
                         </div>
 
                         {/* Run command */}
