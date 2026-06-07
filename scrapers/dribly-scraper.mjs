@@ -520,9 +520,6 @@ async function main() {
         const gameBar = progressBar(gameDone, total, Math.min(40, termWidth - 15))
         const pct = total > 0 ? Math.round((gameDone / total) * 100) : 0
 
-        // ── Render top section ──────────────────────────
-        for (const a of art) lines.push(a)
-        lines.push('')
         lines.push(`  Jogos: ${gameBar} ${gameDone}/${total} (${pct}%)`)
         lines.push('')
 
