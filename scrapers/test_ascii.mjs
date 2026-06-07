@@ -5,9 +5,7 @@ import { resolve, dirname } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const req = createRequire(pathToFileURL(resolve(__dirname, '..', '.dribly-deps', 'package.json')).href)
-
-// Install pngjs if needed
-const { execSync } = await import('child_process')
+const { execSync } = req('child_process')
 try {
     req.resolve('pngjs')
 } catch {
@@ -17,7 +15,7 @@ try {
 
 const { PNG } = req('pngjs')
 
-const url = process.argv[2] || 'https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_169_LOGO.png'
+const url = process.argv[2] || 'https://sav2.fpb.pt/uploads/clubes/logotipo/2010_Odisseia_Basket_Clube1639588149.png'
 console.log('Fetching:', url)
 const res = await fetch(url)
 if (!res.ok) { console.error('Fetch failed:', res.status); process.exit(1) }
