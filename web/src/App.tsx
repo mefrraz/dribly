@@ -28,6 +28,7 @@ import ClubesAdmin from './pages/admin/ClubesAdmin'
 import UsersAdmin from './pages/admin/UsersAdmin'
 import GamesAdmin from './pages/admin/GamesAdmin'
 import CompetitionsAdmin from './pages/admin/CompetitionsAdmin'
+import ScrapeAdmin from './pages/admin/ScrapeAdmin'
 import { ClubProvider } from './lib/ClubContext'
 import { AuthProvider } from './lib/AuthContext'
 import SplashScreen from './components/SplashScreen'
@@ -86,6 +87,7 @@ function App() {
                             <Route path="utilizadores" element={<UsersAdmin />} />
                             <Route path="jogos" element={<GamesAdmin />} />
                             <Route path="competicoes" element={<CompetitionsAdmin />} />
+                            <Route path="scrape" element={<ScrapeAdmin />} />
                         </Route>
                     </Route>
                 </Routes>
