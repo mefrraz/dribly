@@ -315,21 +315,26 @@ async function main() {
     console.log()
     console.log(C.bold + '  🧹 Dados existentes:' + C.reset)
     console.log(`     ${C.purple}[1]${C.reset} Manter (adiciona/atualiza)`)
-    console.log(`     ${C.purple}[2]${C.reset} Limpar antes (apaga jogos dos clubes e re-importa)`)
+    console.log(`     ${C.purple}[2]${C.reset} Limpar antes (apaga e re-importa)`)
+    console.log()
+
+    const optRl = createInterface({ input: process.stdin, output: process.stdout })
+    const cleanAnswer = await new Promise(resolve => {
+        optRl.question(C.cyan + '  > ' + C.reset, resolve)
+    })
+    const shouldClean = cleanAnswer.trim() === '2'
+
     console.log()
     console.log(C.bold + '  📋 Ficheiro de log:' + C.reset)
     console.log(`     ${C.purple}[1]${C.reset} Manter log (para debug)`)
     console.log(`     ${C.purple}[2]${C.reset} Apagar log ao sair`)
     console.log()
 
-    const optRl = createInterface({ input: process.stdin, output: process.stdout })
-    const optAnswer = await new Promise(resolve => {
-        optRl.question(C.cyan + '  Clean,Log > ' + C.reset, resolve)
+    const logAnswer = await new Promise(resolve => {
+        optRl.question(C.cyan + '  > ' + C.reset, resolve)
     })
     optRl.close()
-    const parts = optAnswer.split(',').map(s => s.trim())
-    const shouldClean = parts[0] === '2'
-    const keepLog = parts[1] !== '2' // default: keep
+    const keepLog = logAnswer.trim() !== '2'
 
     if (shouldClean) {
         console.log(C.yellow + '\n  🧹 A limpar jogos existentes...' + C.reset)
@@ -459,8 +464,8 @@ async function main() {
                     const timeText = $link.find('.time').text().trim() || $link.find('.hour').text().trim()
                     const locText = $link.find('.location').text().trim() || $link.find('.place').text().trim()
                     // Debug first game of each club
-                    if (parsedLinks === 0) {
-                        log(`    DEBUG game: resultText="${resultText}" timeText="${timeText}" locText="${locText}"`)
+                    if (parsedLinks === 1) {
+                        log(`    DEBUG game: resultText="${resultText || 'EMPTY'}" timeText="${timeText || 'EMPTY'}" locText="${locText || 'EMPTY'}"`)
                     }
 
                     const logos = []
