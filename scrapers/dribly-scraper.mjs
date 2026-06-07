@@ -404,33 +404,98 @@ async function main() {
     let totalGames = 0
     let done = 0
     const errors = []
-    const CONCURRENCY = 4
+    const recentGames = [] // max 12, newest first
+    const termWidth = process.stdout.columns || 100
+    const LEFT_W = Math.floor(termWidth * 0.55)
+    const RIGHT_W = termWidth - LEFT_W - 3
 
-    // Track active batch for per-game progress display
-    let activeClubs = []
+    function drawScreen(club, gameDone, total, clubIdx) {
+        const lines = []
 
-    for (let i = 0; i < selectedClubs.length; i += CONCURRENCY) {
-        const batch = selectedClubs.slice(i, i + CONCURRENCY)
+        // Header
+        lines.push(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
+        lines.push(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset)
+        lines.push('')
 
-        // Scrape clubs in parallel, but upsert games sequentially per club for progress
-        const results = []
+        // ── LEFT PANEL ──────────────────────────────────
+        const leftLines = []
+
+        // ASCII art basketball
+        const asciiArt = [
+            `     ${C.purple}●${C.reset} `,
+            `   ${C.purple}◯ ◯ ◯${C.reset}`,
+            ` ${C.purple}◯  ●  ◯${C.reset}   ${C.bold}${club.name.slice(0, 22)}${C.reset}`,
+            `   ${C.purple}◯ ◯ ◯${C.reset}`,
+            `     ${C.purple}●${C.reset}    ${C.dim}#${club.id}${C.reset}`,
+        ]
+        leftLines.push(...asciiArt)
+        leftLines.push('')
+
+        // Club progress
+        const gameBar = progressBar(gameDone, total, Math.min(30, LEFT_W - 5))
+        leftLines.push(`  Jogos: ${gameBar} ${gameDone}/${total}`)
+        leftLines.push('')
+
+        // Recent games (last 5)
+        if (recentGames.length > 0) {
+            leftLines.push(`  ${C.dim}── Últimos guardados ──${C.reset}`)
+            for (let i = 0; i < Math.min(5, recentGames.length); i++) {
+                const g = recentGames[i]
+                const line = `  ${g.icon} ${g.text}`.slice(0, LEFT_W - 2)
+                leftLines.push(line)
+            }
+        }
+
+        // ── RIGHT PANEL ─────────────────────────────────
+        const rightLines = []
+        rightLines.push(`  ${C.bold}📋 Histórico${C.reset}`)
+        rightLines.push(`  ${C.dim}${'─'.repeat(RIGHT_W - 2)}${C.reset}`)
+
+        const toShow = recentGames.slice(0, Math.min(10, recentGames.length))
+        for (const g of toShow) {
+            const icon = g.status === 'FINALIZADO' ? C.green + '●' + C.reset : C.yellow + '○' + C.reset
+            const score = g.score ? g.score : 'vs'
+            const line = `  ${icon} ${g.text}`.slice(0, RIGHT_W - 2)
+            rightLines.push(line)
+        }
+        if (toShow.length === 0) {
+            rightLines.push(`  ${C.dim}Aguardando...${C.reset}`)
+        }
+
+        // ── Render side by side ─────────────────────────
+        const maxLines = Math.max(leftLines.length, rightLines.length)
+        for (let i = 0; i < maxLines; i++) {
+            const left = (leftLines[i] || '').padEnd(LEFT_W)
+            const right = (rightLines[i] || '')
+            lines.push(C.dim + '│' + C.reset + left + C.dim + '│' + C.reset + right + C.dim + '│' + C.reset)
+        }
+
+        // Bottom
+        lines.push('')
+        const overallBar = progressBar(clubIdx, selectedClubs.length, Math.min(40, termWidth - 15))
+        lines.push(`  ${overallBar} ${C.dim}${clubIdx}/${selectedClubs.length} clubes${C.reset}`)
+
+        process.stdout.write(C.clear)
+        process.stdout.write(C.hideCursor)
+        console.log(lines.join('\n'))
+    }
+
+    for (let i = 0; i < selectedClubs.length; i += 4) {
+        const batch = selectedClubs.slice(i, i + 4)
+
         for (const club of batch) {
             done++
             const clubIdx = done
-            const clubPct = Math.round((clubIdx / selectedClubs.length) * 100)
 
-            // Fetch games
             let games = []
-            let error = null
             try {
                 games = await scrapeClub(club.id)
             } catch (e) {
-                error = e.message
+                errors.push(club.name)
             }
 
-            // Upsert with per-game progress
-            let gameDone = 0
             const total = games.length
+            let gameDone = 0
 
             for (const g of games) {
                 try {
@@ -438,33 +503,29 @@ async function main() {
                 } catch { /* continue */ }
                 gameDone++
 
-                // Draw per-game progress
-                const gamePct = Math.round((gameDone / total) * 100)
-                const gameBar = progressBar(gameDone, total, 20)
-                const clubStr = padRight(club.name.slice(0, 25), 25)
+                // Add to recent games
+                const dateShort = g.data ? g.data.slice(5) : '??-??'
+                const score = g.resultado_casa != null ? `${g.resultado_casa}-${g.resultado_fora}` : null
+                const icon = score ? C.green + '✓' + C.reset : C.yellow + '○' + C.reset
+                const text = `${dateShort} ${(g.equipa_casa||'?').slice(0,10)} ${score||'vs'} ${(g.equipa_fora||'?').slice(0,10)}`
 
-                process.stdout.write(C.clear)
-                console.log(C.bold + C.purple + '  Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
-                console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length} — ${clubPct}%` + C.reset)
-                console.log()
-                console.log(`  ${C.cyan}📋 ${club.name}${C.reset}`)
-                console.log(`  ${gameBar} ${gameDone}/${total} jogos`)
-                console.log()
+                recentGames.unshift({
+                    icon, text,
+                    status: score ? 'FINALIZADO' : 'AGENDADO',
+                    score,
+                })
+                if (recentGames.length > 12) recentGames.pop()
 
-                // Show overall progress
-                const overallBar = progressBar(clubIdx, selectedClubs.length, 35)
-                console.log(`  ${overallBar} ${C.dim}Geral: ${clubIdx}/${selectedClubs.length} clubes — ${totalGames + gameDone} jogos${C.reset}`)
+                drawScreen(club, gameDone, total, clubIdx)
             }
 
             totalGames += games.length
-            if (error) errors.push(club.name)
-
-            results.push({ club, count: games.length, error })
         }
     }
 
+    process.stdout.write(C.showCursor)
     console.log(C.clear)
-    console.log(C.bold + C.purple + '  Dribly Scraper' + C.reset)
+    console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset)
     console.log()
     console.log(C.bold + C.green + `  ✅ Concluído!` + C.reset)
     console.log(C.dim + `     ${totalGames} jogos em ${done} clubes` + C.reset)
