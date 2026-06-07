@@ -230,7 +230,7 @@ function Landing() {
                                 <button
                                     key={slug}
                                     onClick={() => { if (c) selectClub(c); else navigate('/clube/' + slug + '/home') }}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all ${slug === 'ud-oliveirense' ? 'hidden sm:flex' : ''}`}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all ${slug === 'uni-o-desportiva-oliveirense' ? 'hidden sm:flex' : ''}`}
                                 >
                                     <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
                                         {c?.logo_url ? (
@@ -417,16 +417,16 @@ function Landing() {
                                 ref={carouselRef}
                                 className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory scroll-smooth items-start"
                             >
-                                <div className="shrink-0 w-[calc(50vw-24px)] md:hidden" />
+                                <div className="shrink-0 w-[calc(50vw-16px)] md:hidden" />
                                 {[...games, ...games, ...games].map((match, idx) => (
                                     <div
                                         key={match.slug || match.id + '-' + idx}
-                                        className="min-w-[80vw] md:min-w-[320px] shrink-0 snap-center"
+                                        className="min-w-[65vw] md:min-w-[320px] shrink-0 snap-center"
                                     >
                                         <GameCard match={match} mode="agenda" />
                                     </div>
                                 ))}
-                                <div className="shrink-0 w-[calc(50vw-24px)] md:hidden" />
+                                <div className="shrink-0 w-[calc(50vw-16px)] md:hidden" />
                             </div>
                             <div className="absolute left-0 top-0 bottom-0 w-32 sm:w-44 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
                             <div className="absolute right-0 top-0 bottom-0 w-32 sm:w-44 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
