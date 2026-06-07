@@ -125,10 +125,10 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     onClose()
                     onAuthSuccess?.('signin')
                 } else if ((result.status as string) === 'needs_client_trust') {
-                    // Client Trust — Clerk should auto-send the email code
-                    setSecondFactorNeeded(true)
-                    setStatus('sent')
-                    setErrorMsg('')
+                    // Client Trust is enabled — requires admin to disable it in Clerk dashboard
+                    // Configure → Attack Protection → Client Trust → Disable
+                    setErrorMsg('Verificação de dispositivo ativa. Desativa o Client Trust no Clerk (Configure → Attack Protection).')
+                    setStatus('error')
                 } else if (result.status === 'needs_first_factor') {
                     // Needs password (shouldn't happen with both sent, but handle it)
                     setErrorMsg('Email ou palavra-passe incorretos.')
