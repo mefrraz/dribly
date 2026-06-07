@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Star, Heart, LogIn, UserPlus, ArrowRight, X, Check } from 'lucide-react'
+import { Heart, LogIn, UserPlus, ArrowRight, X, Check, LucideIcon } from 'lucide-react'
 import { type TourTrigger, markOnboardingDone } from './onboardingState'
 
 // Re-export for backward compatibility
@@ -8,7 +8,7 @@ export { type TourTrigger, isOnboardingDone, markOnboardingDone, triggerOnboardi
 
 interface TourStep {
     /** Icon component */
-    Icon: typeof Star
+    Icon: LucideIcon
     title: string
     description: string
     /** Optional accent color class (tailwind text-*) */
@@ -26,7 +26,7 @@ function buildSteps(trigger: TourTrigger): TourStep[] {
             title: trigger === 'signup' ? 'Conta criada!' : 'Bem-vindo de volta!',
             description:
                 trigger === 'signup'
-                    ? 'Agora com conta podes favoritar e seguir clubes e competições. Vamos ver como funciona.'
+                    ? 'Agora com conta podes seguir clubes e competições. Vamos ver como funciona.'
                     : 'Com sessão iniciada tens funcionalidades extra. Vamos ver o que podes fazer.',
             accent: 'text-dribly-purple',
             bgGradient: 'from-dribly-purple/20 to-dribly-purple/5',
@@ -35,18 +35,10 @@ function buildSteps(trigger: TourTrigger): TourStep[] {
 
     steps.push(
         {
-            Icon: Star,
-            title: 'Favoritar clubes',
-            description:
-                'Toca na estrela ⭐ na página de um clube para o tornares no teu favorito. Ele fica sempre no topo da navegação.',
-            accent: 'text-yellow-500',
-            bgGradient: 'from-yellow-500/20 to-yellow-500/5',
-        },
-        {
             Icon: Heart,
             title: 'Seguir clubes e competições',
             description:
-                'Toca no coração ❤️ para seguir vários clubes e vê-los todos reunidos na página Seguidos. Também podes seguir competições.',
+                'Toca no coração ❤️ para seguir clubes e competições. Vê todos os que segues reunidos na página Seguidos.',
             accent: 'text-red-500',
             bgGradient: 'from-red-500/20 to-red-500/5',
         },
@@ -54,7 +46,7 @@ function buildSteps(trigger: TourTrigger): TourStep[] {
             Icon: ArrowRight,
             title: 'Acesso rápido',
             description:
-                'A navegação mostra sempre o teu clube favorito para acesso instantâneo. Basta um toque para veres jogos, classificações e mais.',
+                'Na página Seguidos tens acesso instantâneo a todos os clubes e competições que segues. Basta um toque para veres jogos, classificações e mais.',
             accent: 'text-dribly-purple',
             bgGradient: 'from-dribly-purple/20 to-dribly-purple/5',
         },
@@ -62,7 +54,7 @@ function buildSteps(trigger: TourTrigger): TourStep[] {
             Icon: Check,
             title: 'Tudo pronto!',
             description:
-                'Já sabes o essencial. Usa a pesquisa para encontrar clubes ou competições e começa a seguir os teus favoritos.',
+                'Já sabes o essencial. Usa a pesquisa para encontrar clubes ou competições e começa a seguir os que mais gostas.',
             accent: 'text-green-500',
             bgGradient: 'from-green-500/20 to-green-500/5',
         },
