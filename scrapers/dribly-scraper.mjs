@@ -266,7 +266,7 @@ async function main() {
 
     // ── Scrape! ─────────────────────────────────────────
 
-    // Ctrl+C handler — first press shows summary, second exits
+    // Ctrl+C handler — first press shows selection, second exits
     let ctrlCPressed = false
     const onSigInt = () => {
         if (ctrlCPressed) {
@@ -275,10 +275,12 @@ async function main() {
         }
         ctrlCPressed = true
         process.stdout.write(C.clear)
-        console.log(C.bold + C.yellow + '  ⏸️  Scrape pausado' + C.reset)
-        console.log(C.dim + `  ${done} clubes, ${totalGames} jogos guardados` + C.reset)
-        console.log(C.red + '  Ctrl+C novamente para sair' + C.reset)
+        console.log(C.bold + C.yellow + '  ⏸️  Escolheste:' + C.reset)
+        console.log(C.dim + `  Época: ${season}  |  ${selectedClubs.length} clubes  |  ${totalGames} jogos guardados` + C.reset)
+        console.log(C.dim + `  Progresso: ${done}/${selectedClubs.length} clubes` + C.reset)
         console.log()
+        console.log(C.red + '  Ctrl+C novamente para sair' + C.reset)
+        console.log(C.green + '  A continuar em 2s...' + C.reset)
         // Resume after 2 seconds
         setTimeout(() => {
             ctrlCPressed = false
@@ -458,8 +460,6 @@ async function main() {
     const errors = []
     const recentGames = [] // max 12, newest first
     const termWidth = process.stdout.columns || 100
-    const LEFT_W = Math.floor(termWidth * 0.55)
-    const RIGHT_W = termWidth - LEFT_W - 3
 
     function drawScreen(club, gameDone, total, clubIdx) {
         const lines = []
@@ -469,57 +469,40 @@ async function main() {
         lines.push(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset)
         lines.push('')
 
-        // ── LEFT PANEL ──────────────────────────────────
-        const leftLines = []
-
-        // ASCII art basketball
-        const asciiArt = [
-            `     ${C.purple}●${C.reset} `,
-            `   ${C.purple}◯ ◯ ◯${C.reset}`,
-            ` ${C.purple}◯  ●  ◯${C.reset}   ${C.bold}${club.name.slice(0, 22)}${C.reset}`,
-            `   ${C.purple}◯ ◯ ◯${C.reset}`,
-            `     ${C.purple}●${C.reset}    ${C.dim}#${club.id}${C.reset}`,
+        // Big ASCII art + club name
+        const art = [
+            `       ${C.purple}▄████████▄${C.reset}`,
+            `     ${C.purple}▄██${C.reset}${C.bold}▀▀▀▀${C.reset}${C.purple}██▄${C.reset}     ${C.bold}${club.name}${C.reset}`,
+            `    ${C.purple}██${C.reset}${C.bold}▀      ▀${C.reset}${C.purple}██${C.reset}    ${C.dim}#${club.id}${C.reset}`,
+            `   ${C.purple}█${C.reset}${C.bold}▀   ●    ▀${C.reset}${C.purple}█${C.reset}`,
+            `  ${C.purple}█${C.reset}${C.bold}▀  ◯ ◯ ◯  ▀${C.reset}${C.purple}█${C.reset}`,
+            ` ${C.purple}█${C.reset}${C.bold}▀  ◯  ●  ◯  ▀${C.reset}${C.purple}█${C.reset}    ${C.dim}${season}${C.reset}`,
+            `  ${C.purple}█${C.reset}${C.bold}▀  ◯ ◯ ◯  ▀${C.reset}${C.purple}█${C.reset}`,
+            `   ${C.purple}█${C.reset}${C.bold}▀   ●    ▀${C.reset}${C.purple}█${C.reset}`,
+            `    ${C.purple}██${C.reset}${C.bold}▀      ▀${C.reset}${C.purple}██${C.reset}`,
+            `     ${C.purple}▀████████▀${C.reset}`,
         ]
-        leftLines.push(...asciiArt)
-        leftLines.push('')
 
         // Club progress
-        const gameBar = progressBar(gameDone, total, Math.min(30, LEFT_W - 5))
-        leftLines.push(`  Jogos: ${gameBar} ${gameDone}/${total}`)
-        leftLines.push('')
+        const gameBar = progressBar(gameDone, total, Math.min(40, termWidth - 15))
+        const pct = total > 0 ? Math.round((gameDone / total) * 100) : 0
 
-        // Recent games (last 5)
+        // ── Render top section ──────────────────────────
+        for (const a of art) lines.push(a)
+        lines.push('')
+        lines.push(`  Jogos: ${gameBar} ${gameDone}/${total} (${pct}%)`)
+        lines.push('')
+
+        // ── Histórico (below the progress) ──────────────
         if (recentGames.length > 0) {
-            leftLines.push(`  ${C.dim}── Últimos guardados ──${C.reset}`)
-            for (let i = 0; i < Math.min(5, recentGames.length); i++) {
-                const g = recentGames[i]
-                const line = `  ${g.icon} ${g.text}`.slice(0, LEFT_W - 2)
-                leftLines.push(line)
+            lines.push(`  ${C.bold}📋 Histórico${C.reset}`)
+            lines.push(`  ${C.dim}${'─'.repeat(Math.min(60, termWidth - 4))}${C.reset}`)
+            const toShow = recentGames.slice(0, Math.min(8, recentGames.length))
+            for (const g of toShow) {
+                const icon = g.status === 'FINALIZADO' ? C.green + '●' + C.reset : C.yellow + '○' + C.reset
+                const line = `  ${icon} ${g.text}`.slice(0, termWidth - 4)
+                lines.push(line)
             }
-        }
-
-        // ── RIGHT PANEL ─────────────────────────────────
-        const rightLines = []
-        rightLines.push(`  ${C.bold}📋 Histórico${C.reset}`)
-        rightLines.push(`  ${C.dim}${'─'.repeat(RIGHT_W - 2)}${C.reset}`)
-
-        const toShow = recentGames.slice(0, Math.min(10, recentGames.length))
-        for (const g of toShow) {
-            const icon = g.status === 'FINALIZADO' ? C.green + '●' + C.reset : C.yellow + '○' + C.reset
-            const score = g.score ? g.score : 'vs'
-            const line = `  ${icon} ${g.text}`.slice(0, RIGHT_W - 2)
-            rightLines.push(line)
-        }
-        if (toShow.length === 0) {
-            rightLines.push(`  ${C.dim}Aguardando...${C.reset}`)
-        }
-
-        // ── Render side by side ─────────────────────────
-        const maxLines = Math.max(leftLines.length, rightLines.length)
-        for (let i = 0; i < maxLines; i++) {
-            const left = (leftLines[i] || '').padEnd(LEFT_W)
-            const right = (rightLines[i] || '')
-            lines.push(C.dim + '│' + C.reset + left + C.dim + '│' + C.reset + right + C.dim + '│' + C.reset)
         }
 
         // Bottom
@@ -550,9 +533,9 @@ async function main() {
             // Show current club before starting
             process.stdout.write(C.clear)
             console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
-            console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}` + C.reset)
+            console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset)
             console.log()
-            console.log(`  ${C.cyan}🔍 A pesquisar: ${club.name}${C.reset}`)
+            console.log(C.cyan + `  🔍 A pesquisar: ` + C.reset + C.bold + club.name + C.reset)
             console.log()
 
             let games = []
