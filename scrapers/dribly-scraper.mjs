@@ -123,14 +123,8 @@ async function ensureDeps() {
 async function askCredentials() {
     const rl = createInterface({ input: process.stdin, output: process.stdout })
 
-    console.log(C.yellow + '  ⚠️  Ficheiro .env não encontrado.' + C.reset)
-    console.log(C.dim + '  As credenciais NÃO são guardadas — só ficam nesta sessão.' + C.reset)
-    console.log()
-
-    // Show hint from admin page
-    console.log(C.dim + '  Encontras estes valores em:' + C.reset)
-    console.log(C.dim + '  Vercel → Dribly → Settings → Environment Variables' + C.reset)
-    console.log(C.dim + '  ou em web/.env (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY)' + C.reset)
+    console.log(C.dim + '  As credenciais NÃO são guardadas — só nesta sessão.' + C.reset)
+    console.log(C.dim + '  Vê as credenciais no admin: /admin → Scraper → 📥 Script → Mostrar' + C.reset)
     console.log()
 
     const ask = (q) => new Promise(resolve => rl.question(C.cyan + q + C.reset, resolve))
@@ -450,6 +444,13 @@ async function main() {
         console.log(lines.join('\n'))
     }
 
+    // Initial draw
+    process.stdout.write(C.clear)
+    process.stdout.write(C.hideCursor)
+    console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
+    console.log(C.dim + `  A iniciar scrape de ${selectedClubs.length} clubes...` + C.reset)
+    console.log()
+
     for (let i = 0; i < selectedClubs.length; i += 4) {
         const batch = selectedClubs.slice(i, i + 4)
 
@@ -462,6 +463,7 @@ async function main() {
                 games = await scrapeClub(club.id)
             } catch (e) {
                 errors.push(club.name)
+                console.error(C.red + `  Erro ao scrape ${club.name}: ${e.message}` + C.reset)
             }
 
             const total = games.length
