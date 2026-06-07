@@ -12,7 +12,7 @@
  */
 
 import { execSync } from 'child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, unlinkSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, rmSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 import { createInterface } from 'readline'
@@ -267,11 +267,13 @@ async function main() {
 
     // ── Scrape! ─────────────────────────────────────────
 
-    // Cleanup function
+    // Cleanup function — remove everything the script created
     function cleanup() {
-        try { if (existsSync(LOG_FILE)) unlinkSync(LOG_FILE) } catch {}
-        try { const f = resolve(DEPS_DIR, 'debug_cal.html'); if (existsSync(f)) unlinkSync(f) } catch {}
-        try { const f = resolve(DEPS_DIR, 'debug_res.html'); if (existsSync(f)) unlinkSync(f) } catch {}
+        try {
+            if (existsSync(DEPS_DIR)) {
+                rmSync(DEPS_DIR, { recursive: true, force: true })
+            }
+        } catch {}
     }
 
     // Ctrl+C handler — stops scrape and shows summary
