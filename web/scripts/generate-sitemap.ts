@@ -47,6 +47,7 @@ async function main() {
         url(`${BASE}/mapa`, 'weekly', '0.6'),
         url(`${BASE}/pesquisa`, 'weekly', '0.5'),
         url(`${BASE}/sobre`, 'monthly', '0.4'),
+        url(`${BASE}/privacidade`, 'monthly', '0.3'),
         url(`${BASE}/instalar`, 'monthly', '0.3'),
     ]
 

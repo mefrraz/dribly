@@ -10,6 +10,7 @@ import Standings from './pages/Standings'
 import AssociationCompetitions from './pages/AssociationCompetitions'
 import CompetitionPhases from './pages/CompetitionPhases'
 import About from './pages/About'
+import Privacy from './pages/Privacy'
 import Install from './pages/Install'
 import SearchPage from './pages/SearchPage'
 import Following from './pages/Following'
@@ -76,6 +77,7 @@ function App() {
                         <Route path="competicao/:competitionId" element={<CompetitionDetail />} />
                         <Route path="atleta/:id" element={<AthletePage />} />
                         <Route path="sobre" element={<About />} />
+                        <Route path="privacidade" element={<Privacy />} />
                         <Route path="instalar" element={<Install />} />
                         <Route path="*" element={<NotFound />} />
                     </Route>

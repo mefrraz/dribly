@@ -162,9 +162,11 @@ function Layout() {
             <footer className="hidden md:block bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-white/10 py-8">
                 <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-zinc-500">
                     <div className="flex items-center gap-2">
-                        <span className="font-bold text-zinc-900 dark:text-white">Dribly</span>
+                        <Link to="/" className="font-bold text-zinc-900 dark:text-white hover:text-dribly-purple transition-colors">Dribly</Link>
                         <span className="text-zinc-400">•</span>
                         <span>&copy; {new Date().getFullYear()}</span>
+                        <span className="text-zinc-400">•</span>
+                        <Link to="/privacidade" className="hover:text-dribly-purple transition-colors">Privacidade</Link>
                     </div>
                     <div className="flex gap-4">
                         <a href="https://www.instagram.com/dribly" target="_blank" rel="noopener noreferrer" className="hover:text-dribly-purple transition-colors">
