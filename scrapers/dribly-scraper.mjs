@@ -16,10 +16,17 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 import { createInterface } from 'readline'
+import { createRequire } from 'module'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DEPS_DIR = resolve(__dirname, '..', '.dribly-deps')
 const PKG_JSON = resolve(DEPS_DIR, 'package.json')
+
+// Cross-platform module loader for Windows
+function loadModuleSync(packageName) {
+    const req = createRequire(pathToFileURL(resolve(DEPS_DIR, 'package.json')).href)
+    return req(packageName)
+}
 
 // ── ANSI helpers ───────────────────────────────────────
 
@@ -144,10 +151,9 @@ async function main() {
     await ensureDeps()
 
     // Load modules from deps dir
-    const supabasePath = pathToFileURL(resolve(DEPS_DIR, 'node_modules', '@supabase', 'supabase-js')).href
-    const cheerioPath = pathToFileURL(resolve(DEPS_DIR, 'node_modules', 'cheerio')).href
-    const { createClient } = await import(supabasePath)
-    const cheerioModule = await import(cheerioPath)
+    const supabaseModule = loadModuleSync('@supabase/supabase-js')
+    const { createClient } = supabaseModule
+    const cheerioModule = loadModuleSync('cheerio')
     const cheerio = cheerioModule.default || cheerioModule
 
     // Load env
