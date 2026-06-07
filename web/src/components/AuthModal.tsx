@@ -147,6 +147,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                             strategy: 'password',
                             password,
                         })
+                        console.log('[AuthModal] password attempt:', JSON.stringify({ status: pwResult.status }))
                         if (pwResult.status === 'complete') {
                             await setActive!({ session: pwResult.createdSessionId! })
                             reset()
