@@ -97,6 +97,20 @@ function findLogo(teamName: string, maps: LogoMaps): string | null {
         if (logoHits.size === 1) return logoHits.keys().next().value ?? null
     }
 
+    // 4. Fuzzy fallback: match last significant word (team name almost always ends with city/team)
+    // Try each word from end to start, match the FIRST logo found (most likely correct for "FC Porto" → "Porto")
+    for (let i = teamWords.length - 1; i >= 0; i--) {
+        const tw = teamWords[i]
+        for (const [cn, logo] of maps.logos) {
+            const cw = cn.split(/\s+/).filter(w => w.length > 2)
+            if (cw.includes(tw)) return logo
+        }
+        for (const [sn, logo] of maps.searchNames) {
+            const sw = sn.split(/\s+/).filter(w => w.length > 2)
+            if (sw.includes(tw)) return logo
+        }
+    }
+
     return null
 }
 
