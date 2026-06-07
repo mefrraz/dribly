@@ -125,11 +125,17 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                         strategy: 'password',
                         password,
                     })
+                    console.log('[AuthModal] password attempt (complete):', JSON.stringify({ status: pwResult.status }))
                     if (pwResult.status === 'complete') {
                         await setActive!({ session: pwResult.createdSessionId! })
                         reset()
                         onClose()
                         onAuthSuccess?.('signin')
+                    } else if ((pwResult.status as string) === 'needs_client_trust') {
+                        setIsClientTrust(true)
+                        setSecondFactorNeeded(true)
+                        setStatus('sent')
+                        setErrorMsg('')
                     } else {
                         setErrorMsg('Palavra-passe incorreta.')
                         setStatus('error')
@@ -141,7 +147,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     setStatus('sent')
                     setErrorMsg('')
                 } else if (idResult.status === 'needs_first_factor') {
-                    // Old flow — try password directly
+                    // Try password, may trigger client trust after
                     try {
                         const pwResult = await signIn!.attemptFirstFactor({
                             strategy: 'password',
@@ -153,6 +159,12 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                             reset()
                             onClose()
                             onAuthSuccess?.('signin')
+                        } else if ((pwResult.status as string) === 'needs_client_trust') {
+                            // Password correct, but device needs verification
+                            setIsClientTrust(true)
+                            setSecondFactorNeeded(true)
+                            setStatus('sent')
+                            setErrorMsg('')
                         } else {
                             setErrorMsg('Palavra-passe incorreta.')
                             setStatus('error')
