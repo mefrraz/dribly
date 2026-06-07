@@ -12,7 +12,7 @@
  */
 
 import { execSync } from 'child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 import { createInterface } from 'readline'
@@ -21,6 +21,12 @@ import { createRequire } from 'module'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DEPS_DIR = resolve(__dirname, '..', '.dribly-deps')
 const PKG_JSON = resolve(DEPS_DIR, 'package.json')
+const LOG_FILE = resolve(DEPS_DIR, 'scraper.log')
+
+function log(msg) {
+    const ts = new Date().toISOString()
+    appendFileSync(LOG_FILE, `[${ts}] ${msg}\n`)
+}
 
 // Cross-platform module loader for Windows
 function loadModuleSync(packageName) {
@@ -147,6 +153,7 @@ async function main() {
     console.log(C.clear)
     console.log(C.bold + C.purple + '  Dribly Scraper' + C.reset)
     console.log(C.dim + '  Scrape local de jogos — zero cota Vercel' + C.reset)
+    console.log(C.dim + `  Logs: ${LOG_FILE}` + C.reset)
     console.log()
 
     // Install deps
@@ -306,6 +313,8 @@ async function main() {
     async function scrapeClub(clubId) {
         const url = (page) => `https://www.fpb.pt/${page}/clube_${clubId}/?epoca=${encodeURIComponent(season)}&escalao=S%C3%A9nior&genero=masculino`
 
+        log(`Scraping club ${clubId} — ${season}`)
+
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), 15000)
 
@@ -315,9 +324,11 @@ async function main() {
                 fetch(url('resultados'), { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: controller.signal }),
             ])
             clearTimeout(timeout)
+            log(`  Fetched calendar (${calRes.status}) and results (${resRes.status})`)
 
         const calHtml = await calRes.text()
         const resHtml = await resRes.text()
+        log(`  Calendar HTML: ${calHtml.length} chars, Results HTML: ${resHtml.length} chars`)
 
         function parse(html) {
             const $ = cheerio.load(html)
@@ -378,6 +389,7 @@ async function main() {
 
         const calGames = parse(calHtml)
         const resGames = parse(resHtml)
+        log(`  Parsed: ${calGames.length} calendar games, ${resGames.length} results games`)
 
         // Merge: results override calendar
         const merged = new Map()
@@ -387,7 +399,9 @@ async function main() {
                 merged.set(g.slug, { ...merged.get(g.slug), ...g })
             }
         }
-        return Array.from(merged.values())
+        const all = Array.from(merged.values())
+        log(`  Total after merge: ${all.length} games`)
+        return all
         } finally {
             clearTimeout(timeout)
         }
