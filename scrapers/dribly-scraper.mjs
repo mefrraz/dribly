@@ -259,6 +259,26 @@ async function main() {
 
     // ── Scrape! ─────────────────────────────────────────
 
+    // Ctrl+C handler — first press shows summary, second exits
+    let ctrlCPressed = false
+    const onSigInt = () => {
+        if (ctrlCPressed) {
+            process.stdout.write(C.showCursor)
+            process.exit(0)
+        }
+        ctrlCPressed = true
+        process.stdout.write(C.clear)
+        console.log(C.bold + C.yellow + '  ⏸️  Scrape pausado' + C.reset)
+        console.log(C.dim + `  ${done} clubes, ${totalGames} jogos guardados` + C.reset)
+        console.log(C.red + '  Ctrl+C novamente para sair' + C.reset)
+        console.log()
+        // Resume after 2 seconds
+        setTimeout(() => {
+            ctrlCPressed = false
+        }, 2000)
+    }
+    process.on('SIGINT', onSigInt)
+
     console.log(C.clear)
     console.log(C.bold + C.purple + '  Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
     console.log(C.dim + `  ${selectedClubs.length} clubes selecionados` + C.reset)
@@ -489,6 +509,18 @@ async function main() {
 
             const total = games.length
             let gameDone = 0
+
+            // Show club result before processing games
+            if (total === 0) {
+                process.stdout.write(C.clear)
+                console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
+                console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length} — ${club.name}` + C.reset)
+                console.log(`  ${C.dim}Nenhum jogo encontrado${C.reset}`)
+                console.log()
+                // Still update overall count
+                totalGames += 0
+                continue
+            }
 
             for (const g of games) {
                 try {
