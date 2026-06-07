@@ -474,9 +474,8 @@ async function main() {
             const buffer = Buffer.from(await res.arrayBuffer())
             const png = PNG.sync.read(buffer)
 
-            const w = Math.min(36, termWidth - 6)
-            const h = Math.round(w * (png.height / png.width) * 0.5)
-            const chars = ' .:-=+*#%@'
+            const w = Math.min(60, termWidth - 4)
+            const h = Math.round(w * (png.height / png.width) * 0.45)
 
             const result = []
             for (let y = 0; y < h; y++) {
@@ -489,12 +488,11 @@ async function main() {
                     const g = png.data[idx + 1]
                     const b = png.data[idx + 2]
                     const a = png.data[idx + 3]
-                    if (a < 128) { line += ' '; continue }
-                    const brightness = 0.299 * r + 0.587 * g + 0.114 * b
-                    const ci = Math.floor(brightness / 255 * (chars.length - 1))
-                    line += chars[Math.min(ci, chars.length - 1)]
+                    if (a < 128) { line += '  '; continue }
+                    // True color ANSI block
+                    line += `\x1b[48;2;${r};${g};${b}m  \x1b[0m`
                 }
-                result.push(C.purple + line + C.reset)
+                result.push(line)
             }
             asciiCache.set(clubId, result)
             return result
