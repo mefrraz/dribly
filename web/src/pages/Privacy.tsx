@@ -70,7 +70,7 @@ function Privacy() {
                         <h2 className="text-base font-bold text-zinc-800 dark:text-zinc-200 mb-2">6. Contacto</h2>
                         <p>
                             Para qualquer dúvida sobre privacidade ou para exercer os teus direitos:<br />
-                            📧 <a href="mailto:privacidade@dribly.pt" className="text-dribly-purple hover:underline">privacidade@dribly.pt</a>
+                            📧 <a href="mailto:me.frraz@gmail.com" className="text-dribly-purple hover:underline">me.frraz@gmail.com</a>
                         </p>
                     </section>
                 </div>
