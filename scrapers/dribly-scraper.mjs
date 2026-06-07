@@ -340,9 +340,16 @@ async function main() {
         function parse(html) {
             try {
                 const $ = cheerio.load(html)
-                const games = []
+                // Debug cheerio
+                const allDivs = $('div')
                 const dayWrappers = $('.day-wrapper')
-                log(`    cheerio loaded OK, found ${dayWrappers.length} .day-wrapper elements`)
+                const gameLinks = $('a.game-wrapper-a')
+                log(`    cheerio: ${allDivs.length} divs, ${dayWrappers.length} .day-wrapper, ${gameLinks.length} a.game-wrapper-a`)
+                log(`    cheerio type: ${typeof $}, load type: ${typeof cheerio.load}`)
+                if (allDivs.length === 0) {
+                    log(`    FIRST 200 CHARS: ${html.substring(0, 200)}`)
+                }
+                const games = []
                 dayWrappers.each((_, dw) => {
                 const dateStr = $(dw).find('h3.date').text().trim()
                 const iso = parseDatePt(dateStr)
