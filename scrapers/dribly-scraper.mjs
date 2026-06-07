@@ -459,13 +459,31 @@ async function main() {
                         competicao = parts[1]?.trim() || ''
                     } else { competicao = compText }
 
-                    const resultText = $link.find('.result span').text().trim()
-                    const scoreMatch = resultText.match(/(\d+)\s*-\s*(\d+)/)
-                    const timeText = $link.find('.time').text().trim() || $link.find('.hour').text().trim()
-                    const locText = $link.find('.location').text().trim() || $link.find('.place').text().trim()
-                    // Debug first game of each club
+                    // Results page: score in .results_text elements
+                    const resultsTexts = $link.find('.results_text')
+                    let scoreCasa = null, scoreFora = null
+                    if (resultsTexts.length >= 2) {
+                        scoreCasa = parseInt(resultsTexts.eq(0).text().trim())
+                        scoreFora = parseInt(resultsTexts.eq(1).text().trim())
+                        if (isNaN(scoreCasa)) scoreCasa = null
+                        if (isNaN(scoreFora)) scoreFora = null
+                    }
+                    // Calendar page: score in .result span
+                    const resultSpan = $link.find('.result span').text().trim()
+                    const spanMatch = resultSpan.match(/(\d+)\s*-\s*(\d+)/)
+                    if (spanMatch && scoreCasa === null) {
+                        scoreCasa = parseInt(spanMatch[1])
+                        scoreFora = parseInt(spanMatch[2])
+                    }
+
+                    // Time: .time or .hour
+                    const timeText = $link.find('.hour').text().trim() || $link.find('.time').text().trim()
+
+                    // Location: .location-wrapper text
+                    const locText = $link.find('.location-wrapper').text().trim() || $link.find('.location').text().trim()
+
                     if (parsedLinks === 1) {
-                        log(`    DEBUG game: resultText="${resultText || 'EMPTY'}" timeText="${timeText || 'EMPTY'}" locText="${locText || 'EMPTY'}"`)
+                        log(`    DEBUG: scores=${scoreCasa}-${scoreFora} time="${timeText || 'EMPTY'}" loc="${locText || 'EMPTY'}"`)
                     }
 
                     const logos = []
@@ -481,10 +499,10 @@ async function main() {
                     games.push({
                         slug, data: iso, hora: timeText || null,
                         equipa_casa: names[0] || '', equipa_fora: names[1] || '',
-                        resultado_casa: scoreMatch ? parseInt(scoreMatch[1]) : null,
-                        resultado_fora: scoreMatch ? parseInt(scoreMatch[2]) : null,
+                        resultado_casa: scoreCasa,
+                        resultado_fora: scoreFora,
                         escalao, competicao, local: locText || null,
-                        status: scoreMatch ? 'FINALIZADO' : 'AGENDADO',
+                        status: (scoreCasa !== null && scoreFora !== null) ? 'FINALIZADO' : 'AGENDADO',
                         logotipo_casa: logos[0] || null, logotipo_fora: logos[1] || null,
                         epoca: season,
                     })
