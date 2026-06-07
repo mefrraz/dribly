@@ -180,7 +180,7 @@ function Layout() {
             </footer>
             )}
 
-            {!isMapaPage && <BottomNav />}
+            <BottomNav />
             <PWAInstallBanner />
             <ToastContainer />
             <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
