@@ -115,7 +115,7 @@ async function ensureDeps() {
     console.log()
 
     try {
-        execSync('npm install @supabase/supabase-js cheerio', {
+        execSync('npm install @supabase/supabase-js cheerio jimp', {
             cwd: DEPS_DIR,
             stdio: 'pipe',
         })
@@ -184,7 +184,7 @@ async function main() {
 
     startSpinner()
     process.stdout.write(C.dim + '  A carregar clubes...' + C.reset)
-    const { data: clubs } = await supabase.from('clubs').select('id,name').order('name')
+    const { data: clubs } = await supabase.from('clubs').select('id,name,logo_url').order('name')
     stopSpinner()
 
     if (!clubs || clubs.length === 0) {
@@ -461,7 +461,43 @@ async function main() {
     const recentGames = [] // max 12, newest first
     const termWidth = process.stdout.columns || 100
 
-    function drawScreen(club, gameDone, total, clubIdx) {
+    // ── Logo to ASCII cache ────────────────────────────
+    const logoAsciiCache = new Map()
+
+    async function getLogoAscii(clubId, logoUrl) {
+        if (logoAsciiCache.has(clubId)) return logoAsciiCache.get(clubId)
+        if (!logoUrl) return null
+
+        try {
+            const Jimp = (await import(pathToFileURL(resolve(DEPS_DIR, 'node_modules', 'jimp')).href)).default
+            const res = await fetch(logoUrl)
+            if (!res.ok) return null
+            const buffer = Buffer.from(await res.arrayBuffer())
+            const image = await Jimp.read(buffer)
+            const w = Math.min(40, termWidth - 4)
+            const h = Math.round(w * 0.5) // maintain aspect
+            image.resize(w, h).greyscale()
+
+            const chars = ' .:;+=xX$@'
+            const lines = []
+            for (let y = 0; y < image.bitmap.height; y++) {
+                let line = ''
+                for (let x = 0; x < image.bitmap.width; x++) {
+                    const idx = (y * image.bitmap.width + x) * 4
+                    const r = image.bitmap.data[idx]
+                    const charIdx = Math.floor((r / 255) * (chars.length - 1))
+                    line += chars[charIdx]
+                }
+                lines.push(C.purple + line + C.reset)
+            }
+            logoAsciiCache.set(clubId, lines)
+            return lines
+        } catch {
+            return null
+        }
+    }
+
+    async function drawScreen(club, gameDone, total, clubIdx) {
         const lines = []
 
         // Header
@@ -469,19 +505,16 @@ async function main() {
         lines.push(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset)
         lines.push('')
 
-        // Big ASCII art + club name
-        const art = [
-            `       ${C.purple}▄████████▄${C.reset}`,
-            `     ${C.purple}▄██${C.reset}${C.bold}▀▀▀▀${C.reset}${C.purple}██▄${C.reset}     ${C.bold}${club.name}${C.reset}`,
-            `    ${C.purple}██${C.reset}${C.bold}▀      ▀${C.reset}${C.purple}██${C.reset}    ${C.dim}#${club.id}${C.reset}`,
-            `   ${C.purple}█${C.reset}${C.bold}▀   ●    ▀${C.reset}${C.purple}█${C.reset}`,
-            `  ${C.purple}█${C.reset}${C.bold}▀  ◯ ◯ ◯  ▀${C.reset}${C.purple}█${C.reset}`,
-            ` ${C.purple}█${C.reset}${C.bold}▀  ◯  ●  ◯  ▀${C.reset}${C.purple}█${C.reset}    ${C.dim}${season}${C.reset}`,
-            `  ${C.purple}█${C.reset}${C.bold}▀  ◯ ◯ ◯  ▀${C.reset}${C.purple}█${C.reset}`,
-            `   ${C.purple}█${C.reset}${C.bold}▀   ●    ▀${C.reset}${C.purple}█${C.reset}`,
-            `    ${C.purple}██${C.reset}${C.bold}▀      ▀${C.reset}${C.purple}██${C.reset}`,
-            `     ${C.purple}▀████████▀${C.reset}`,
-        ]
+        // Club info
+        lines.push(C.bold + club.name + C.reset + C.dim + `  #${club.id}` + C.reset)
+        lines.push('')
+
+        // Logo ASCII (fetched async)
+        const logoArt = await getLogoAscii(club.id, club.logo_url)
+        if (logoArt) {
+            for (const l of logoArt) lines.push('  ' + l)
+            lines.push('')
+        }
 
         // Club progress
         const gameBar = progressBar(gameDone, total, Math.min(40, termWidth - 15))
@@ -584,7 +617,7 @@ async function main() {
                 })
                 if (recentGames.length > 12) recentGames.pop()
 
-                drawScreen(club, gameDone, total, clubIdx)
+                await drawScreen(club, gameDone, total, clubIdx)
             }
 
             totalGames += games.length
