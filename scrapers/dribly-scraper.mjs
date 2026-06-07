@@ -12,7 +12,7 @@
  */
 
 import { execSync } from 'child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, unlinkSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 import { createInterface } from 'readline'
@@ -267,6 +267,13 @@ async function main() {
 
     // ── Scrape! ─────────────────────────────────────────
 
+    // Cleanup function
+    function cleanup() {
+        try { if (existsSync(LOG_FILE)) unlinkSync(LOG_FILE) } catch {}
+        try { const f = resolve(DEPS_DIR, 'debug_cal.html'); if (existsSync(f)) unlinkSync(f) } catch {}
+        try { const f = resolve(DEPS_DIR, 'debug_res.html'); if (existsSync(f)) unlinkSync(f) } catch {}
+    }
+
     // Ctrl+C handler — stops scrape and shows summary
     let stopped = false
     const onSigInt = () => {
@@ -282,10 +289,40 @@ async function main() {
         if (errors.length > 0) {
             console.log(C.red + `  ${errors.length} erros: ${errors.slice(0, 3).join(', ')}` + C.reset)
         }
+        console.log(C.dim + '  🧹 A limpar ficheiros temporários...' + C.reset)
+        cleanup()
+        console.log(C.green + '  ✅ Limpo.' + C.reset)
         console.log()
         process.exit(0)
     }
     process.on('SIGINT', onSigInt)
+
+    // ── Clean mode ──────────────────────────────────────
+    console.log(C.clear)
+    console.log(C.bold + C.purple + '  Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
+    console.log(C.dim + `  ${selectedClubs.length} clubes selecionados` + C.reset)
+    console.log()
+    console.log(C.bold + '  🧹 Dados existentes:' + C.reset)
+    console.log(`     ${C.purple}[1]${C.reset} Manter (adiciona/atualiza)`)
+    console.log(`     ${C.purple}[2]${C.reset} Limpar antes (apaga jogos dos clubes e re-importa)`)
+    console.log()
+
+    const cleanRl = createInterface({ input: process.stdin, output: process.stdout })
+    const cleanChoice = await new Promise(resolve => {
+        cleanRl.question(C.cyan + '  > ' + C.reset, resolve)
+    })
+    cleanRl.close()
+    const shouldClean = cleanChoice.trim() === '2'
+
+    if (shouldClean) {
+        console.log(C.yellow + '\n  🧹 A limpar jogos existentes...' + C.reset)
+        for (const club of selectedClubs) {
+            const name = club.name.replace(/'/g, "''")
+            await supabase.from(seasonTable).delete()
+                .or(`equipa_casa.ilike.%${name}%,equipa_fora.ilike.%${name}%`)
+        }
+        console.log(C.green + '  ✅ Dados anteriores removidos.\n' + C.reset)
+    }
 
     console.log(C.clear)
     console.log(C.bold + C.purple + '  Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
@@ -662,6 +699,9 @@ async function main() {
         console.log(C.red + `     Erros: ${errors.slice(0, 5).join(', ')}${errors.length > 5 ? '...' : ''}` + C.reset)
     }
 
+    console.log(C.dim + '  🧹 A limpar ficheiros temporários...' + C.reset)
+    cleanup()
+    console.log(C.green + '  ✅ Limpo.' + C.reset)
     console.log()
 }
 
