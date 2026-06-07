@@ -112,7 +112,7 @@ async function ensureDeps() {
     }
 
     console.log(C.cyan + '\n  📦 A instalar dependências...' + C.reset)
-    console.log(C.dim + '     @supabase/supabase-js + cheerio' + C.reset)
+    console.log(C.dim + '     @supabase/supabase-js + cheerio + jimp' + C.reset)
     console.log()
 
     try {
