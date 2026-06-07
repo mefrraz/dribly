@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Star, Heart, Trophy, ArrowRight, Loader2, Check, X, Search } from 'lucide-react'
+import { Heart, Trophy, ArrowRight, Loader2, Check, X, Search } from 'lucide-react'
 import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { useFollows } from '../hooks/useFollows'
 import { supabase } from '../lib/supabase'
@@ -15,9 +15,8 @@ interface Competition {
     association_name: string
 }
 
-const FAVORITE_SUGGESTIONS = ['fc-porto', 'sl-benfica', 'sporting-cp', 'ud-oliveirense']
-
-const FOLLOW_SUGGESTIONS = [
+const RECOMMENDED_CLUBS = [
+    'fc-porto', 'sl-benfica', 'sporting-cp', 'ud-oliveirense',
     'sc-lusitania', 'vitoria-sc', 'galitos-barreiro', 'cd-povoa',
     'sangalhos-dc', 'ovar-basquete',
 ]
@@ -82,11 +81,7 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
 
     // ---- Derived ----
 
-    const favClubs = FAVORITE_SUGGESTIONS
-        .map(slug => clubs.find(c => c.slug === slug))
-        .filter(Boolean) as Club[]
-
-    const followClubs = FOLLOW_SUGGESTIONS
+    const recommendedClubs = RECOMMENDED_CLUBS
         .map(slug => clubs.find(c => c.slug === slug))
         .filter(Boolean) as Club[]
 
@@ -203,12 +198,12 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
                         <Loader2 size={24} className="animate-spin text-dribly-purple" />
                     </div>
                 ) : step === 0 ? (
-                    /* ======== Step 0: Favorite club ======== */
+                    /* ======== Step 0: Recommended clubs ======== */
                     <>
                         <button onClick={finish} className="absolute top-4 right-4 p-1.5 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"><X size={16} /></button>
-                        <div className="w-12 h-12 mx-auto rounded-full bg-yellow-100 dark:bg-yellow-500/10 flex items-center justify-center mb-3"><Star size={22} className="text-yellow-500 fill-yellow-500" /></div>
-                        <h3 className="text-lg font-black text-zinc-900 dark:text-white text-center mb-1">Escolhe o teu clube</h3>
-                        <p className="text-xs text-zinc-400 text-center mb-4">Vai aparecer no topo da navegação.</p>
+                        <div className="w-12 h-12 mx-auto rounded-full bg-red-100 dark:bg-red-500/10 flex items-center justify-center mb-3"><Heart size={22} className="text-red-500 fill-red-500" /></div>
+                        <h3 className="text-lg font-black text-zinc-900 dark:text-white text-center mb-1">Clubes recomendados</h3>
+                        <p className="text-xs text-zinc-400 text-center mb-4">Segue os clubes que queres acompanhar.</p>
 
                         <div className="relative mb-4">
                             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
@@ -221,51 +216,19 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
                         ) : (
                             <>
                                 <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Sugestões</p>
-                                <div className="space-y-1.5 mb-5">{favClubs.map(c => renderClubRow(c))}</div>
+                                <div className="space-y-1.5 mb-5">{recommendedClubs.map(c => renderClubRow(c))}</div>
                             </>
                         )}
 
                         <div className="flex items-center justify-center gap-1.5 mb-4">
                             <div className="w-6 h-1.5 rounded-full bg-dribly-purple" />
-                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700" />
                             <div className="w-1.5 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700" />
                         </div>
                         <button onClick={() => goTo(1)} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full bg-dribly-purple text-white text-sm font-bold hover:bg-dribly-purple/90 active:scale-[0.97] shadow-sm shadow-dribly-purple/20 transition-all">Seguinte <ArrowRight size={15} /></button>
                         <button onClick={finish} className="block mx-auto mt-3 text-[11px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Saltar</button>
                     </>
-                ) : step === 1 ? (
-                    /* ======== Step 1: Follow clubs ======== */
-                    <>
-                        <button onClick={finish} className="absolute top-4 right-4 p-1.5 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"><X size={16} /></button>
-                        <div className="w-12 h-12 mx-auto rounded-full bg-red-100 dark:bg-red-500/10 flex items-center justify-center mb-3"><Heart size={22} className="text-red-500 fill-red-500" /></div>
-                        <h3 className="text-lg font-black text-zinc-900 dark:text-white text-center mb-1">Segue clubes</h3>
-                        <p className="text-xs text-zinc-400 text-center mb-4">Os jogos aparecem nos Seguidos.</p>
-
-                        <div className="relative mb-4">
-                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-                            <input type="text" value={clubQuery} onChange={e => setClubQuery(e.target.value)} placeholder="Pesquisar clubes..." className="w-full pl-9 pr-4 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-white/10 rounded-xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none transition-all focus:ring-2 focus:ring-dribly-purple/30 focus:border-dribly-purple" />
-                            {clubQuery && <button onClick={() => setClubQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-zinc-600"><X size={14} /></button>}
-                        </div>
-
-                        {clubSearchResults.length > 0 ? (
-                            <div className="space-y-1.5 mb-5">{clubSearchResults.map(c => renderClubRow(c))}</div>
-                        ) : (
-                            <>
-                                <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Sugestões</p>
-                                <div className="space-y-1.5 mb-5">{followClubs.map(c => renderClubRow(c))}</div>
-                            </>
-                        )}
-
-                        <div className="flex items-center justify-center gap-1.5 mb-4">
-                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700" />
-                            <div className="w-6 h-1.5 rounded-full bg-dribly-purple" />
-                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700" />
-                        </div>
-                        <button onClick={() => goTo(2)} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full bg-dribly-purple text-white text-sm font-bold hover:bg-dribly-purple/90 transition-all active:scale-[0.97] shadow-sm shadow-dribly-purple/20">Seguinte <ArrowRight size={15} /></button>
-                        <button onClick={finish} className="block mx-auto mt-3 text-[11px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">Saltar</button>
-                    </>
                 ) : (
-                    /* ======== Step 2: Follow competitions ======== */
+                    /* ======== Step 1: Follow competitions ======== */
                     <>
                         <button onClick={finish} className="absolute top-4 right-4 p-1.5 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"><X size={16} /></button>
                         <div className="w-12 h-12 mx-auto rounded-full bg-dribly-purple/10 dark:bg-dribly-purple/20 flex items-center justify-center mb-3"><Trophy size={22} className="text-dribly-purple" /></div>
@@ -298,7 +261,6 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
                         </div>
 
                         <div className="flex items-center justify-center gap-1.5 mb-4">
-                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700" />
                             <div className="w-1.5 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700" />
                             <div className="w-6 h-1.5 rounded-full bg-dribly-purple" />
                         </div>
