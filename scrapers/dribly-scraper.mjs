@@ -703,42 +703,43 @@ async function main() {
                     continue
                 }
 
-            const total = games.length
-            let gameDone = 0
+                const total = games.length
+                let gameDone = 0
 
-            // Show club result before processing games
-            if (total === 0) {
-                process.stdout.write(C.clear)
-                console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
-                console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length} — ${club.name}` + C.reset)
-                console.log(`  ${C.dim}Nenhum jogo encontrado${C.reset}`)
-                console.log()
-                // Still update overall count
-                totalGames += 0
-                continue
-            }
+                // Show club result before processing games
+                if (total === 0) {
+                    process.stdout.write(C.clear)
+                    console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
+                    console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length} — ${club.name}` + C.reset)
+                    console.log(`  ${C.dim}Nenhum jogo encontrado${C.reset}`)
+                    console.log()
+                    // Still update overall count
+                    totalGames += 0
+                    continue
+                }
 
-            for (const g of games) {
-                try {
-                    await supabase.from(seasonTable).upsert(g, { onConflict: 'slug' })
-                    totalGames++ // increment immediately for accurate Ctrl+C stats
-                } catch { /* continue */ }
-                gameDone++
+                for (const g of games) {
+                    try {
+                        await supabase.from(seasonTable).upsert(g, { onConflict: 'slug' })
+                        totalGames++ // increment immediately for accurate Ctrl+C stats
+                    } catch { /* continue */ }
+                    gameDone++
 
-                // Add to recent games
-                const dateShort = g.data ? g.data.slice(5) : '??-??'
-                const score = g.resultado_casa != null ? `${g.resultado_casa}-${g.resultado_fora}` : null
-                const icon = score ? C.green + '✓' + C.reset : C.yellow + '○' + C.reset
-                const text = `${dateShort} ${(g.equipa_casa||'?').slice(0,10)} ${score||'vs'} ${(g.equipa_fora||'?').slice(0,10)}`
+                    // Add to recent games
+                    const dateShort = g.data ? g.data.slice(5) : '??-??'
+                    const score = g.resultado_casa != null ? `${g.resultado_casa}-${g.resultado_fora}` : null
+                    const icon = score ? C.green + '✓' + C.reset : C.yellow + '○' + C.reset
+                    const text = `${dateShort} ${(g.equipa_casa||'?').slice(0,10)} ${score||'vs'} ${(g.equipa_fora||'?').slice(0,10)}`
 
-                recentGames.unshift({
-                    icon, text,
-                    status: score ? 'FINALIZADO' : 'AGENDADO',
-                    score,
-                })
-                if (recentGames.length > 12) recentGames.pop()
+                    recentGames.unshift({
+                        icon, text,
+                        status: score ? 'FINALIZADO' : 'AGENDADO',
+                        score,
+                    })
+                    if (recentGames.length > 12) recentGames.pop()
 
-                await drawScreen(club, gameDone, total, clubIdx, false)
+                    await drawScreen(club, gameDone, total, clubIdx, false)
+                }
             }
 
         }
