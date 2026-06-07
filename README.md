@@ -31,9 +31,9 @@
 
 ---
 
-## 🎯 Porquê o Dribly
+## 🎯 Porquê a Dribly
 
-O basquetebol português tem centenas de clubes e dezenas de competições, mas as plataformas disponíveis ou são pagas, ou desktop-only, ou limitadas a uma competição. O Dribly preenche essa lacuna com uma app 100% gratuita, mobile-first e open source.
+O basquetebol português tem centenas de clubes e dezenas de competições, mas as plataformas disponíveis ou são pagas, ou desktop-only, ou limitadas a uma competição. A Dribly preenche essa lacuna com uma app 100% gratuita, mobile-first e open source.
 
 | Funcionalidade | Dribly | FPB.pt | Swish | TugaBasket |
 |---|---|---|---|---|
@@ -147,7 +147,7 @@ npm run build      # tsc + vitest + vite build
 
 ## ⚙️ Arquitetura
 
-O Dribly é uma **SPA sem backend próprio**. Toda a lógica vive no browser ou em Edge Functions serverless.
+A Dribly é uma **SPA sem backend própria**. Toda a lógica vive no browser ou em Edge Functions serverless.
 
 ```
 Browser (React SPA)
