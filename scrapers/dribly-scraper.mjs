@@ -271,7 +271,16 @@ async function main() {
     function cleanup() {
         try {
             if (existsSync(DEPS_DIR)) {
-                rmSync(DEPS_DIR, { recursive: true, force: true })
+                if (keepLog) {
+                    // Remove node_modules only, keep logs
+                    const nm = resolve(DEPS_DIR, 'node_modules')
+                    if (existsSync(nm)) rmSync(nm, { recursive: true, force: true })
+                    // Remove debug HTML
+                    try { const f = resolve(DEPS_DIR, 'debug_cal.html'); if (existsSync(f)) rmSync(f, { force: true }) } catch {}
+                    try { const f = resolve(DEPS_DIR, 'debug_res.html'); if (existsSync(f)) rmSync(f, { force: true }) } catch {}
+                } else {
+                    rmSync(DEPS_DIR, { recursive: true, force: true })
+                }
             }
         } catch {}
     }
@@ -299,7 +308,7 @@ async function main() {
     }
     process.on('SIGINT', onSigInt)
 
-    // ── Clean mode ──────────────────────────────────────
+    // ── Options ─────────────────────────────────────────
     console.log(C.clear)
     console.log(C.bold + C.purple + '  Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
     console.log(C.dim + `  ${selectedClubs.length} clubes selecionados` + C.reset)
@@ -308,13 +317,19 @@ async function main() {
     console.log(`     ${C.purple}[1]${C.reset} Manter (adiciona/atualiza)`)
     console.log(`     ${C.purple}[2]${C.reset} Limpar antes (apaga jogos dos clubes e re-importa)`)
     console.log()
+    console.log(C.bold + '  📋 Ficheiro de log:' + C.reset)
+    console.log(`     ${C.purple}[1]${C.reset} Manter log (para debug)`)
+    console.log(`     ${C.purple}[2]${C.reset} Apagar log ao sair`)
+    console.log()
 
-    const cleanRl = createInterface({ input: process.stdin, output: process.stdout })
-    const cleanChoice = await new Promise(resolve => {
-        cleanRl.question(C.cyan + '  > ' + C.reset, resolve)
+    const optRl = createInterface({ input: process.stdin, output: process.stdout })
+    const optAnswer = await new Promise(resolve => {
+        optRl.question(C.cyan + '  Clean,Log > ' + C.reset, resolve)
     })
-    cleanRl.close()
-    const shouldClean = cleanChoice.trim() === '2'
+    optRl.close()
+    const parts = optAnswer.split(',').map(s => s.trim())
+    const shouldClean = parts[0] === '2'
+    const keepLog = parts[1] !== '2' // default: keep
 
     if (shouldClean) {
         console.log(C.yellow + '\n  🧹 A limpar jogos existentes...' + C.reset)
