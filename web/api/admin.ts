@@ -253,30 +253,42 @@ async function handleUpsertClub(payload?: Record<string, unknown>) {
     const club = payload?.club as Record<string, unknown>
     if (!club?.id) return json({ error: 'club.id required' }, 400)
 
-    // Upsert: use POST with Prefer: resolution=merge-duplicates
-    const res = await supabaseRest('clubs', {
-        method: 'POST',
-        body: JSON.stringify({
-            id: club.id,
-            name: club.name,
-            short_name: club.short_name || null,
-            slug: club.slug,
-            search_name: club.search_name || (club.name as string)?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''),
-            primary_color: club.primary_color || null,
-            logo_url: club.logo_url || null,
-            logo_secondary: club.logo_secondary || null,
-            priority: club.priority || null,
-        }),
-        headers: { Prefer: 'resolution=merge-duplicates' },
-    })
-
-    if (!res.ok) {
-        const err = await res.text()
-        return json({ error: `Upsert failed: ${err}` }, 502)
+    // Only send fields that exist in the clubs table
+    const body: Record<string, unknown> = {
+        id: club.id,
+        name: club.name,
+        slug: club.slug,
+        search_name: club.search_name || String(club.name || '').toLowerCase(),
     }
+    if (club.short_name !== undefined) body.short_name = club.short_name
+    if (club.primary_color !== undefined) body.primary_color = club.primary_color
+    if (club.logo_url !== undefined) body.logo_url = club.logo_url
+    if (club.logo_secondary !== undefined) body.logo_secondary = club.logo_secondary
+    if (club.priority !== undefined) body.priority = club.priority
 
-    const rows = (await res.json()) as Array<Record<string, unknown>>
-    return json({ ok: true, club: rows[0] })
+    try {
+        const res = await supabaseRest('clubs', {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: { Prefer: 'resolution=merge-duplicates' },
+        })
+
+        if (!res.ok) {
+            const err = await res.text()
+            return json({ error: `Upsert failed: ${err}` }, 502)
+        }
+
+        const text = await res.text()
+        if (!text) {
+            // Upsert succeeded but returned no body — that's OK
+            return json({ ok: true, club: body })
+        }
+        const rows = JSON.parse(text) as Array<Record<string, unknown>>
+        return json({ ok: true, club: rows[0] })
+    } catch (err) {
+        console.error('[admin] upsertClub error:', err)
+        return json({ error: 'Internal error updating club' }, 500)
+    }
 }
 
 async function handleUpdateGame(payload?: Record<string, unknown>) {
