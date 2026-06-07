@@ -128,10 +128,16 @@ function ZoomWatcher({ onZoom, onMove }: { onZoom: (z: number) => void; onMove: 
 function LocateButton({ mapRef }: { mapRef: React.RefObject<L.Map | null> }) {
     const [locating, setLocating] = useState(false)
     const [hasLocated, setHasLocated] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     const handleLocate = () => {
-        if (!navigator.geolocation) return
+        if (!navigator.geolocation) {
+            setError('Geolocalização não disponível neste dispositivo.')
+            setTimeout(() => setError(null), 4000)
+            return
+        }
         setLocating(true)
+        setError(null)
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const m = mapRef.current
@@ -150,20 +156,36 @@ function LocateButton({ mapRef }: { mapRef: React.RefObject<L.Map | null> }) {
                 setLocating(false)
                 setHasLocated(true)
             },
-            () => { setLocating(false) },
-            { enableHighAccuracy: true, timeout: 10000 }
+            (err) => {
+                setLocating(false)
+                const messages: Record<number, string> = {
+                    1: 'Permissão negada. Verifica as definições de privacidade.',
+                    2: 'Posição indisponível. Tenta outra vez.',
+                    3: 'Tempo esgotado. Verifica a ligação.',
+                }
+                setError(messages[err.code] || 'Erro ao obter localização.')
+                setTimeout(() => setError(null), 4000)
+            },
+            { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
         )
     }
 
     return (
-        <button
-            onClick={handleLocate}
-            disabled={locating}
-            className="shrink-0 p-2.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-lg hover:bg-white dark:hover:bg-zinc-800 transition-colors"
-            title="Localizar-me"
-        >
-            <Navigation size={18} className={locating ? 'animate-spin text-dribly-purple' : hasLocated ? 'text-blue-500' : 'text-dribly-purple'} />
-        </button>
+        <div className="relative shrink-0">
+            <button
+                onClick={handleLocate}
+                disabled={locating}
+                className="p-2.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-zinc-200 dark:border-white/10 rounded-xl shadow-lg hover:bg-white dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                title="Localizar-me"
+            >
+                <Navigation size={18} className={locating ? 'animate-spin text-dribly-purple' : hasLocated ? 'text-blue-500' : 'text-dribly-purple'} />
+            </button>
+            {error && (
+                <div className="absolute top-full right-0 mt-1.5 w-56 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2 text-[11px] text-red-700 dark:text-red-300 shadow-lg whitespace-normal">
+                    {error}
+                </div>
+            )}
+        </div>
     )
 }
 
