@@ -330,10 +330,20 @@ async function main() {
         const resHtml = await resRes.text()
         log(`  Calendar HTML: ${calHtml.length} chars, Results HTML: ${resHtml.length} chars`)
 
+        // DEBUG: save first club HTML to disk
+        if (!existsSync(resolve(DEPS_DIR, 'debug_cal.html'))) {
+            writeFileSync(resolve(DEPS_DIR, 'debug_cal.html'), calHtml)
+            writeFileSync(resolve(DEPS_DIR, 'debug_res.html'), resHtml)
+            log(`  Saved debug HTML to ${DEPS_DIR}/debug_cal.html and debug_res.html`)
+        }
+
         function parse(html) {
-            const $ = cheerio.load(html)
-            const games = []
-            $('.day-wrapper').each((_, dw) => {
+            try {
+                const $ = cheerio.load(html)
+                const games = []
+                const dayWrappers = $('.day-wrapper')
+                log(`    cheerio loaded OK, found ${dayWrappers.length} .day-wrapper elements`)
+                dayWrappers.each((_, dw) => {
                 const dateStr = $(dw).find('h3.date').text().trim()
                 const iso = parseDatePt(dateStr)
                 if (!iso) return
@@ -385,6 +395,10 @@ async function main() {
                 })
             })
             return games
+            } catch (e) {
+                log(`    PARSE ERROR: ${e.message}`)
+                return []
+            }
         }
 
         const calGames = parse(calHtml)
