@@ -14,7 +14,7 @@
 import { execSync } from 'child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { resolve, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 import { createInterface } from 'readline'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -144,8 +144,11 @@ async function main() {
     await ensureDeps()
 
     // Load modules from deps dir
-    const { createClient } = await import(resolve(DEPS_DIR, 'node_modules', '@supabase', 'supabase-js', 'dist', 'main', 'index.mjs'))
-    const cheerio = await import(resolve(DEPS_DIR, 'node_modules', 'cheerio', 'dist', 'main.js'))
+    const supabasePath = pathToFileURL(resolve(DEPS_DIR, 'node_modules', '@supabase', 'supabase-js')).href
+    const cheerioPath = pathToFileURL(resolve(DEPS_DIR, 'node_modules', 'cheerio')).href
+    const { createClient } = await import(supabasePath)
+    const cheerioModule = await import(cheerioPath)
+    const cheerio = cheerioModule.default || cheerioModule
 
     // Load env
     if (!loadEnv()) {
