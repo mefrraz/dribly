@@ -91,54 +91,56 @@ async function callAdmin<T>(
 
 export function useAdminApi() {
     const { getToken } = useClerkAuth()
+    // Use the supabase template so the JWT includes public_metadata
+    const getAdminToken = () => getToken({ template: 'supabase' })
 
     return {
         getStats: () =>
-            callAdmin<AdminStats>('getStats', undefined, getToken),
+            callAdmin<AdminStats>('getStats', undefined, getAdminToken),
 
         listUsers: (limit = 50, offset = 0) =>
             callAdmin<{ users: AdminUser[]; total: number }>(
                 'listUsers',
                 { limit, offset },
-                getToken,
+                getAdminToken,
             ),
 
         getUserFollows: (userId: string) =>
             callAdmin<{ follows: AdminFollow[] }>(
                 'getUserFollows',
                 { userId },
-                getToken,
+                getAdminToken,
             ),
 
         deleteUser: (userId: string) =>
             callAdmin<{ ok: boolean; errors?: string[] }>(
                 'deleteUser',
                 { userId },
-                getToken,
+                getAdminToken,
             ),
 
         listClubs: () =>
-            callAdmin<{ clubs: AdminClub[] }>('listClubs', undefined, getToken),
+            callAdmin<{ clubs: AdminClub[] }>('listClubs', undefined, getAdminToken),
 
         upsertClub: (club: Partial<AdminClub> & { id: number }) =>
             callAdmin<{ ok: boolean; club: AdminClub }>(
                 'upsertClub',
                 { club },
-                getToken,
+                getAdminToken,
             ),
 
         updateGame: (slug: string, updates: Record<string, unknown>) =>
             callAdmin<{ ok: boolean }>(
                 'updateGame',
                 { slug, updates },
-                getToken,
+                getAdminToken,
             ),
 
         listCompetitionsMeta: () =>
             callAdmin<{ competitions: AdminCompetitionMeta[] }>(
                 'listCompetitionsMeta',
                 undefined,
-                getToken,
+                getAdminToken,
             ),
 
         upsertCompetitionMeta: (
@@ -147,7 +149,7 @@ export function useAdminApi() {
             callAdmin<{ ok: boolean; competition: AdminCompetitionMeta }>(
                 'upsertCompetitionMeta',
                 { competition: comp },
-                getToken,
+                getAdminToken,
             ),
     }
 }
