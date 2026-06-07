@@ -266,25 +266,23 @@ async function main() {
 
     // ── Scrape! ─────────────────────────────────────────
 
-    // Ctrl+C handler — first press shows selection, second exits
-    let ctrlCPressed = false
+    // Ctrl+C handler — stops scrape and shows summary
+    let stopped = false
     const onSigInt = () => {
-        if (ctrlCPressed) {
-            process.stdout.write(C.showCursor)
-            process.exit(0)
-        }
-        ctrlCPressed = true
+        stopped = true
+        process.stdout.write(C.showCursor)
         process.stdout.write(C.clear)
-        console.log(C.bold + C.yellow + '  ⏸️  Escolheste:' + C.reset)
-        console.log(C.dim + `  Época: ${season}  |  ${selectedClubs.length} clubes  |  ${totalGames} jogos guardados` + C.reset)
-        console.log(C.dim + `  Progresso: ${done}/${selectedClubs.length} clubes` + C.reset)
+        console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset)
         console.log()
-        console.log(C.red + '  Ctrl+C novamente para sair' + C.reset)
-        console.log(C.green + '  A continuar em 2s...' + C.reset)
-        // Resume after 2 seconds
-        setTimeout(() => {
-            ctrlCPressed = false
-        }, 2000)
+        console.log(C.bold + C.yellow + '  ⏸️  Scrape interrompido' + C.reset)
+        console.log(C.dim + `  ${done} clubes processados, ${totalGames} jogos guardados` + C.reset)
+        console.log(C.dim + `  Época: ${season}  |  ${selectedClubs.length - done} clubes restantes` + C.reset)
+        console.log()
+        if (errors.length > 0) {
+            console.log(C.red + `  ${errors.length} erros: ${errors.slice(0, 3).join(', ')}` + C.reset)
+        }
+        console.log()
+        process.exit(0)
     }
     process.on('SIGINT', onSigInt)
 
@@ -469,9 +467,10 @@ async function main() {
         if (!logoUrl) return null
 
         try {
-            const Jimp = (await import(pathToFileURL(resolve(DEPS_DIR, 'node_modules', 'jimp')).href)).default
+            const JimpModule = await import(pathToFileURL(resolve(DEPS_DIR, 'node_modules', 'jimp')).href)
+            const Jimp = JimpModule.default || JimpModule
             const res = await fetch(logoUrl)
-            if (!res.ok) return null
+            if (!res.ok) { log(`  Logo fetch failed: ${res.status} for ${logoUrl}`); return null }
             const buffer = Buffer.from(await res.arrayBuffer())
             const image = await Jimp.read(buffer)
             const w = Math.min(40, termWidth - 4)
@@ -492,7 +491,8 @@ async function main() {
             }
             logoAsciiCache.set(clubId, lines)
             return lines
-        } catch {
+        } catch (e) {
+            log(`  Logo ASCII failed: ${e.message}`)
             return null
         }
     }
@@ -553,10 +553,11 @@ async function main() {
     console.log(C.bold + C.yellow + `  Ctrl+C para parar` + C.reset)
     console.log()
 
-    for (let i = 0; i < selectedClubs.length; i += 4) {
+    for (let i = 0; i < selectedClubs.length && !stopped; i += 4) {
         const batch = selectedClubs.slice(i, i + 4)
 
         for (const club of batch) {
+            if (stopped) break
             done++
             const clubIdx = done
 
