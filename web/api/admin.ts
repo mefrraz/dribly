@@ -73,6 +73,19 @@ function supabaseRest(table: string, init?: RequestInit) {
 
 // ── Auth guard ─────────────────────────────────────────
 
+function decodeJwt(token: string): Record<string, unknown> | null {
+    try {
+        const parts = token.split('.')
+        if (parts.length !== 3) return null
+        // Decode the payload (middle part) from base64url
+        const payload = parts[1]
+        const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+        return JSON.parse(decoded) as Record<string, unknown>
+    } catch {
+        return null
+    }
+}
+
 async function verifyAdmin(request: Request): Promise<string | null> {
     const auth = request.headers.get('Authorization')
     if (!auth?.startsWith('Bearer ')) {
@@ -80,35 +93,23 @@ async function verifyAdmin(request: Request): Promise<string | null> {
         return null
     }
     const token = auth.slice(7)
-    console.log('[admin] token prefix:', token.substring(0, 20) + '...')
 
-    try {
-        // Verify session token via Clerk Backend API
-        const res = await clerkApi('/tokens/verify', {
-            method: 'POST',
-            body: JSON.stringify({ token }),
-        })
-
-        if (!res.ok) {
-            console.log('[admin] token verification failed:', res.status, await res.text().catch(() => ''))
-            return null
-        }
-
-        const data = (await res.json()) as {
-            id?: string
-            public_metadata?: { role?: string }
-        }
-        console.log('[admin] verified user:', data.id, 'role:', data.public_metadata?.role)
-
-        if (data.public_metadata?.role !== 'admin') {
-            console.log('[admin] user is not admin')
-            return null
-        }
-        return data.id ?? null
-    } catch (err) {
-        console.error('[admin] verifyAdmin exception:', err)
+    // Decode JWT locally (no external API call needed)
+    const payload = decodeJwt(token)
+    if (!payload) {
+        console.log('[admin] failed to decode JWT')
         return null
     }
+
+    console.log('[admin] JWT payload:', JSON.stringify({ sub: payload.sub, metadata: payload.public_metadata }))
+
+    const metadata = payload.public_metadata as { role?: string } | undefined
+    if (metadata?.role !== 'admin') {
+        console.log('[admin] user is not admin, role:', metadata?.role)
+        return null
+    }
+
+    return (payload.sub as string) ?? null
 }
 
 // ── Action handlers ────────────────────────────────────
