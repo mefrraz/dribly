@@ -124,7 +124,21 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     onAuthSuccess?.('signin')
                 } else if (result.status === 'needs_second_factor' || (result.status as string) === 'needs_client_trust') {
                     // Client Trust / 2FA — email code needed
-                    setIsClientTrust((result.status as string) === 'needs_client_trust')
+                    const isCT = (result.status as string) === 'needs_client_trust'
+                    setIsClientTrust(isCT)
+                    // For client trust, explicitly trigger the email sending
+                    if (isCT) {
+                        try {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            await (signIn as any).prepareFirstFactor({ strategy: 'email_code' })
+                            console.log('[AuthModal] client trust email code sent')
+                        } catch (ctErr) {
+                            console.error('[AuthModal] client trust email failed:', ctErr)
+                            setErrorMsg('Erro ao enviar código. Tenta novamente.')
+                            setStatus('error')
+                            return
+                        }
+                    }
                     setSecondFactorNeeded(true)
                     setStatus('sent')
                     setErrorMsg('')
@@ -295,6 +309,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     </div>
                 ) : (
                     <>
+                        {!secondFactorNeeded && !signUpVerificationNeeded && (
                         <div className="text-center mb-5">
                             <div className="w-14 h-14 mx-auto rounded-full bg-dribly-purple/10 flex items-center justify-center mb-3">
                                 {mode === 'signin' ? (
@@ -314,6 +329,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                         : 'Regista-te para seguir clubes e competições.'}
                             </p>
                         </div>
+                        )}
 
                         {mode === 'forgot' ? (
                             /* Forgot password mode */
@@ -419,12 +435,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                         ) : signUpVerificationNeeded ? (
                             /* Sign-up email verification — enter code */
                             <div className="space-y-3">
-                                <div className="text-center">
-                                    <CheckCircle size={24} className="text-green-500 mx-auto mb-1" />
-                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-3">
-                                        Código enviado para o teu email.
-                                    </p>
-                                </div>
+                                <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center">
+                                    Código enviado para <strong>{email}</strong>
+                                </p>
                                 <div className="relative">
                                     <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                                     <input
@@ -450,7 +463,18 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                     {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : null}
                                     Verificar código
                                 </button>
-                                <p className="text-center">
+                                <div className="flex gap-3 justify-center">
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            setStatus('loading')
+                                            try { await signUp!.prepareVerification({ strategy: 'email_code' }) } catch { /* ignore */ }
+                                            setStatus('sent')
+                                        }}
+                                        className="text-[11px] text-dribly-purple hover:underline"
+                                    >
+                                        Reenviar código
+                                    </button>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -463,17 +487,14 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                     >
                                         Voltar
                                     </button>
-                                </p>
+                                </div>
                             </div>
                         ) : secondFactorNeeded ? (
                             /* Client Trust 2FA — enter email code */
                             <div className="space-y-3">
-                                <div className="text-center">
-                                    <CheckCircle size={24} className="text-green-500 mx-auto mb-1" />
-                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-3">
-                                        Código de verificação enviado para o teu email.
-                                    </p>
-                                </div>
+                                <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center">
+                                    Código enviado para <strong>{email}</strong>
+                                </p>
                                 <div className="relative">
                                     <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                                     <input
@@ -499,7 +520,23 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                     {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : null}
                                     Verificar código
                                 </button>
-                                <p className="text-center">
+                                <div className="flex gap-3 justify-center">
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            setStatus('loading')
+                                            try {
+                                                if (isClientTrust) {
+                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                    await (signIn as any).prepareFirstFactor({ strategy: 'email_code' })
+                                                }
+                                            } catch { /* ignore */ }
+                                            setStatus('sent')
+                                        }}
+                                        className="text-[11px] text-dribly-purple hover:underline"
+                                    >
+                                        Reenviar código
+                                    </button>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -512,7 +549,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                     >
                                         Voltar
                                     </button>
-                                </p>
+                                </div>
                             </div>
                         ) : (
                         <form onSubmit={handleSubmit} className="space-y-3">
@@ -588,7 +625,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                         )}
 
                         {/* Forgot password — sign in only */}
-                        {mode === 'signin' && (
+                        {!secondFactorNeeded && !signUpVerificationNeeded && mode === 'signin' && (
                             <p className="text-center mt-2">
                                 <button
                                     type="button"
@@ -601,6 +638,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                         )}
 
                         {/* Mode switch */}
+                        {!secondFactorNeeded && !signUpVerificationNeeded && (
                         <p className="text-[11px] text-zinc-400 dark:text-zinc-500 text-center mt-4">
                             {mode === 'forgot' ? (
                                 <>Lembraste-te? <button onClick={switchMode} className="text-dribly-purple font-bold hover:underline">Iniciar sessão</button></>
@@ -610,6 +648,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                 <>Já tens conta? <button onClick={switchMode} className="text-dribly-purple font-bold hover:underline">Iniciar sessão</button></>
                             )}
                         </p>
+                        )}
                     </>
                 )}
             </div>
