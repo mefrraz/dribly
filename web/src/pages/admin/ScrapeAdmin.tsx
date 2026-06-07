@@ -247,6 +247,25 @@ export default function ScrapeAdmin() {
                             </p>
                         </div>
 
+                        {/* Credentials */}
+                        <div className="bg-amber-50 dark:bg-amber-900/10 rounded-xl p-3 mb-3 border border-amber-200 dark:border-amber-800">
+                            <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase mb-1.5">Credenciais necessárias</p>
+                            <p className="text-xs text-amber-700 dark:text-amber-300">
+                                O script pede-te estas variáveis se não encontrar o <code className="text-amber-800 dark:text-amber-200">.env</code>:
+                            </p>
+                            <div className="mt-2 space-y-1">
+                                <code className="block text-[11px] font-mono bg-amber-100 dark:bg-amber-900/20 px-2 py-1 rounded">
+                                    SUPABASE_URL
+                                </code>
+                                <code className="block text-[11px] font-mono bg-amber-100 dark:bg-amber-900/20 px-2 py-1 rounded">
+                                    SUPABASE_SERVICE_ROLE_KEY
+                                </code>
+                            </div>
+                            <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-1.5">
+                                Vercel → Dribly → Settings → Environment Variables
+                            </p>
+                        </div>
+
                         {/* Run command */}
                         <div className="bg-zinc-50 dark:bg-zinc-900 rounded-xl p-3">
                             <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1.5">Como correr</p>

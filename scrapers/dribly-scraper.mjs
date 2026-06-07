@@ -123,20 +123,56 @@ async function ensureDeps() {
 // ── Load env ───────────────────────────────────────────
 
 function loadEnv() {
-    const envPath = resolve(__dirname, '..', 'web', '.env')
-    if (!existsSync(envPath)) return false
-
-    const content = readFileSync(envPath, 'utf-8')
-    for (const line of content.split('\n')) {
-        const trimmed = line.trim()
-        if (!trimmed || trimmed.startsWith('#')) continue
-        const eq = trimmed.indexOf('=')
-        if (eq === -1) continue
-        const key = trimmed.slice(0, eq)
-        const val = trimmed.slice(eq + 1)
-        if (!process.env[key]) process.env[key] = val
+    // Try multiple locations
+    const paths = [
+        resolve(DEPS_DIR, '.env'),
+        resolve(__dirname, '..', 'web', '.env'),
+        resolve(process.cwd(), '.env'),
+        resolve(process.cwd(), '..', 'web', '.env'),
+    ]
+    for (const envPath of paths) {
+        if (existsSync(envPath)) {
+            const content = readFileSync(envPath, 'utf-8')
+            for (const line of content.split('\n')) {
+                const trimmed = line.trim()
+                if (!trimmed || trimmed.startsWith('#')) continue
+                const eq = trimmed.indexOf('=')
+                if (eq === -1) continue
+                const key = trimmed.slice(0, eq)
+                const val = trimmed.slice(eq + 1)
+                if (!process.env[key]) process.env[key] = val
+            }
+            return true
+        }
     }
-    return true
+    return false
+}
+
+async function askCredentials() {
+    const rl = createInterface({ input: process.stdin, output: process.stdout })
+
+    console.log(C.yellow + '  ⚠️  Ficheiro .env não encontrado.' + C.reset)
+    console.log(C.dim + '  As credenciais NÃO são guardadas — só ficam nesta sessão.' + C.reset)
+    console.log()
+
+    // Show hint from admin page
+    console.log(C.dim + '  Encontras estes valores em:' + C.reset)
+    console.log(C.dim + '  Vercel → Dribly → Settings → Environment Variables' + C.reset)
+    console.log(C.dim + '  ou em web/.env (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY)' + C.reset)
+    console.log()
+
+    const ask = (q) => new Promise(resolve => rl.question(C.cyan + q + C.reset, resolve))
+
+    const url = await ask('  SUPABASE_URL: ')
+    const key = await ask('  SUPABASE_SERVICE_ROLE_KEY: ')
+    rl.close()
+
+    if (!url || !key) {
+        console.log(C.red + '\n  ❌ Credenciais obrigatórias.\n' + C.reset)
+        process.exit(1)
+    }
+
+    return { url, key }
 }
 
 // ── Main ───────────────────────────────────────────────
@@ -156,17 +192,18 @@ async function main() {
     const cheerioModule = loadModuleSync('cheerio')
     const cheerio = cheerioModule.default || cheerioModule
 
-    // Load env
+    // Load env or ask for credentials
     if (!loadEnv()) {
-        console.log(C.red + '  ❌ Ficheiro web/.env não encontrado.' + C.reset)
-        process.exit(1)
+        const creds = await askCredentials()
+        process.env.SUPABASE_URL = creds.url
+        process.env.SUPABASE_SERVICE_ROLE_KEY = creds.key
     }
 
     const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
     const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!SUPABASE_URL || !SUPABASE_KEY) {
-        console.log(C.red + '  ❌ SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY em falta no .env' + C.reset)
+        console.log(C.red + '  ❌ SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY em falta.' + C.reset)
         process.exit(1)
     }
 
