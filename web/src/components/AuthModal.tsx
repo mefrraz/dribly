@@ -25,6 +25,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
     const [forgotStep, setForgotStep] = useState<'email' | 'code' | 'password'>('email')
     const [showPassword, setShowPassword] = useState(false)
     const [showNewPassword, setShowNewPassword] = useState(false)
+    // Client Trust 2FA — email code second factor
+    const [secondFactorNeeded, setSecondFactorNeeded] = useState(false)
+    const [secondFactorCode, setSecondFactorCode] = useState('')
 
     const isLoaded = siLoaded && suLoaded
 
@@ -41,6 +44,8 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
         setForgotStep('email')
         setShowPassword(false)
         setShowNewPassword(false)
+        setSecondFactorNeeded(false)
+        setSecondFactorCode('')
     }
 
     const handleClose = () => {
@@ -82,6 +87,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     setStatus('pending')
                 }
             } else {
+                // Sign-in — may trigger Client Trust (email code 2FA)
                 const result = await Promise.race([
                     signIn!.create({
                         identifier: email.trim(),
@@ -91,11 +97,17 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                         setTimeout(() => reject(new Error('timeout')), 15000)
                     ),
                 ])
+
                 if (result.status === 'complete') {
                     await setActive!({ session: result.createdSessionId! })
                     reset()
                     onClose()
                     onAuthSuccess?.('signin')
+                } else if (result.status === 'needs_second_factor') {
+                    // Client Trust — email code was sent automatically by Clerk
+                    setSecondFactorNeeded(true)
+                    setStatus('sent')
+                    setErrorMsg('')
                 } else {
                     setErrorMsg('Verificação adicional necessária. Verifica o teu email.')
                     setStatus('error')
@@ -118,6 +130,31 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                 setErrorMsg('Este email já está registado.')
             else
                 setErrorMsg(msg || 'Ocorreu um erro. Tenta novamente.')
+        }
+    }
+
+    /** Verify the email code sent by Clerk for Client Trust 2FA */
+    const handleVerifySecondFactor = async () => {
+        if (!secondFactorCode.trim() || !signIn) return
+        setStatus('loading')
+        setErrorMsg('')
+        try {
+            const result = await signIn.attemptSecondFactor({
+                strategy: 'email_code',
+                code: secondFactorCode.trim(),
+            })
+            if (result.status === 'complete') {
+                await setActive!({ session: result.createdSessionId! })
+                reset()
+                onClose()
+                onAuthSuccess?.('signin')
+            } else {
+                setStatus('error')
+                setErrorMsg('Código inválido. Tenta novamente.')
+            }
+        } catch {
+            setStatus('error')
+            setErrorMsg('Código inválido ou expirado.')
         }
     }
 
@@ -327,6 +364,55 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                         </p>
                                     </div>
                                 )}
+                            </div>
+                        ) : secondFactorNeeded ? (
+                            /* Client Trust 2FA — enter email code */
+                            <div className="space-y-3">
+                                <div className="text-center">
+                                    <CheckCircle size={24} className="text-green-500 mx-auto mb-1" />
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-3">
+                                        Código de verificação enviado para o teu email.
+                                    </p>
+                                </div>
+                                <div className="relative">
+                                    <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input
+                                        type="text"
+                                        value={secondFactorCode}
+                                        onChange={e => setSecondFactorCode(e.target.value)}
+                                        placeholder="Código de 6 dígitos"
+                                        autoFocus
+                                        required
+                                        maxLength={6}
+                                        className="w-full pl-9 pr-4 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-white/10 rounded-xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none transition-all focus:ring-2 focus:ring-dribly-purple/30 focus:border-dribly-purple"
+                                    />
+                                </div>
+                                {status === 'error' && errorMsg && (
+                                    <p className="text-xs text-red-500 font-medium text-center">{errorMsg}</p>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={handleVerifySecondFactor}
+                                    disabled={!isLoaded || status === 'loading'}
+                                    className="w-full py-2.5 rounded-full bg-dribly-purple text-white text-sm font-bold hover:bg-dribly-purple/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.97] shadow-sm shadow-dribly-purple/20 flex items-center justify-center gap-2"
+                                >
+                                    {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : null}
+                                    Verificar código
+                                </button>
+                                <p className="text-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setSecondFactorNeeded(false)
+                                            setSecondFactorCode('')
+                                            setStatus('idle')
+                                            setErrorMsg('')
+                                        }}
+                                        className="text-[11px] text-zinc-400 hover:text-dribly-purple transition-colors"
+                                    >
+                                        Voltar
+                                    </button>
+                                </p>
                             </div>
                         ) : (
                         <form onSubmit={handleSubmit} className="space-y-3">
