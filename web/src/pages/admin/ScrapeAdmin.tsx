@@ -18,6 +18,7 @@ export default function ScrapeAdmin() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [showDates, setShowDates] = useState(false)
+    const [showScriptModal, setShowScriptModal] = useState(false)
 
     const {
         selected, progress, running, summary,
@@ -83,14 +84,13 @@ export default function ScrapeAdmin() {
 
                 <div className="flex-1" />
 
-                <a
-                    href="https://raw.githubusercontent.com/mefrraz/dribly/main/scrapers/dribly-scraper.mjs"
-                    download="dribly-scraper.mjs"
+                <button
+                    onClick={() => setShowScriptModal(true)}
                     className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-dribly-purple/10 hover:text-dribly-purple transition-colors flex items-center gap-1"
                     title="Descarrega o script para correr no teu PC (Node.js). Não gasta cota Vercel."
                 >
                     <Download size={11} /> Script
-                </a>
+                </button>
 
                 <span className="text-xs text-zinc-400">
                     {selected.size}/{clubs.length} clubes
@@ -204,6 +204,62 @@ export default function ScrapeAdmin() {
                     )}
                 </div>
             </div>
+
+            {/* Script modal */}
+            {showScriptModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                    onClick={() => setShowScriptModal(false)}>
+                    <div className="bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 max-w-md w-full mx-4 shadow-xl"
+                        onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-sm font-black text-zinc-900 dark:text-white flex items-center gap-2">
+                                <Download size={16} className="text-dribly-purple" />
+                                Dribly Scraper
+                            </h3>
+                            <button onClick={() => setShowScriptModal(false)}
+                                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+                                ✕
+                            </button>
+                        </div>
+
+                        <p className="text-xs text-zinc-500 mb-4">
+                            Script Node.js para scrape local. Zero cota Vercel — corre no teu PC.
+                        </p>
+
+                        {/* Download */}
+                        <a
+                            href="https://raw.githubusercontent.com/mefrraz/dribly/main/scrapers/dribly-scraper.mjs"
+                            download="dribly-scraper.mjs"
+                            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-dribly-purple text-white text-sm font-bold hover:bg-dribly-purple-dark transition-colors mb-4"
+                        >
+                            <Download size={14} />
+                            Descarregar dribly-scraper.mjs
+                        </a>
+
+                        {/* Dependencies */}
+                        <div className="bg-zinc-50 dark:bg-zinc-900 rounded-xl p-3 mb-3">
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1.5">Dependências</p>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                O script instala automaticamente: <code className="text-dribly-purple">@supabase/supabase-js</code> + <code className="text-dribly-purple">cheerio</code>
+                            </p>
+                            <p className="text-[10px] text-zinc-400 mt-1">
+                                Requer Node.js ≥ 18
+                            </p>
+                        </div>
+
+                        {/* Run command */}
+                        <div className="bg-zinc-50 dark:bg-zinc-900 rounded-xl p-3">
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1.5">Como correr</p>
+                            <code className="block text-xs text-zinc-700 dark:text-zinc-300 font-mono bg-zinc-100 dark:bg-zinc-800 px-3 py-2 rounded-lg">
+                                node dribly-scraper.mjs
+                            </code>
+                            <p className="text-[10px] text-zinc-400 mt-1.5">
+                                Interativo: escolhe época, clubes e vê o progresso no terminal.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
