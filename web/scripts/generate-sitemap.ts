@@ -73,13 +73,23 @@ async function main() {
     )
     console.log(`  ✅ ${compUrls.length} competições`)
 
-    // ── Games (current season) ──
-    const { data: games } = await supabase
-        .from('games_2025_2026')
-        .select('slug')
-        .limit(5000)
+    // ── Games (current season) — paginated (Supabase max 1000/request) ──
+    const allGames: { slug: string }[] = []
+    let rangeStart = 0
+    const PAGE_SIZE = 1000
+    while (true) {
+        const { data: batch } = await supabase
+            .from('games_2025_2026')
+            .select('slug')
+            .range(rangeStart, rangeStart + PAGE_SIZE - 1)
+            .order('data', { ascending: false })
+        if (!batch || batch.length === 0) break
+        allGames.push(...(batch as { slug: string }[]))
+        if (batch.length < PAGE_SIZE) break
+        rangeStart += PAGE_SIZE
+    }
 
-    const gameUrls = (games || []).map((g: { slug: string }) =>
+    const gameUrls = allGames.map((g: { slug: string }) =>
         url(`${BASE}/jogo/${g.slug}`, 'weekly', '0.5')
     )
     console.log(`  ✅ ${gameUrls.length} jogos`)
