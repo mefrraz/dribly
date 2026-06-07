@@ -20,7 +20,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
     const [username, setUsername] = useState('')
     const [resetCode, setResetCode] = useState('')
     const [newPassword, setNewPassword] = useState('')
-    const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'sent' | 'verified'>('idle')
+    const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'sent' | 'verified' | 'pending'>('idle')
     const [errorMsg, setErrorMsg] = useState('')
     const [forgotStep, setForgotStep] = useState<'email' | 'code' | 'password'>('email')
     const [showPassword, setShowPassword] = useState(false)
@@ -77,9 +77,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     onClose()
                     onAuthSuccess?.('signup')
                 } else {
-                    // email verification pending — still considered success from UX perspective
+                    // email verification pending — show as info, not error
                     setErrorMsg('Verifica o teu email para confirmares o registo.')
-                    setStatus('error')
+                    setStatus('pending')
                 }
             } else {
                 const result = await Promise.race([
@@ -381,9 +381,12 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                 </button>
                             </div>
 
-                            {/* Error */}
+                            {/* Status messages */}
                             {status === 'error' && errorMsg && (
                                 <p className="text-xs text-red-500 font-medium text-center">{errorMsg}</p>
+                            )}
+                            {status === 'pending' && errorMsg && (
+                                <p className="text-xs text-blue-600 dark:text-blue-400 font-medium text-center bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-xl">{errorMsg}</p>
                             )}
 
                             {/* Submit */}
