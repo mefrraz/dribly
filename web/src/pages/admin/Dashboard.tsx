@@ -150,23 +150,33 @@ export default function Dashboard() {
                     )}
                 </div>
 
-                {creds && showCreds && (
+                {showCreds && (
                     <div className="space-y-2">
-                        <div>
-                            <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">SUPABASE_URL</p>
-                            <code className="block text-[11px] font-mono bg-zinc-50 dark:bg-zinc-800 px-3 py-2 rounded-lg text-zinc-700 dark:text-zinc-300 break-all">
-                                {creds.supabaseUrl}
-                            </code>
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">SUPABASE_SERVICE_ROLE_KEY</p>
-                            <code className="block text-[11px] font-mono bg-zinc-50 dark:bg-zinc-800 px-3 py-2 rounded-lg text-zinc-700 dark:text-zinc-300 break-all">
-                                {creds.supabaseServiceRoleKey}
-                            </code>
-                        </div>
-                        <p className="text-[10px] text-amber-600 dark:text-amber-400">
-                            ⚠️ Estas credenciais são sensíveis. Usa apenas para o script local.
-                        </p>
+                        {!creds ? (
+                            <p className="text-xs text-zinc-500">A carregar...</p>
+                        ) : !creds.supabaseUrl && !creds.supabaseServiceRoleKey ? (
+                            <p className="text-xs text-red-500 font-bold">
+                                ⚠️ Credenciais indisponíveis. Verifica as env vars no Vercel: SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.
+                            </p>
+                        ) : (
+                            <>
+                                <div>
+                                    <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">SUPABASE_URL</p>
+                                    <code className="block text-[11px] font-mono bg-zinc-50 dark:bg-zinc-800 px-3 py-2 rounded-lg text-zinc-700 dark:text-zinc-300 break-all">
+                                        {creds.supabaseUrl}
+                                    </code>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-bold text-zinc-400 uppercase mb-1">SUPABASE_SERVICE_ROLE_KEY</p>
+                                    <code className="block text-[11px] font-mono bg-zinc-50 dark:bg-zinc-800 px-3 py-2 rounded-lg text-zinc-700 dark:text-zinc-300 break-all">
+                                        {creds.supabaseServiceRoleKey}
+                                    </code>
+                                </div>
+                                <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                                    ⚠️ Estas credenciais são sensíveis. Usa apenas para o script local.
+                                </p>
+                            </>
+                        )}
                     </div>
                 )}
             </div>
