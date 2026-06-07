@@ -286,10 +286,15 @@ async function main() {
     async function scrapeClub(clubId) {
         const url = (page) => `https://www.fpb.pt/${page}/clube_${clubId}/?epoca=${encodeURIComponent(season)}&escalao=S%C3%A9nior&genero=masculino`
 
-        const [calRes, resRes] = await Promise.all([
-            fetch(url('calendario'), { headers: { 'User-Agent': 'Mozilla/5.0' } }),
-            fetch(url('resultados'), { headers: { 'User-Agent': 'Mozilla/5.0' } }),
-        ])
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 15000)
+
+        try {
+            const [calRes, resRes] = await Promise.all([
+                fetch(url('calendario'), { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: controller.signal }),
+                fetch(url('resultados'), { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: controller.signal }),
+            ])
+            clearTimeout(timeout)
 
         const calHtml = await calRes.text()
         const resHtml = await resRes.text()
@@ -363,6 +368,9 @@ async function main() {
             }
         }
         return Array.from(merged.values())
+        } finally {
+            clearTimeout(timeout)
+        }
     }
 
     let totalGames = 0
@@ -449,6 +457,7 @@ async function main() {
     process.stdout.write(C.hideCursor)
     console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
     console.log(C.dim + `  A iniciar scrape de ${selectedClubs.length} clubes...` + C.reset)
+    console.log(C.bold + C.yellow + `  Ctrl+C para parar` + C.reset)
     console.log()
 
     for (let i = 0; i < selectedClubs.length; i += 4) {
@@ -458,12 +467,24 @@ async function main() {
             done++
             const clubIdx = done
 
+            // Show current club before starting
+            process.stdout.write(C.clear)
+            console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
+            console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}` + C.reset)
+            console.log()
+            console.log(`  ${C.cyan}🔍 A pesquisar: ${club.name}${C.reset}`)
+            console.log()
+
             let games = []
             try {
                 games = await scrapeClub(club.id)
             } catch (e) {
                 errors.push(club.name)
-                console.error(C.red + `  Erro ao scrape ${club.name}: ${e.message}` + C.reset)
+                process.stdout.write(C.clear)
+                console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset)
+                console.log(C.red + `  ❌ ${club.name}: ${e.message}` + C.reset)
+                console.log()
+                continue
             }
 
             const total = games.length
