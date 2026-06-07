@@ -105,17 +105,18 @@ async function ensureDeps() {
     // Check if already installed
     const supabasePath = resolve(DEPS_DIR, 'node_modules', '@supabase', 'supabase-js')
     const cheerioPath = resolve(DEPS_DIR, 'node_modules', 'cheerio')
+    const pngjsPath = resolve(DEPS_DIR, 'node_modules', 'pngjs')
 
-    if (existsSync(supabasePath) && existsSync(cheerioPath)) {
+    if (existsSync(supabasePath) && existsSync(cheerioPath) && existsSync(pngjsPath)) {
         return
     }
 
     console.log(C.cyan + '\n  📦 A instalar dependências...' + C.reset)
-    console.log(C.dim + '     @supabase/supabase-js + cheerio' + C.reset)
+    console.log(C.dim + '     @supabase/supabase-js + cheerio + pngjs' + C.reset)
     console.log()
 
     try {
-        execSync('npm install @supabase/supabase-js cheerio', {
+        execSync('npm install @supabase/supabase-js cheerio pngjs', {
             cwd: DEPS_DIR,
             stdio: 'pipe',
         })
@@ -459,18 +460,47 @@ async function main() {
     const recentGames = [] // max 12, newest first
     const termWidth = process.stdout.columns || 100
 
-    // ── Club ASCII art ────────────────────────────────
-    function getClubAscii(club) {
-        return [
-            `  ${C.bold}${club.name}${C.reset}`,
-            `  ${C.dim}#${club.id}  |  ${season}${C.reset}`,
-            '',
-            `  ${C.purple}╔══════════════════════════╗${C.reset}`,
-            `  ${C.purple}║${C.reset}  ${C.bold}◉${C.reset}              ${C.bold}◉${C.reset}  ${C.purple}║${C.reset}`,
-            `  ${C.purple}║${C.reset}        ${C.bold}🏀${C.reset}        ${C.purple}║${C.reset}`,
-            `  ${C.purple}║${C.reset}  ${C.bold}◉${C.reset}              ${C.bold}◉${C.reset}  ${C.purple}║${C.reset}`,
-            `  ${C.purple}╚══════════════════════════╝${C.reset}`,
-        ]
+    // ── PNG to ASCII converter ─────────────────────────
+    const asciiCache = new Map()
+    const { PNG } = loadModuleSync('pngjs')
+
+    async function getLogoAscii(clubId, logoUrl) {
+        if (asciiCache.has(clubId)) return asciiCache.get(clubId)
+        if (!logoUrl) return null
+
+        try {
+            const res = await fetch(logoUrl)
+            if (!res.ok) return null
+            const buffer = Buffer.from(await res.arrayBuffer())
+            const png = PNG.sync.read(buffer)
+
+            const w = Math.min(36, termWidth - 6)
+            const h = Math.round(w * (png.height / png.width) * 0.5)
+            const chars = ' .:-=+*#%@'
+
+            const result = []
+            for (let y = 0; y < h; y++) {
+                let line = ''
+                for (let x = 0; x < w; x++) {
+                    const srcX = Math.floor(x * png.width / w)
+                    const srcY = Math.floor(y * png.height / h)
+                    const idx = (png.width * srcY + srcX) << 2
+                    const r = png.data[idx]
+                    const g = png.data[idx + 1]
+                    const b = png.data[idx + 2]
+                    const a = png.data[idx + 3]
+                    if (a < 128) { line += ' '; continue }
+                    const brightness = 0.299 * r + 0.587 * g + 0.114 * b
+                    const ci = Math.floor(brightness / 255 * (chars.length - 1))
+                    line += chars[Math.min(ci, chars.length - 1)]
+                }
+                result.push(C.purple + line + C.reset)
+            }
+            asciiCache.set(clubId, result)
+            return result
+        } catch {
+            return null
+        }
     }
 
     async function drawScreen(club, gameDone, total, clubIdx) {
@@ -481,9 +511,15 @@ async function main() {
         lines.push(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset)
         lines.push('')
 
-        // Club ASCII art
-        const art = getClubAscii(club)
-        for (const l of art) lines.push(l)
+        // Club info + logo ASCII
+        lines.push(C.bold + club.name + C.reset + C.dim + `  #${club.id}` + C.reset)
+        lines.push('')
+        const logoArt = await getLogoAscii(club.id, club.logo_url)
+        if (logoArt) {
+            for (const l of logoArt) lines.push('  ' + l)
+        } else {
+            lines.push(`  ${C.dim}(logo indisponível)${C.reset}`)
+        }
         lines.push('')
 
         // Club progress
