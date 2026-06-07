@@ -25,14 +25,17 @@ const req = createRequire(pathToFileURL(resolve(DEPS_DIR, 'package.json')).href)
 const cheerio = req('cheerio')
 const { createClient } = req('@supabase/supabase-js')
 
-// Load env for Supabase
-const envPath = resolve(__dirname, '..', 'web', '.env')
-if (existsSync(envPath)) {
-    const { readFileSync } = req('fs')
-    for (const line of readFileSync(envPath, 'utf-8').split('\n')) {
-        const eq = line.indexOf('=')
-        if (eq > 0) { const k = line.slice(0, eq).trim(); const v = line.slice(eq + 1).trim(); if (!process.env[k]) process.env[k] = v }
-    }
+async function askCredentials() {
+    const rl = createInterface({ input: process.stdin, output: process.stdout })
+    console.log(C.dim + '  Credenciais NÃO guardadas — só nesta sessão.' + C.reset)
+    console.log(C.dim + '  Admin → Scraper → 📥 Script → Mostrar' + C.reset)
+    console.log()
+    const ask = (q) => new Promise(resolve => rl.question(C.cyan + q + C.reset, resolve))
+    const url = await ask('  SUPABASE_URL: ')
+    const key = await ask('  SUPABASE_SERVICE_ROLE_KEY: ')
+    rl.close()
+    if (!url || !key) { console.log(C.red + '\n  ❌ Credenciais obrigatórias.\n' + C.reset); process.exit(1) }
+    return { url, key }
 }
 
 const C = { reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m', purple: '\x1b[35m', green: '\x1b[32m', red: '\x1b[31m', yellow: '\x1b[33m', cyan: '\x1b[36m', clear: '\x1b[2J\x1b[H' }
@@ -45,10 +48,7 @@ const SEASONS = [
 ]
 
 // Load club list from Supabase
-async function fetchClubs() {
-    const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (!url || !key) { console.log(C.red + '  ❌ Credenciais Supabase em falta no .env' + C.reset); process.exit(1) }
+async function fetchClubs(url, key) {
     const supabase = createClient(url, key)
 
     console.log(C.dim + '  A carregar clubes do Supabase...' + C.reset)
@@ -90,8 +90,11 @@ async function main() {
 
     console.log(C.clear)
     console.log(C.bold + C.purple + '  Contador de Jogos FPB' + C.reset)
-    console.log(C.dim + '  Direto da FPB — sem Supabase  |  Log: ' + LOG + C.reset)
+    console.log(C.dim + '  Conta jogos na FPB  |  Log: ' + LOG + C.reset)
     console.log()
+
+    // Credentials
+    const { url, key } = await askCredentials()
 
     // Season selection
     console.log(C.bold + '  📅 Época:' + C.reset)
@@ -107,8 +110,8 @@ async function main() {
     if (sChoice.toUpperCase() === 'A') seasons = SEASONS
     else { const i = parseInt(sChoice) - 1; if (i >= 0 && i < SEASONS.length) seasons = [SEASONS[i]]; else { console.log(C.red + 'Inválido' + C.reset); process.exit(1) } }
 
-    // Fetch clubs from FPB
-    CLUBS = await fetchClubs()
+    // Fetch clubs from Supabase
+    CLUBS = await fetchClubs(url, key)
     if (CLUBS.length === 0) { console.log(C.red + '  ❌ Nenhum clube encontrado.' + C.reset); process.exit(1) }
 
     // Show clubs
@@ -176,6 +179,16 @@ async function main() {
     log(`FINAL: ${grandTotal} jogos em ${done} operações`)
     console.log(C.bold + C.green + `\n  🏀 Total: ${grandTotal} jogos` + C.reset)
     console.log(C.dim + `  Resultados guardados em: ${LOG}` + C.reset)
+
+    // Cleanup deps, keep logs
+    const { rmSync } = req('fs')
+    try {
+        const nm = resolve(DEPS_DIR, 'node_modules')
+        if (existsSync(nm)) rmSync(nm, { recursive: true, force: true })
+        const pkg = resolve(DEPS_DIR, 'package.json')
+        if (existsSync(pkg)) rmSync(pkg, { force: true })
+    } catch {}
+    console.log(C.dim + '  🧹 Dependências removidas, log mantido.' + C.reset)
     console.log()
 }
 
