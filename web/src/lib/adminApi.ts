@@ -91,8 +91,8 @@ async function callAdmin<T>(
 
 export function useAdminApi() {
     const { getToken } = useClerkAuth()
-    // Use the supabase template so the JWT includes public_metadata
-    const getAdminToken = () => getToken({ template: 'supabase' })
+    // Use Clerk session token (NOT supabase) — verified by Clerk's API
+    const getAdminToken = () => getToken()
 
     return {
         getStats: () =>
