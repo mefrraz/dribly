@@ -13,16 +13,27 @@ import { createRequire } from 'module'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DEPS_DIR = resolve(__dirname, '..', '.dribly-deps')
 
-// Auto-install cheerio
-if (!existsSync(resolve(DEPS_DIR, 'node_modules', 'cheerio'))) {
+// Auto-install deps
+if (!existsSync(resolve(DEPS_DIR, 'node_modules', 'cheerio')) || !existsSync(resolve(DEPS_DIR, 'node_modules', '@supabase', 'supabase-js'))) {
     mkdirSync(DEPS_DIR, { recursive: true })
     writeFileSync(resolve(DEPS_DIR, 'package.json'), JSON.stringify({ type: 'module', private: true }))
-    console.log('Instalando cheerio...')
-    execSync('npm install cheerio', { cwd: DEPS_DIR, stdio: 'pipe' })
+    console.log('Instalando cheerio + supabase-js...')
+    execSync('npm install cheerio @supabase/supabase-js', { cwd: DEPS_DIR, stdio: 'pipe' })
 }
 
 const req = createRequire(pathToFileURL(resolve(DEPS_DIR, 'package.json')).href)
 const cheerio = req('cheerio')
+const { createClient } = req('@supabase/supabase-js')
+
+// Load env for Supabase
+const envPath = resolve(__dirname, '..', 'web', '.env')
+if (existsSync(envPath)) {
+    const { readFileSync } = req('fs')
+    for (const line of readFileSync(envPath, 'utf-8').split('\n')) {
+        const eq = line.indexOf('=')
+        if (eq > 0) { const k = line.slice(0, eq).trim(); const v = line.slice(eq + 1).trim(); if (!process.env[k]) process.env[k] = v }
+    }
+}
 
 const C = { reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m', purple: '\x1b[35m', green: '\x1b[32m', red: '\x1b[31m', yellow: '\x1b[33m', cyan: '\x1b[36m', clear: '\x1b[2J\x1b[H' }
 
@@ -33,34 +44,18 @@ const SEASONS = [
     '2007/2008','2006/2007','2005/2006','2004/2005','2003/2004',
 ]
 
-// Scrape club list from FPB
+// Load club list from Supabase
 async function fetchClubs() {
-    console.log(C.dim + '  A carregar lista de clubes da FPB...' + C.reset)
-    const res = await fetch('https://www.fpb.pt/clubes/', { headers: { 'User-Agent': 'Mozilla/5.0' } })
-    const html = await res.text()
-    const $ = cheerio.load(html)
-    const clubs = []
-    // Try multiple selector patterns for club links
-    $('a[href*="/clube/"]').each((_, el) => {
-        const href = $(el).attr('href') || ''
-        const m = href.match(/\/clube\/(\d+)/)
-        if (!m) return
-        const id = parseInt(m[1])
-        const name = $(el).text().trim() || $(el).attr('title') || `Clube #${id}`
-        if (name && !clubs.find(c => c[0] === id)) clubs.push([id, name])
-    })
-    // Also try .club-item, .club-card, etc
-    if (clubs.length < 50) {
-        $('[class*="club"] a[href*="/clube/"], .club-list a, .clubs-list a').each((_, el) => {
-            const href = $(el).attr('href') || ''
-            const m = href.match(/\/clube\/(\d+)/)
-            if (!m) return
-            const id = parseInt(m[1])
-            const name = $(el).text().trim()
-            if (name && !clubs.find(c => c[0] === id)) clubs.push([id, name])
-        })
-    }
-    console.log(C.green + `  ✅ ${clubs.length} clubes encontrados.\n` + C.reset)
+    const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!url || !key) { console.log(C.red + '  ❌ Credenciais Supabase em falta no .env' + C.reset); process.exit(1) }
+    const supabase = createClient(url, key)
+
+    console.log(C.dim + '  A carregar clubes do Supabase...' + C.reset)
+    const { data, error } = await supabase.from('clubs').select('id,name').order('name')
+    if (error || !data) { console.log(C.red + '  ❌ Erro ao carregar clubes' + C.reset); process.exit(1) }
+    const clubs = data.map(c => [c.id, c.name || `Clube #${c.id}`])
+    console.log(C.green + `  ✅ ${clubs.length} clubes carregados.\n` + C.reset)
     return clubs
 }
 
