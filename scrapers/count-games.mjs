@@ -33,24 +33,38 @@ const SEASONS = [
     '2007/2008','2006/2007','2005/2006','2004/2005','2003/2004',
 ]
 
-// Hardcoded club IDs and names from Supabase (avoids scraping the clubs page)
-const CLUBS = [
-    [169,'FC Porto'],[120,'SL Benfica'],[127,'Sporting CP'],[28,'UD Oliveirense'],
-    [119,'FC Gaia'],[12,'Ovarense'],[1,'Anadia FC'],[39,'Académica'],
-    [188,'Académico FC'],[3,'Alenquer'],[196,'Angrabasket'],[209,'Atlético CP'],
-    [232,'Barreirense'],[273,'Belenenses'],[356,'CAB Madeira'],[357,'CAB Lisboa'],
-    [370,'UTAD'],[632,'CD Póvoa'],[703,'Artenave'],[862,'Esgueira'],
-    [873,'Estoril'],[914,'Galitos'],[941,'GDB Leca'],[948,'Illiabum'],
-    [953,'Imortal'],[2405,'Lusitânia'],[2539,'Maia BC'],[2620,'NCR Valongo'],
-    [2623,'NB Queluz'],[2660,'Odisseia'],[2694,'Padernense'],[2717,'Portimonense'],
-    [2813,'Salesianos'],[3330,'Sangalhos'],[3335,'Santa Maria'],[3400,'Sertã'],
-    [3411,'Seixal'],[3484,'Sines'],[3538,'Tavira'],[3668,'Viana'],
-    [3671,'Vila Real'],[3679,'Vitória SC'],[3682,'Xico Andebol'],
-    [3695,'Foz Côa'],[3709,'Almeirim'],[3711,'Amadora'],[3714,'Barcelos'],
-    [3715,'Braga BC'],[3728,'Coimbra'],[3730,'AMA Basket'],[3751,'Eléctrico'],
-    [3761,'Figueira da Foz'],[3762,'Gafanha'],[3763,'Lousada'],[3765,'Viseu'],
-    [2846,'Odisseia 2010'],[3484,'Sines'],
-]
+// Scrape club list from FPB
+async function fetchClubs() {
+    console.log(C.dim + '  A carregar lista de clubes da FPB...' + C.reset)
+    const res = await fetch('https://www.fpb.pt/clubes/', { headers: { 'User-Agent': 'Mozilla/5.0' } })
+    const html = await res.text()
+    const $ = cheerio.load(html)
+    const clubs = []
+    // Try multiple selector patterns for club links
+    $('a[href*="/clube/"]').each((_, el) => {
+        const href = $(el).attr('href') || ''
+        const m = href.match(/\/clube\/(\d+)/)
+        if (!m) return
+        const id = parseInt(m[1])
+        const name = $(el).text().trim() || $(el).attr('title') || `Clube #${id}`
+        if (name && !clubs.find(c => c[0] === id)) clubs.push([id, name])
+    })
+    // Also try .club-item, .club-card, etc
+    if (clubs.length < 50) {
+        $('[class*="club"] a[href*="/clube/"], .club-list a, .clubs-list a').each((_, el) => {
+            const href = $(el).attr('href') || ''
+            const m = href.match(/\/clube\/(\d+)/)
+            if (!m) return
+            const id = parseInt(m[1])
+            const name = $(el).text().trim()
+            if (name && !clubs.find(c => c[0] === id)) clubs.push([id, name])
+        })
+    }
+    console.log(C.green + `  ✅ ${clubs.length} clubes encontrados.\n` + C.reset)
+    return clubs
+}
+
+let CLUBS = []
 
 async function countClub(clubId, clubName, season) {
     const url = (page) => `https://www.fpb.pt/${page}/clube_${clubId}/?epoca=${encodeURIComponent(season)}&escalao=S%C3%A9nior&genero=masculino`
@@ -92,6 +106,10 @@ async function main() {
     let seasons
     if (sChoice.toUpperCase() === 'A') seasons = SEASONS
     else { const i = parseInt(sChoice) - 1; if (i >= 0 && i < SEASONS.length) seasons = [SEASONS[i]]; else { console.log(C.red + 'Inválido' + C.reset); process.exit(1) } }
+
+    // Fetch clubs from FPB
+    CLUBS = await fetchClubs()
+    if (CLUBS.length === 0) { console.log(C.red + '  ❌ Nenhum clube encontrado.' + C.reset); process.exit(1) }
 
     // Show clubs
     console.log(C.clear)
