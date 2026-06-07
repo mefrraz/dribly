@@ -105,8 +105,9 @@ async function ensureDeps() {
     // Check if already installed
     const supabasePath = resolve(DEPS_DIR, 'node_modules', '@supabase', 'supabase-js')
     const cheerioPath = resolve(DEPS_DIR, 'node_modules', 'cheerio')
+    const jimpPath = resolve(DEPS_DIR, 'node_modules', 'jimp')
 
-    if (existsSync(supabasePath) && existsSync(cheerioPath)) {
+    if (existsSync(supabasePath) && existsSync(cheerioPath) && existsSync(jimpPath)) {
         return
     }
 
