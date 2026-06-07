@@ -170,8 +170,16 @@ async function main() {
             log(`${season} | ${name} (#${id}) | ${n} jogos`)
             const pct = Math.round((done / totalOps) * 100)
             const bar = '█'.repeat(Math.floor(pct / 4)) + '░'.repeat(25 - Math.floor(pct / 4))
-            process.stdout.write(`\r  [${C.purple}${bar}${C.reset}] ${pct}%  ${name.padEnd(25)} ${C.bold}${n}${C.reset} jogos  |  Total: ${grandTotal}`)
+            // Clear line before writing
+            process.stdout.write('\r\x1b[K')
+            process.stdout.write(`  [${C.purple}${bar}${C.reset}] ${String(pct).padStart(3)}%  ${name.slice(0, 20).padEnd(20)} ${C.bold}${String(n).padStart(3)}${C.reset} jogos`)
+            // New line for totals
+            process.stdout.write(`\n\x1b[K  ${C.dim}Época: ${seasonTotal}  |  Total: ${grandTotal}${C.reset}`)
+            // Move cursor back up
+            process.stdout.write('\x1b[1A')
         }
+        // Clear the extra totals line before printing season summary
+        process.stdout.write('\n\x1b[K')
         console.log(`\n  ${C.green}✅ ${season}: ${seasonTotal} jogos${C.reset}  |  Acumulado: ${grandTotal}`)
         log(`${season} TOTAL: ${seasonTotal} | ACUMULADO: ${grandTotal}`)
     }
