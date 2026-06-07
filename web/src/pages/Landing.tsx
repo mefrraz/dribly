@@ -415,13 +415,13 @@ function Landing() {
                         <div className="relative">
                             <div
                                 ref={carouselRef}
-                                className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory scroll-smooth items-stretch"
+                                className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory scroll-smooth items-start"
                             >
                                 <div className="shrink-0 w-[calc(50vw-24px)] md:hidden" />
                                 {[...games, ...games, ...games].map((match, idx) => (
                                     <div
                                         key={match.slug || match.id + '-' + idx}
-                                        className="min-w-[80vw] md:min-w-[320px] shrink-0 snap-center h-full"
+                                        className="min-w-[80vw] md:min-w-[320px] shrink-0 snap-center"
                                     >
                                         <GameCard match={match} mode="agenda" />
                                     </div>
