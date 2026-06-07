@@ -469,10 +469,14 @@ async function main() {
 
         try {
             const Jimp = loadModuleSync('jimp')
+            log(`  Jimp keys: ${Object.keys(Jimp).join(', ')}`)
+            // Try different API shapes
+            const JimpRead = Jimp.read || (Jimp.default && Jimp.default.read) || Jimp
+            log(`  JimpRead type: ${typeof JimpRead}, read type: ${typeof (JimpRead && JimpRead.read)}`)
             const res = await fetch(logoUrl)
             if (!res.ok) { log(`  Logo fetch failed: ${res.status} for ${logoUrl}`); return null }
             const buffer = Buffer.from(await res.arrayBuffer())
-            const image = await Jimp.read(buffer)
+            const image = await JimpRead.read(buffer)
             const w = Math.min(40, termWidth - 4)
             const h = Math.round(w * 0.5) // maintain aspect
             image.resize(w, h).greyscale()
