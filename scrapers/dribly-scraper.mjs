@@ -197,7 +197,7 @@ async function main() {
 
     // ── Season selection ────────────────────────────────
 
-    const seasons = ['2025/2026', '2024/2025', '2023/2024', '2022/2023']
+    const seasons = ['2025/2026', '2024/2025', '2023/2024', '2022/2023', '2021/2022', '2020/2021', '2019/2020', '2018/2019', '2017/2018', '2016/2017', '2015/2016']
     console.log(C.bold + '  📅 Escolhe a época:' + C.reset)
     seasons.forEach((s, i) => {
         console.log(`     ${C.purple}[${i + 1}]${C.reset} ${s}`)
@@ -707,6 +707,7 @@ async function main() {
             for (const g of games) {
                 try {
                     await supabase.from(seasonTable).upsert(g, { onConflict: 'slug' })
+                    totalGames++ // increment immediately for accurate Ctrl+C stats
                 } catch { /* continue */ }
                 gameDone++
 
@@ -726,7 +727,6 @@ async function main() {
                 await drawScreen(club, gameDone, total, clubIdx, false)
             }
 
-            totalGames += games.length
         }
     }
 
