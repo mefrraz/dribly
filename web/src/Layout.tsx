@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Sun, Moon, Instagram, Github, Info, BarChart2, Home, Search, LogIn, Heart, Trophy, Building2, MapPin } from 'lucide-react'
+import { Sun, Moon, Instagram, Github, Info, BarChart2, Home, Search, LogIn, Heart, Trophy, Building2, MapPin, Shield } from 'lucide-react'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastContainer } from './components/Toast'
 import PWAInstallBanner from './components/PWAInstallBanner'
@@ -10,6 +10,7 @@ import { AuthModal } from './components/AuthModal'
 import { OnboardingTour, type TourTrigger } from './components/OnboardingTour'
 import { PostOnboardingSuggestions } from './components/PostOnboardingSuggestions'
 import { useAuth } from './lib/AuthContext'
+import { useUser } from '@clerk/clerk-react'
 
 function Layout() {
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
@@ -19,6 +20,8 @@ function Layout() {
     const [showSuggestions, setShowSuggestions] = useState(false)
     const location = useLocation()
     const { user } = useAuth()
+    const { user: clerkUser } = useUser()
+    const isAdmin = clerkUser?.publicMetadata?.role === 'admin'
     const isMapaPage = location.pathname === '/mapa'
 
     const handleAuthSuccess = useCallback((method: 'signin' | 'signup') => {
@@ -137,6 +140,11 @@ function Layout() {
                             <button onClick={toggleTheme} className={`${navIcon} text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5`} aria-label="Tema">
                                 {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
                             </button>
+                            {isAdmin && (
+                                <Link to="/admin" className={`${navIcon} text-dribly-purple hover:bg-dribly-purple/10`} aria-label="Admin" title="Painel de administração">
+                                    <Shield size={17} />
+                                </Link>
+                            )}
                         </div>
 
                     </div>

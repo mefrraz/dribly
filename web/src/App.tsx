@@ -21,6 +21,13 @@ import ClubTeams from './pages/club/ClubTeams'
 import ClubTeamDetail from './pages/club/ClubTeamDetail'
 import AthletePage from './pages/Athlete'
 import NotFound from './pages/NotFound'
+import { AdminRoute } from './components/AdminRoute'
+import { AdminLayout } from './pages/admin/AdminLayout'
+import Dashboard from './pages/admin/Dashboard'
+import ClubesAdmin from './pages/admin/ClubesAdmin'
+import UsersAdmin from './pages/admin/UsersAdmin'
+import GamesAdmin from './pages/admin/GamesAdmin'
+import CompetitionsAdmin from './pages/admin/CompetitionsAdmin'
 import { ClubProvider } from './lib/ClubContext'
 import { AuthProvider } from './lib/AuthContext'
 import SplashScreen from './components/SplashScreen'
@@ -69,6 +76,17 @@ function App() {
                         <Route path="sobre" element={<About />} />
                         <Route path="instalar" element={<Install />} />
                         <Route path="*" element={<NotFound />} />
+                    </Route>
+
+                    {/* Admin — separate layout, Clerk-role protected */}
+                    <Route path="/admin" element={<AdminRoute />}>
+                        <Route element={<AdminLayout />}>
+                            <Route index element={<Dashboard />} />
+                            <Route path="clubes" element={<ClubesAdmin />} />
+                            <Route path="utilizadores" element={<UsersAdmin />} />
+                            <Route path="jogos" element={<GamesAdmin />} />
+                            <Route path="competicoes" element={<CompetitionsAdmin />} />
+                        </Route>
                     </Route>
                 </Routes>
                 </Suspense>

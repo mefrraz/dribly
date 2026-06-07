@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { ClerkProvider } from '@clerk/clerk-react'
 import App from './App.tsx'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import './index.css'
 import 'leaflet/dist/leaflet.css'
 
@@ -28,6 +29,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             }}
         >
             <App />
+            <SpeedInsights />
         </ClerkProvider>
     </React.StrictMode>,
 )
