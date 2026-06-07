@@ -105,18 +105,17 @@ async function ensureDeps() {
     // Check if already installed
     const supabasePath = resolve(DEPS_DIR, 'node_modules', '@supabase', 'supabase-js')
     const cheerioPath = resolve(DEPS_DIR, 'node_modules', 'cheerio')
-    const jimpPath = resolve(DEPS_DIR, 'node_modules', 'jimp')
 
-    if (existsSync(supabasePath) && existsSync(cheerioPath) && existsSync(jimpPath)) {
+    if (existsSync(supabasePath) && existsSync(cheerioPath)) {
         return
     }
 
     console.log(C.cyan + '\n  📦 A instalar dependências...' + C.reset)
-    console.log(C.dim + '     @supabase/supabase-js + cheerio + jimp' + C.reset)
+    console.log(C.dim + '     @supabase/supabase-js + cheerio' + C.reset)
     console.log()
 
     try {
-        execSync('npm install @supabase/supabase-js cheerio jimp', {
+        execSync('npm install @supabase/supabase-js cheerio', {
             cwd: DEPS_DIR,
             stdio: 'pipe',
         })
@@ -460,43 +459,18 @@ async function main() {
     const recentGames = [] // max 12, newest first
     const termWidth = process.stdout.columns || 100
 
-    // ── Logo to ASCII cache ────────────────────────────
-    const logoAsciiCache = new Map()
-
-    async function getLogoAscii(clubId, logoUrl) {
-        if (logoAsciiCache.has(clubId)) return logoAsciiCache.get(clubId)
-        if (!logoUrl) return null
-
-        try {
-            const JimpModule = loadModuleSync('jimp')
-            const Jimp = JimpModule.Jimp
-            const res = await fetch(logoUrl)
-            if (!res.ok) { log(`  Logo fetch failed: ${res.status} for ${logoUrl}`); return null }
-            const buffer = Buffer.from(await res.arrayBuffer())
-            const image = await Jimp.read(buffer)
-            const w = Math.min(40, termWidth - 4)
-            const h = Math.round(w * 0.5) // maintain aspect
-            image.resize(w, h).greyscale()
-
-            const chars = ' .:;+=xX$@'
-            const lines = []
-            for (let y = 0; y < image.bitmap.height; y++) {
-                let line = ''
-                for (let x = 0; x < image.bitmap.width; x++) {
-                    const idx = (y * image.bitmap.width + x) * 4
-                    const r = image.bitmap.data[idx]
-                    const charIdx = Math.floor((r / 255) * (chars.length - 1))
-                    line += chars[charIdx]
-                }
-                lines.push(C.purple + line + C.reset)
-            }
-            logoAsciiCache.set(clubId, lines)
-            return lines
-        } catch (e) {
-            log(`  Logo ASCII failed: ${JSON.stringify(String(e))}`)
-            if (e.stack) log(`  Stack: ${e.stack}`)
-            return null
-        }
+    // ── Club ASCII art ────────────────────────────────
+    function getClubAscii(club) {
+        return [
+            `  ${C.bold}${club.name}${C.reset}`,
+            `  ${C.dim}#${club.id}  |  ${season}${C.reset}`,
+            '',
+            `  ${C.purple}╔══════════════════════════╗${C.reset}`,
+            `  ${C.purple}║${C.reset}  ${C.bold}◉${C.reset}              ${C.bold}◉${C.reset}  ${C.purple}║${C.reset}`,
+            `  ${C.purple}║${C.reset}        ${C.bold}🏀${C.reset}        ${C.purple}║${C.reset}`,
+            `  ${C.purple}║${C.reset}  ${C.bold}◉${C.reset}              ${C.bold}◉${C.reset}  ${C.purple}║${C.reset}`,
+            `  ${C.purple}╚══════════════════════════╝${C.reset}`,
+        ]
     }
 
     async function drawScreen(club, gameDone, total, clubIdx) {
@@ -507,16 +481,10 @@ async function main() {
         lines.push(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset)
         lines.push('')
 
-        // Club info
-        lines.push(C.bold + club.name + C.reset + C.dim + `  #${club.id}` + C.reset)
+        // Club ASCII art
+        const art = getClubAscii(club)
+        for (const l of art) lines.push(l)
         lines.push('')
-
-        // Logo ASCII (fetched async)
-        const logoArt = await getLogoAscii(club.id, club.logo_url)
-        if (logoArt) {
-            for (const l of logoArt) lines.push('  ' + l)
-            lines.push('')
-        }
 
         // Club progress
         const gameBar = progressBar(gameDone, total, Math.min(40, termWidth - 15))
