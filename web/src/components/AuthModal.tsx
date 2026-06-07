@@ -125,10 +125,17 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                     onClose()
                     onAuthSuccess?.('signin')
                 } else if ((result.status as string) === 'needs_client_trust') {
-                    // Client Trust is enabled — requires admin to disable it in Clerk dashboard
-                    // Configure → Attack Protection → Client Trust → Disable
-                    setErrorMsg('Verificação de dispositivo ativa. Desativa o Client Trust no Clerk (Configure → Attack Protection).')
-                    setStatus('error')
+                    // Client Trust — prepare the second factor to send the email code
+                    try {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        await (signIn as any).prepareSecondFactor({ strategy: 'email_code' })
+                        console.log('[AuthModal] client trust email code prepared')
+                    } catch (prepErr) {
+                        console.error('[AuthModal] prepareSecondFactor failed:', prepErr)
+                    }
+                    setSecondFactorNeeded(true)
+                    setStatus('sent')
+                    setErrorMsg('')
                 } else if (result.status === 'needs_first_factor') {
                     // Needs password (shouldn't happen with both sent, but handle it)
                     setErrorMsg('Email ou palavra-passe incorretos.')
