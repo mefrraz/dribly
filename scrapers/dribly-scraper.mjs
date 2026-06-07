@@ -482,9 +482,7 @@ async function main() {
                     // Location: .location-wrapper text
                     const locText = $link.find('.location-wrapper').text().trim() || $link.find('.location').text().trim()
 
-                    if (parsedLinks === 1) {
-                        log(`    DEBUG: scores=${scoreCasa}-${scoreFora} time="${timeText || 'EMPTY'}" loc="${locText || 'EMPTY'}"`)
-                    }
+                    // debug removed — scraper verified working
 
                     const logos = []
                     $link.find('.image-container img').each((___, img) => {
