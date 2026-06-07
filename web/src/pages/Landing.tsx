@@ -556,8 +556,8 @@ function Landing() {
                                 <th className="text-center py-3 px-1 font-bold text-dribly-purple w-[14.4%]"><div className="inline-flex items-center justify-center gap-1"><span className="w-2 h-2 rounded-full bg-dribly-purple shrink-0" /><span>Dribly</span></div></th>
                                 <th className="text-center py-3 px-1 font-bold text-zinc-500 dark:text-zinc-400 w-[14.4%]">FPB</th>
                                 <th className="text-center py-3 px-1 font-bold text-zinc-500 dark:text-zinc-400 w-[14.4%]">Swish</th>
-                                <th className="text-center py-3 px-1 font-bold text-zinc-500 dark:text-zinc-400 w-[14.4%]">TugaBasket</th>
-                                <th className="text-center py-3 px-1 font-bold text-zinc-500 dark:text-zinc-400 w-[14.4%]">Zerozero</th>
+                                <th className="text-center py-3 px-1 font-bold text-zinc-500 dark:text-zinc-400 w-[14.4%] hidden sm:table-cell">TugaBasket</th>
+                                <th className="text-center py-3 px-1 font-bold text-zinc-500 dark:text-zinc-400 w-[14.4%] hidden md:table-cell">Zerozero</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -579,8 +579,8 @@ function Landing() {
                                     <td className="text-center py-2.5"><Cell val={dribly} /></td>
                                     <td className="text-center py-2.5"><Cell val={fpb} /></td>
                                     <td className="text-center py-2.5"><Cell val={swish} /></td>
-                                    <td className="text-center py-2.5"><Cell val={tuga} /></td>
-                                    <td className="text-center py-2.5"><Cell val={zz} /></td>
+                                    <td className="text-center py-2.5 hidden sm:table-cell"><Cell val={tuga} /></td>
+                                    <td className="text-center py-2.5 hidden md:table-cell"><Cell val={zz} /></td>
                                 </tr>
                             ))}
                         </tbody>

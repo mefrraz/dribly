@@ -30,50 +30,95 @@ export function useLandingData() {
     const [allComps, setAllComps] = useState<LandingCompetition[]>([])
     const [compMetaMap, setCompMetaMap] = useState<Map<number, CompMeta>>(new Map())
 
-    // Featured games: upcoming games from top clubs
+    // Featured games: upcoming games from most-followed clubs (or fallback)
     useEffect(() => {
-        const clubPatterns = ['Porto', 'Benfica', 'Sporting', 'Oliveirense']
-        const orClauses = clubPatterns
-            .map(n => `equipa_casa.ilike.%${n}%,equipa_fora.ilike.%${n}%`)
-            .join(',')
-        supabase
-            .from('games_2025_2026')
-            .select('*')
-            .or(orClauses)
-            .neq('status', 'FINALIZADO')
-            .gte('data', new Date().toISOString().split('T')[0])
-            .order('data', { ascending: true })
-            .then(({ data }: { data: unknown }) => {
-                if (data) {
-                    let arr = data as Match[]
-                    const counts: Record<string, number> = {}
-                    const knownTeams = ['PORTO', 'BENFICA', 'SPORTING', 'OLIVEIRENSE']
-                    const matchNames = [
-                        'Futebol Clube do Porto',
-                        'SL Benfica',
-                        'Sporting Clube Portugal',
-                        'UD Oliveirense',
-                    ]
-                    arr = arr
-                        .filter(m => {
-                            const full = (m.equipa_casa + ' ' + m.equipa_fora).toUpperCase()
-                            const matchName = matchNames.find(t =>
-                                full.includes(t.toUpperCase())
-                            )
-                            if (!matchName) return false
-                            const key = knownTeams.find(t =>
-                                matchName.toUpperCase().includes(t)
-                            )
-                            if (!key) return false
-                            counts[key] = (counts[key] || 0) + 1
-                            return counts[key] <= 3
-                        })
-                        .sort(() => Math.random() - 0.5)
-                        .slice(0, 12)
-                    setGames(arr)
+        async function fetchFeatured() {
+            // 1. Get top followed clubs
+            const { data: follows } = await supabase
+                .from('user_follows')
+                .select('entity_id')
+                .eq('entity_type', 'club')
+
+            let clubNames: string[] = []
+
+            if (follows && follows.length > 0) {
+                // Count follows per club — only clubs with ≥3 follows
+                const counts: Record<number, number> = {}
+                for (const f of follows) counts[f.entity_id] = (counts[f.entity_id] || 0) + 1
+                const topIds = Object.entries(counts)
+                    .filter(([, n]) => n >= 3)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 10)
+                    .map(([id]) => parseInt(id))
+
+                // Get names for those clubs
+                const { data: topClubs } = await supabase
+                    .from('clubs')
+                    .select('name')
+                    .in('id', topIds)
+
+                if (topClubs && topClubs.length > 0) {
+                    clubNames = topClubs.map((c: { name: string }) => c.name)
                 }
-                setGamesLoading(false)
-            })
+            }
+
+            // Fallback: 3 grandes
+            if (clubNames.length === 0) {
+                clubNames = [
+                    'Futebol Clube do Porto',
+                    'SL Benfica',
+                    'Sporting Clube Portugal',
+                ]
+            }
+
+            // 2. Build patterns: use full name + extract keyword (last significant word)
+            const patterns = new Set<string>()
+            for (const name of clubNames) {
+                patterns.add(name)
+                // Extract keyword: last word, skip common short prefixes
+                const cleaned = name.replace(/^(FC|SL|SC|CD|UD|AD|GD|AC|CF|OS|CP)\s+/i, '')
+                const words = cleaned.split(/\s+/)
+                const keyword = words[words.length - 1]
+                if (keyword && keyword.length >= 4 && keyword !== 'Clube' && keyword !== 'Sport') {
+                    patterns.add(keyword)
+                }
+            }
+            const patternArr = [...patterns]
+            const orClauses = patternArr
+                .map(n => `equipa_casa.ilike.%${n}%,equipa_fora.ilike.%${n}%`)
+                .join(',')
+
+            // 3. Query games
+            const { data } = await supabase
+                .from('games_2025_2026')
+                .select('*')
+                .or(orClauses)
+                .neq('status', 'FINALIZADO')
+                .gte('data', new Date().toISOString().split('T')[0])
+                .order('data', { ascending: true })
+
+            if (data) {
+                let arr = data as Match[]
+                // Cap per-club: max 3 games each, identified by the keyword match
+                const perClub: Record<string, number> = {}
+                arr = arr
+                    .filter(m => {
+                        const full = (m.equipa_casa + ' ' + m.equipa_fora).toUpperCase()
+                        // Find which pattern matched
+                        const matched = patternArr.find(p =>
+                            full.includes(p.toUpperCase())
+                        )
+                        if (!matched) return false
+                        perClub[matched] = (perClub[matched] || 0) + 1
+                        return perClub[matched] <= 3
+                    })
+                    .sort(() => Math.random() - 0.5)
+                    .slice(0, 12)
+                setGames(arr)
+            }
+            setGamesLoading(false)
+        }
+        fetchFeatured()
     }, [])
 
     // Associations
