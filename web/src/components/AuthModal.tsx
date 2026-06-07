@@ -28,6 +28,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
     // Client Trust 2FA — email code second factor
     const [secondFactorNeeded, setSecondFactorNeeded] = useState(false)
     const [secondFactorCode, setSecondFactorCode] = useState('')
+    // Sign-up email verification code
+    const [signUpVerificationNeeded, setSignUpVerificationNeeded] = useState(false)
+    const [signUpVerificationCode, setSignUpVerificationCode] = useState('')
 
     const isLoaded = siLoaded && suLoaded
 
@@ -46,6 +49,8 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
         setShowNewPassword(false)
         setSecondFactorNeeded(false)
         setSecondFactorCode('')
+        setSignUpVerificationNeeded(false)
+        setSignUpVerificationCode('')
     }
 
     const handleClose = () => {
@@ -89,9 +94,13 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                         console.log('[AuthModal] verification email prepared successfully')
                     } catch (prepErr) {
                         console.error('[AuthModal] prepareVerification failed:', prepErr)
+                        setErrorMsg('Erro ao enviar email de verificação. Tenta novamente.')
+                        setStatus('error')
+                        return
                     }
-                    setErrorMsg('Verifica o teu email para confirmares o registo.')
-                    setStatus('pending')
+                    setSignUpVerificationNeeded(true)
+                    setStatus('sent')
+                    setErrorMsg('')
                 }
             } else {
                 // Sign-in — may trigger Client Trust (email code 2FA)
@@ -157,6 +166,31 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                 reset()
                 onClose()
                 onAuthSuccess?.('signin')
+            } else {
+                setStatus('error')
+                setErrorMsg('Código inválido. Tenta novamente.')
+            }
+        } catch {
+            setStatus('error')
+            setErrorMsg('Código inválido ou expirado.')
+        }
+    }
+
+    /** Verify the email code for sign-up verification */
+    const handleVerifySignUp = async () => {
+        if (!signUpVerificationCode.trim() || !signUp) return
+        setStatus('loading')
+        setErrorMsg('')
+        try {
+            const result = await signUp.attemptVerification({
+                strategy: 'email_code',
+                code: signUpVerificationCode.trim(),
+            })
+            if (result.status === 'complete') {
+                await setActive!({ session: result.createdSessionId! })
+                reset()
+                onClose()
+                onAuthSuccess?.('signup')
             } else {
                 setStatus('error')
                 setErrorMsg('Código inválido. Tenta novamente.')
@@ -373,6 +407,55 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                         </p>
                                     </div>
                                 )}
+                            </div>
+                        ) : signUpVerificationNeeded ? (
+                            /* Sign-up email verification — enter code */
+                            <div className="space-y-3">
+                                <div className="text-center">
+                                    <CheckCircle size={24} className="text-green-500 mx-auto mb-1" />
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-3">
+                                        Código enviado para o teu email.
+                                    </p>
+                                </div>
+                                <div className="relative">
+                                    <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input
+                                        type="text"
+                                        value={signUpVerificationCode}
+                                        onChange={e => setSignUpVerificationCode(e.target.value)}
+                                        placeholder="Código de 6 dígitos"
+                                        autoFocus
+                                        required
+                                        maxLength={6}
+                                        className="w-full pl-9 pr-4 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-white/10 rounded-xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none transition-all focus:ring-2 focus:ring-dribly-purple/30 focus:border-dribly-purple"
+                                    />
+                                </div>
+                                {status === 'error' && errorMsg && (
+                                    <p className="text-xs text-red-500 font-medium text-center">{errorMsg}</p>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={handleVerifySignUp}
+                                    disabled={!isLoaded || status === 'loading'}
+                                    className="w-full py-2.5 rounded-full bg-dribly-purple text-white text-sm font-bold hover:bg-dribly-purple/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.97] shadow-sm shadow-dribly-purple/20 flex items-center justify-center gap-2"
+                                >
+                                    {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : null}
+                                    Verificar código
+                                </button>
+                                <p className="text-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setSignUpVerificationNeeded(false)
+                                            setSignUpVerificationCode('')
+                                            setStatus('idle')
+                                            setErrorMsg('')
+                                        }}
+                                        className="text-[11px] text-zinc-400 hover:text-dribly-purple transition-colors"
+                                    >
+                                        Voltar
+                                    </button>
+                                </p>
                             </div>
                         ) : secondFactorNeeded ? (
                             /* Client Trust 2FA — enter email code */
