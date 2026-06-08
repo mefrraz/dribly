@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Trophy, TrendingUp } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
@@ -7,8 +7,10 @@ import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { normalize } from '../lib/clubSearch'
 
 function Ranking() {
-    const { clubs } = useClub()
+    const { clubs, loadClubs } = useClub()
     const [query, setQuery] = useState('')
+
+    useEffect(() => { loadClubs() }, [loadClubs])
 
     // Sort clubs by ELO descending, fallback to 1500
     const ranked = useMemo(() => {
