@@ -139,6 +139,7 @@ export default function PavilionsAdmin() {
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-12">ID</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Nome</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Rua</th>
+                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Cód. Postal</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Cidade</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Distrito</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-16">Coord</th>
@@ -169,7 +170,8 @@ export default function PavilionsAdmin() {
                                             <MapPin size={12} className="text-dribly-purple shrink-0" />
                                             <span className="truncate max-w-[250px]">{p.nome}</span>
                                         </td>
-                                        <td className="px-4 py-2 text-zinc-500 truncate max-w-[180px]">{p.rua || '—'}</td>
+                                        <td className="px-4 py-2 text-zinc-500 truncate max-w-[150px]">{p.rua || '—'}</td>
+                                        <td className="px-4 py-2 text-zinc-500 font-mono text-[11px]">{p.codigo_postal || '—'}</td>
                                         <td className="px-4 py-2 text-zinc-500">{p.cidade || '—'}</td>
                                         <td className="px-4 py-2">
                                             {p.distrito ? (
@@ -245,9 +247,10 @@ function EditRow({
     return (
         <tr className="bg-dribly-purple/5 dark:bg-dribly-purple/10 border-b border-dribly-purple/20">
             <td className="px-4 py-2 text-zinc-400 font-mono">{form.id}</td>
-            <td className="px-4 py-2">{field('Nome', 'nome', 'w-48')}</td>
-            <td className="px-4 py-2">{field('Rua', 'rua', 'w-40')}</td>
-            <td className="px-4 py-2">{field('Cidade', 'cidade', 'w-28')}</td>
+            <td className="px-4 py-2">{field('Nome', 'nome', 'w-40')}</td>
+            <td className="px-4 py-2">{field('Rua', 'rua', 'w-36')}</td>
+            <td className="px-4 py-2">{field('C.Postal', 'codigo_postal', 'w-24')}</td>
+            <td className="px-4 py-2">{field('Cidade', 'cidade', 'w-24')}</td>
             <td className="px-4 py-2">{field('Distrito', 'distrito', 'w-28')}</td>
             <td className="px-4 py-2">
                 <div className="flex items-center gap-1">

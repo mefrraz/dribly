@@ -3,7 +3,16 @@ import { Search, Play, Square, Clock, Star, Download } from 'lucide-react'
 import { useAdminApi, type AdminClub } from '../../lib/adminApi'
 import { useScraper } from '../../hooks/useScraper'
 
-const SEASONS = ['2025/2026', '2024/2025', '2023/2024', '2022/2023', '2021/2022', '2020/2021', '2019/2020']
+const SEASONS = (() => {
+    const seasons: string[] = []
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    const currentSeasonStart = now.getMonth() >= 8 ? currentYear : currentYear - 1
+    for (let y = currentSeasonStart; y >= 2003; y--) {
+        seasons.push(`${y}/${y + 1}`)
+    }
+    return seasons
+})()
 
 function formatDate(iso: string | null): string {
     if (!iso) return '—'

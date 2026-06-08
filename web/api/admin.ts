@@ -218,7 +218,7 @@ async function handleGetUserFollows(payload?: Record<string, unknown>) {
         entity_id: f.entity_id,
         entity_name: f.entity_type === 'club'
             ? (clubMap.get(f.entity_id) || `Clube #${f.entity_id}`)
-            : (compMap.get(f.entity_id) || `Competição #${f.entity_id}`),
+            : (compMap.get(f.entity_id) || `${f.entity_type} #${f.entity_id}`),
         created_at: f.created_at,
     }))
 
