@@ -159,18 +159,34 @@ async function main() {
                 }
             }
 
-            if (gp > 0) {
-                await supabase
-                    .from('club_elo_history')
-                    .upsert({
-                        club_id: club.id,
-                        season,
-                        elo_rating: Math.round(rating),
-                        games_played: gp,
-                        updated_at: new Date().toISOString(),
-                    }, { onConflict: 'club_id,season' })
-                stored++
+            // Fallback: match by last significant word
+            if (gp === 0) {
+                const clubWords = clubNorm.split(/\s+/).filter(w => w.length > 3)
+                if (clubWords.length > 0) {
+                    const lastWord = clubWords[clubWords.length - 1]
+                    for (const [teamName, r] of ratings) {
+                        const teamNorm = norm(teamName)
+                        const teamWords = teamNorm.split(/\s+/).filter(w => w.length > 3)
+                        if (lastWord.length >= 4 && teamWords.includes(lastWord)) {
+                            rating = r
+                            gp = gamesPlayed.get(teamName) ?? 0
+                            break
+                        }
+                    }
+                }
             }
+
+            // Store even if 0 games (some clubs have no games this season)
+            await supabase
+                .from('club_elo_history')
+                .upsert({
+                    club_id: club.id,
+                    season,
+                    elo_rating: Math.round(rating),
+                    games_played: gp,
+                    updated_at: new Date().toISOString(),
+                }, { onConflict: 'club_id,season' })
+            stored++
         }
 
         console.log(`  ✅ ${season}: ${games.length} jogos → ${stored} clubes`)
