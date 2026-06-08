@@ -160,5 +160,15 @@ export function useAdminApi() {
                 { competition: comp },
                 getAdminToken,
             ),
+
+        trackPageView: () =>
+            callAdmin<{ ok: boolean }>('trackPageView', undefined, getAdminToken),
+
+        getPageViews: (days = 30) =>
+            callAdmin<{ views: Array<{ date: string; count: number }> }>(
+                'getPageViews',
+                { days },
+                getAdminToken,
+            ),
     }
 }

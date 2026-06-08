@@ -26,6 +26,8 @@ type AdminAction =
     | 'updateGame'
     | 'listCompetitionsMeta'
     | 'upsertCompetitionMeta'
+    | 'trackPageView'
+    | 'getPageViews'
 
 interface AdminRequest {
     action: AdminAction
@@ -418,6 +420,50 @@ async function handleUpsertCompetitionMeta(payload?: Record<string, unknown>) {
     return json({ ok: true, competition: rows[0] })
 }
 
+// ── Page views ─────────────────────────────────────────
+
+async function handleTrackPageView() {
+    try {
+        const today = new Date().toISOString().split('T')[0]
+        // Use RPC to upsert: INSERT ... ON CONFLICT DO UPDATE
+        const res = await supabaseRest('rpc/increment_page_view', {
+            method: 'POST',
+            body: JSON.stringify({ p_date: today }),
+            headers: { 'Content-Type': 'application/json' },
+        })
+        if (!res.ok) {
+            // Fallback: plain insert (will fail for duplicates, but that's OK)
+            await supabaseRest('page_views', {
+                method: 'POST',
+                body: JSON.stringify({ date: today, count: 1 }),
+                headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+            }).catch(() => {})
+        }
+        return json({ ok: true })
+    } catch {
+        return json({ ok: false }, 500)
+    }
+}
+
+async function handleGetPageViews(payload?: Record<string, unknown>) {
+    const days = (payload?.days as number) || 30
+    const start = new Date()
+    start.setDate(start.getDate() - days)
+    const startDate = start.toISOString().split('T')[0]
+
+    try {
+        const res = await supabaseRest(
+            `page_views?date=gte.${startDate}&order=date.asc`,
+            { method: 'GET' },
+        )
+        if (!res.ok) return json({ views: [] })
+        const rows = (await res.json()) as Array<{ date: string; count: number }>
+        return json({ views: rows })
+    } catch {
+        return json({ views: [] })
+    }
+}
+
 // ── Router ─────────────────────────────────────────────
 
 export default async function handler(request: Request) {
@@ -437,18 +483,23 @@ export default async function handler(request: Request) {
         return json({ error: 'POST only' }, 405)
     }
 
-    // Auth
-    const adminId = await verifyAdmin(request)
-    if (!adminId) {
-        return json({ error: 'Unauthorized — admin role required' }, 401)
-    }
-
-    // Parse body
+    // Parse body first — some actions don't need auth
     let body: AdminRequest
     try {
         body = (await request.json()) as AdminRequest
     } catch {
         return json({ error: 'Invalid JSON body' }, 400)
+    }
+
+    // trackPageView doesn't need auth (public beacon)
+    if (body.action === 'trackPageView') {
+        return await handleTrackPageView()
+    }
+
+    // Auth required for everything else
+    const adminId = await verifyAdmin(request)
+    if (!adminId) {
+        return json({ error: 'Unauthorized — admin role required' }, 401)
     }
 
     // Route to handler
@@ -480,6 +531,10 @@ export default async function handler(request: Request) {
                 return await handleListCompetitionsMeta()
             case 'upsertCompetitionMeta':
                 return await handleUpsertCompetitionMeta(payload)
+            case 'trackPageView':
+                return await handleTrackPageView()
+            case 'getPageViews':
+                return await handleGetPageViews(payload)
             default:
                 return json({ error: `Unknown action: ${action}` }, 400)
         }

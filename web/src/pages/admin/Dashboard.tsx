@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Building2, Users, Heart, Calendar } from 'lucide-react'
+import { Building2, Users, Heart, Calendar, Eye } from 'lucide-react'
 import { useAdminApi, type AdminStats } from '../../lib/adminApi'
 
 function StatCard({
@@ -36,6 +36,11 @@ export default function Dashboard() {
     const api = useAdminApi()
     const [stats, setStats] = useState<AdminStats | null>(null)
     const [error, setError] = useState<string | null>(null)
+    const [pageViews, setPageViews] = useState<Array<{ date: string; count: number }>>([])
+
+    useEffect(() => {
+        api.getPageViews(30).then(d => setPageViews(d.views)).catch(() => {})
+    }, [])
 
     useEffect(() => {
         // Try getStats first, fall back to counting from listUsers if Clerk API fails
@@ -103,7 +108,41 @@ export default function Dashboard() {
                     value={stats?.games ?? '—'}
                     color="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
                 />
+                <StatCard
+                    icon={Eye}
+                    label="Visitas (hoje)"
+                    value={pageViews.find(v => v.date === new Date().toISOString().split('T')[0])?.count ?? 0}
+                    color="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
+                />
             </div>
+
+            {/* Page views chart */}
+            {pageViews.length > 0 && (
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 mb-4">
+                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+                        <Eye size={14} className="text-amber-500" />
+                        Visitas — últimos {pageViews.length} dias
+                    </h3>
+                    <div className="flex items-end gap-1 h-32">
+                        {pageViews.map((v) => {
+                            const max = Math.max(...pageViews.map(x => x.count), 1)
+                            const pct = (v.count / max) * 100
+                            const label = v.date.slice(5) // MM-DD
+                            return (
+                                <div key={v.date} className="flex-1 flex flex-col items-center gap-1 min-w-0">
+                                    <span className="text-[9px] text-zinc-400 font-mono">{v.count || ''}</span>
+                                    <div
+                                        className="w-full rounded-t-md bg-amber-500/60 dark:bg-amber-500/40 hover:bg-amber-500 transition-colors min-h-[4px]"
+                                        style={{ height: `${Math.max(pct, 2)}%` }}
+                                        title={`${v.date}: ${v.count} visitas`}
+                                    />
+                                    <span className="text-[8px] text-zinc-500 mt-0.5">{label}</span>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
 
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 mb-4">
                 <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-3">

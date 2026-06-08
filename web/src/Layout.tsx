@@ -12,6 +12,28 @@ import { PostOnboardingSuggestions } from './components/PostOnboardingSuggestion
 import { useAuth } from './lib/AuthContext'
 import { useUser } from '@clerk/clerk-react'
 
+// ── Page view beacon (once per session per page) ──────
+
+const VIEWED_KEY = 'dribly_viewed_pages'
+function trackPageView() {
+    const today = new Date().toISOString().split('T')[0]
+    const raw = localStorage.getItem(VIEWED_KEY)
+    const viewed: string[] = raw ? JSON.parse(raw) : []
+    // Already tracked today → skip
+    if (viewed.includes(today)) return
+    // Fire beacon (fire-and-forget)
+    fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'trackPageView' }),
+    }).catch(() => {})
+    // Mark today as tracked
+    viewed.push(today)
+    // Keep only last 7 days to avoid localStorage bloat
+    while (viewed.length > 7) viewed.shift()
+    localStorage.setItem(VIEWED_KEY, JSON.stringify(viewed))
+}
+
 function Layout() {
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
     const [searchOpen, setSearchOpen] = useState(false)
@@ -33,6 +55,9 @@ function Layout() {
     }, [])
 
     useEffect(() => { window.scrollTo(0, 0) }, [location.pathname])
+
+    // Track page view (once per day)
+    useEffect(() => { trackPageView() }, [location.pathname])
 
     useEffect(() => {
         if (theme === 'dark') {
