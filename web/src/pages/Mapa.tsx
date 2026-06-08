@@ -121,6 +121,50 @@ function useClusters(pavilions: Pavilion[], zoom: number): Map<string, Pavilion[
     }, [pavilions, zoom])
 }
 
+/**
+ * Detect pavilions that share the exact same coordinates and assign
+ * tiny spiral offsets so overlapping pins are clickable.
+ * First marker stays in place; each subsequent marker shifts ~2m in
+ * a different compass direction.
+ */
+function useCoLocatedOffsets(
+    clusters: Map<string, Pavilion[]>,
+    zoom: number,
+): Map<string, [number, number]> {
+    return useMemo(() => {
+        const offsets = new Map<string, [number, number]>()
+        // Only apply offsets when zoomed in close enough
+        if (zoom < 15) return offsets
+
+        // Build map: coordinate → list of cluster keys
+        const coordMap = new Map<string, string[]>()
+        for (const [key, group] of clusters) {
+            if (group.length !== 1) continue
+            const p = group[0]
+            const coordKey = `${p.lat.toFixed(7)},${p.lng.toFixed(7)}`
+            if (!coordMap.has(coordKey)) coordMap.set(coordKey, [])
+            coordMap.get(coordKey)!.push(key)
+        }
+
+        // Spiral offsets (~2-3m steps at Portugal latitude)
+        const spiral: [number, number][] = [
+            [0.000025, 0], [-0.000025, 0],
+            [0, 0.000025], [0, -0.000025],
+            [0.000018, 0.000018], [-0.000018, 0.000018],
+            [-0.000018, -0.000018], [0.000018, -0.000018],
+        ]
+
+        for (const [, keys] of coordMap) {
+            if (keys.length <= 1) continue
+            keys.forEach((key, i) => {
+                if (i === 0) return // first stays put
+                offsets.set(key, spiral[Math.min(i - 1, spiral.length - 1)])
+            })
+        }
+        return offsets
+    }, [clusters, zoom])
+}
+
 /** Track zoom + sync position to URL */
 function ZoomWatcher({ onZoom, onMove }: { onZoom: (z: number) => void; onMove: (map: L.Map) => void }) {
     const map = useMap()
@@ -266,6 +310,7 @@ export default function Mapa() {
     }, [pavilions, selectedDistrict])
 
     const clusters = useClusters(filteredPavilions, zoom)
+    const coLocatedOffsets = useCoLocatedOffsets(clusters, zoom)
 
     const handleMarkerClick = (pavilion: Pavilion) => {
         setSelected(pavilion)
@@ -395,8 +440,12 @@ export default function Mapa() {
                         const first = group[0]
                         if (group.length === 1) {
                             const isActive = activePavilionIds.has(first.id)
+                            const offset = coLocatedOffsets.get(key)
+                            const pos: [number, number] = offset
+                                ? [first.lat + offset[0], first.lng + offset[1]]
+                                : [first.lat, first.lng]
                             return (
-                                <Marker key={key} position={[first.lat, first.lng]}
+                                <Marker key={key} position={pos}
                                     icon={isActive ? activeIcon() : inactiveIcon()}
                                     eventHandlers={{ click: () => handleMarkerClick(first) }}
                                 />
