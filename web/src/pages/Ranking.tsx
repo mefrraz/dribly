@@ -9,7 +9,8 @@ import { normalize } from '../lib/clubSearch'
 function weightedElo(club: Club): number {
     const raw = club.elo_rating ?? 1500
     const p = club.priority ?? 4
-    const bonus = p === 2 ? 200 : p === 3 ? 100 : 0
+    // Lower priority = bigger club: 1 → +300, 2 → +200, 3 → +100, 4+ → 0
+    const bonus = p === 1 ? 300 : p === 2 ? 200 : p === 3 ? 100 : 0
     return raw + bonus
 }
 
