@@ -127,21 +127,33 @@ async function handleGetStats() {
     const gamesCount = parseInt(gamesRes.headers.get('content-range')?.split('/')[1] || '0')
     const followsCount = parseInt(followsRes.headers.get('content-range')?.split('/')[1] || '0')
 
-    // Users count from Clerk (fall back to listUsers if limit=1 fails)
+    // Users count from Clerk — try multiple approaches
     let usersCount = 0
     try {
-        // Try with limit=0 first (some Clerk instances don't support limit=1)
-        const clerkUsers = await clerkApi('/users?limit=50&order_by=-created_at')
-        const total = clerkUsers.headers.get('x-total-count')
-        if (total) usersCount = parseInt(total)
-    } catch {
-        // Fallback: count from listUsers (slower but more reliable)
-        try {
-            const res2 = await clerkApi('/users?limit=100&offset=0')
-            const total2 = res2.headers.get('x-total-count')
-            if (total2) usersCount = parseInt(total2)
-        } catch { /* both failed — leave at 0 */ }
-    }
+        // Primary: use x-total-count header
+        const res = await clerkApi('/users?limit=1&offset=0')
+        const total = res.headers.get('x-total-count')
+        if (total && parseInt(total) > 0) {
+            usersCount = parseInt(total)
+        } else {
+            // Fallback: fetch a page, check header, probe next page
+            const res2 = await clerkApi('/users?limit=50&offset=0&order_by=-created_at')
+            const total2 = parseInt(res2.headers.get('x-total-count') || '0')
+            if (total2 > 0) {
+                usersCount = total2
+            } else {
+                const data = await res2.json() as unknown[]
+                // Probe: if we got 50 users, there's at least one more page
+                if (Array.isArray(data) && data.length >= 50) {
+                    const probe = await clerkApi('/users?limit=1&offset=50&order_by=-created_at')
+                    const probeTotal = parseInt(probe.headers.get('x-total-count') || '0')
+                    usersCount = probeTotal > 0 ? probeTotal : (data.length + 50)
+                } else {
+                    usersCount = Array.isArray(data) ? data.length : 0
+                }
+            }
+        }
+    } catch { /* all failed — leave at 0 */ }
 
     return json({
         clubs: clubsCount,
@@ -170,7 +182,19 @@ async function handleListUsers(payload?: Record<string, unknown>) {
         public_metadata: Record<string, unknown>
     }>
 
-    const total = parseInt(res.headers.get('x-total-count') || '0')
+    // Try x-total-count header; fall back to pagination probe if missing/zero
+    let total = parseInt(res.headers.get('x-total-count') || '0')
+    if (total === 0 && users.length > 0) {
+        // If we got users but no total header, estimate by probing next page
+        try {
+            const probe = await clerkApi(`/users?limit=1&offset=${offset + limit}&order_by=-created_at`)
+            const probeTotal = parseInt(probe.headers.get('x-total-count') || '0')
+            if (probeTotal > 0) total = probeTotal
+            else total = offset + users.length + (users.length === limit ? limit : 0) // rough estimate
+        } catch {
+            total = offset + users.length + (users.length >= limit ? 1 : 0)
+        }
+    }
 
     const mapped = users.map((u) => ({
         id: u.id,

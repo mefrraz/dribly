@@ -105,7 +105,7 @@ export default function Dashboard() {
                 />
             </div>
 
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 mb-4">
                 <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-3">
                     Atalhos
                 </h3>
@@ -135,6 +135,53 @@ export default function Dashboard() {
                         🏆 Competições
                     </a>
                 </div>
+            </div>
+
+            {/* Vercel analytics — quick links to dashboard */}
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5">
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
+                        📊 Vercel Analytics
+                    </h3>
+                    <span className="text-[10px] text-zinc-400">dribly.pt</span>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                    <a
+                        href="https://vercel.com/mefrraz/dribly/analytics"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-dribly-purple/10 hover:text-dribly-purple transition-colors font-bold flex items-center gap-1.5"
+                    >
+                        📈 Analytics
+                    </a>
+                    <a
+                        href="https://vercel.com/mefrraz/dribly/speed-insights"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-dribly-purple/10 hover:text-dribly-purple transition-colors font-bold flex items-center gap-1.5"
+                    >
+                        ⚡ Speed Insights
+                    </a>
+                    <a
+                        href="https://vercel.com/mefrraz/dribly/deployments"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-dribly-purple/10 hover:text-dribly-purple transition-colors font-bold flex items-center gap-1.5"
+                    >
+                        🚀 Deploys
+                    </a>
+                    <a
+                        href="https://vercel.com/mefrraz/dribly/logs"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-dribly-purple/10 hover:text-dribly-purple transition-colors font-bold flex items-center gap-1.5"
+                    >
+                        📋 Logs
+                    </a>
+                </div>
+                <p className="text-[10px] text-zinc-400 mt-3">
+                    Abre o dashboard do Vercel para ver page views, unique visitors, Core Web Vitals e logs das Edge Functions.
+                </p>
             </div>
         </div>
     )
