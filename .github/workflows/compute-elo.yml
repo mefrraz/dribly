@@ -1,0 +1,27 @@
+name: compute-elo
+
+on:
+  schedule:
+    - cron: '0 4 * * *'   # every day at 4am UTC
+  workflow_dispatch:       # manual trigger
+
+jobs:
+  elo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install dotenv @supabase/supabase-js
+
+      - name: Compute ELO ratings
+        run: npx tsx web/scripts/compute-elo.ts
