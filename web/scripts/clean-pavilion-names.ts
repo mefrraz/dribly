@@ -1,18 +1,19 @@
 /**
- * Clean pavilion names via AI (GPT-4o-mini).
+ * Clean pavilion names via AI (NVIDIA NIM — Llama 3.1 8B, free tier).
  *
  * Fixes: spelling errors, missing "Pavilhão" prefix, ALL CAPS, inconsistent
  * abbreviations ("Mun." → "Municipal"), and truncated/incomplete names.
  *
  * Usage:
  *   cd web
- *   OPENAI_API_KEY=sk-... SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
+ *   NVIDIA_API_KEY=nvapi-... SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
  *     npx tsx scripts/clean-pavilion-names.ts
  *
  * Dry-run mode (default): shows proposed changes without writing.
  * Pass --apply to actually update the database.
  *
- * Cost: ~400 pavilions × ~100 tokens × $0.15/1M ≈ $0.006 total.
+ * Get your free NVIDIA API key: https://build.nvidia.com/explore/discover
+ * Model: meta/llama-3.1-8b-instruct (free tier, no cost)
  */
 
 import { createClient } from '@supabase/supabase-js'
@@ -20,14 +21,14 @@ import * as readline from 'readline'
 
 // ── Config ────────────────────────────────────────────
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || ''
+const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || ''
 const SUPABASE_URL = process.env.SUPABASE_URL || ''
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 const APPLY = process.argv.includes('--apply')
 const BATCH_SIZE = 20 // pavilions per API call
 
-if (!OPENAI_API_KEY || !SUPABASE_URL || !SUPABASE_KEY) {
-    console.error('Missing env vars. Needed: OPENAI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY')
+if (!NVIDIA_API_KEY || !SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('Missing env vars. Needed: NVIDIA_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY')
     process.exit(1)
 }
 
@@ -105,14 +106,14 @@ async function main() {
     }
 
     if (!APPLY) {
-        console.log(`\n💡 Dry-run mode. Run with --apply to send ${dirty.length} names to GPT-4o-mini and update the database.`)
-        console.log(`   Estimated cost: ~$${(dirty.length * 0.000015).toFixed(4)} (GPT-4o-mini @ $0.15/1M tokens)`)
+        console.log(`\n💡 Dry-run mode. Run with --apply to send ${dirty.length} names to Llama 3.1 8B (NVIDIA NIM) and update the database.`)
+        console.log(`   Cost: FREE (NVIDIA NIM free tier)`)
         process.exit(0)
     }
 
     // ── APPLY mode ─────────────────────────────────────
 
-    console.log('\n⚠️  This will call OpenAI API and UPDATE the pavilions table.')
+    console.log('\n⚠️  This will call NVIDIA NIM API and UPDATE the pavilions table.')
     console.log(`   ${dirty.length} names will be sent for cleaning.`)
     console.log('   Press Enter to continue, or Ctrl+C to cancel...')
 
@@ -131,19 +132,20 @@ async function main() {
         console.log(`\n🤖 Sending batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(dirty.length / BATCH_SIZE)} (${batch.length} names)...`)
 
         try {
-            const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                    'Authorization': `Bearer ${NVIDIA_API_KEY}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    model: 'gpt-4o-mini',
+                    model: 'meta/llama-3.1-8b-instruct',
                     messages: [
                         { role: 'system', content: SYSTEM_PROMPT },
                         { role: 'user', content: names.join('\n') },
                     ],
                     temperature: 0,
+                    top_p: 0.7,
                     max_tokens: batch.length * 60,
                 }),
             })
