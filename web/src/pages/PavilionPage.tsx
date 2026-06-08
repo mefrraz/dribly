@@ -135,16 +135,13 @@ export default function PavilionPage() {
                         <h1 className="text-xl font-black text-zinc-900 dark:text-white">
                             {pavilion.nome}
                         </h1>
-                        <div className="flex items-center gap-2 mt-1">
-                            {pavilion.distrito && (
+                        {pavilion.distrito && (
+                            <div className="flex items-center gap-2 mt-1">
                                 <span className="inline-block px-2 py-0.5 rounded-md bg-dribly-purple/10 text-[10px] font-bold text-dribly-purple">
                                     {pavilion.distrito}
                                 </span>
-                            )}
-                            {pavilion.cidade && pavilion.cidade !== pavilion.distrito && (
-                                <span className="text-xs text-zinc-400">{pavilion.cidade}</span>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
