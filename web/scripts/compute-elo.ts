@@ -1,8 +1,8 @@
 /**
- * Compute-ELO — Calcula ratings ELO para todos os clubes com base em 23 épocas.
+ * Compute-ELO — Calcula ratings ELO por época e guarda em club_elo_history.
  *
  * Uso:  npx tsx web/scripts/compute-elo.ts
- * Requer: SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY no ambiente (.env ou CI)
+ * Requer: SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
  */
 
 import 'dotenv/config'
@@ -35,6 +35,10 @@ function tableName(season: string): string {
     return 'games_' + season.replace('/', '_')
 }
 
+function norm(s: string): string {
+    return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+}
+
 interface Game {
     data: string
     equipa_casa: string
@@ -43,20 +47,45 @@ interface Game {
     resultado_fora: number | null
 }
 
-function norm(s: string): string {
-    return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
-}
-
 async function main() {
-    console.log('🏀 Computing ELO ratings...\n')
+    console.log('🏀 Computing ELO ratings per season...\n')
 
-    // 1. Fetch ALL games from all seasons (paginated, Supabase max 1000/request)
-    const allGames: Game[] = []
+    // ── Load club data ──
+    const { data: clubData } = await supabase
+        .from('clubs')
+        .select('id, name, priority')
+
+    if (!clubData) { console.error('No clubs found'); process.exit(1) }
+
+    const clubs = clubData as { id: number; name: string; priority: number | null }[]
+    console.log(`  📋 ${clubs.length} clubes carregados`)
+
+    // Build priority lookup
+    const clubPriority = new Map<string, number>()
+    for (const c of clubs) {
+        clubPriority.set(norm(c.name), c.priority ?? 4)
+    }
+
+    function getClubPriority(teamName: string): number {
+        const n = norm(teamName)
+        if (clubPriority.has(n)) return clubPriority.get(n)!
+        const words = n.split(/\s+/).filter(w => w.length > 3)
+        for (let i = words.length - 1; i >= 0; i--) {
+            for (const [cn, p] of clubPriority) {
+                if (cn.includes(words[i])) return p
+            }
+        }
+        return 4
+    }
+
+    // ── Process each season independently ──
     for (const season of SEASONS) {
         const table = tableName(season)
+
+        // Fetch games with pagination
+        const games: Game[] = []
         let page = 0
         const PAGE = 1000
-        let totalForSeason = 0
         while (true) {
             const { data, error } = await supabase
                 .from(table)
@@ -66,151 +95,88 @@ async function main() {
                 .order('data', { ascending: true })
                 .range(page * PAGE, (page + 1) * PAGE - 1)
 
-            if (error) {
-                console.error(`  ⚠️  ${table} page ${page}: ${error.message}`)
-                break
-            }
+            if (error) break
             if (!data || data.length === 0) break
-
-            // Normalize team names
             for (const row of data as unknown as Game[]) {
-                allGames.push({
+                games.push({
                     ...row,
                     equipa_casa: norm(row.equipa_casa),
                     equipa_fora: norm(row.equipa_fora),
                 })
             }
-            totalForSeason += data.length
             if (data.length < PAGE) break
             page++
         }
-        if (totalForSeason > 0) console.log(`  ✅ ${table}: ${totalForSeason} jogos`)
-    }
 
-    // 2. Load club priorities for importance weighting
-    const { data: clubData } = await supabase
-        .from('clubs')
-        .select('name, priority, id')
-    const clubPriority = new Map<string, number>()
-    if (clubData) {
-        for (const c of clubData as { name: string; priority: number | null; id: number }[]) {
-            clubPriority.set(norm(c.name), c.priority ?? 4)
-        }
-    }
-    console.log(`  📋 ${clubPriority.size} prioridades carregadas`)
-
-    // 3. Sort all games by date
-    allGames.sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
-    console.log(`\n  📊 Total: ${allGames.length} jogos processados`)
-
-    // 4. Compute ELO with importance weighting
-    const ratings = new Map<string, number>()
-
-    function getRating(club: string): number {
-        return ratings.get(club) ?? START_RATING
-    }
-
-    function getPriority(teamName: string): number {
-        // Try exact match, then fallback by last word
-        const n = norm(teamName)
-        if (clubPriority.has(n)) return clubPriority.get(n)!
-        // Fallback: match last word
-        const words = n.split(/\s+/).filter(w => w.length > 3)
-        for (let i = words.length - 1; i >= 0; i--) {
-            for (const [cn, p] of clubPriority) {
-                if (cn.includes(words[i])) return p
-            }
-        }
-        return 4 // default: lowest importance
-    }
-
-    for (const game of allGames) {
-        const casa = game.equipa_casa.trim()
-        const fora = game.equipa_fora.trim()
-        const scoreCasa = game.resultado_casa ?? 0
-        const scoreFora = game.resultado_fora ?? 0
-
-        const rCasa = getRating(casa)
-        const rFora = getRating(fora)
-        const pCasa = getPriority(casa)
-        const pFora = getPriority(fora)
-
-        // Priority adjustment: bigger club (lower number) gets rating boost in expectation
-        // priority 2 vs 4 → +200 boost for the priority-2 club
-        const priorityAdj = (pFora - pCasa) * 100
-
-        // Expected scores with priority adjustment
-        const eCasa = 1 / (1 + Math.pow(10, (rFora - rCasa + priorityAdj) / 400))
-        const eFora = 1 - eCasa
-
-        // Actual scores
-        let sCasa = 0.5
-        let sFora = 0.5
-        if (scoreCasa > scoreFora) { sCasa = 1; sFora = 0 }
-        else if (scoreFora > scoreCasa) { sCasa = 0; sFora = 1 }
-
-        // New ratings
-        ratings.set(casa, rCasa + K_FACTOR * (sCasa - eCasa))
-        ratings.set(fora, rFora + K_FACTOR * (sFora - eFora))
-    }
-
-    console.log(`  🧮 Ratings calculados para ${ratings.size} equipas`)
-
-    // 4. Match team names to club IDs via the clubs table
-    const { data: clubs } = await supabase
-        .from('clubs')
-        .select('id, name')
-
-    if (!clubs) {
-        console.error('Failed to fetch clubs')
-        process.exit(1)
-    }
-
-    function normalize(s: string): string {
-        return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
-    }
-
-    console.log('\n  🔗 A ligar equipas aos clubes...')
-    let matched = 0
-
-    for (const club of clubs) {
-        const clubNorm = normalize(club.name)
-        let bestRating: number | null = null
-
-        // Try exact match first
-        for (const [teamName, rating] of ratings) {
-            const teamNorm = normalize(teamName)
-            if (teamNorm === clubNorm || teamNorm.includes(clubNorm) || clubNorm.includes(teamNorm)) {
-                bestRating = rating
-                break
-            }
+        if (games.length === 0) {
+            console.log(`  ⚠️  ${season}: sem jogos`)
+            continue
         }
 
-        // Fallback: match by last significant word
-        if (bestRating === null) {
-            const clubWords = clubNorm.split(/\s+/).filter(w => w.length > 3)
-            const lastClubWord = clubWords[clubWords.length - 1]
-            for (const [teamName, rating] of ratings) {
-                const teamNorm = normalize(teamName)
-                const teamWords = teamNorm.split(/\s+/).filter(w => w.length > 3)
-                if (lastClubWord && teamWords.includes(lastClubWord)) {
-                    bestRating = rating
+        // Compute ELO for this season
+        const ratings = new Map<string, number>()
+        const gamesPlayed = new Map<string, number>()
+
+        for (const game of games) {
+            const casa = game.equipa_casa.trim()
+            const fora = game.equipa_fora.trim()
+            const scoreCasa = game.resultado_casa ?? 0
+            const scoreFora = game.resultado_fora ?? 0
+
+            const rCasa = ratings.get(casa) ?? START_RATING
+            const rFora = ratings.get(fora) ?? START_RATING
+            const pCasa = getClubPriority(casa)
+            const pFora = getClubPriority(fora)
+
+            const priorityAdj = (pFora - pCasa) * 100
+
+            const eCasa = 1 / (1 + Math.pow(10, (rFora - rCasa + priorityAdj) / 400))
+            const eFora = 1 - eCasa
+
+            let sCasa = 0.5, sFora = 0.5
+            if (scoreCasa > scoreFora) { sCasa = 1; sFora = 0 }
+            else if (scoreFora > scoreCasa) { sCasa = 0; sFora = 1 }
+
+            ratings.set(casa, rCasa + K_FACTOR * (sCasa - eCasa))
+            ratings.set(fora, rFora + K_FACTOR * (sFora - eFora))
+            gamesPlayed.set(casa, (gamesPlayed.get(casa) ?? 0) + 1)
+            gamesPlayed.set(fora, (gamesPlayed.get(fora) ?? 0) + 1)
+        }
+
+        // Match to clubs and store
+        let stored = 0
+        for (const club of clubs) {
+            const clubNorm = norm(club.name)
+            let rating = START_RATING
+            let gp = 0
+
+            for (const [teamName, r] of ratings) {
+                const teamNorm = norm(teamName)
+                if (teamNorm === clubNorm || teamNorm.includes(clubNorm) || clubNorm.includes(teamNorm)) {
+                    rating = r
+                    gp = gamesPlayed.get(teamName) ?? 0
                     break
                 }
             }
+
+            if (gp > 0) {
+                await supabase
+                    .from('club_elo_history')
+                    .upsert({
+                        club_id: club.id,
+                        season,
+                        elo_rating: Math.round(rating),
+                        games_played: gp,
+                        updated_at: new Date().toISOString(),
+                    }, { onConflict: 'club_id,season' })
+                stored++
+            }
         }
 
-        if (bestRating !== null) {
-            await supabase
-                .from('clubs')
-                .update({ elo_rating: Math.round(bestRating) })
-                .eq('id', club.id)
-            matched++
-        }
+        console.log(`  ✅ ${season}: ${games.length} jogos → ${stored} clubes`)
     }
 
-    console.log(`  ✅ ${matched}/${clubs.length} clubes atualizados com ELO`)
-    console.log('\n🏆 Ranking ELO completo!')
+    console.log('\n🏆 ELO por época completo!')
 }
 
 main().catch(err => {

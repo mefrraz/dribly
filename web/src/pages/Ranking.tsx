@@ -3,15 +3,17 @@ import { Link } from 'react-router-dom'
 import { Search, TrendingUp, Loader2, HelpCircle, X } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
 import { SeoHead } from '../components/SeoHead'
-import { useClub, type Club, displayName } from '../lib/ClubContext'
+import { supabase } from '../lib/supabase'
 import { normalize } from '../lib/clubSearch'
 
-function weightedElo(club: Club): number {
-    const raw = club.elo_rating ?? 1500
-    const p = club.priority ?? 4
-    // Lower priority = bigger club: 1 → +300, 2 → +200, 3 → +100, 4+ → 0
-    const bonus = p === 1 ? 300 : p === 2 ? 200 : p === 3 ? 100 : 0
-    return raw + bonus
+interface RankedClub {
+    id: number
+    name: string
+    slug: string
+    search_name: string
+    logo_url: string | null
+    priority: number | null
+    elo: number
 }
 
 const SEASONS = [
@@ -21,31 +23,58 @@ const SEASONS = [
     '2007/2008', '2006/2007', '2005/2006', '2004/2005', '2003/2004',
 ]
 
+function displayName(club: { name: string; short_name?: string | null }): string {
+    return club.short_name || club.name
+}
+
 function Ranking() {
-    const { clubs, loadClubs } = useClub()
     const [query, setQuery] = useState('')
     const [loading, setLoading] = useState(true)
     const [showHelp, setShowHelp] = useState(false)
     const [season, setSeason] = useState(SEASONS[0])
+    const [clubs, setClubs] = useState<RankedClub[]>([])
 
     useEffect(() => {
-        loadClubs().finally(() => setLoading(false))
-    }, [loadClubs])
-
-    const ranked = useMemo(() => {
-        return [...clubs].sort((a, b) => weightedElo(b) - weightedElo(a))
-    }, [clubs])
+        setLoading(true)
+        supabase
+            .from('club_elo_history')
+            .select('club_id, elo_rating, clubs!inner(id, name, slug, search_name, logo_url, priority)')
+            .eq('season', season)
+            .order('elo_rating', { ascending: false })
+            .then(({ data }) => {
+                if (data) {
+                    setClubs(
+                        (data as unknown as {
+                            club_id: number
+                            elo_rating: number
+                            clubs: { id: number; name: string; slug: string; search_name: string; logo_url: string | null; priority: number | null }
+                        }[]).map(row => ({
+                            id: row.clubs.id,
+                            name: row.clubs.name,
+                            slug: row.clubs.slug,
+                            search_name: row.clubs.search_name,
+                            logo_url: row.clubs.logo_url,
+                            priority: row.clubs.priority,
+                            elo: Math.round(row.elo_rating),
+                        }))
+                    )
+                } else {
+                    setClubs([])
+                }
+                setLoading(false)
+            })
+    }, [season])
 
     const filtered = useMemo(() => {
-        if (!query.trim()) return ranked
+        if (!query.trim()) return clubs
         const q = normalize(query)
-        return ranked.filter(c =>
+        return clubs.filter(c =>
             normalize(c.name).includes(q) ||
             normalize(c.search_name || '').includes(q)
         )
-    }, [ranked, query])
+    }, [clubs, query])
 
-    if (loading && clubs.length === 0) {
+    if (loading) {
         return (
             <div className="max-w-xl mx-auto pb-24 px-3 flex items-center justify-center min-h-[50vh]">
                 <Loader2 size={24} className="animate-spin text-dribly-purple" />
@@ -55,14 +84,14 @@ function Ranking() {
 
     return (
         <div className="max-w-xl mx-auto pb-24 px-3">
-            <SeoHead title="Ranking Nacional" description="Ranking ELO de todos os clubes de basquetebol português baseado em 24.000+ jogos." />
+            <SeoHead title="Ranking Nacional" description="Ranking ELO de todos os clubes de basquetebol português por época." />
             <PageHeader title="Voltar" />
 
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <div>
                     <h1 className="text-base font-black text-zinc-900 dark:text-white">Ranking Nacional</h1>
-                    <p className="text-[11px] text-zinc-400">{ranked.length} clubes ordenados por desempenho</p>
+                    <p className="text-[11px] text-zinc-400">{clubs.length} clubes em {season}</p>
                 </div>
                 <button
                     onClick={() => setShowHelp(true)}
@@ -85,9 +114,6 @@ function Ranking() {
                         <option key={s} value={s}>{s}</option>
                     ))}
                 </select>
-                {season !== '2025/2026' && (
-                    <span className="text-[10px] text-amber-500">(dados limitados)</span>
-                )}
             </div>
 
             {/* Search */}
@@ -103,51 +129,53 @@ function Ranking() {
             </div>
 
             {/* List */}
-            <div className="glass-card divide-y divide-zinc-100 dark:divide-white/5">
-                {filtered.length === 0 ? (
-                    <p className="text-xs text-zinc-400 text-center py-12">Nenhum clube encontrado.</p>
-                ) : (
-                    filtered.map((club) => (
-                        <Link
-                            key={club.id}
-                            to={`/clube/${club.slug}/home`}
-                            className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors group"
-                        >
-                            {/* Posição */}
-                            <span className="w-6 text-xs font-bold text-zinc-400 dark:text-zinc-500 text-right shrink-0">
-                                {ranked.indexOf(club) + 1}
-                            </span>
-
-                            {/* Logo */}
-                            <div className="w-8 h-8 shrink-0 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center overflow-hidden">
-                                {club.logo_url ? (
-                                    <img src={club.logo_url} alt="" className="w-5 h-5 object-contain" />
-                                ) : (
-                                    <span className="text-[10px] font-bold text-zinc-500">
-                                        {displayName(club).charAt(0)}
-                                    </span>
-                                )}
-                            </div>
-
-                            {/* Nome + prioridade se relevante */}
-                            <div className="flex-1 min-w-0">
-                                <span className="text-sm font-bold text-zinc-900 dark:text-white truncate block">
-                                    {displayName(club)}
+            {clubs.length === 0 ? (
+                <div className="glass-card p-8 text-center">
+                    <p className="text-xs text-zinc-400">Sem dados para esta época.</p>
+                </div>
+            ) : (
+                <div className="glass-card divide-y divide-zinc-100 dark:divide-white/5">
+                    {filtered.length === 0 ? (
+                        <p className="text-xs text-zinc-400 text-center py-12">Nenhum clube encontrado.</p>
+                    ) : (
+                        filtered.map((club, i) => (
+                            <Link
+                                key={club.id}
+                                to={`/clube/${club.slug}/home`}
+                                className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors group"
+                            >
+                                <span className="w-6 text-xs font-bold text-zinc-400 dark:text-zinc-500 text-right shrink-0">
+                                    {i + 1}
                                 </span>
-                            </div>
 
-                            {/* ELO */}
-                            <span className="text-sm font-mono font-bold text-dribly-purple shrink-0 ml-2">
-                                {weightedElo(club)}
-                            </span>
-                        </Link>
-                    ))
-                )}
-            </div>
+                                <div className="w-8 h-8 shrink-0 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center overflow-hidden">
+                                    {club.logo_url ? (
+                                        <img src={club.logo_url} alt="" className="w-5 h-5 object-contain" />
+                                    ) : (
+                                        <span className="text-[10px] font-bold text-zinc-500">
+                                            {club.name.charAt(0)}
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                    <span className="text-sm font-bold text-zinc-900 dark:text-white truncate block">
+                                        {displayName(club)}
+                                    </span>
+                                </div>
+
+                                <span className="text-sm font-mono font-bold text-dribly-purple shrink-0 ml-2">
+                                    {club.elo}
+                                </span>
+                            </Link>
+                        ))
+                    )}
+                </div>
+            )}
 
             <p className="text-[10px] text-zinc-400 text-center mt-4 flex items-center justify-center gap-1">
                 <TrendingUp size={11} />
-                Atualizado diariamente · {ranked.length} clubes
+                Atualizado diariamente · {clubs.length} clubes
             </p>
 
             {/* Help modal */}
@@ -182,7 +210,7 @@ function Ranking() {
                                 </div>
                             </div>
 
-                            <p className="text-zinc-400">Cada época é independente — o rating recomeça nos 1.500 pts. Baseado em 24.000+ jogos da época {season}.</p>
+                            <p className="text-zinc-400">Cada época é independente — o rating recomeça nos 1.500 pts. Dados da época {season}.</p>
                         </div>
                     </div>
                 </div>
