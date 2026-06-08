@@ -11,7 +11,15 @@ const CLUBS_CACHE_KEY = 'dribly_clubs_cache_v2'
 function loadCachedClubs(): Club[] {
     try {
         const raw = localStorage.getItem(CLUBS_CACHE_KEY)
-        if (raw) return JSON.parse(raw) as Club[]
+        if (raw) {
+            const clubs = JSON.parse(raw) as Club[]
+            // Invalidate cache if new fields are missing (e.g., elo_rating added later)
+            if (clubs.length > 0 && clubs[0].elo_rating === undefined) {
+                localStorage.removeItem(CLUBS_CACHE_KEY)
+                return []
+            }
+            return clubs
+        }
     } catch { /* ignore */ }
     return []
 }
