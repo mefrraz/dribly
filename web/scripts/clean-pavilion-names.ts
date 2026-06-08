@@ -117,10 +117,15 @@ async function main() {
     console.log(`   ${dirty.length} names will be sent for cleaning.`)
     console.log('   Press Enter to continue, or Ctrl+C to cancel...')
 
-    await new Promise<void>((resolve) => {
-        const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-        rl.question('', () => { rl.close(); resolve() })
-    })
+    // Auto-confirm when stdin is piped (non-interactive)
+    if (process.stdin.isTTY) {
+        await new Promise<void>((resolve) => {
+            const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+            rl.question('', () => { rl.close(); resolve() })
+        })
+    } else {
+        console.log('(auto-confirming — non-interactive mode)')
+    }
 
     // Process in batches
     const corrections: { id: number; old: string; new: string }[] = []
