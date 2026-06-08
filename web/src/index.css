@@ -54,7 +54,7 @@
      Reduces initial paint cost for long lists (clubes, equipas, jogos). */
   .content-visibility-auto {
     content-visibility: auto;
-    contain-intrinsic-size: auto 80px;
+    contain-intrinsic-size: auto 120px;
   }
 }
 

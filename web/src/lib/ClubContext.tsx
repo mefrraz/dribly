@@ -6,7 +6,7 @@ import { ClubContext, type Club } from './useClub'
 // eslint-disable-next-line react-refresh/only-export-components
 export { useClub, displayName, type Club, type ClubContextType } from './useClub'
 
-const CLUBS_CACHE_KEY = 'dribly_clubs_cache'
+const CLUBS_CACHE_KEY = 'dribly_clubs_cache_v2'
 
 function loadCachedClubs(): Club[] {
     try {

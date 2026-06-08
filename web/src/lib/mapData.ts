@@ -89,27 +89,56 @@ export async function fetchGamesAtPavilion(pavilionName: string, _city?: string 
 }
 
 /**
+ * Normalize a pavilion or game-local name for fuzzy matching:
+ * lowercase, strip accents, remove common prefixes and filler words.
+ */
+function normalizeName(name: string): string {
+    return name
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // strip accents
+        .replace(/^pavilhao\s+(municipal\s+)?/i, '')
+        .replace(/^pav\.\s*/i, '')
+        .replace(/^mun\.\s*/i, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+}
+
+/**
  * Count games at each pavilion (for cluster labels).
+ * Matches game.local against pavilion names via normalized substring matching.
  * Returns a map: pavilion_id → game_count
- *
- * TODO: implement pavilion name matching against games.local to produce
- *       meaningful per-pavilion counts for cluster display.
  */
 export async function fetchPavilionGameCounts(): Promise<Map<number, number>> {
-    const { data } = await supabase
-        .from('games_2025_2026')
-        .select('local')
-        .not('local', 'is', null)
-        .limit(5000)
+    // Fetch pavilions and games in parallel
+    const [pavRes, gamesRes] = await Promise.all([
+        supabase.from('pavilions').select('id, nome').not('lat', 'is', null),
+        supabase.from('games_2025_2026').select('local').not('local', 'is', null).limit(5000),
+    ])
 
-    if (!data) return new Map()
+    const pavilions = (pavRes.data || []) as { id: number; nome: string }[]
+    const games = (gamesRes.data || []) as { local: string }[]
 
-    // Count games per pavilion by substring-matching game.local against pavilion names
+    if (pavilions.length === 0 || games.length === 0) return new Map()
+
+    // Pre-normalize pavilion names
+    const normPavs = pavilions.map(p => ({ id: p.id, norm: normalizeName(p.nome) }))
+
     const counts = new Map<number, number>()
-    for (const game of data) {
-        const local = (game as { local: string }).local
-        if (local) {
-            counts.set(0, (counts.get(0) || 0) + 1)
+    for (const game of games) {
+        if (!game.local) continue
+        const normLocal = normalizeName(game.local)
+        if (normLocal.length < 3) continue
+
+        // Try exact match first, then substring containment
+        let bestId: number | null = null
+        for (const p of normPavs) {
+            if (p.norm === normLocal) { bestId = p.id; break }
+            if (p.norm.includes(normLocal) || normLocal.includes(p.norm)) {
+                bestId = p.id // last match wins (longest name is most precise)
+            }
+        }
+        if (bestId !== null) {
+            counts.set(bestId, (counts.get(bestId) || 0) + 1)
         }
     }
 

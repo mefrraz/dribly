@@ -9,7 +9,7 @@
  */
 import { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { MapPin, CalendarDays, Trophy, Info, Navigation, Home, Mail, Building2, Globe } from 'lucide-react'
+import { MapPin, CalendarDays, Trophy, Info, Navigation, Home, Mail } from 'lucide-react'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { PageHeader } from '../components/PageHeader'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
@@ -212,20 +212,6 @@ export default function PavilionPage() {
                                     <div className="min-w-0">
                                         <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Código Postal</p>
                                         <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.codigo_postal || '—'}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-2.5">
-                                    <Building2 size={14} className="text-zinc-400 shrink-0 mt-0.5" />
-                                    <div className="min-w-0">
-                                        <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Cidade</p>
-                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.cidade || '—'}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-2.5">
-                                    <Globe size={14} className="text-zinc-400 shrink-0 mt-0.5" />
-                                    <div className="min-w-0">
-                                        <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Distrito</p>
-                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.distrito || '—'}</p>
                                     </div>
                                 </div>
                             </div>
