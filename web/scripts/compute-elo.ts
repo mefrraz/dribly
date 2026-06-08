@@ -176,6 +176,25 @@ async function main() {
         console.log(`  ✅ ${season}: ${games.length} jogos → ${stored} clubes`)
     }
 
+    // ── Sync current season ELO to clubs.elo_rating (for club page display) ──
+    console.log('\n  📊 A sincronizar ELO da época atual para a tabela clubs...')
+    const { data: currentSeason } = await supabase
+        .from('club_elo_history')
+        .select('club_id, elo_rating')
+        .eq('season', '2025/2026')
+
+    if (currentSeason) {
+        let synced = 0
+        for (const row of currentSeason as { club_id: number; elo_rating: number }[]) {
+            await supabase
+                .from('clubs')
+                .update({ elo_rating: row.elo_rating })
+                .eq('id', row.club_id)
+            synced++
+        }
+        console.log(`  ✅ ${synced} clubes atualizados na tabela clubs`)
+    }
+
     console.log('\n🏆 ELO por época completo!')
 }
 
