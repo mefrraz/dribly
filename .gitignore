@@ -51,6 +51,7 @@ web_antiga/
 /scripts/
 scrapers/scraped_*.json
 scrapers/*.js
+scrapers/*.cjs
 fpb_clubes*.json
 https___*.htm
 dribly_logos_finais.html
