@@ -143,8 +143,17 @@ async function main() {
             gamesPlayed.set(fora, (gamesPlayed.get(fora) ?? 0) + 1)
         }
 
-        // Match to clubs and store
-        let stored = 0
+        // Skip empty seasons early
+        if (games.length === 0) {
+            console.log(`  ⚠️  ${season}: sem jogos`)
+            continue
+        }
+
+        // Match to clubs and build batch
+        const batch: { club_id: number; season: string; elo_rating: number; games_played: number; updated_at: string }[] = []
+        const now = new Date().toISOString()
+        let withGames = 0
+
         for (const club of clubs) {
             const clubNorm = norm(club.name)
             let rating = START_RATING
@@ -155,6 +164,7 @@ async function main() {
                 if (teamNorm === clubNorm || teamNorm.includes(clubNorm) || clubNorm.includes(teamNorm)) {
                     rating = r
                     gp = gamesPlayed.get(teamName) ?? 0
+                    if (gp > 0) withGames++
                     break
                 }
             }
@@ -170,29 +180,37 @@ async function main() {
                         if (lastWord.length >= 4 && teamWords.includes(lastWord)) {
                             rating = r
                             gp = gamesPlayed.get(teamName) ?? 0
+                            if (gp > 0) withGames++
                             break
                         }
                     }
                 }
             }
 
-            // Store even if 0 games (some clubs have no games this season)
-            await supabase
-                .from('club_elo_history')
-                .upsert({
-                    club_id: club.id,
-                    season,
-                    elo_rating: Math.round(rating),
-                    games_played: gp,
-                    updated_at: new Date().toISOString(),
-                }, { onConflict: 'club_id,season' })
-            stored++
+            batch.push({
+                club_id: club.id,
+                season,
+                elo_rating: Math.round(rating),
+                games_played: gp,
+                updated_at: now,
+            })
+        }
+
+        // Batch upsert — single request
+        const { error: upsertErr } = await supabase
+            .from('club_elo_history')
+            .upsert(batch, { onConflict: 'club_id,season' })
+
+        if (upsertErr) {
+            console.error(`  ❌ ${season}: upsert error — ${upsertErr.message}`)
+        } else {
+            console.log(`  ✅ ${season}: ${games.length} jogos → ${withGames} clubes com jogos`)
         }
 
         console.log(`  ✅ ${season}: ${games.length} jogos → ${stored} clubes`)
     }
 
-    // ── Sync current season ELO to clubs.elo_rating (for club page display) ──
+    // ── Sync current season ELO to clubs.elo_rating (batch upsert) ──
     console.log('\n  📊 A sincronizar ELO da época atual para a tabela clubs...')
     const { data: currentSeason } = await supabase
         .from('club_elo_history')
@@ -200,15 +218,16 @@ async function main() {
         .eq('season', '2025/2026')
 
     if (currentSeason) {
-        let synced = 0
-        for (const row of currentSeason as { club_id: number; elo_rating: number }[]) {
-            await supabase
-                .from('clubs')
-                .update({ elo_rating: row.elo_rating })
-                .eq('id', row.club_id)
-            synced++
+        const updates = (currentSeason as { club_id: number; elo_rating: number }[]).map(row => ({
+            id: row.club_id,
+            elo_rating: row.elo_rating,
+        }))
+        const { error: updErr } = await supabase.from('clubs').upsert(updates, { onConflict: 'id' })
+        if (updErr) {
+            console.error(`  ❌ Sync error: ${updErr.message}`)
+        } else {
+            console.log(`  ✅ ${updates.length} clubes sincronizados`)
         }
-        console.log(`  ✅ ${synced} clubes atualizados na tabela clubs`)
     }
 
     console.log('\n🏆 ELO por época completo!')
