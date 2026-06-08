@@ -1,0 +1,1477 @@
+[
+  {
+    "id": 1,
+    "name": "Anadia Futebol Clube",
+    "primary_color": "#145DA0"
+  },
+  {
+    "id": 3,
+    "name": "Associação Desportiva Sanjoanense",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 4,
+    "name": "Sporting Clube das Caldas",
+    "primary_color": "#2ECC71"
+  },
+  {
+    "id": 5,
+    "name": "Clube dos Galitos",
+    "primary_color": "#B20E0F"
+  },
+  {
+    "id": 6,
+    "name": "Sport Clube Beira Mar",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 7,
+    "name": "Olivais Futebol Clube",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 8,
+    "name": "Ginásio Clube Figueirense",
+    "primary_color": "#FA0000"
+  },
+  {
+    "id": 9,
+    "name": "Sporting Clube Farense",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 12,
+    "name": "A.D.O. Basquetebol da Associação Desportiva Ovarense",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 13,
+    "name": "Clube Desportivo Covilhã",
+    "primary_color": "#2C14DB"
+  },
+  {
+    "id": 16,
+    "name": "Sangalhos Desporto Clube",
+    "primary_color": "#2D2BCA"
+  },
+  {
+    "id": 17,
+    "name": "Clube Desportivo Lousanense",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 18,
+    "name": "Clube do Povo de Esgueira",
+    "primary_color": "#088000"
+  },
+  {
+    "id": 22,
+    "name": "Illiabum Clube",
+    "primary_color": "#FFF824"
+  },
+  {
+    "id": 23,
+    "name": "Ginásio Clube Olhanense",
+    "primary_color": "#048B38"
+  },
+  {
+    "id": 24,
+    "name": "Clube de Futebol Os Bonjoanenses de Faro",
+    "primary_color": "#ECF0F1"
+  },
+  {
+    "id": 25,
+    "name": "Sport Clube Conimbricense",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 26,
+    "name": "Sporting Clube Marinhense",
+    "primary_color": "#0CB035"
+  },
+  {
+    "id": 28,
+    "name": "União Desportiva Oliveirense",
+    "primary_color": "#AC0609"
+  },
+  {
+    "id": 30,
+    "name": "Clube Amigos do Basquete",
+    "primary_color": "#FF0000"
+  },
+  {
+    "id": 31,
+    "name": "União Desportiva e Recreativa da Zona Alta",
+    "primary_color": "#2A8301"
+  },
+  {
+    "id": 32,
+    "name": "Associação Recreativa e Cultural de Oliveirinha",
+    "primary_color": "#2C3E50"
+  },
+  {
+    "id": 35,
+    "name": "Clube Stella Maris Peniche",
+    "primary_color": "#E9FA00"
+  },
+  {
+    "id": 36,
+    "name": "Clube Futebol Os Belenenses",
+    "primary_color": "#145DA0"
+  },
+  {
+    "id": 37,
+    "name": "Juventude Basquetebol Clube",
+    "primary_color": "#68B6D2"
+  },
+  {
+    "id": 39,
+    "name": "Associação Académica de Coimbra",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 41,
+    "name": "Atlético Clube de Portugal",
+    "primary_color": "#145DA0"
+  },
+  {
+    "id": 43,
+    "name": "Atlético Sport Clube/Bomb Vol Reguengos Monsaraz",
+    "primary_color": "#025F15"
+  },
+  {
+    "id": 45,
+    "name": "Clube Juvenil Boa Viagem",
+    "primary_color": "#4294BD"
+  },
+  {
+    "id": 48,
+    "name": "Grupo Desportivo da Gafanha",
+    "primary_color": "#FFFFFF"
+  },
+  {
+    "id": 49,
+    "name": "Clube Desportivo de Campinho",
+    "primary_color": "#16A085"
+  },
+  {
+    "id": 51,
+    "name": "Associação Recreativa Amarense",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 53,
+    "name": "Sporting Clube Figueirense",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 60,
+    "name": "Sporting Clube Olhanense",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 66,
+    "name": "Grupo Desportivo André Soares",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 68,
+    "name": "Grupo Desportivo Escola Secundária de Santo André",
+    "primary_color": "#13811B"
+  },
+  {
+    "id": 69,
+    "name": "Famalicense Atlético Clube",
+    "primary_color": "#000165"
+  },
+  {
+    "id": 73,
+    "name": "Núcleo Desporto Amador Pombal",
+    "primary_color": "#145DA0"
+  },
+  {
+    "id": 74,
+    "name": "Clube Basquetebol de Leiria",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 76,
+    "name": "Sport Club Lusitânia",
+    "primary_color": "#05761B"
+  },
+  {
+    "id": 79,
+    "name": "Clube Náutico de Abrantes",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 88,
+    "name": "Ginásio Clube de Águeda",
+    "primary_color": "#0c5583"
+  },
+  {
+    "id": 89,
+    "name": "Fayal Sport Club",
+    "primary_color": "#2ECC71"
+  },
+  {
+    "id": 99,
+    "name": "Sociedade de Instrução Musical Escolar Cruz-Quebradense",
+    "primary_color": "#16A085"
+  },
+  {
+    "id": 105,
+    "name": "Maria Pia Sport Clube",
+    "primary_color": "#145DA0"
+  },
+  {
+    "id": 106,
+    "name": "Carnide Clube",
+    "primary_color": "#145DA0"
+  },
+  {
+    "id": 107,
+    "name": "Centro dos Antigos Alunos Salesianos",
+    "primary_color": "#041171"
+  },
+  {
+    "id": 118,
+    "name": "Clube Desportivo da Póvoa",
+    "primary_color": "#302DCD"
+  },
+  {
+    "id": 119,
+    "name": "Futebol Clube de Gaia",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 120,
+    "name": "Futebol Clube do Porto",
+    "primary_color": "#145DA0"
+  },
+  {
+    "id": 122,
+    "name": "Clube Propaganda de Natação",
+    "primary_color": "#0000FF"
+  },
+  {
+    "id": 127,
+    "name": "Sport Lisboa e Benfica",
+    "primary_color": "#C30000"
+  },
+  {
+    "id": 130,
+    "name": "Clube Nacional de Natação",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 131,
+    "name": "Atletico Clube de Moscavide",
+    "primary_color": "#3289FB"
+  },
+  {
+    "id": 135,
+    "name": "Sport Algés e Dafundo",
+    "primary_color": "#27AE60"
+  },
+  {
+    "id": 153,
+    "name": "Clube de Basquete de Albufeira",
+    "primary_color": "#0135D8"
+  },
+  {
+    "id": 160,
+    "name": "Juvemaia - Associação Cultural Desportiva e Cívica",
+    "primary_color": "#2980B9"
+  },
+  {
+    "id": 169,
+    "name": "Sporting Clube de Portugal",
+    "primary_color": "#006F52"
+  },
+  {
+    "id": 172,
+    "name": "Núcleo Cultural Recreativo de Valongo",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 174,
+    "name": "Guifões Sport Clube",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 175,
+    "name": "Grupo Desportivo Basquete de Leça",
+    "primary_color": "#F90B0B"
+  },
+  {
+    "id": 176,
+    "name": "Sporting Clube Vasco da Gama",
+    "primary_color": "#E74C3C"
+  },
+  {
+    "id": 179,
+    "name": "Grupo Desportivo Bolacesto",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 181,
+    "name": "União Académica António Aroso",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 182,
+    "name": "Galitos Futebol Clube",
+    "primary_color": "#C30909"
+  },
+  {
+    "id": 183,
+    "name": "Futebol Clube Barreirense",
+    "primary_color": "#D20412"
+  },
+  {
+    "id": 186,
+    "name": "Scalipus Clube Setúbal",
+    "primary_color": "#E67E22"
+  },
+  {
+    "id": 188,
+    "name": "Académico Futebol Clube",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 189,
+    "name": "Sporting Clube de Coimbrões",
+    "primary_color": "#005236"
+  },
+  {
+    "id": 190,
+    "name": "Clube Atlético de Queluz",
+    "primary_color": "#2C3E50"
+  },
+  {
+    "id": 196,
+    "name": "Associação Educação Física Desportiva Torres Vedras",
+    "primary_color": "#FF330F"
+  },
+  {
+    "id": 198,
+    "name": "Clube Basquetebol da Escola Secundária da Amadora",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 200,
+    "name": "Clube de Basquetebol do Fundão",
+    "primary_color": "#D35400"
+  },
+  {
+    "id": 205,
+    "name": "Clube Ana de Santa Maria",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 208,
+    "name": "Clube Elvense de Natação",
+    "primary_color": "#008400"
+  },
+  {
+    "id": 209,
+    "name": "Associação Desportiva e Cultural Escola Diogo Cão",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 219,
+    "name": "União Desportiva Vilafranquense",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 228,
+    "name": "Club Sport Marítimo",
+    "primary_color": "#27AE60"
+  },
+  {
+    "id": 231,
+    "name": "Clube de Basquetebol de Tavira",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 232,
+    "name": "Associação Cultural e Desportiva Ferragudo",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 245,
+    "name": "Salesianos de Lisboa",
+    "primary_color": "#F31212"
+  },
+  {
+    "id": 248,
+    "name": "União Desportiva e Cultural do Forte",
+    "primary_color": "#13450D"
+  },
+  {
+    "id": 261,
+    "name": "Unidos Futebol Clube do Tortosendo",
+    "primary_color": "#00058a"
+  },
+  {
+    "id": 273,
+    "name": "Associação Cultural e Recreativa de Vale de Cambra",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 293,
+    "name": "Biblioteca Instrução Recreio",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 294,
+    "name": "Real Clube Vale de Cavala",
+    "primary_color": "#EEE20B"
+  },
+  {
+    "id": 304,
+    "name": "Clube Desportivo José Régio",
+    "primary_color": "#7F8C8D"
+  },
+  {
+    "id": 308,
+    "name": "Centro Treino Municipal Vila Pouca de Aguiar",
+    "primary_color": "#219419"
+  },
+  {
+    "id": 327,
+    "name": "Casa do Povo de Lanheses",
+    "primary_color": "#FFEE00"
+  },
+  {
+    "id": 332,
+    "name": "Clube Basket Quarteira Tubarões",
+    "primary_color": "#E67E22"
+  },
+  {
+    "id": 339,
+    "name": "Clube Académico da Araucaria de Vila Real",
+    "primary_color": "#41729F"
+  },
+  {
+    "id": 341,
+    "name": "Estrela Calheta Futebol Clube",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 356,
+    "name": "Associação Desportiva de Manteigas",
+    "primary_color": "#F9E562"
+  },
+  {
+    "id": 357,
+    "name": "Associação Desportiva de Vagos",
+    "primary_color": "#E0CA00"
+  },
+  {
+    "id": 361,
+    "name": "Laranjeiras Clube",
+    "primary_color": "#FFFFFF"
+  },
+  {
+    "id": 365,
+    "name": "Sport Clube Maria da Fonte",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 370,
+    "name": "Associação Académica da UTAD",
+    "primary_color": "#95A5A6"
+  },
+  {
+    "id": 440,
+    "name": "União Desportiva Leiria",
+    "primary_color": "#ECF0F1"
+  },
+  {
+    "id": 529,
+    "name": "Grupo Desportivo de Trancoso",
+    "primary_color": "#E11414"
+  },
+  {
+    "id": 542,
+    "name": "Núcleo do Sporting do Cartaxo",
+    "primary_color": "#27981F"
+  },
+  {
+    "id": 546,
+    "name": "Basquete Clube de Barcelos",
+    "primary_color": "#05A805"
+  },
+  {
+    "id": 588,
+    "name": "Basket Club de Vila Real",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 632,
+    "name": "Associação Cultural e Desportivo Santa Marta Portuzelo",
+    "primary_color": "#F50000"
+  },
+  {
+    "id": 634,
+    "name": "Centro Recreativo e Cultural Quinta dos Lombos",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 656,
+    "name": "Basket Clube de Valença",
+    "primary_color": "#CD2CED"
+  },
+  {
+    "id": 692,
+    "name": "Clube Desportivo Pinhalnovense",
+    "primary_color": "#3145F6"
+  },
+  {
+    "id": 703,
+    "name": "Artenave Atelier - Associação de Solidariedade",
+    "primary_color": "#2ECC71"
+  },
+  {
+    "id": 704,
+    "name": "Grupo Recreativo Independente Brandoense",
+    "primary_color": "#27AE60"
+  },
+  {
+    "id": 714,
+    "name": "Maia Basket Clube",
+    "primary_color": "#274472"
+  },
+  {
+    "id": 717,
+    "name": "Clube Desportivo Amiense",
+    "primary_color": "#F70820"
+  },
+  {
+    "id": 723,
+    "name": "Clube de Basquete de Viana",
+    "primary_color": "#760505"
+  },
+  {
+    "id": 731,
+    "name": "Fides - Orfeão de Valbom",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 736,
+    "name": "Clube Desportivo Escolar Os Vitorinos",
+    "primary_color": "#9B59B6"
+  },
+  {
+    "id": 758,
+    "name": "Clube União Sportiva",
+    "primary_color": "#059E17"
+  },
+  {
+    "id": 774,
+    "name": "Atlético Clube Alfenense",
+    "primary_color": "#2980B9"
+  },
+  {
+    "id": 815,
+    "name": "Santarém Basket Clube",
+    "primary_color": "#F20D1C"
+  },
+  {
+    "id": 834,
+    "name": "Clube Celorico Basket",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 835,
+    "name": "Clube Amigos Basquetebol Grândola - Os Javalis",
+    "primary_color": "#2C3E50"
+  },
+  {
+    "id": 840,
+    "name": "Clube Desportivo e Cultural Juventude Pacense",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 849,
+    "name": "Clube Seia Basket",
+    "primary_color": "#7F8C8D"
+  },
+  {
+    "id": 855,
+    "name": "Club Camões",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 861,
+    "name": "Clube Futebol Andorinha",
+    "primary_color": "#2257ae"
+  },
+  {
+    "id": 862,
+    "name": "Associação Desportiva Água de Pena",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 866,
+    "name": "Clube Basket de Queluz",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 871,
+    "name": "Basket Clube Desportivo - Associação Desportiva de Basto",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 873,
+    "name": "Associação Juvenil Estremoz",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 879,
+    "name": "Basket Clube de Coura",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 880,
+    "name": "Monção Basket Clube 2000",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 887,
+    "name": "União Desportiva e Cultural de Machico",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 889,
+    "name": "Guarda Basket",
+    "primary_color": "#FFC800"
+  },
+  {
+    "id": 901,
+    "name": "Associação Teatro  Construção",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 914,
+    "name": "Alenquer Basket Clube",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 922,
+    "name": "Colégio José Álvaro Vidal - Fundação CEBI",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 926,
+    "name": "Sociedade de Instrução Recreio Os Pimpões",
+    "primary_color": "#E9892F"
+  },
+  {
+    "id": 934,
+    "name": "Barca Basket Clube",
+    "primary_color": "#EB2D33"
+  },
+  {
+    "id": 941,
+    "name": "Associação Juvenil do Clube Operário Desportivo",
+    "primary_color": "#5E09FB"
+  },
+  {
+    "id": 945,
+    "name": "Basket Clube Lis",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 948,
+    "name": "Associação Amigos de Angrabasket",
+    "primary_color": "#E67E22"
+  },
+  {
+    "id": 949,
+    "name": "Montijo Basket Associação",
+    "primary_color": "#16A085"
+  },
+  {
+    "id": 950,
+    "name": "Basket Almada Clube",
+    "primary_color": "#37D0FB"
+  },
+  {
+    "id": 953,
+    "name": "Academia Musical 1º Junho 1893",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 967,
+    "name": "Desportivo do Nucleo de Basquetebol da ABIT",
+    "primary_color": "#FFFFFF"
+  },
+  {
+    "id": 975,
+    "name": "Clube Desportivo Os Especiais",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 2246,
+    "name": "Núcleo Basket ABSMA",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2276,
+    "name": "Grupo Desportivo Gonçalo Velho",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2300,
+    "name": "Vitória Sport Clube",
+    "primary_color": "#2C3E50"
+  },
+  {
+    "id": 2302,
+    "name": "Chamusca Basket Clube",
+    "primary_color": "#FB04B9"
+  },
+  {
+    "id": 2310,
+    "name": "Sociedade Cultural e Recreativa Gaeirense",
+    "primary_color": "#E82A20"
+  },
+  {
+    "id": 2326,
+    "name": "Portimonense Sporting Clube",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2383,
+    "name": "Basquete Clube do Porto Santo",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 2404,
+    "name": "Sporting Clube de Braga",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 2405,
+    "name": "Associaçao Cultural e Recreativa Vigorosa",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2428,
+    "name": "Estoril Basket Clube",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 2429,
+    "name": "Grupo Desportivo e Recreativo André de Resende",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2430,
+    "name": "Rio Maior Basket",
+    "primary_color": "#326CA9"
+  },
+  {
+    "id": 2493,
+    "name": "Clube Hiper-Activo Malveira",
+    "primary_color": "#F1870E"
+  },
+  {
+    "id": 2527,
+    "name": "Clube Desportivo Escola Francisco Franco",
+    "primary_color": "#273D87"
+  },
+  {
+    "id": 2539,
+    "name": "Associação Desportiva e Cultural da Ponta do Pargo",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2609,
+    "name": "Atómicos Sport Clube",
+    "primary_color": "#2C3E50"
+  },
+  {
+    "id": 2620,
+    "name": "Associação Basquetebol Albicastrense",
+    "primary_color": "#EE7C11"
+  },
+  {
+    "id": 2623,
+    "name": "Associação Caminha Jovem",
+    "primary_color": "#2C3E50"
+  },
+  {
+    "id": 2648,
+    "name": "Valour Futebol Clube - Assoc. Cult. Recreativa e Desp. do Rosário",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2660,
+    "name": "Associação Cultural Recreativa da Cerca -São Pedro",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 2685,
+    "name": "Clube Desportivo Torres Novas - Org. Aut. Basquetebol",
+    "primary_color": "#EDCA1D"
+  },
+  {
+    "id": 2694,
+    "name": "Associação Desportiva e Recreativa Estrelas Brigantinas",
+    "primary_color": "#EA0029"
+  },
+  {
+    "id": 2699,
+    "name": "Clube Desportivo Garachico",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2717,
+    "name": "Associação Desportiva Galomar",
+    "primary_color": "#E67E22"
+  },
+  {
+    "id": 2742,
+    "name": "Clube Desportivo e Cultural do Porto Moniz",
+    "primary_color": "#FFFFFF"
+  },
+  {
+    "id": 2769,
+    "name": "Micaelense Basket Clube",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2774,
+    "name": "OBC - Odivelas Basket Clube",
+    "primary_color": "#E74C3C"
+  },
+  {
+    "id": 2775,
+    "name": "Basket Club de Canas de Senhorim",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 2776,
+    "name": "Associação S S Sociedade Columbófila Cantanhedense",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2778,
+    "name": "Centro de Cultura e Desporto dos Horários do Funchal",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2779,
+    "name": "Clube Desportivo Escolar Os Fuseiros",
+    "primary_color": "#FFFFFF"
+  },
+  {
+    "id": 2813,
+    "name": "Associação Cultural e Desportiva de São João",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2819,
+    "name": "Restauradores da Granja",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2823,
+    "name": "Clube Desportivo Recreativo Santanense",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2832,
+    "name": "JuvCap - Associação Juventude Capelas",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2839,
+    "name": "Eléctrico Futebol Clube",
+    "primary_color": "#008040"
+  },
+  {
+    "id": 2843,
+    "name": "Grupo Desportivo Escola Maria Alberta Menéres",
+    "primary_color": "#0000FF"
+  },
+  {
+    "id": 2846,
+    "name": "2010 Odisseia Basket Clube",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2847,
+    "name": "Beja Basket Clube",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 2858,
+    "name": "Enesse Basquetebol Clube",
+    "primary_color": "#FF2E2E"
+  },
+  {
+    "id": 2900,
+    "name": "Grupo Desportivo do Estreito",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2906,
+    "name": "Grupo Basket Atlântico",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 2920,
+    "name": "Basket Club Limiense",
+    "primary_color": "#090E9F"
+  },
+  {
+    "id": 2932,
+    "name": "Imortal Basket Club",
+    "primary_color": "#B30000"
+  },
+  {
+    "id": 2997,
+    "name": "Basket Clube de Gaia",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3009,
+    "name": "Salesianos de Évora",
+    "primary_color": "#0000FF"
+  },
+  {
+    "id": 3015,
+    "name": "Núcleo Sportinguista do Concelho de Estarreja",
+    "primary_color": "#008863"
+  },
+  {
+    "id": 3016,
+    "name": "Club 5Basket - Associação",
+    "primary_color": "#274472"
+  },
+  {
+    "id": 3019,
+    "name": "Clube Escolar de Desporto da Escola Básica 2,3 de Arrifes",
+    "primary_color": "#FFFFFF"
+  },
+  {
+    "id": 3060,
+    "name": "Salesianos do Estoril",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3155,
+    "name": "Powertogether-Associação",
+    "primary_color": "#387EFF"
+  },
+  {
+    "id": 3161,
+    "name": "Grupo Desportivo de Boticas",
+    "primary_color": "#EC1313"
+  },
+  {
+    "id": 3165,
+    "name": "Clube Desportivo e Cultural Juventude Ilha Verde",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3208,
+    "name": "CBP2012- Basquetebol Clube de Penafiel",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 3221,
+    "name": "Clube Desportivo e Cultural Escola Sec. Ribeira Grande",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3243,
+    "name": "Escola de Modalidades do Sport Lisboa e Benfica em Oliveira de Azemeis",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 3254,
+    "name": "Seixal Clube 1925",
+    "primary_color": "#E61E2B"
+  },
+  {
+    "id": 3260,
+    "name": "Clube Recreativo Desportivo Arrudense",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 3279,
+    "name": "Clube Desportivo Mar e Serra",
+    "primary_color": "#16A085"
+  },
+  {
+    "id": 3286,
+    "name": "Centro Juvenil Salesiano de Arouca",
+    "primary_color": "#F7EF02"
+  },
+  {
+    "id": 3317,
+    "name": "Tabela Predileta",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3319,
+    "name": "Pioneiros NBL - Núcleo Basket de Loures",
+    "primary_color": "#8E44AD"
+  },
+  {
+    "id": 3329,
+    "name": "Associação Portuguesa de Deficientes Braga BCR",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3330,
+    "name": "Associação Portuguesa de Deficientes Paredes",
+    "primary_color": "#FFFFFF"
+  },
+  {
+    "id": 3331,
+    "name": "GDD Alcoitão",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3335,
+    "name": "Associação Portuguesa de Deficientes Sintra",
+    "primary_color": "#0F3BDB"
+  },
+  {
+    "id": 3336,
+    "name": "Associação Portuguesa de Deficientes Leiria",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3337,
+    "name": "Associação Portuguesa de Deficientes Lisboa",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 3340,
+    "name": "Nucleo Basquetebol Amadora - NBA",
+    "primary_color": "#2980B9"
+  },
+  {
+    "id": 3367,
+    "name": "Basket Club de Tomar",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3368,
+    "name": "Clube Desportivo Olivais e Moscavide",
+    "primary_color": "#2980B9"
+  },
+  {
+    "id": 3388,
+    "name": "RBDA - Ribeirão Basket Associação Desportiva",
+    "primary_color": "#0080FF"
+  },
+  {
+    "id": 3390,
+    "name": "Centro Recreativo de Antes",
+    "primary_color": "#E74C3C"
+  },
+  {
+    "id": 3393,
+    "name": "Sporting Clube São João de Ver",
+    "primary_color": "#FF0000"
+  },
+  {
+    "id": 3398,
+    "name": "Futebol Clube Vizela",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3400,
+    "name": "Associação Desportiva Porto da Cruz",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3402,
+    "name": "Clube Desportivo Carvalheiro",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3408,
+    "name": "Centro Recreativo do Casal do Grilo",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3409,
+    "name": "CCRD da Barreira - Basquetebol Condeixa",
+    "primary_color": "#FF0000"
+  },
+  {
+    "id": 3411,
+    "name": "Associação de Moradores do Bairro Novo da Moita",
+    "primary_color": "#30A206"
+  },
+  {
+    "id": 3413,
+    "name": "Grupo Desportivo Alcochetense",
+    "primary_color": "#27AE60"
+  },
+  {
+    "id": 3418,
+    "name": "Clube Desportivo Marista de Carcavelos",
+    "primary_color": "#2980B9"
+  },
+  {
+    "id": 3419,
+    "name": "LMCB - Associação Desportiva Linces de Mafra",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3423,
+    "name": "União Sport Clube de Paredes",
+    "primary_color": "#010066"
+  },
+  {
+    "id": 3439,
+    "name": "CCD Estrela do Zêzere",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3443,
+    "name": "Sporting Clube Barquinhense",
+    "primary_color": "#1EB913"
+  },
+  {
+    "id": 3446,
+    "name": "Escola Desportiva - Guarda UP",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3455,
+    "name": "FamaBasket - Clube Basquetebol de Famalicão",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3459,
+    "name": "LAC Basquetebol Clube",
+    "primary_color": "#8E44AD"
+  },
+  {
+    "id": 3484,
+    "name": "Associação Clube de Basquetebol da Barca",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3485,
+    "name": "CLIP Teams Associação Desportiva",
+    "primary_color": "#2980B9"
+  },
+  {
+    "id": 3486,
+    "name": "Paço de Arcos Clube",
+    "primary_color": "#27AE60"
+  },
+  {
+    "id": 3487,
+    "name": "Atlético Basquete Clube de Santo André",
+    "primary_color": "#C79D05"
+  },
+  {
+    "id": 3488,
+    "name": "Sines Surf Clube",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3491,
+    "name": "Mirandela Basquete Clube",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3509,
+    "name": "Clube Desportivo de Tondela",
+    "primary_color": "#008000"
+  },
+  {
+    "id": 3529,
+    "name": "Núcleo de Minibasquete de Canaviais",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 3532,
+    "name": "Clube de Football Os Armacenenses",
+    "primary_color": "#272A91"
+  },
+  {
+    "id": 3538,
+    "name": "Associação 20Kms de Almeirim",
+    "primary_color": "#5885AF"
+  },
+  {
+    "id": 3552,
+    "name": "Sporting Clube da Cumieira",
+    "primary_color": "#7C3AED"
+  },
+  {
+    "id": 3561,
+    "name": "Juventude Ouriense",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 3567,
+    "name": "Clube Desportivo Gumirães Basket - Viseu",
+    "primary_color": "#BDC3C7"
+  },
+  {
+    "id": 3604,
+    "name": "Benedita Hoopers Club",
+    "primary_color": "#2980B9"
+  },
+  {
+    "id": 3606,
+    "name": "CSI - Ubuntu Basket Academy",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3625,
+    "name": "ZORA - Basquetebol Clube do Marco",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3628,
+    "name": "União Sport Clube Mira Sintra",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3650,
+    "name": "Aveiro Ria BC",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3654,
+    "name": "Esposende Basket Clube",
+    "primary_color": "#145DA0"
+  },
+  {
+    "id": 3657,
+    "name": "Clube Desportivo das Aves 1930",
+    "primary_color": "#E74C3C"
+  },
+  {
+    "id": 3665,
+    "name": "Grupo Desportivo da Azinhaga",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3666,
+    "name": "VITFUT - Associação",
+    "primary_color": "#C3E0E5"
+  },
+  {
+    "id": 3668,
+    "name": "APPACDM da Figueira da Foz",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3671,
+    "name": "Associação de Famílias Solidárias com a Deficiência",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3679,
+    "name": "Associação de Pais e Encarregados de Educação do Agrupamento de Escolas de Tondela",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 3680,
+    "name": "Clube Desportivo Primeiro de Maio",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3682,
+    "name": "Associação Académica Pinhalnovense",
+    "primary_color": "#2C3E50"
+  },
+  {
+    "id": 3685,
+    "name": "Sport Club Operário de Cem Soldos",
+    "primary_color": "#ECF0F1"
+  },
+  {
+    "id": 3689,
+    "name": "Associação Macedo Academy",
+    "primary_color": "#274472"
+  },
+  {
+    "id": 3690,
+    "name": "Gaviões de São Brás Clube",
+    "primary_color": "#2C3E50"
+  },
+  {
+    "id": 3695,
+    "name": "Agrupamento de Escolas de Foz Côa",
+    "primary_color": "#ECF0F1"
+  },
+  {
+    "id": 3697,
+    "name": "Grupo Desportivo e Recreativo de Portugal",
+    "primary_color": "#C0392B"
+  },
+  {
+    "id": 3698,
+    "name": "Febres Sport Club",
+    "primary_color": "#F1C40F"
+  },
+  {
+    "id": 3709,
+    "name": "Associação Desportiva Flaviense",
+    "primary_color": "#2C3E50"
+  },
+  {
+    "id": 3711,
+    "name": "Associação CJD Sports",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3713,
+    "name": "Clube Play Sports",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3714,
+    "name": "Associação Centro Cultural Desportiva Estrelas São João De Brito",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3715,
+    "name": "Associação Clube de Montanha Murça Desporto e Aventura",
+    "primary_color": "#ECF0F1"
+  },
+  {
+    "id": 3716,
+    "name": "XKY - Clube Desportivo Internacional",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3721,
+    "name": "Clube Recreativo de São Joaninho",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3722,
+    "name": "Pesqueiraamiga Associação de Solidariedade Social",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3725,
+    "name": "UKROP - Iniciativa Ofuscante de Viseu",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3726,
+    "name": "FCS - Basket Club de Campo",
+    "primary_color": "#2980B9"
+  },
+  {
+    "id": 3727,
+    "name": "Associação TVDE 45/18",
+    "primary_color": "#D35400"
+  },
+  {
+    "id": 3728,
+    "name": "Associação AD Mealhada",
+    "primary_color": "#8E44AD"
+  },
+  {
+    "id": 3730,
+    "name": "AMA BASKET - Associação Amigos do Basquetebol",
+    "primary_color": "#145DA0"
+  },
+  {
+    "id": 3731,
+    "name": "Atlético Clube de Astromil",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3737,
+    "name": "Sampaense Basket Club",
+    "primary_color": "#2ECC71"
+  },
+  {
+    "id": 3750,
+    "name": "Cinfães Basket Clube",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3751,
+    "name": "Académica da Amadora - Associação Desportiva e Cultural",
+    "primary_color": "#34495E"
+  },
+  {
+    "id": 3754,
+    "name": "Salesianos de Manique",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3755,
+    "name": "Grupo Desportivo Alpha Musa",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3756,
+    "name": "Centro Desportivo Municipal de Mondim de Basto",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3757,
+    "name": "Futebol Clube Beira Mar",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3759,
+    "name": "Grupo Desportivo Concha Azul",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3760,
+    "name": "Vários-cooperativa De Solidariedade Social, Crl",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3761,
+    "name": "APIFF Associação Pela Inclusão - Figueira da Foz",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3762,
+    "name": "Associaçâo Hípica e Psicomotora De Viseu",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3763,
+    "name": "APPACDM - Santa Comba Dão",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3764,
+    "name": "Sporting Clube da Madeira",
+    "primary_color": "#27AE60"
+  },
+  {
+    "id": 3765,
+    "name": "APCV – Associação de Paralisia Cerebral de Viseu",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 3766,
+    "name": "CBF Felgueiras - Associação Desportiva",
+    "primary_color": "#3498DB"
+  },
+  {
+    "id": 99999,
+    "name": "SEC_TEST_DEL",
+    "primary_color": "#000000"
+  }
+]
