@@ -14,11 +14,14 @@ function weightedElo(club: Club): number {
     return raw + bonus
 }
 
+const SEASONS = ['2025/2026', '2024/2025', '2023/2024', '2022/2023', '2021/2022']
+
 function Ranking() {
     const { clubs, loadClubs } = useClub()
     const [query, setQuery] = useState('')
     const [loading, setLoading] = useState(true)
     const [showHelp, setShowHelp] = useState(false)
+    const [season, setSeason] = useState(SEASONS[0])
 
     useEffect(() => {
         loadClubs().finally(() => setLoading(false))
@@ -63,6 +66,23 @@ function Ranking() {
                     <HelpCircle size={13} />
                     Como funciona
                 </button>
+            </div>
+
+            {/* Season selector */}
+            <div className="flex items-center gap-2 mb-4">
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Época</span>
+                <select
+                    value={season}
+                    onChange={e => setSeason(e.target.value)}
+                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-lg px-3 py-1.5 text-xs font-bold text-zinc-700 dark:text-zinc-300 outline-none focus:ring-2 focus:ring-dribly-purple/30"
+                >
+                    {SEASONS.map(s => (
+                        <option key={s} value={s}>{s}</option>
+                    ))}
+                </select>
+                {season !== '2025/2026' && (
+                    <span className="text-[10px] text-amber-500">(dados limitados)</span>
+                )}
             </div>
 
             {/* Search */}
@@ -143,7 +163,7 @@ function Ranking() {
                                 <li>Perder contra um mais fraco → desce muito</li>
                             </ul>
                             <p>A <strong>importância</strong> do clube também pesa: clubes de topo têm um bónus de <strong>+100 a +200 pts</strong>, refletindo a competitividade da divisão onde jogam.</p>
-                            <p className="text-zinc-400">Baseado em 24.000+ jogos de 23 épocas. Recalculado diariamente.</p>
+                            <p className="text-zinc-400">Baseado em 24.000+ jogos da época {season}. Atualizações diárias.</p>
                         </div>
                     </div>
                 </div>
