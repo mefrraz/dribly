@@ -68,14 +68,14 @@ export default function PavilionsAdmin() {
             .from('pavilions')
             .update({
                 nome: editForm.nome,
-                rua: editForm.rua,
-                codigo_postal: editForm.codigo_postal,
-                cidade: editForm.cidade,
-                distrito: editForm.distrito,
-                concelho: editForm.concelho,
-                lat: editForm.lat,
-                lng: editForm.lng,
-                fpb_url: editForm.fpb_url,
+                rua: editForm.rua || null,
+                codigo_postal: editForm.codigo_postal || null,
+                cidade: editForm.cidade || null,
+                distrito: editForm.distrito || null,
+                concelho: editForm.concelho || null,
+                lat: editForm.lat ?? null,
+                lng: editForm.lng ?? null,
+                fpb_url: editForm.fpb_url || null,
             })
             .eq('id', editingId)
 
@@ -138,6 +138,7 @@ export default function PavilionsAdmin() {
                             <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-12">ID</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Nome</th>
+                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Rua</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Cidade</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Distrito</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-16">Coord</th>
@@ -166,8 +167,9 @@ export default function PavilionsAdmin() {
                                         </td>
                                         <td className="px-4 py-2 font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                             <MapPin size={12} className="text-dribly-purple shrink-0" />
-                                            <span className="truncate max-w-[300px]">{p.nome}</span>
+                                            <span className="truncate max-w-[250px]">{p.nome}</span>
                                         </td>
+                                        <td className="px-4 py-2 text-zinc-500 truncate max-w-[180px]">{p.rua || '—'}</td>
                                         <td className="px-4 py-2 text-zinc-500">{p.cidade || '—'}</td>
                                         <td className="px-4 py-2">
                                             {p.distrito ? (
@@ -243,8 +245,9 @@ function EditRow({
     return (
         <tr className="bg-dribly-purple/5 dark:bg-dribly-purple/10 border-b border-dribly-purple/20">
             <td className="px-4 py-2 text-zinc-400 font-mono">{form.id}</td>
-            <td className="px-4 py-2">{field('Nome', 'nome', 'w-60')}</td>
-            <td className="px-4 py-2">{field('Cidade', 'cidade', 'w-32')}</td>
+            <td className="px-4 py-2">{field('Nome', 'nome', 'w-48')}</td>
+            <td className="px-4 py-2">{field('Rua', 'rua', 'w-40')}</td>
+            <td className="px-4 py-2">{field('Cidade', 'cidade', 'w-28')}</td>
             <td className="px-4 py-2">{field('Distrito', 'distrito', 'w-28')}</td>
             <td className="px-4 py-2">
                 <div className="flex items-center gap-1">

@@ -111,6 +111,7 @@ export default function ClubesAdmin() {
 
             {/* Card view */}
             {view === 'cards' && (
+                <>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6">
                     {filtered.map((club) => (
                         <div
@@ -151,6 +152,18 @@ export default function ClubesAdmin() {
                         </div>
                     ))}
                 </div>
+
+                {/* Edit modal for card view */}
+                {editingId !== null && (
+                    <EditModal
+                        form={editForm}
+                        setForm={setEditForm}
+                        onSave={saveEdit}
+                        onCancel={cancelEdit}
+                        saving={saving}
+                    />
+                )}
+                </>
             )}
 
             {/* Table view (only when selected) */}
@@ -375,5 +388,89 @@ function EditRow({
                 </div>
             </td>
         </tr>
+    )
+}
+
+// ── Edit modal for card view ────────────────────────────
+
+function EditModal({
+    form,
+    setForm,
+    onSave,
+    onCancel,
+    saving,
+}: {
+    form: Partial<AdminClub>
+    setForm: (f: Partial<AdminClub>) => void
+    onSave: () => void
+    onCancel: () => void
+    saving: boolean
+}) {
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onCancel}>
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl w-full max-w-sm p-6 animate-slide-up"
+                onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-sm font-black text-zinc-900 dark:text-white">
+                        Editar #{form.id}
+                    </h3>
+                    <button onClick={onCancel} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+                        <X size={18} />
+                    </button>
+                </div>
+
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Nome</label>
+                        <input type="text" value={form.name || ''}
+                            onChange={(e) => setForm({ ...form, name: e.target.value })}
+                            className="w-full px-3 py-2 text-sm rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold focus:outline-none focus:border-dribly-purple" />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Slug</label>
+                        <input type="text" value={form.slug || ''}
+                            onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                            className="w-full px-3 py-2 text-sm rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-dribly-purple" />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1">URL do Logo</label>
+                        <input type="text" value={form.logo_url || ''}
+                            onChange={(e) => setForm({ ...form, logo_url: e.target.value || null })}
+                            placeholder="https://..."
+                            className="w-full px-3 py-2 text-sm rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-dribly-purple" />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Cor</label>
+                        <div className="flex items-center gap-2">
+                            <input type="color" value={form.primary_color || '#7C3AED'}
+                                onChange={(e) => setForm({ ...form, primary_color: e.target.value })}
+                                className="w-10 h-10 rounded-xl cursor-pointer border-2 border-zinc-200 dark:border-zinc-600 p-0.5" />
+                            <input type="text" value={form.primary_color || ''}
+                                onChange={(e) => setForm({ ...form, primary_color: e.target.value })}
+                                placeholder="#000000"
+                                className="flex-1 px-3 py-2 text-sm rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white font-mono focus:outline-none focus:border-dribly-purple" />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Prioridade</label>
+                        <input type="number" value={form.priority ?? ''}
+                            onChange={(e) => setForm({ ...form, priority: e.target.value ? parseInt(e.target.value) : null })}
+                            className="w-full px-3 py-2 text-sm rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-dribly-purple" />
+                    </div>
+                </div>
+
+                <div className="flex gap-2 mt-6">
+                    <button onClick={onSave} disabled={saving}
+                        className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-dribly-purple text-white text-sm font-bold hover:bg-dribly-purple-dark transition-colors disabled:opacity-50">
+                        <Save size={14} />
+                        {saving ? 'A guardar...' : 'Guardar'}
+                    </button>
+                    <button onClick={onCancel}
+                        className="px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-500 text-sm font-bold hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
     )
 }
