@@ -61,7 +61,7 @@ beforeEach(() => {
 describe('displayName', () => {
     const baseClub: Club = {
         id: 1, name: 'Futebol Clube do Porto', short_name: 'FC Porto', slug: 'fc-porto',
-        search_name: 'fcporto', logo_url: null, logo_secondary: null, primary_color: null, priority: null,
+        search_name: 'fcporto', logo_url: null, logo_secondary: null, primary_color: null, priority: null, elo_rating: null,
     }
 
     it('should return short_name when available', () => {

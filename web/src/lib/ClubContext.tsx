@@ -29,7 +29,7 @@ export function ClubProvider({ children }: { children: ReactNode }) {
         if (clubsFetched) return
         const { data } = await supabase
             .from('clubs')
-            .select('id, name, short_name, slug, search_name, logo_url, logo_secondary, primary_color, priority')
+            .select('id, name, short_name, slug, search_name, logo_url, logo_secondary, primary_color, priority, elo_rating')
             .order('name')
         if (data) {
             setClubsFetched(true)
@@ -43,7 +43,7 @@ export function ClubProvider({ children }: { children: ReactNode }) {
         if (cached) return cached
         const { data } = await supabase
             .from('clubs')
-            .select('id, name, short_name, slug, search_name, logo_url, logo_secondary, primary_color, priority')
+            .select('id, name, short_name, slug, search_name, logo_url, logo_secondary, primary_color, priority, elo_rating')
             .eq('slug', slug)
             .single()
         if (data) {

@@ -10,6 +10,7 @@ export interface Club {
     logo_secondary: string | null
     primary_color: string | null
     priority: number | null
+    elo_rating: number | null
 }
 
 /** Display name: short_name if available, otherwise name. */

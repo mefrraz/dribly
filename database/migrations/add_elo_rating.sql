@@ -1,0 +1,2 @@
+-- Add ELO rating column to clubs
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS elo_rating DOUBLE PRECISION DEFAULT 1500;

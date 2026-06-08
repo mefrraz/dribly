@@ -17,6 +17,7 @@ import Following from './pages/Following'
 import ClubsPage from './pages/ClubsPage'
 import ProfilePage from './pages/ProfilePage'
 import Leagues from './pages/Leagues'
+import Ranking from './pages/Ranking'
 import CompetitionDetail from './pages/CompetitionDetail'
 import ClubTeams from './pages/club/ClubTeams'
 import ClubTeamDetail from './pages/club/ClubTeamDetail'
@@ -73,6 +74,7 @@ function App() {
                         <Route path="perfil" element={<ProfilePage />} />
                         <Route path="clubes" element={<ClubsPage />} />
                         <Route path="ligas" element={<Leagues />} />
+                        <Route path="ranking" element={<Ranking />} />
                         <Route path="mapa" element={<Mapa />} />
                         <Route path="pavilhao/:recintoId" element={<PavilionPage />} />
                         <Route path="competicao/:competitionId" element={<CompetitionDetail />} />

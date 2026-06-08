@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Sun, Moon, Instagram, Github, Info, BarChart2, Home, Search, LogIn, Heart, Trophy, Building2, MapPin, Shield } from 'lucide-react'
+import { Sun, Moon, Instagram, Github, Info, BarChart2, Home, Search, LogIn, Heart, Trophy, Building2, MapPin, Shield, TrendingUp } from 'lucide-react'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastContainer } from './components/Toast'
 import PWAInstallBanner from './components/PWAInstallBanner'
@@ -124,6 +124,9 @@ function Layout() {
                                 </Link>
                                 <Link to="/mapa" className={`${navPill} ${isActive('/mapa') ? navPillActive : navPillInactive}`}>
                                     <MapPin size={14} /> Mapa
+                                </Link>
+                                <Link to="/ranking" className={`${navPill} ${isActive('/ranking') ? navPillActive : navPillInactive}`}>
+                                    <TrendingUp size={14} /> Ranking
                                 </Link>
                                 <Link to="/classificacoes" className={`${navPill} ${isActive('/classificacoes') ? navPillActive : navPillInactive}`}>
                                     <BarChart2 size={14} /> Classificações

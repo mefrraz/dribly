@@ -94,7 +94,14 @@ function ClubHome() {
                         <span className="text-sm font-bold text-zinc-500">{displayName(club).charAt(0)}</span>
                     )}
                 </div>
-                <h1 className="text-lg font-bold text-zinc-900 dark:text-white truncate flex-1">{displayName(club)}</h1>
+                <h1 className="text-lg font-bold text-zinc-900 dark:text-white truncate flex-1">
+                    {displayName(club)}
+                    {club.elo_rating != null && (
+                        <span className="ml-2 text-xs font-mono font-bold text-dribly-purple bg-dribly-purple/10 px-1.5 py-0.5 rounded-md">
+                            {club.elo_rating}
+                        </span>
+                    )}
+                </h1>
                 <div className="flex items-center gap-1">
                     <a href={`https://www.fpb.pt/equipas/clube_${club.id}/`} target="_blank" rel="noopener noreferrer"
                         className="p-2 rounded-full text-zinc-400 hover:text-dribly-purple hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
