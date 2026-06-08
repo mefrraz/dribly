@@ -171,8 +171,13 @@ export default function UsersAdmin() {
                                                         onClick={() =>
                                                             setDeleteTarget(u)
                                                         }
-                                                        className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                                        title="Apagar"
+                                                        disabled={u.is_admin}
+                                                        className={`p-1.5 rounded-lg transition-colors ${
+                                                            u.is_admin
+                                                                ? 'text-zinc-200 dark:text-zinc-700 cursor-not-allowed'
+                                                                : 'text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
+                                                        }`}
+                                                        title={u.is_admin ? 'Não é possível apagar administradores' : 'Apagar'}
                                                     >
                                                         <Trash2 size={14} />
                                                     </button>
@@ -330,21 +335,16 @@ export default function UsersAdmin() {
                                         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 text-xs"
                                     >
                                         <span
-                                            className={`w-1.5 h-1.5 rounded-full ${
+                                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                                                 f.entity_type === 'club'
                                                     ? 'bg-dribly-purple'
                                                     : 'bg-amber-500'
                                             }`}
                                         />
-                                        <span className="text-zinc-500">
-                                            {f.entity_type === 'club'
-                                                ? 'Clube'
-                                                : 'Competição'}
+                                        <span className="text-zinc-500 truncate">
+                                            {f.entity_name}
                                         </span>
-                                        <span className="text-zinc-400 font-mono text-[11px]">
-                                            #{f.entity_id}
-                                        </span>
-                                        <span className="text-zinc-300 text-[10px] ml-auto">
+                                        <span className="text-zinc-300 text-[10px] ml-auto shrink-0">
                                             {formatDate(
                                                 new Date(
                                                     f.created_at,

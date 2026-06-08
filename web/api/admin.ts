@@ -127,13 +127,21 @@ async function handleGetStats() {
     const gamesCount = parseInt(gamesRes.headers.get('content-range')?.split('/')[1] || '0')
     const followsCount = parseInt(followsRes.headers.get('content-range')?.split('/')[1] || '0')
 
-    // Users count from Clerk
+    // Users count from Clerk (fall back to listUsers if limit=1 fails)
     let usersCount = 0
     try {
-        const clerkUsers = await clerkApi('/users?limit=1')
+        // Try with limit=0 first (some Clerk instances don't support limit=1)
+        const clerkUsers = await clerkApi('/users?limit=50&order_by=-created_at')
         const total = clerkUsers.headers.get('x-total-count')
         if (total) usersCount = parseInt(total)
-    } catch { /* ignore */ }
+    } catch {
+        // Fallback: count from listUsers (slower but more reliable)
+        try {
+            const res2 = await clerkApi('/users?limit=100&offset=0')
+            const total2 = res2.headers.get('x-total-count')
+            if (total2) usersCount = parseInt(total2)
+        } catch { /* both failed — leave at 0 */ }
+    }
 
     return json({
         clubs: clubsCount,
@@ -193,12 +201,46 @@ async function handleGetUserFollows(payload?: Record<string, unknown>) {
         created_at: string
     }>
 
-    return json({ follows })
+    // Resolve entity names: fetch all clubs and competitions_meta, join by entity_id
+    const [clubsRes, compsRes] = await Promise.all([
+        supabaseRest('clubs?select=id,name', { method: 'GET' }),
+        supabaseRest('competitions_meta?select=id,name', { method: 'GET' }),
+    ])
+
+    const clubs = (clubsRes.ok ? await clubsRes.json() : []) as Array<{ id: number; name: string }>
+    const comps = (compsRes.ok ? await compsRes.json() : []) as Array<{ id: number; name: string }>
+
+    const clubMap = new Map(clubs.map(c => [c.id, c.name]))
+    const compMap = new Map(comps.map(c => [c.id, c.name]))
+
+    const enriched = follows.map(f => ({
+        entity_type: f.entity_type,
+        entity_id: f.entity_id,
+        entity_name: f.entity_type === 'club'
+            ? (clubMap.get(f.entity_id) || `Clube #${f.entity_id}`)
+            : (compMap.get(f.entity_id) || `Competição #${f.entity_id}`),
+        created_at: f.created_at,
+    }))
+
+    return json({ follows: enriched })
 }
 
 async function handleDeleteUser(payload?: Record<string, unknown>) {
     const userId = payload?.userId as string
     if (!userId) return json({ error: 'userId required' }, 400)
+
+    // Prevent deleting admin users
+    try {
+        const adminCheck = await clerkApi(`/users/${userId}`)
+        if (adminCheck.ok) {
+            const userData = await adminCheck.json() as { public_metadata?: { role?: string } }
+            if (userData.public_metadata?.role === 'admin') {
+                return json({ error: 'Cannot delete admin users' }, 403)
+            }
+        }
+    } catch {
+        return json({ error: 'Failed to verify user' }, 502)
+    }
 
     const errors: string[] = []
 

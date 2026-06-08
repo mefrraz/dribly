@@ -14,6 +14,7 @@ export interface AdminUser {
 export interface AdminFollow {
     entity_type: string
     entity_id: number
+    entity_name: string
     created_at: string
 }
 

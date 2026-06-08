@@ -3,7 +3,7 @@ import { Search, Play, Square, Clock, Star, Download } from 'lucide-react'
 import { useAdminApi, type AdminClub } from '../../lib/adminApi'
 import { useScraper } from '../../hooks/useScraper'
 
-const SEASONS = ['2025/2026', '2024/2025', '2023/2024', '2022/2023']
+const SEASONS = ['2025/2026', '2024/2025', '2023/2024', '2022/2023', '2021/2022', '2020/2021', '2019/2020']
 
 function formatDate(iso: string | null): string {
     if (!iso) return '—'
