@@ -122,47 +122,59 @@ function useClusters(pavilions: Pavilion[], zoom: number): Map<string, Pavilion[
 }
 
 /**
- * Detect pavilions that share the exact same coordinates and assign
- * tiny spiral offsets so overlapping pins are clickable.
- * First marker stays in place; each subsequent marker shifts ~2m in
- * a different compass direction.
+ * Merge single-pavilion clusters that share the exact same coordinates
+ * into "co-located" groups. Returns a new cluster map where co-located
+ * pavilions are grouped together under a coordinate-based key.
  */
-function useCoLocatedOffsets(
+function useCoLocatedClusters(
     clusters: Map<string, Pavilion[]>,
-    zoom: number,
-): Map<string, [number, number]> {
+): Map<string, Pavilion[]> {
     return useMemo(() => {
-        const offsets = new Map<string, [number, number]>()
-        // Only apply offsets when zoomed in close enough
-        if (zoom < 15) return offsets
+        const merged = new Map(clusters)
+        const coordMap = new Map<string, { key: string; group: Pavilion[] }>()
 
-        // Build map: coordinate → list of cluster keys
-        const coordMap = new Map<string, string[]>()
-        for (const [key, group] of clusters) {
+        // Find singles at same coordinates
+        for (const [key, group] of merged) {
             if (group.length !== 1) continue
             const p = group[0]
             const coordKey = `${p.lat.toFixed(7)},${p.lng.toFixed(7)}`
-            if (!coordMap.has(coordKey)) coordMap.set(coordKey, [])
-            coordMap.get(coordKey)!.push(key)
+            if (!coordMap.has(coordKey)) {
+                coordMap.set(coordKey, { key, group: [] })
+            }
+            coordMap.get(coordKey)!.group.push(p)
         }
 
-        // Spiral offsets (~2-3m steps at Portugal latitude)
-        const spiral: [number, number][] = [
-            [0.000025, 0], [-0.000025, 0],
-            [0, 0.000025], [0, -0.000025],
-            [0.000018, 0.000018], [-0.000018, 0.000018],
-            [-0.000018, -0.000018], [0.000018, -0.000018],
-        ]
-
-        for (const [, keys] of coordMap) {
-            if (keys.length <= 1) continue
-            keys.forEach((key, i) => {
-                if (i === 0) return // first stays put
-                offsets.set(key, spiral[Math.min(i - 1, spiral.length - 1)])
-            })
+        // Replace co-located singles with a merged group
+        for (const [, entry] of coordMap) {
+            if (entry.group.length <= 1) continue
+            // Remove individual keys, add merged key
+            for (const p of entry.group) {
+                merged.delete(`${p.id}`)
+            }
+            const mergedKey = entry.group.map(p => `${p.id}`).sort().join('+')
+            merged.set(mergedKey, entry.group)
         }
-        return offsets
-    }, [clusters, zoom])
+
+        return merged
+    }, [clusters])
+}
+
+/** Co-located pavilion badge — amber, smaller than regular clusters */
+function coLocatedClusterIcon(count: number): L.DivIcon {
+    return L.divIcon({
+        html: `<div style="
+            width:22px;height:22px;
+            background:#F59E0B;
+            border:2px solid white;
+            border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            color:white;font-weight:800;font-size:11px;
+            box-shadow:0 2px 6px rgba(245,158,11,0.5);
+        ">${count}</div>`,
+        className: '',
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
+    })
 }
 
 /** Track zoom + sync position to URL */
@@ -255,6 +267,7 @@ export default function Mapa() {
     })
     const [selected, setSelected] = useState<Pavilion | null>(null)
     const [sheetOpen, setSheetOpen] = useState(false)
+    const [coLocatedGroup, setCoLocatedGroup] = useState<Pavilion[] | null>(null)
     const [initialFitDone] = useState(!!searchParams.get('z'))
     const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
     const [darkMode, setDarkMode] = useState(isDark)
@@ -310,7 +323,7 @@ export default function Mapa() {
     }, [pavilions, selectedDistrict])
 
     const clusters = useClusters(filteredPavilions, zoom)
-    const coLocatedOffsets = useCoLocatedOffsets(clusters, zoom)
+    const coLocatedClusters = useCoLocatedClusters(clusters)
 
     const handleMarkerClick = (pavilion: Pavilion) => {
         setSelected(pavilion)
@@ -436,21 +449,34 @@ export default function Mapa() {
                     <FitBounds pavilions={filteredPavilions} skip={initialFitDone || !!selectedDistrict} />
                     <ZoomWatcher onZoom={setZoom} onMove={syncToUrl} />
 
-                    {Array.from(clusters.entries()).map(([key, group]) => {
+                    {Array.from(coLocatedClusters.entries()).map(([key, group]) => {
                         const first = group[0]
+                        // Co-located group: multiple pavilions at exact same coordinates
+                        const isCoLocated = group.length > 1 && key.includes('+')
+                        if (isCoLocated) {
+                            return (
+                                <Marker key={key} position={[first.lat, first.lng]}
+                                    icon={coLocatedClusterIcon(group.length)}
+                                    eventHandlers={{
+                                        click: () => {
+                                            // Show floating popup instead of zooming in
+                                            setCoLocatedGroup(group)
+                                        },
+                                    }}
+                                />
+                            )
+                        }
+                        // Normal single marker
                         if (group.length === 1) {
                             const isActive = activePavilionIds.has(first.id)
-                            const offset = coLocatedOffsets.get(key)
-                            const pos: [number, number] = offset
-                                ? [first.lat + offset[0], first.lng + offset[1]]
-                                : [first.lat, first.lng]
                             return (
-                                <Marker key={key} position={pos}
+                                <Marker key={key} position={[first.lat, first.lng]}
                                     icon={isActive ? activeIcon() : inactiveIcon()}
                                     eventHandlers={{ click: () => handleMarkerClick(first) }}
                                 />
                             )
                         }
+                        // Normal geographic cluster
                         return (
                             <Marker key={key} position={[first.lat, first.lng]}
                                 icon={clusterIcon(group.length)}
@@ -485,6 +511,40 @@ export default function Mapa() {
             </div>
 
         </div>
+
+        {/* Co-located pavilion popup — floating card with list of pavilions */}
+        {coLocatedGroup && coLocatedGroup.length > 1 && (
+            <div className="absolute bottom-28 md:bottom-16 left-1/2 -translate-x-1/2 z-[1200] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-amber-200 dark:border-amber-800 rounded-2xl shadow-2xl p-3 min-w-[240px] max-w-[320px] animate-slide-up">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                        {coLocatedGroup.length} pavilhões neste local
+                    </span>
+                    <button
+                        onClick={() => setCoLocatedGroup(null)}
+                        className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                    >
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="space-y-0.5">
+                    {coLocatedGroup.map((p) => (
+                        <button
+                            key={p.id}
+                            onClick={() => {
+                                setCoLocatedGroup(null)
+                                handleMarkerClick(p)
+                            }}
+                            className="w-full text-left px-3 py-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors flex items-center gap-3"
+                        >
+                            <MapPin size={14} className="text-dribly-purple shrink-0" />
+                            <span className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+                                {displayPavilionName(p)}
+                            </span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        )}
 
         {selected && (
             <PavilionSheet pavilion={selected} isOpen={sheetOpen} onClose={() => setSheetOpen(false)} />
