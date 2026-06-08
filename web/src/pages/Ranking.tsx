@@ -1,21 +1,32 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Trophy, TrendingUp } from 'lucide-react'
+import { Search, Trophy, TrendingUp, Loader2 } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
 import { SeoHead } from '../components/SeoHead'
 import { useClub, type Club, displayName } from '../lib/ClubContext'
 import { normalize } from '../lib/clubSearch'
 
+/** Weight ELO by club priority (lower priority = bigger club = bonus) */
+function weightedElo(club: Club): number {
+    const raw = club.elo_rating ?? 1500
+    const p = club.priority ?? 4
+    // priority 2 → +200, priority 3 → +100, priority 4+ → +0
+    const bonus = p === 2 ? 200 : p === 3 ? 100 : 0
+    return raw + bonus
+}
+
 function Ranking() {
     const { clubs, loadClubs } = useClub()
     const [query, setQuery] = useState('')
+    const [loading, setLoading] = useState(true)
 
-    useEffect(() => { loadClubs() }, [loadClubs])
+    useEffect(() => {
+        loadClubs().finally(() => setLoading(false))
+    }, [loadClubs])
 
-    // Sort clubs by ELO descending, fallback to 1500
+    // Sort by weighted ELO
     const ranked = useMemo(() => {
-        return [...clubs]
-            .sort((a, b) => (b.elo_rating ?? 1500) - (a.elo_rating ?? 1500))
+        return [...clubs].sort((a, b) => weightedElo(b) - weightedElo(a))
     }, [clubs])
 
     const filtered = useMemo(() => {
@@ -27,8 +38,16 @@ function Ranking() {
         )
     }, [ranked, query])
 
-    const maxElo = ranked[0]?.elo_rating ?? 2000
-    const minElo = ranked[ranked.length - 1]?.elo_rating ?? 1000
+    const maxWeighted = ranked.length > 0 ? weightedElo(ranked[0]) : 2000
+    const minWeighted = ranked.length > 0 ? weightedElo(ranked[ranked.length - 1]) : 1000
+
+    if (loading && clubs.length === 0) {
+        return (
+            <div className="max-w-2xl mx-auto pb-24 px-3 flex items-center justify-center min-h-[50vh]">
+                <Loader2 size={24} className="animate-spin text-dribly-purple" />
+            </div>
+        )
+    }
 
     return (
         <div className="max-w-2xl mx-auto pb-24 px-3">
@@ -42,8 +61,7 @@ function Ranking() {
                     Ranking Nacional
                 </h1>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
-                    Baseado no sistema <strong>ELO Rating</strong> — 23 épocas, 15.000+ jogos.
-                    Cada vitória sobe o rating; derrotas contra equipas mais fracas pesam mais.
+                    <strong>ELO Rating</strong> com peso por importância do clube — baseado em 23 épocas e 24.000+ jogos.
                 </p>
             </div>
 
@@ -69,8 +87,8 @@ function Ranking() {
                             key={club.id}
                             club={club}
                             position={ranked.indexOf(club) + 1}
-                            maxElo={maxElo}
-                            minElo={minElo}
+                            maxElo={maxWeighted}
+                            minElo={minWeighted}
                         />
                     ))
                 )}
@@ -88,7 +106,7 @@ function Ranking() {
 }
 
 function RankRow({ club, position, maxElo, minElo }: { club: Club; position: number; maxElo: number; minElo: number }) {
-    const elo = club.elo_rating ?? 1500
+    const elo = weightedElo(club)
     const range = maxElo - minElo || 1
     const pct = Math.round(((elo - minElo) / range) * 100)
 
