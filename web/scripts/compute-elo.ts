@@ -43,28 +43,48 @@ interface Game {
     resultado_fora: number | null
 }
 
+function norm(s: string): string {
+    return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+}
+
 async function main() {
     console.log('🏀 Computing ELO ratings...\n')
 
-    // 1. Fetch ALL games from all seasons
+    // 1. Fetch ALL games from all seasons (paginated, Supabase max 1000/request)
     const allGames: Game[] = []
     for (const season of SEASONS) {
         const table = tableName(season)
-        const { data, error } = await supabase
-            .from(table)
-            .select('data, equipa_casa, equipa_fora, resultado_casa, resultado_fora')
-            .not('resultado_casa', 'is', null)
-            .not('resultado_fora', 'is', null)
-            .order('data', { ascending: true })
+        let page = 0
+        const PAGE = 1000
+        let totalForSeason = 0
+        while (true) {
+            const { data, error } = await supabase
+                .from(table)
+                .select('data, equipa_casa, equipa_fora, resultado_casa, resultado_fora')
+                .not('resultado_casa', 'is', null)
+                .not('resultado_fora', 'is', null)
+                .order('data', { ascending: true })
+                .range(page * PAGE, (page + 1) * PAGE - 1)
 
-        if (error) {
-            console.error(`  ⚠️  ${table}: ${error.message}`)
-            continue
+            if (error) {
+                console.error(`  ⚠️  ${table} page ${page}: ${error.message}`)
+                break
+            }
+            if (!data || data.length === 0) break
+
+            // Normalize team names
+            for (const row of data as unknown as Game[]) {
+                allGames.push({
+                    ...row,
+                    equipa_casa: norm(row.equipa_casa),
+                    equipa_fora: norm(row.equipa_fora),
+                })
+            }
+            totalForSeason += data.length
+            if (data.length < PAGE) break
+            page++
         }
-        if (data) {
-            console.log(`  ✅ ${table}: ${data.length} jogos`)
-            allGames.push(...(data as unknown as Game[]))
-        }
+        if (totalForSeason > 0) console.log(`  ✅ ${table}: ${totalForSeason} jogos`)
     }
 
     // 2. Sort all games by date
