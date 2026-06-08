@@ -87,15 +87,41 @@ async function main() {
         if (totalForSeason > 0) console.log(`  ✅ ${table}: ${totalForSeason} jogos`)
     }
 
-    // 2. Sort all games by date
+    // 2. Load club priorities for importance weighting
+    const { data: clubData } = await supabase
+        .from('clubs')
+        .select('name, priority, id')
+    const clubPriority = new Map<string, number>()
+    if (clubData) {
+        for (const c of clubData as { name: string; priority: number | null; id: number }[]) {
+            clubPriority.set(norm(c.name), c.priority ?? 4)
+        }
+    }
+    console.log(`  📋 ${clubPriority.size} prioridades carregadas`)
+
+    // 3. Sort all games by date
     allGames.sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
     console.log(`\n  📊 Total: ${allGames.length} jogos processados`)
 
-    // 3. Compute ELO
+    // 4. Compute ELO with importance weighting
     const ratings = new Map<string, number>()
 
     function getRating(club: string): number {
         return ratings.get(club) ?? START_RATING
+    }
+
+    function getPriority(teamName: string): number {
+        // Try exact match, then fallback by last word
+        const n = norm(teamName)
+        if (clubPriority.has(n)) return clubPriority.get(n)!
+        // Fallback: match last word
+        const words = n.split(/\s+/).filter(w => w.length > 3)
+        for (let i = words.length - 1; i >= 0; i--) {
+            for (const [cn, p] of clubPriority) {
+                if (cn.includes(words[i])) return p
+            }
+        }
+        return 4 // default: lowest importance
     }
 
     for (const game of allGames) {
@@ -106,9 +132,15 @@ async function main() {
 
         const rCasa = getRating(casa)
         const rFora = getRating(fora)
+        const pCasa = getPriority(casa)
+        const pFora = getPriority(fora)
 
-        // Expected scores
-        const eCasa = 1 / (1 + Math.pow(10, (rFora - rCasa) / 400))
+        // Priority adjustment: bigger club (lower number) gets rating boost in expectation
+        // priority 2 vs 4 → +200 boost for the priority-2 club
+        const priorityAdj = (pFora - pCasa) * 100
+
+        // Expected scores with priority adjustment
+        const eCasa = 1 / (1 + Math.pow(10, (rFora - rCasa + priorityAdj) / 400))
         const eFora = 1 - eCasa
 
         // Actual scores
