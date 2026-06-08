@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Search, Save, X } from 'lucide-react'
+import { Search, Save, X, LayoutGrid, List } from 'lucide-react'
 import { useAdminApi, type AdminClub } from '../../lib/adminApi'
+
+type ViewMode = 'table' | 'cards'
 
 export default function ClubesAdmin() {
     const api = useAdminApi()
@@ -11,6 +13,7 @@ export default function ClubesAdmin() {
     const [editForm, setEditForm] = useState<Partial<AdminClub>>({})
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [view, setView] = useState<ViewMode>('cards')
 
     useEffect(() => {
         api
@@ -72,20 +75,86 @@ export default function ClubesAdmin() {
                 <h2 className="text-lg font-black text-zinc-900 dark:text-white">
                     Clubes ({clubs.length})
                 </h2>
-                <div className="relative">
-                    <Search
-                        size={14}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="pl-8 pr-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white w-48 focus:outline-none focus:border-dribly-purple"
-                    />
+                <div className="flex items-center gap-2">
+                    {/* View toggle */}
+                    <div className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+                        <button
+                            onClick={() => setView('cards')}
+                            className={`p-1.5 transition-colors ${view === 'cards' ? 'bg-dribly-purple text-white' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`}
+                            title="Vista em cards"
+                        >
+                            <LayoutGrid size={14} />
+                        </button>
+                        <button
+                            onClick={() => setView('table')}
+                            className={`p-1.5 transition-colors ${view === 'table' ? 'bg-dribly-purple text-white' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`}
+                            title="Vista em tabela"
+                        >
+                            <List size={14} />
+                        </button>
+                    </div>
+                    <div className="relative">
+                        <Search
+                            size={14}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Pesquisar..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="pl-8 pr-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white w-48 focus:outline-none focus:border-dribly-purple"
+                        />
+                    </div>
                 </div>
             </div>
+
+            {/* Card view */}
+            {view === 'cards' && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6">
+                    {filtered.map((club) => (
+                        <div
+                            key={club.id}
+                            onClick={() => startEdit(club)}
+                            className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 flex flex-col items-center gap-3 cursor-pointer hover:border-dribly-purple/30 hover:shadow-md transition-all group"
+                        >
+                            {/* Logo */}
+                            <div className="w-16 h-16 rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
+                                {club.logo_url ? (
+                                    <img src={club.logo_url} alt="" className="w-12 h-12 object-contain" />
+                                ) : (
+                                    <span className="text-2xl font-black text-zinc-300 dark:text-zinc-600">
+                                        {club.name.charAt(0)}
+                                    </span>
+                                )}
+                            </div>
+                            {/* Name */}
+                            <p className="text-[11px] font-bold text-zinc-900 dark:text-white text-center leading-tight line-clamp-2">
+                                {club.name}
+                            </p>
+                            {/* Color swatch */}
+                            {club.primary_color && (
+                                <div className="flex items-center gap-1.5">
+                                    <span
+                                        className="w-5 h-5 rounded-full border border-zinc-200 dark:border-zinc-600"
+                                        style={{ backgroundColor: club.primary_color }}
+                                    />
+                                    <span className="text-[10px] font-mono text-zinc-400">
+                                        {club.primary_color}
+                                    </span>
+                                </div>
+                            )}
+                            {/* Edit hint */}
+                            <span className="text-[9px] text-zinc-300 dark:text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                Clique para editar
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Table view (only when selected) */}
+            {view === 'table' && (
 
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
                 <div className="overflow-x-auto">
@@ -194,6 +263,7 @@ export default function ClubesAdmin() {
                     </p>
                 )}
             </div>
+            )}
         </div>
     )
 }

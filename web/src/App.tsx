@@ -26,6 +26,7 @@ import { AdminRoute } from './components/AdminRoute'
 import { AdminLayout } from './pages/admin/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
 import ClubesAdmin from './pages/admin/ClubesAdmin'
+import PavilionsAdmin from './pages/admin/PavilionsAdmin'
 import UsersAdmin from './pages/admin/UsersAdmin'
 import GamesAdmin from './pages/admin/GamesAdmin'
 import CompetitionsAdmin from './pages/admin/CompetitionsAdmin'
@@ -87,6 +88,7 @@ function App() {
                         <Route element={<AdminLayout />}>
                             <Route index element={<Dashboard />} />
                             <Route path="clubes" element={<ClubesAdmin />} />
+                            <Route path="pavilhoes" element={<PavilionsAdmin />} />
                             <Route path="utilizadores" element={<UsersAdmin />} />
                             <Route path="jogos" element={<GamesAdmin />} />
                             <Route path="competicoes" element={<CompetitionsAdmin />} />

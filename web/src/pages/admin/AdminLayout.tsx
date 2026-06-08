@@ -1,9 +1,10 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
-import { LayoutDashboard, Building2, Users, Calendar, CalendarDays, Trophy, RefreshCw, ArrowLeft } from 'lucide-react'
+import { LayoutDashboard, Building2, Users, Calendar, CalendarDays, Trophy, RefreshCw, ArrowLeft, MapPin } from 'lucide-react'
 
 const NAV_ITEMS = [
     { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
     { to: '/admin/clubes', label: 'Clubes', icon: Building2 },
+    { to: '/admin/pavilhoes', label: 'Pavilhões', icon: MapPin },
     { to: '/admin/utilizadores', label: 'Utilizadores', icon: Users },
     { to: '/admin/jogos', label: 'Jogos', icon: Calendar },
     { to: '/admin/calendario', label: 'Calendário', icon: CalendarDays },
