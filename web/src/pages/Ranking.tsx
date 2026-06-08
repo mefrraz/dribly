@@ -14,7 +14,12 @@ function weightedElo(club: Club): number {
     return raw + bonus
 }
 
-const SEASONS = ['2025/2026', '2024/2025', '2023/2024', '2022/2023', '2021/2022']
+const SEASONS = [
+    '2025/2026', '2024/2025', '2023/2024', '2022/2023', '2021/2022', '2020/2021',
+    '2019/2020', '2018/2019', '2017/2018', '2016/2017', '2015/2016', '2014/2015',
+    '2013/2014', '2012/2013', '2011/2012', '2010/2011', '2009/2010', '2008/2009',
+    '2007/2008', '2006/2007', '2005/2006', '2004/2005', '2003/2004',
+]
 
 function Ranking() {
     const { clubs, loadClubs } = useClub()
@@ -149,21 +154,35 @@ function Ranking() {
             {showHelp && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" onClick={() => setShowHelp(false)}>
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-                    <div className="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-white/10 p-5 max-w-sm w-full" onClick={e => e.stopPropagation()}>
+                    <div className="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-white/10 p-5 max-w-sm w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                         <button onClick={() => setShowHelp(false)} className="absolute top-3 right-3 p-1 rounded-full text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
                             <X size={16} />
                         </button>
                         <h3 className="text-sm font-black text-zinc-900 dark:text-white mb-3">Como funciona o ranking</h3>
-                        <div className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                            <p>O <strong>ELO Rating</strong> é um sistema matemático usado no xadrez há 60 anos. Adaptado ao basquetebol português:</p>
-                            <ul className="list-disc list-inside space-y-1">
-                                <li>Cada clube começa com <strong>1500 pts</strong></li>
-                                <li>Ganhar contra um clube <strong>mais forte</strong> → sobe muito</li>
-                                <li>Ganhar contra um clube <strong>mais fraco</strong> → sobe pouco</li>
-                                <li>Perder contra um mais fraco → desce muito</li>
-                            </ul>
-                            <p>A <strong>importância</strong> do clube também pesa: clubes de topo têm um bónus de <strong>+100 a +200 pts</strong>, refletindo a competitividade da divisão onde jogam.</p>
-                            <p className="text-zinc-400">Baseado em 24.000+ jogos da época {season}. Atualizações diárias.</p>
+                        <div className="space-y-3 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                            <p>Baseado no sistema <strong>ELO Rating</strong>, usado no xadrez profissional desde 1960. Não mede "qual o maior clube" — mede <strong>desempenho dentro das competições disputadas</strong> nessa época.</p>
+
+                            <div>
+                                <p className="font-bold text-zinc-700 dark:text-zinc-300 mb-1">Regras básicas:</p>
+                                <ul className="list-disc list-inside space-y-0.5">
+                                    <li>Todos começam com 1.500 pts por época</li>
+                                    <li>Vencer um adversário com rating <strong>superior</strong> ao teu → ganhas muitos pontos</li>
+                                    <li>Vencer um adversário com rating <strong>inferior</strong> → ganhas poucos pontos</li>
+                                    <li>Perder com um adversário de rating inferior → perdes muitos pontos</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <p className="font-bold text-zinc-700 dark:text-zinc-300 mb-1">Níveis dos clubes (prioridade):</p>
+                                <p className="mb-1">A prioridade reflete a <strong>divisão habitual</strong> do clube e ajusta ligeiramente o cálculo para evitar distorções:</p>
+                                <div className="space-y-1 mt-1.5">
+                                    <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-dribly-purple shrink-0" /><span><strong>Nível 1</strong> — Liga Betclic (topo nacional)</span></div>
+                                    <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-purple-400 shrink-0" /><span><strong>Nível 2</strong> — Proliga, 1ª Divisão</span></div>
+                                    <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-purple-300 shrink-0" /><span><strong>Nível 3</strong> — 2ª Divisão e restantes</span></div>
+                                </div>
+                            </div>
+
+                            <p className="text-zinc-400">Cada época é independente — o rating recomeça nos 1.500 pts. Baseado em 24.000+ jogos da época {season}.</p>
                         </div>
                     </div>
                 </div>
