@@ -17,7 +17,6 @@ const FEATURED_LEAGUES = [
     { name: 'Proliga', id: 10903 },
     { name: '1ª Divisão', id: 10904 },
     { name: '2ª Divisão', id: 10905 },
-    { name: 'Taça Hugo Santos', id: 10917 },
 ]
 
 // ---- Sub-components ----
@@ -224,17 +223,26 @@ function Landing() {
                     </p>
 
                     {/* Featured league pills */}
-                    <div className="flex flex-wrap justify-center gap-2 mb-6 ">
-                        {FEATURED_LEAGUES.map(({ name, id }) => (
-                            <button
-                                key={id}
-                                onClick={() => navigate('/competicao/' + id)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all"
-                            >
-                                <Trophy size={12} className="text-dribly-purple" />
-                                {name}
-                            </button>
-                        ))}
+                    <div className="flex justify-center gap-2 mb-6 flex-nowrap overflow-x-auto scrollbar-none px-2">
+                        {FEATURED_LEAGUES.map(({ name, id }, i) => {
+                            const meta = compMetaMap.get(id)
+                            return (
+                                <button
+                                    key={id}
+                                    onClick={() => navigate('/competicao/' + id)}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all shrink-0 ${i >= 3 ? 'hidden sm:flex' : ''}`}
+                                >
+                                    <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
+                                        {meta?.logo ? (
+                                            <img src={meta.logo} alt="" className="w-3.5 h-3.5 object-contain" decoding="async" />
+                                        ) : (
+                                            <Trophy size={10} className="text-dribly-purple" />
+                                        )}
+                                    </span>
+                                    {name}
+                                </button>
+                            )
+                        })}
                     </div>
 
                     {/* Search input + dropdown */}
@@ -405,18 +413,16 @@ function Landing() {
                         <div className="relative">
                             <div
                                 ref={carouselRef}
-                                className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory scroll-smooth items-start"
+                                className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory scroll-smooth items-start px-4 md:px-0"
                             >
-                                <div className="shrink-0 w-[calc(50vw-16px)] md:hidden" />
                                 {[...games, ...games, ...games].map((match, idx) => (
-                                    <div key={match.slug || match.id + '-' + idx} className="shrink-0 snap-center">
+                                    <div key={match.slug || match.id + '-' + idx} className="w-[calc(100vw-2rem)] md:w-[320px] shrink-0 snap-center">
                                         <GameCard match={match} mode="agenda" />
                                     </div>
                                 ))}
-                                <div className="shrink-0 w-[calc(50vw-16px)] md:hidden" />
                             </div>
-                            <div className="absolute left-0 top-0 bottom-0 w-32 sm:w-44 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
-                            <div className="absolute right-0 top-0 bottom-0 w-32 sm:w-44 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
+                            <div className="absolute left-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
+                            <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
                         </div>
                     )}
                 </div>
