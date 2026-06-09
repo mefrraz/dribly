@@ -26,7 +26,9 @@ const COMP_PRIORITY: Record<string, number> = {
 }
 
 function norm(s: string): string {
-    return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+    // Strip sponsor/patron suffixes: "FC GAIA - FOKUS" → "fc gaia"
+    const clean = s.replace(/\s*[-–/]\s*\S.*$/, '')
+    return clean.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 }
 
 async function main() {
@@ -76,64 +78,38 @@ async function main() {
         console.log()
     }
 
-    // Step 4: Match to clubs (best effort) and update
-    console.log('  🔗 A ligar equipas a clubes...')
-    let updated = 0
-    const skipped: string[] = []
+    // Step 4: Show teams with their club suggestions (NO auto-update)
+    console.log('  🔗 Sugestões de matching (verifica manualmente):\n')
 
-    for (const club of clubs as { id: number; name: string; priority: number | null }[]) {
-        const cn = norm(club.name)
-        let bestP = 99
+    const clubList = clubs as { id: number; name: string; priority: number | null }[]
 
-        for (const [teamName, p] of teamPriority) {
-            const tn = norm(teamName)
-            // Exact
-            if (cn === tn) { if (p < bestP) bestP = p; continue }
-            // Substring either way
-            if (cn.includes(tn) || tn.includes(cn)) { if (p < bestP) bestP = p }
-            // Common words (last 2+ words of club name appear in team name)
+    for (const [teamName, p] of [...teamPriority.entries()].sort(([, a], [, b]) => a - b)) {
+        const tn = norm(teamName)
+        const suggestions: string[] = []
+
+        for (const club of clubList) {
+            const cn = norm(club.name)
+            if (cn === tn) { suggestions.push(`${club.name} (exact)`); continue }
+            if (cn.includes(tn) || tn.includes(cn)) { suggestions.push(`${club.name} (substr)`); continue }
             const cWords = cn.split(/\s+/).filter(w => w.length > 2)
             const tWords = tn.split(/\s+/).filter(w => w.length > 2)
-            if (cWords.length >= 2 && tWords.length >= 2) {
-                const match = cWords.filter(w => tWords.includes(w)).length
-                if (match >= 2) { if (p < bestP) bestP = p }
+            const common = cWords.filter(w => tWords.includes(w))
+            if (common.length >= 2 || (common.length >= 1 && common[0].length >= 4)) {
+                suggestions.push(`${club.name} (word: ${common.join(',')})`)
             }
         }
 
-        if (bestP < 99 && bestP !== club.priority) {
-            console.log(`    ${club.priority ?? '?'}→${bestP}  ${club.name}`)
-            await supabase.from('clubs').update({ priority: bestP }).eq('id', club.id)
-            updated++
+        const icon = p === 1 ? '🟣' : p === 2 ? '🔵' : p === 3 ? '🟢' : '🟡'
+        console.log(`  ${icon} P${p} "${teamName}"`)
+        if (suggestions.length > 0) {
+            for (const s of suggestions.slice(0, 3)) console.log(`       → ${s}`)
+            if (suggestions.length > 3) console.log(`       ... +${suggestions.length - 3}`)
+        } else {
+            console.log(`       ⚠️  sem match`)
         }
     }
 
-    console.log(`\n✅ ${updated} clubes atualizados`)
-
-    // Fallback: clubs not matched → priority 5 (no national competition data)
-    let fallback = 0
-    for (const club of clubs as { id: number; name: string; priority: number | null }[]) {
-        const cn = norm(club.name)
-        let hasMatch = false
-        for (const [teamName] of teamPriority) {
-            const tn = norm(teamName)
-            if (cn === tn || cn.includes(tn) || tn.includes(cn)) { hasMatch = true; break }
-            const cWords = cn.split(/\s+/).filter(w => w.length > 2)
-            const tWords = tn.split(/\s+/).filter(w => w.length > 2)
-            if (cWords.length >= 2 && tWords.length >= 2) {
-                if (cWords.filter(w => tWords.includes(w)).length >= 2) { hasMatch = true; break }
-            }
-        }
-        if (!hasMatch && club.priority !== 5) {
-            await supabase.from('clubs').update({ priority: 5 }).eq('id', club.id)
-            fallback++
-        }
-    }
-    console.log(`📋 ${fallback} clubes sem competição nacional → prioridade 5`)
-
-    if (skipped.length > 0) {
-        console.log(`\n⚠️  ${skipped.length} equipas sem match:`)
-        skipped.forEach(t => console.log(`    - ${t}`))
-    }
+    console.log(`\n🏆 83 equipas listadas. Corre com --apply para atualizar.`)
 }
 
 main().catch(err => { console.error(err); process.exit(1) })
