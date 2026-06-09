@@ -12,11 +12,12 @@ import { associationLogoUrl } from '../lib/associationLogos'
 import { normalize, buildSearchText } from '../lib/clubSearch'
 import type { LandingCompetition } from '../hooks/useLandingData'
 
-const FEATURED_CLUBS = [
-    { name: 'FC Porto', slug: 'futebol-clube-do-porto' },
-    { name: 'SL Benfica', slug: 'sport-lisboa-e-benfica' },
-    { name: 'Sporting CP', slug: 'sporting-clube-de-portugal' },
-    { name: 'UD Oliveirense', slug: 'uni-o-desportiva-oliveirense' },
+const FEATURED_LEAGUES = [
+    { name: 'Liga Betclic', id: 10902 },
+    { name: 'Proliga', id: 10903 },
+    { name: '1ª Divisão', id: 10904 },
+    { name: '2ª Divisão', id: 10905 },
+    { name: 'Taça Hugo Santos', id: 10917 },
 ]
 
 // ---- Sub-components ----
@@ -222,29 +223,18 @@ function Landing() {
                         Resultados de todos os clubes de basquetebol em Portugal
                     </p>
 
-                    {/* Featured club pills */}
+                    {/* Featured league pills */}
                     <div className="flex flex-wrap justify-center gap-2 mb-6 ">
-                        {FEATURED_CLUBS.map(({ name, slug }) => {
-                            const c = clubs.find(x => x.slug === slug)
-                            return (
-                                <button
-                                    key={slug}
-                                    onClick={() => { if (c) selectClub(c); else navigate('/clube/' + slug + '/home') }}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all ${slug === 'uni-o-desportiva-oliveirense' ? 'hidden sm:flex' : ''}`}
-                                >
-                                    <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
-                                        {c?.logo_url ? (
-                                            <img src={c.logo_url} alt="" className="w-3.5 h-3.5 object-contain" decoding="async" />
-                                        ) : (
-                                            <span className="text-[9px] font-bold text-zinc-500">
-                                                {name.charAt(0).toUpperCase()}
-                                            </span>
-                                        )}
-                                    </span>
-                                    {c ? displayName(c) : name}
-                                </button>
-                            )
-                        })}
+                        {FEATURED_LEAGUES.map(({ name, id }) => (
+                            <button
+                                key={id}
+                                onClick={() => navigate('/competicao/' + id)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all"
+                            >
+                                <Trophy size={12} className="text-dribly-purple" />
+                                {name}
+                            </button>
+                        ))}
                     </div>
 
                     {/* Search input + dropdown */}
@@ -419,10 +409,7 @@ function Landing() {
                             >
                                 <div className="shrink-0 w-[calc(50vw-16px)] md:hidden" />
                                 {[...games, ...games, ...games].map((match, idx) => (
-                                    <div
-                                        key={match.slug || match.id + '-' + idx}
-                                        className="min-w-[65vw] md:min-w-[320px] shrink-0 snap-center"
-                                    >
+                                    <div key={match.slug || match.id + '-' + idx} className="shrink-0 snap-center">
                                         <GameCard match={match} mode="agenda" />
                                     </div>
                                 ))}
