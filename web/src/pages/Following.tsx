@@ -137,7 +137,7 @@ export default function Following() {
                                     className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl p-4 hover:border-dribly-purple/40 hover:shadow-md transition-all duration-200 text-center">
                                     <div className="w-14 h-14 mx-auto rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center overflow-hidden mb-2 border border-zinc-100 dark:border-zinc-700">
                                         {club.logo_url ? (
-                                            <img src={club.logo_url} alt="" className="w-10 h-10 object-contain" />
+                                            <img src={club.logo_url} alt="" className="w-10 h-10 object-contain" loading="lazy" decoding="async" />
                                         ) : (
                                             <span className="text-lg font-bold text-zinc-400">{displayName(club).charAt(0)}</span>
                                         )}

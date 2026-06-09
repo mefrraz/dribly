@@ -123,7 +123,7 @@ function SearchPage() {
                                     >
                                         <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
                                             {club.logo_url ? (
-                                                <img src={club.logo_url} alt="" className="w-7 h-7 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                                                <img src={club.logo_url} alt="" className="w-7 h-7 object-contain" loading="lazy" decoding="async" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                                             ) : null}
                                             <span className={club.logo_url ? 'hidden' : 'text-sm font-bold text-zinc-500'}>{displayName(club).charAt(0).toUpperCase()}</span>
                                         </div>
