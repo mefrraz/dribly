@@ -32,6 +32,7 @@ function Ranking() {
     const [loading, setLoading] = useState(true)
     const [showHelp, setShowHelp] = useState(false)
     const [season, setSeason] = useState(SEASONS[0])
+    const [nivel, setNivel] = useState<number | null>(null) // null = todos
     const [clubs, setClubs] = useState<RankedClub[]>([])
 
     useEffect(() => {
@@ -59,13 +60,19 @@ function Ranking() {
     }, [season])
 
     const filtered = useMemo(() => {
-        if (!query.trim()) return clubs
-        const q = normalize(query)
-        return clubs.filter(c =>
-            normalize(c.name).includes(q) ||
-            normalize(c.search_name || '').includes(q)
-        )
-    }, [clubs, query])
+        let result = clubs
+        if (nivel !== null) {
+            result = result.filter(c => c.priority === nivel)
+        }
+        if (query.trim()) {
+            const q = normalize(query)
+            result = result.filter(c =>
+                normalize(c.name).includes(q) ||
+                normalize(c.search_name || '').includes(q)
+            )
+        }
+        return result
+    }, [clubs, query, nivel])
 
     if (loading) {
         return (
@@ -95,18 +102,33 @@ function Ranking() {
                 </button>
             </div>
 
-            {/* Season selector */}
-            <div className="flex items-center gap-2 mb-4">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Época</span>
-                <select
-                    value={season}
-                    onChange={e => setSeason(e.target.value)}
-                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-lg px-3 py-1.5 text-xs font-bold text-zinc-700 dark:text-zinc-300 outline-none focus:ring-2 focus:ring-dribly-purple/30"
-                >
-                    {SEASONS.map(s => (
-                        <option key={s} value={s}>{s}</option>
-                    ))}
-                </select>
+            {/* Season + Nível selectors */}
+            <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Época</span>
+                    <select
+                        value={season}
+                        onChange={e => setSeason(e.target.value)}
+                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-bold text-zinc-700 dark:text-zinc-300 outline-none focus:ring-2 focus:ring-dribly-purple/30"
+                    >
+                        {SEASONS.map(s => (
+                            <option key={s} value={s}>{s}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Nível</span>
+                    <select
+                        value={nivel === null ? 'all' : nivel}
+                        onChange={e => setNivel(e.target.value === 'all' ? null : parseInt(e.target.value))}
+                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-bold text-zinc-700 dark:text-zinc-300 outline-none focus:ring-2 focus:ring-dribly-purple/30"
+                    >
+                        <option value="all">Todos</option>
+                        <option value="1">1 — Liga Betclic</option>
+                        <option value="2">2 — Proliga / 1ª Div</option>
+                        <option value="3">3 — 2ª Divisão</option>
+                    </select>
+                </div>
             </div>
 
             {/* Search */}
