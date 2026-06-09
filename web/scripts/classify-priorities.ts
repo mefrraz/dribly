@@ -89,35 +89,65 @@ async function main() {
 
     if (!clubs) { console.error('No clubs'); process.exit(1) }
 
-    // Build club → competitions map with proper matching
+    // Build club → competitions map with O(1) lookup
     function norm(s: string): string {
         return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
     }
-    const clubNorms = (clubs as { id: number; name: string }[]).map(c => ({ id: c.id, n: norm(c.name) }))
+
+    // Pre-build lookup: normalized name → club id (exact + last-word index)
+    const exactMap = new Map<string, number>()
+    const wordMap = new Map<string, number[]>()
+    for (const c of clubs as { id: number; name: string }[]) {
+        const n = norm(c.name)
+        exactMap.set(n, c.id)
+        const words = n.split(/\s+/).filter(w => w.length > 3)
+        for (const w of words) {
+            if (!wordMap.has(w)) wordMap.set(w, [])
+            wordMap.get(w)!.push(c.id)
+        }
+    }
+
     const clubComps = new Map<number, Set<string>>()
+    const seenPairs = new Set<string>() // deduplicate team+comp
 
     for (const g of games as { equipa_casa: string; equipa_fora: string; competicao: string | null }[]) {
         const comp = (g.competicao || '').trim()
-        if (!comp || /sub[-\s]?1[0-9]|sub[-\s]?[0-9]{2}|formação|distrital|torneio/i.test(comp)) continue
+        if (!comp) continue
 
         for (const team of [g.equipa_casa, g.equipa_fora]) {
             const tn = norm(team)
-            // Find matching club
-            for (const c of clubNorms) {
-                let match = false
-                if (c.n === tn || c.n.includes(tn) || tn.includes(c.n)) {
-                    match = true
-                } else {
-                    // Fallback by last word
-                    const cWords = c.n.split(/\s+/).filter(w => w.length > 3)
-                    const tWords = tn.split(/\s+/).filter(w => w.length > 3)
-                    if (cWords.length > 0 && tWords.includes(cWords[cWords.length - 1])) {
-                        match = true
-                    }
+            const key = `${tn}::${comp}`
+            if (seenPairs.has(key)) continue
+            seenPairs.add(key)
+
+            // Exact match
+            if (exactMap.has(tn)) {
+                const cid = exactMap.get(tn)!
+                if (!clubComps.has(cid)) clubComps.set(cid, new Set())
+                clubComps.get(cid)!.add(comp)
+                continue
+            }
+
+            // Substring match
+            let found = false
+            for (const [cn, cid] of exactMap) {
+                if (cn.includes(tn) || tn.includes(cn)) {
+                    if (!clubComps.has(cid)) clubComps.set(cid, new Set())
+                    clubComps.get(cid)!.add(comp)
+                    found = true
+                    break
                 }
-                if (match) {
-                    if (!clubComps.has(c.id)) clubComps.set(c.id, new Set())
-                    clubComps.get(c.id)!.add(comp)
+            }
+            if (found) continue
+
+            // Fallback by last word
+            const tWords = tn.split(/\s+/).filter(w => w.length > 3)
+            for (const tw of tWords) {
+                const ids = wordMap.get(tw)
+                if (ids && ids.length === 1) {
+                    const cid = ids[0]
+                    if (!clubComps.has(cid)) clubComps.set(cid, new Set())
+                    clubComps.get(cid)!.add(comp)
                     break
                 }
             }
