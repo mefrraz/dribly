@@ -32,7 +32,7 @@ function Ranking() {
     const [loading, setLoading] = useState(true)
     const [showHelp, setShowHelp] = useState(false)
     const [season, setSeason] = useState(SEASONS[0])
-    const [nivel, setNivel] = useState<number | null>(null) // null = todos
+    const [nivel, setNivel] = useState<number>(1) // default: Liga Betclic
     const [clubs, setClubs] = useState<RankedClub[]>([])
 
     useEffect(() => {
@@ -61,7 +61,7 @@ function Ranking() {
 
     const filtered = useMemo(() => {
         let result = clubs
-        if (nivel !== null) {
+        if (nivel > 0) {
             result = result.filter(c => c.priority === nivel)
         }
         if (query.trim()) {
@@ -119,14 +119,14 @@ function Ranking() {
                 <div className="flex items-center gap-1.5">
                     <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Nível</span>
                     <select
-                        value={nivel === null ? 'all' : nivel}
-                        onChange={e => setNivel(e.target.value === 'all' ? null : parseInt(e.target.value))}
+                        value={nivel}
+                        onChange={e => setNivel(parseInt(e.target.value))}
                         className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-bold text-zinc-700 dark:text-zinc-300 outline-none focus:ring-2 focus:ring-dribly-purple/30"
                     >
-                        <option value="all">Todos</option>
-                        <option value="1">1 — Liga Betclic</option>
-                        <option value="2">2 — Proliga / 1ª Div</option>
-                        <option value="3">3 — 2ª Divisão</option>
+                        <option value="0">Todos</option>
+                        <option value="1">1 - Liga Betclic</option>
+                        <option value="2">2 - Proliga / 1ª Div</option>
+                        <option value="3">3 - 2ª Divisão</option>
                     </select>
                 </div>
             </div>
@@ -213,9 +213,9 @@ function Ranking() {
                                 <p className="font-bold text-zinc-700 dark:text-zinc-300 mb-1">Níveis dos clubes (prioridade):</p>
                                 <p className="mb-1">A prioridade reflete a <strong>divisão habitual</strong> do clube e ajusta ligeiramente o cálculo para evitar distorções:</p>
                                 <div className="space-y-1 mt-1.5">
-                                    <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-dribly-purple shrink-0" /><span><strong>Nível 1</strong> — Liga Betclic (topo nacional)</span></div>
-                                    <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-purple-400 shrink-0" /><span><strong>Nível 2</strong> — Proliga, 1ª Divisão</span></div>
-                                    <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-purple-300 shrink-0" /><span><strong>Nível 3</strong> — 2ª Divisão e restantes</span></div>
+                                    <div className="flex items-center gap-2"><span className="text-dribly-purple font-bold">-</span><span><strong>Nível 1</strong> - Liga Betclic (topo nacional)</span></div>
+                                    <div className="flex items-center gap-2"><span className="text-purple-400 font-bold">-</span><span><strong>Nível 2</strong> - Proliga, 1ª Divisão</span></div>
+                                    <div className="flex items-center gap-2"><span className="text-purple-300 font-bold">-</span><span><strong>Nível 3</strong> - 2ª Divisão e restantes</span></div>
                                 </div>
                             </div>
 
