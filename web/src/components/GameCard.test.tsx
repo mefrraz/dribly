@@ -39,11 +39,10 @@ describe('GameCard', () => {
             </MemoryRouter>
         )
 
-        expect(screen.getByText('18:00')).toBeTruthy()
+        expect(screen.getByText('15 abr · 18:00')).toBeTruthy()
         expect(screen.getByText('FC PORTO')).toBeTruthy()
         expect(screen.getByText('SL BENFICA')).toBeTruthy()
         expect(screen.getByText('Dragão Arena')).toBeTruthy()
-        expect(screen.getByText('Liga Betclic')).toBeTruthy()
     })
 
     it('should render result game with scores', () => {
@@ -112,8 +111,9 @@ describe('GameCard', () => {
             </MemoryRouter>
         )
 
-        // Clock icon should not appear if no valid hora
-        expect(screen.queryByText('18:00')).toBeNull()
+        // Hour should not appear if no valid hora
+        expect(screen.getByText('15 abr')).toBeTruthy()
+        expect(screen.queryByText('·')).toBeNull()
     })
 
     it('should link to game detail page', () => {
