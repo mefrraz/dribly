@@ -51,16 +51,24 @@ function Ranking() {
                         eloMap.set(row.club_id, row.elo_rating)
                     }
                 }
-                setClubs(
-                    (allClubs as RankedClub[]).map(c => ({
-                        ...c,
-                        elo: Math.round(eloMap.get(c.id) ?? 1500),
-                    })).sort((a, b) => b.elo - a.elo)
-                )
+                const ranked = (allClubs as RankedClub[]).map(c => ({
+                    ...c,
+                    elo: Math.round(eloMap.get(c.id) ?? 1500),
+                })).sort((a, b) => b.elo - a.elo)
+                setClubs(ranked)
+
+                // Auto-select level from ?destaque= param
+                const slug = searchParams.get('destaque')
+                if (slug) {
+                    const club = ranked.find(c => c.slug === slug)
+                    if (club && club.priority) {
+                        setNivel(club.priority)
+                    }
+                }
             }
             setLoading(false)
         })
-    }, [season])
+    }, [season, searchParams])
 
     // Highlight club from ?destaque= param
     useEffect(() => {
