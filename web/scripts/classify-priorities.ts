@@ -1,12 +1,7 @@
 /**
- * Deterministic priority assignment — reads games from national competitions
- * and assigns priority based on which competition each team plays in.
- *
- * Liga Betclic Masculina  → 1
- * Proliga                  → 2
- * 1ª Divisão Masculina     → 2
- * 2ª Divisão Masculina     → 3
- * Others / no data          → 4
+ * Priority classifier v3 — Uses competition→priority mapping from ChatGPT.
+ * Assigns priority to each club based on the BEST (lowest) competition they play in.
+ * Clubs without games in mapped competitions keep their current priority.
  */
 
 import 'dotenv/config'
@@ -18,59 +13,24 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 if (!supabaseUrl || !supabaseKey) { console.error('Missing env vars'); process.exit(1) }
 const supabase = createClient(supabaseUrl, supabaseKey, { realtime: { transport: WebSocket } })
 
+// From ChatGPT — only national senior competitions (99 = ignore)
+const COMP_PRIORITY: Record<string, number> = {
+    'Liga Betclic Feminina': 1,
+    'Liga Betclic Masculina': 1,
+    'Liga BCR': 1,
+    'Proliga': 2,
+    '1ª Divisão Feminina': 2,
+    '1ª Divisão Masculina': 3,
+    '2ª Divisão Feminina': 3,
+    '2ª Divisão Masculina': 4,
+}
+
 function norm(s: string): string {
     return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 }
 
-async function getPriority(teamNames: string[], clubs: { id: number; name: string }[]): Promise<[number, number][]> {
-    // Build lookup maps
-    const exact = new Map<string, number>()
-    const wordIdx = new Map<string, number[]>()
-    for (const c of clubs) {
-        const n = norm(c.name)
-        exact.set(n, c.id)
-        for (const w of n.split(/\s+/).filter(w => w.length > 3)) {
-            if (!wordIdx.has(w)) wordIdx.set(w, [])
-            wordIdx.get(w)!.push(c.id)
-        }
-    }
-
-    const clubDiv: Map<number, Set<number>> = new Map()
-    for (const tn of teamNames) {
-        const name = norm(tn)
-
-        // Exact
-        if (exact.has(name)) {
-            const cid = exact.get(name)!
-            if (!clubDiv.has(cid)) clubDiv.set(cid, new Set())
-            continue
-        }
-
-        // Substring
-        let found = false
-        for (const [cn, cid] of exact) {
-            if (cn.includes(name) || name.includes(cn)) {
-                if (!clubDiv.has(cid)) clubDiv.set(cid, new Set())
-                found = true
-                break
-            }
-        }
-        if (found) continue
-
-        // Word match (only if unique)
-        for (const w of name.split(/\s+/).filter(w => w.length > 3)) {
-            const ids = wordIdx.get(w)
-            if (ids && ids.length === 1) {
-                if (!clubDiv.has(ids[0])) clubDiv.set(ids[0], new Set())
-                break
-            }
-        }
-    }
-    return [...clubDiv.entries()]
-}
-
 async function main() {
-    console.log('🎯 Priority classifier — deterministic\n')
+    console.log('🎯 Priority classifier v3 — competition mapping\n')
 
     const [{ data: clubs }, { data: games }] = await Promise.all([
         supabase.from('clubs').select('id, name, priority').order('id'),
@@ -78,68 +38,80 @@ async function main() {
     ])
     if (!clubs || !games) { console.error('No data'); process.exit(1) }
 
-    const clubList = clubs as { id: number; name: string; priority: number | null }[]
-
-    // Categorize teams by competition
-    const div1 = new Set<string>()
-    const div2 = new Set<string>()
-    const div3 = new Set<string>()
-
+    // Step 1: For each known competition, collect all team names
+    const compTeams = new Map<string, Set<string>>()
     for (const g of games as { equipa_casa: string; equipa_fora: string; competicao: string | null }[]) {
-        const comp = (g.competicao || '').toLowerCase()
-        let div: number | null = null
-        if (comp.includes('liga betclic') && comp.includes('masculin')) div = 1
-        else if (comp.includes('proliga')) div = 2
-        else if (comp.includes('1ª divisão') && comp.includes('masculin')) div = 2
-        else if (comp.includes('2ª divisão') && comp.includes('masculin')) div = 3
-        if (!div) continue
-
-        const set = div === 1 ? div1 : div === 2 ? div2 : div3
-        set.add(g.equipa_casa)
-        set.add(g.equipa_fora)
+        const comp = (g.competicao || '').trim()
+        if (!COMP_PRIORITY[comp]) continue
+        if (!compTeams.has(comp)) compTeams.set(comp, new Set())
+        compTeams.get(comp)!.add(g.equipa_casa)
+        compTeams.get(comp)!.add(g.equipa_fora)
     }
 
-    console.log(`  📋 Div 1 (Betclic): ${div1.size} equipas`)
-    console.log(`  📋 Div 2 (Proliga/1ª): ${div2.size} equipas`)
-    console.log(`  📋 Div 3 (2ª): ${div3.size} equipas\n`)
+    console.log('  Competições encontradas:')
+    for (const [comp, teams] of compTeams) {
+        console.log(`    ${comp} (p${COMP_PRIORITY[comp]}): ${teams.size} equipas`)
+    }
 
-    // Match to clubs
-    const [res1, res2, res3] = await Promise.all([
-        getPriority([...div1], clubList),
-        getPriority([...div2], clubList),
-        getPriority([...div3], clubList),
-    ])
+    // Step 2: Assign best priority to each team name
+    const teamPriority = new Map<string, number>()
+    for (const [comp, teams] of compTeams) {
+        const p = COMP_PRIORITY[comp]
+        for (const team of teams) {
+            const cur = teamPriority.get(team) ?? 99
+            if (p < cur) teamPriority.set(team, p)
+        }
+    }
 
-    // Assign: lowest division number wins
-    const final = new Map<number, number>()
-    for (const [id] of res1) final.set(id, 1)
-    for (const [id] of res2) if (!final.has(id)) final.set(id, 2)
-    for (const [id] of res3) if (!final.has(id)) final.set(id, 3)
+    console.log(`\n  📋 ${teamPriority.size} equipas únicas classificadas\n`)
 
-    console.log(`  🏀 ${final.size} clubes classificados por competição\n`)
+    // Step 3: Print teams by priority (for manual verification)
+    for (let p = 1; p <= 4; p++) {
+        const teams = [...teamPriority.entries()].filter(([, v]) => v === p)
+        console.log(`  Prioridade ${p} (${teams.length} equipas):`)
+        for (const [name] of teams.slice(0, 20)) {
+            console.log(`    - ${name}`)
+        }
+        if (teams.length > 20) console.log(`    ... +${teams.length - 20} mais`)
+        console.log()
+    }
 
-    // Update
+    // Step 4: Match to clubs (best effort) and update
+    console.log('  🔗 A ligar equipas a clubes...')
     let updated = 0
-    for (const [id, priority] of final) {
-        const club = clubList.find(c => c.id === id)
-        if (club && club.priority !== priority) {
-            console.log(`    ${club.priority ?? '?'}→${priority}  ${club.name}`)
-            await supabase.from('clubs').update({ priority }).eq('id', id)
+    const skipped: string[] = []
+
+    for (const club of clubs as { id: number; name: string; priority: number | null }[]) {
+        const cn = norm(club.name)
+        let bestP = 99
+
+        for (const [teamName, p] of teamPriority) {
+            const tn = norm(teamName)
+            // Exact
+            if (cn === tn) { if (p < bestP) bestP = p; continue }
+            // Substring either way
+            if (cn.includes(tn) || tn.includes(cn)) { if (p < bestP) bestP = p }
+            // Common words (last 2+ words of club name appear in team name)
+            const cWords = cn.split(/\s+/).filter(w => w.length > 2)
+            const tWords = tn.split(/\s+/).filter(w => w.length > 2)
+            if (cWords.length >= 2 && tWords.length >= 2) {
+                const match = cWords.filter(w => tWords.includes(w)).length
+                if (match >= 2) { if (p < bestP) bestP = p }
+            }
+        }
+
+        if (bestP < 99 && bestP !== club.priority) {
+            console.log(`    ${club.priority ?? '?'}→${bestP}  ${club.name}`)
+            await supabase.from('clubs').update({ priority: bestP }).eq('id', club.id)
             updated++
         }
     }
 
-    // Remaining clubs → priority 4 if not already
-    let to4 = 0
-    for (const c of clubList) {
-        if (!final.has(c.id) && c.priority !== 4) {
-            await supabase.from('clubs').update({ priority: 4 }).eq('id', c.id)
-            to4++
-        }
-    }
-    if (to4 > 0) console.log(`    📋 ${to4} clubes sem competição nacional → priority 4\n`)
-
     console.log(`\n✅ ${updated} clubes atualizados`)
+    if (skipped.length > 0) {
+        console.log(`\n⚠️  ${skipped.length} equipas sem match:`)
+        skipped.forEach(t => console.log(`    - ${t}`))
+    }
 }
 
 main().catch(err => { console.error(err); process.exit(1) })
