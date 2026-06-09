@@ -108,6 +108,28 @@ async function main() {
     }
 
     console.log(`\n✅ ${updated} clubes atualizados`)
+
+    // Fallback: clubs not matched → priority 5 (no national competition data)
+    let fallback = 0
+    for (const club of clubs as { id: number; name: string; priority: number | null }[]) {
+        const cn = norm(club.name)
+        let hasMatch = false
+        for (const [teamName] of teamPriority) {
+            const tn = norm(teamName)
+            if (cn === tn || cn.includes(tn) || tn.includes(cn)) { hasMatch = true; break }
+            const cWords = cn.split(/\s+/).filter(w => w.length > 2)
+            const tWords = tn.split(/\s+/).filter(w => w.length > 2)
+            if (cWords.length >= 2 && tWords.length >= 2) {
+                if (cWords.filter(w => tWords.includes(w)).length >= 2) { hasMatch = true; break }
+            }
+        }
+        if (!hasMatch && club.priority !== 5) {
+            await supabase.from('clubs').update({ priority: 5 }).eq('id', club.id)
+            fallback++
+        }
+    }
+    console.log(`📋 ${fallback} clubes sem competição nacional → prioridade 5`)
+
     if (skipped.length > 0) {
         console.log(`\n⚠️  ${skipped.length} equipas sem match:`)
         skipped.forEach(t => console.log(`    - ${t}`))

@@ -141,7 +141,9 @@ function Ranking() {
                         <option value="0">Todos</option>
                         <option value="1">1 - Liga Betclic</option>
                         <option value="2">2 - Proliga / 1ª Div</option>
-                        <option value="3">3 - 2ª Divisão</option>
+                        <option value="3">3 - 1ª / 2ª Div</option>
+                        <option value="4">4 - 2ª Divisão</option>
+                        <option value="5">5 - Sem dados</option>
                     </select>
                 </div>
             </div>
