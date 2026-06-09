@@ -65,13 +65,10 @@ function Landing() {
 
     useEffect(() => { loadClubs() }, [loadClubs])
 
-    // Start carousel at middle copy once games are loaded
+    // Start carousel at beginning
     useEffect(() => {
         if (games.length > 0 && carouselRef.current) {
-            const card = carouselRef.current.querySelector('.snap-center') as HTMLElement | null
-            const cardWidth = card ? card.offsetWidth + 12 : 332
-            const startIdx = games.length + Math.floor(Math.random() * games.length)
-            carouselRef.current.scrollLeft = startIdx * cardWidth
+            carouselRef.current.scrollLeft = 0
         }
     }, [games])
 
@@ -192,17 +189,7 @@ function Landing() {
         const el = carouselRef.current
         const card = el.querySelector('.snap-center') as HTMLElement | null
         const cardWidth = card ? card.offsetWidth + 12 : 332
-        const max = el.scrollWidth - el.clientWidth
-        const half = max / 2
-
-        const next = el.scrollLeft + dir * cardWidth
-        if (next > max - cardWidth) {
-            el.scrollLeft = next - half
-        } else if (next < cardWidth) {
-            el.scrollLeft = next + half
-        } else {
-            el.scrollBy({ left: dir * cardWidth, behavior: 'smooth' })
-        }
+        el.scrollBy({ left: dir * cardWidth, behavior: 'smooth' })
     }
 
     return (
@@ -415,7 +402,7 @@ function Landing() {
                                 ref={carouselRef}
                                 className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory scroll-smooth items-start px-4 md:px-0"
                             >
-                                {[...games, ...games, ...games].map((match, idx) => (
+                                {games.map((match, idx) => (
                                     <div key={match.slug || match.id + '-' + idx} className="w-[calc(100vw-2rem)] md:w-[320px] shrink-0 snap-center">
                                         <GameCard match={match} mode="agenda" />
                                     </div>

@@ -30,22 +30,30 @@ export function useLandingData() {
     const [allComps, setAllComps] = useState<LandingCompetition[]>([])
     const [compMetaMap, setCompMetaMap] = useState<Map<number, CompMeta>>(new Map())
 
-    // Featured games: upcoming Liga Betclic games
+    // Featured games: upcoming + recent Liga Betclic games
     useEffect(() => {
-        supabase
-            .from('games_2025_2026')
-            .select('*')
-            .ilike('competicao', '%Liga Betclic%')
-            .neq('status', 'FINALIZADO')
-            .gte('data', new Date().toISOString().split('T')[0])
-            .order('data', { ascending: true })
-            .limit(12)
-            .then(({ data }: { data: unknown }) => {
-                if (data) {
-                    setGames(data as Match[])
-                }
-                setGamesLoading(false)
-            })
+        Promise.all([
+            supabase
+                .from('games_2025_2026')
+                .select('*')
+                .ilike('competicao', '%Liga Betclic%')
+                .eq('status', 'FINALIZADO')
+                .order('data', { ascending: false })
+                .limit(6),
+            supabase
+                .from('games_2025_2026')
+                .select('*')
+                .ilike('competicao', '%Liga Betclic%')
+                .neq('status', 'FINALIZADO')
+                .gte('data', new Date().toISOString().split('T')[0])
+                .order('data', { ascending: true })
+                .limit(8),
+        ]).then(([{ data: recent }, { data: upcoming }]) => {
+            const recentGames = (recent || []) as Match[]
+            const upcomingGames = (upcoming || []) as Match[]
+            setGames([...recentGames, ...upcomingGames])
+            setGamesLoading(false)
+        })
     }, [])
 
     // Associations
