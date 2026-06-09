@@ -154,13 +154,25 @@ async function main() {
         }
     }
 
-    // Build club info list
+    // Build club info list — clubs without competition data get default priority 3
     const clubList: ClubInfo[] = (clubs as { id: number; name: string; priority: number | null }[]).map(c => ({
         id: c.id,
         name: c.name,
         current_priority: c.priority,
         competitions: [...(clubComps.get(c.id) || new Set())],
     }))
+
+    // Fallback: clubs without detected competitions → priority 3 (safe default, not Liga Betclic)
+    let fallbackUpdates = 0
+    for (const c of clubList) {
+        if (c.competitions.length === 0 && c.current_priority !== 3 && c.current_priority !== 4) {
+            await supabase.from('clubs').update({ priority: 3 }).eq('id', c.id)
+            console.log(`    ${c.current_priority ?? '?'}→3  ${c.name} (sem dados)`)
+            c.current_priority = 3
+            fallbackUpdates++
+        }
+    }
+    if (fallbackUpdates > 0) console.log(`  📋 ${fallbackUpdates} clubes sem dados → priority 3\n`)
 
     console.log(`  📋 ${clubList.length} clubes, ${clubList.filter(c => c.competitions.length > 0).length} com competições\n`)
 
