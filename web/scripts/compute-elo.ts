@@ -206,8 +206,6 @@ async function main() {
         } else {
             console.log(`  ✅ ${season}: ${games.length} jogos → ${withGames} clubes com jogos`)
         }
-
-        console.log(`  ✅ ${season}: ${games.length} jogos → ${stored} clubes`)
     }
 
     // ── Sync current season ELO to clubs.elo_rating (batch upsert) ──
