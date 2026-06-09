@@ -234,7 +234,7 @@ function Landing() {
                                 >
                                     <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
                                         {c?.logo_url ? (
-                                            <img src={c.logo_url} alt="" className="w-3.5 h-3.5 object-contain" />
+                                            <img src={c.logo_url} alt="" className="w-3.5 h-3.5 object-contain" decoding="async" />
                                         ) : (
                                             <span className="text-[9px] font-bold text-zinc-500">
                                                 {name.charAt(0).toUpperCase()}

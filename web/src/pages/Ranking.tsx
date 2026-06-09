@@ -188,7 +188,7 @@ function Ranking() {
 
                                 <div className="w-8 h-8 shrink-0 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center overflow-hidden">
                                     {club.logo_url ? (
-                                        <img src={club.logo_url} alt="" className="w-5 h-5 object-contain" />
+                                        <img src={club.logo_url} alt="" className="w-5 h-5 object-contain" loading="lazy" decoding="async" />
                                     ) : (
                                         <span className="text-[10px] font-bold text-zinc-500">
                                             {club.name.charAt(0)}

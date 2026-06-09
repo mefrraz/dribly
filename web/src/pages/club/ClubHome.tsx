@@ -89,7 +89,7 @@ function ClubHome() {
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
                     {club.logo_url ? (
-                        <img src={club.logo_url} alt="" className="w-7 h-7 object-contain" />
+                        <img src={club.logo_url} alt="" className="w-7 h-7 object-contain" decoding="async" />
                     ) : (
                         <span className="text-sm font-bold text-zinc-500">{displayName(club).charAt(0)}</span>
                     )}
