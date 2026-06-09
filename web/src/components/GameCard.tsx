@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Clock, MapPin, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Match } from './types'
 import { isClubWin } from '../lib/matchUtils'
+import { semiAbrev } from '../lib/fpbUtils'
 
 interface GameCardProps {
   match: Match
@@ -23,13 +24,17 @@ const GameCardInner = ({ match, mode, clubName, clubSlug }: GameCardProps) => {
 
   const badge = mode === 'agenda'
     ? null
-    : won === true
-      ? { icon: TrendingUp, label: 'VITÓRIA', className: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' }
-      : won === false
-        ? { icon: TrendingDown, label: 'DERROTA', className: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' }
-        : won === 'draw'
-          ? { icon: Minus, label: 'EMPATE', className: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400' }
-          : { icon: Minus, label: 'FIN', className: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500' }
+    : clubName
+      ? won === true
+        ? { icon: TrendingUp, label: 'VITÓRIA', className: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' }
+        : won === false
+          ? { icon: TrendingDown, label: 'DERROTA', className: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' }
+          : won === 'draw'
+            ? { icon: Minus, label: 'EMPATE', className: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400' }
+            : { icon: Minus, label: 'FIN', className: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500' }
+      : match.status === 'FINALIZADO'
+        ? { icon: Minus, label: 'FIN', className: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500' }
+        : null
 
   return (
     <Link to={linkSlug} className="glass-card flex flex-col group active:scale-[0.98]">
@@ -115,7 +120,7 @@ function TeamRow({ name, logo, score, dimmed }: { name: string; logo: string | n
           </div>
         )}
         <span className="text-sm font-bold text-zinc-900 dark:text-white leading-tight truncate">
-          {name.toUpperCase()}
+          {semiAbrev(name).toUpperCase()}
         </span>
       </div>
       {score !== null && (
