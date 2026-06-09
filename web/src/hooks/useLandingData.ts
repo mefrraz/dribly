@@ -30,47 +30,19 @@ export function useLandingData() {
     const [allComps, setAllComps] = useState<LandingCompetition[]>([])
     const [compMetaMap, setCompMetaMap] = useState<Map<number, CompMeta>>(new Map())
 
-    // Featured games: upcoming games from top clubs
+    // Featured games: upcoming Liga Betclic games
     useEffect(() => {
-        const clubPatterns = ['Porto', 'Benfica', 'Sporting', 'Oliveirense']
-        const orClauses = clubPatterns
-            .map(n => `equipa_casa.ilike.%${n}%,equipa_fora.ilike.%${n}%`)
-            .join(',')
         supabase
             .from('games_2025_2026')
             .select('*')
-            .or(orClauses)
+            .ilike('competicao', '%Liga Betclic%')
             .neq('status', 'FINALIZADO')
             .gte('data', new Date().toISOString().split('T')[0])
             .order('data', { ascending: true })
+            .limit(12)
             .then(({ data }: { data: unknown }) => {
                 if (data) {
-                    let arr = data as Match[]
-                    const counts: Record<string, number> = {}
-                    const knownTeams = ['PORTO', 'BENFICA', 'SPORTING', 'OLIVEIRENSE']
-                    const matchNames = [
-                        'Futebol Clube do Porto',
-                        'SL Benfica',
-                        'Sporting Clube Portugal',
-                        'UD Oliveirense',
-                    ]
-                    arr = arr
-                        .filter(m => {
-                            const full = (m.equipa_casa + ' ' + m.equipa_fora).toUpperCase()
-                            const matchName = matchNames.find(t =>
-                                full.includes(t.toUpperCase())
-                            )
-                            if (!matchName) return false
-                            const key = knownTeams.find(t =>
-                                matchName.toUpperCase().includes(t)
-                            )
-                            if (!key) return false
-                            counts[key] = (counts[key] || 0) + 1
-                            return counts[key] <= 3
-                        })
-                        .sort(() => Math.random() - 0.5)
-                        .slice(0, 12)
-                    setGames(arr)
+                    setGames(data as Match[])
                 }
                 setGamesLoading(false)
             })
