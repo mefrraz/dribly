@@ -36,33 +36,26 @@ function Ranking() {
 
     useEffect(() => {
         setLoading(true)
-        supabase
-            .from('club_elo_history')
-            .select('club_id, elo_rating, clubs!inner(id, name, slug, search_name, logo_url, priority)')
-            .eq('season', season)
-            .order('elo_rating', { ascending: false })
-            .then(({ data }) => {
-                if (data) {
-                    setClubs(
-                        (data as unknown as {
-                            club_id: number
-                            elo_rating: number
-                            clubs: { id: number; name: string; slug: string; search_name: string; logo_url: string | null; priority: number | null }
-                        }[]).map(row => ({
-                            id: row.clubs.id,
-                            name: row.clubs.name,
-                            slug: row.clubs.slug,
-                            search_name: row.clubs.search_name,
-                            logo_url: row.clubs.logo_url,
-                            priority: row.clubs.priority,
-                            elo: Math.round(row.elo_rating),
-                        }))
-                    )
-                } else {
-                    setClubs([])
+        Promise.all([
+            supabase.from('clubs').select('id, name, slug, search_name, logo_url, priority').order('name'),
+            supabase.from('club_elo_history').select('club_id, elo_rating').eq('season', season),
+        ]).then(([{ data: allClubs }, { data: eloData }]) => {
+            if (allClubs) {
+                const eloMap = new Map<number, number>()
+                if (eloData) {
+                    for (const row of eloData as { club_id: number; elo_rating: number }[]) {
+                        eloMap.set(row.club_id, row.elo_rating)
+                    }
                 }
-                setLoading(false)
-            })
+                setClubs(
+                    (allClubs as RankedClub[]).map(c => ({
+                        ...c,
+                        elo: Math.round(eloMap.get(c.id) ?? 1500),
+                    })).sort((a, b) => b.elo - a.elo)
+                )
+            }
+            setLoading(false)
+        })
     }, [season])
 
     const filtered = useMemo(() => {
@@ -129,12 +122,7 @@ function Ranking() {
             </div>
 
             {/* List */}
-            {clubs.length === 0 ? (
-                <div className="glass-card p-8 text-center">
-                    <p className="text-xs text-zinc-400">Sem dados para esta época.</p>
-                </div>
-            ) : (
-                <div className="glass-card divide-y divide-zinc-100 dark:divide-white/5">
+            <div className="glass-card divide-y divide-zinc-100 dark:divide-white/5">
                     {filtered.length === 0 ? (
                         <p className="text-xs text-zinc-400 text-center py-12">Nenhum clube encontrado.</p>
                     ) : (
@@ -171,7 +159,6 @@ function Ranking() {
                         ))
                     )}
                 </div>
-            )}
 
             <p className="text-[10px] text-zinc-400 text-center mt-4 flex items-center justify-center gap-1">
                 <TrendingUp size={11} />
@@ -210,7 +197,7 @@ function Ranking() {
                                 </div>
                             </div>
 
-                            <p className="text-zinc-400">Cada época é independente — o rating recomeça nos 1.500 pts. Dados da época {season}.</p>
+                            <p className="text-zinc-400">Cada época é independente — o rating recomeça nos 1.500 pts. {clubs.filter(c => c.elo !== 1500).length} clubes com jogos registados na época {season}.</p>
                         </div>
                     </div>
                 </div>

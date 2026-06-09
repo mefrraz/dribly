@@ -215,16 +215,23 @@ async function main() {
         .select('club_id, elo_rating')
         .eq('season', '2025/2026')
 
-    if (currentSeason) {
-        let synced = 0
-        for (const row of currentSeason as { club_id: number; elo_rating: number }[]) {
-            const { error: updErr } = await supabase
-                .from('clubs')
-                .update({ elo_rating: row.elo_rating })
-                .eq('id', row.club_id)
-            if (!updErr) synced++
+    if (currentSeason && currentSeason.length > 0) {
+        // Single SQL: UPDATE clubs SET elo_rating = h.elo_rating FROM club_elo_history h WHERE clubs.id = h.club_id AND h.season = '2025/2026'
+        const { error: updErr } = await supabase.rpc('sync_elo_to_clubs', { s: '2025/2026' })
+        if (updErr) {
+            // Fallback: sequential updates
+            let synced = 0
+            for (const row of currentSeason as { club_id: number; elo_rating: number }[]) {
+                const { error } = await supabase
+                    .from('clubs')
+                    .update({ elo_rating: row.elo_rating })
+                    .eq('id', row.club_id)
+                if (!error) synced++
+            }
+            console.log(`  ✅ ${synced} clubes sincronizados (sequential)`)
+        } else {
+            console.log(`  ✅ ${currentSeason.length} clubes sincronizados (RPC)`)
         }
-        console.log(`  ✅ ${synced} clubes sincronizados`)
     }
 
     console.log('\n🏆 ELO por época completo!')
