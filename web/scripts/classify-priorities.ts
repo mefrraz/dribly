@@ -89,20 +89,37 @@ async function main() {
 
     if (!clubs) { console.error('No clubs'); process.exit(1) }
 
-    // Build club → competitions map
+    // Build club → competitions map with proper matching
+    function norm(s: string): string {
+        return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+    }
+    const clubNorms = (clubs as { id: number; name: string }[]).map(c => ({ id: c.id, n: norm(c.name) }))
     const clubComps = new Map<number, Set<string>>()
+
     for (const g of games as { equipa_casa: string; equipa_fora: string; competicao: string | null }[]) {
-        const comp = g.competicao || ''
-        // Only include senior/senior-like competitions (exclude youth)
-        if (/sub[-\s]?1[0-9]|sub[-\s]?[0-9]{2}|formação/i.test(comp)) continue
-        // Match team names to clubs
-        for (const c of clubs as { id: number; name: string }[]) {
-            const cn = c.name.toLowerCase()
-            const casa = g.equipa_casa.toLowerCase()
-            const fora = g.equipa_fora.toLowerCase()
-            if (cn.includes(casa) || casa.includes(cn) || cn.includes(fora) || fora.includes(cn)) {
-                if (!clubComps.has(c.id)) clubComps.set(c.id, new Set())
-                clubComps.get(c.id)!.add(comp)
+        const comp = (g.competicao || '').trim()
+        if (!comp || /sub[-\s]?1[0-9]|sub[-\s]?[0-9]{2}|formação|distrital|torneio/i.test(comp)) continue
+
+        for (const team of [g.equipa_casa, g.equipa_fora]) {
+            const tn = norm(team)
+            // Find matching club
+            for (const c of clubNorms) {
+                let match = false
+                if (c.n === tn || c.n.includes(tn) || tn.includes(c.n)) {
+                    match = true
+                } else {
+                    // Fallback by last word
+                    const cWords = c.n.split(/\s+/).filter(w => w.length > 3)
+                    const tWords = tn.split(/\s+/).filter(w => w.length > 3)
+                    if (cWords.length > 0 && tWords.includes(cWords[cWords.length - 1])) {
+                        match = true
+                    }
+                }
+                if (match) {
+                    if (!clubComps.has(c.id)) clubComps.set(c.id, new Set())
+                    clubComps.get(c.id)!.add(comp)
+                    break
+                }
             }
         }
     }
