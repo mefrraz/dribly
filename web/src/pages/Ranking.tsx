@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useMemo, useEffect, useRef } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Search, TrendingUp, Loader2, HelpCircle, X } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
 import { SeoHead } from '../components/SeoHead'
@@ -32,8 +32,11 @@ function Ranking() {
     const [loading, setLoading] = useState(true)
     const [showHelp, setShowHelp] = useState(false)
     const [season, setSeason] = useState(SEASONS[0])
-    const [nivel, setNivel] = useState<number>(1) // default: Liga Betclic
+    const [nivel, setNivel] = useState<number>(1)
     const [clubs, setClubs] = useState<RankedClub[]>([])
+    const [highlight, setHighlight] = useState<string | null>(null)
+    const [searchParams] = useSearchParams()
+    const highlightRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         setLoading(true)
@@ -58,6 +61,18 @@ function Ranking() {
             setLoading(false)
         })
     }, [season])
+
+    // Highlight club from ?destaque= param
+    useEffect(() => {
+        const slug = searchParams.get('destaque')
+        if (slug && clubs.length > 0 && !loading) {
+            setHighlight(slug)
+            setTimeout(() => {
+                highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                setTimeout(() => setHighlight(null), 2000)
+            }, 300)
+        }
+    }, [clubs, loading, searchParams])
 
     const filtered = useMemo(() => {
         let result = clubs
@@ -149,10 +164,13 @@ function Ranking() {
                         <p className="text-xs text-zinc-400 text-center py-12">Nenhum clube encontrado.</p>
                     ) : (
                         filtered.map((club, i) => (
-                            <Link
+                            <div
                                 key={club.id}
+                                ref={club.slug === highlight ? highlightRef : undefined}
+                            >
+                                <Link
                                 to={`/clube/${club.slug}/home`}
-                                className="flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors group"
+                                className={`flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors group rounded-lg ${club.slug === highlight ? 'bg-dribly-purple/10 dark:bg-dribly-purple/20 ring-1 ring-dribly-purple/30 animate-pulse' : ''}`}
                             >
                                 <span className="w-6 text-xs font-bold text-zinc-400 dark:text-zinc-500 text-right shrink-0">
                                     {i + 1}
@@ -178,6 +196,7 @@ function Ranking() {
                                     {club.elo}
                                 </span>
                             </Link>
+                            </div>
                         ))
                     )}
                 </div>

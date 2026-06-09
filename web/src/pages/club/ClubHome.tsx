@@ -97,9 +97,9 @@ function ClubHome() {
                 <h1 className="text-lg font-bold text-zinc-900 dark:text-white truncate flex-1">
                     {displayName(club)}
                     {club.elo_rating != null && (
-                        <span className="ml-2 text-xs font-mono font-bold text-dribly-purple bg-dribly-purple/10 px-1.5 py-0.5 rounded-md">
-                            {club.elo_rating}
-                        </span>
+                        <Link to={`/ranking?destaque=${club.slug}`} className="ml-2 text-xs font-bold text-white bg-[var(--club-color)] px-1.5 py-0.5 rounded-md hover:opacity-80 transition-opacity">
+                            #{club.elo_rating}
+                        </Link>
                     )}
                 </h1>
                 <div className="flex items-center gap-1">
