@@ -286,7 +286,7 @@ function Landing() {
                                             >
                                                 <div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
                                                     {club.logo_url ? (
-                                                        <img src={club.logo_url} alt="" className="w-6 h-6 object-contain" />
+                                                        <img src={club.logo_url} alt="" className="w-6 h-6 object-contain" loading="lazy" decoding="async" />
                                                     ) : (
                                                         <span className="text-xs font-bold text-zinc-500">
                                                             {displayName(club).charAt(0).toUpperCase()}

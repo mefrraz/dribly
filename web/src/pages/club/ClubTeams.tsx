@@ -64,7 +64,7 @@ function ClubTeams() {
                     >
                         {team.photo && (
                             <div className="relative h-48 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-                                <img src={team.photo} alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
+                                <img src={team.photo} alt="" className="absolute inset-0 w-full h-full object-cover object-center" loading="lazy" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                             </div>
                         )}

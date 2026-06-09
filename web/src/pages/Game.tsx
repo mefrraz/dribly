@@ -484,7 +484,7 @@ function Game() {
                                 <Link to={`/jogo/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
                                     <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
                                         {firstLogo ? (
-                                            <img src={firstLogo} alt="" className="w-5 h-5 object-contain" />
+                                            <img src={firstLogo} alt="" className="w-5 h-5 object-contain" loading="lazy" decoding="async" />
                                         ) : (
                                             <span className="text-[9px] font-bold text-zinc-500">{semiAbrev(firstTeam).charAt(0)}</span>
                                         )}
@@ -494,7 +494,7 @@ function Game() {
                                     <span className="text-[12px] text-zinc-500 dark:text-zinc-400 shrink-0">{semiAbrev(secondTeam)}</span>
                                     <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
                                         {secondLogo ? (
-                                            <img src={secondLogo} alt="" className="w-5 h-5 object-contain" />
+                                            <img src={secondLogo} alt="" className="w-5 h-5 object-contain" loading="lazy" decoding="async" />
                                         ) : (
                                             <span className="text-[9px] font-bold text-zinc-500">{semiAbrev(secondTeam).charAt(0)}</span>
                                         )}

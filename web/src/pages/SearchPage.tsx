@@ -149,9 +149,9 @@ function SearchPage() {
                                     >
                                         <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
                                             {compLogoMap.get(comp.competition_id) ? (
-                                                <img src={compLogoMap.get(comp.competition_id)} alt="" className="w-6 h-6 object-contain" />
+                                                <img src={compLogoMap.get(comp.competition_id)} alt="" className="w-6 h-6 object-contain" loading="lazy" decoding="async" />
                                             ) : associationLogoUrl(comp.association_id) ? (
-                                                <img src={associationLogoUrl(comp.association_id)!} alt="" className="w-6 h-6 object-contain" />
+                                                <img src={associationLogoUrl(comp.association_id)!} alt="" className="w-6 h-6 object-contain" loading="lazy" decoding="async" />
                                             ) : (
                                                 <Trophy size={18} className="text-zinc-400" />
                                             )}

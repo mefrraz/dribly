@@ -146,7 +146,7 @@ export default function AthletePage() {
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
                                 {data.numero && <span className="text-sm font-bold text-zinc-500">#{data.numero}</span>}
                                 {data.posicao && <span className="text-xs font-bold text-zinc-500">{data.posicao}</span>}
-                                {data.clube && <span className="text-xs text-zinc-400 inline-flex items-center gap-1">· {clubLogo && <img src={clubLogo} alt="" className="w-4 h-4 object-contain rounded-full" />}{data.clube}</span>}
+                                {data.clube && <span className="text-xs text-zinc-400 inline-flex items-center gap-1">· {clubLogo && <img src={clubLogo} alt="" className="w-4 h-4 object-contain rounded-full" loading="lazy" decoding="async" />}{data.clube}</span>}
                             </div>
                             <div className="flex items-center gap-1.5 mt-1.5">
                                 {data.bandeiraUrl && <img src={data.bandeiraUrl} alt="" className="w-4 h-3 object-cover rounded-sm" />}
@@ -169,7 +169,7 @@ export default function AthletePage() {
                         </div>
                         {data.foto && (
                             <div className="w-28 h-32 shrink-0 rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
-                                <img src={data.foto} alt="" className="w-full h-full object-cover object-top" />
+                                <img src={data.foto} alt="" className="w-full h-full object-cover object-top" loading="lazy" />
                             </div>
                         )}
                     </div>

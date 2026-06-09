@@ -259,7 +259,7 @@ function TeamBlock({ name, logo }: { name: string; logo: string | null }) {
         <div className="flex-1 flex flex-col items-center text-center gap-2 min-w-0">
             <div className="w-20 h-20 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
                 {logo ? (
-                    <img src={logo} alt="" className="w-14 h-14 object-contain" />
+                    <img src={logo} alt="" className="w-14 h-14 object-contain" loading="lazy" decoding="async" />
                 ) : (
                     <span className="text-2xl font-bold text-zinc-500">{name.charAt(0)}</span>
                 )}

@@ -134,7 +134,7 @@ function ClubTeamDetail() {
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden">
                     {equipaPhoto && (
                         <div className="relative h-48 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-                            <img src={equipaPhoto} alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
+                            <img src={equipaPhoto} alt="" className="absolute inset-0 w-full h-full object-cover object-center" loading="lazy" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                         </div>
                     )}
@@ -184,7 +184,7 @@ function ClubTeamDetail() {
                         <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center gap-4">
                             <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-700/50 overflow-hidden">
                                 {club.logo_url ? (
-                                    <img src={club.logo_url} alt="" className="w-14 h-14 sm:w-[72px] sm:h-[72px] object-contain" />
+                                    <img src={club.logo_url} alt="" className="w-14 h-14 sm:w-[72px] sm:h-[72px] object-contain" loading="lazy" decoding="async" />
                                 ) : (
                                     <span className="text-2xl font-bold text-zinc-500">{club.name.charAt(0)}</span>
                                 )}

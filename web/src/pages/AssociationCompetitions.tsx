@@ -116,7 +116,7 @@ export default function AssociationCompetitions() {
                     <>
                         <div className="bg-white dark:bg-zinc-900/90 rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 p-5 sm:p-6 shadow-sm mb-6 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-800/50 flex items-center justify-center p-3 shrink-0 border border-zinc-100 dark:border-zinc-700/50 shadow-inner">
-                                <img src={associationLogoUrl(id) || ''} alt={name} className="w-full h-full object-contain"
+                                <img src={associationLogoUrl(id) || ''} alt={name} className="w-full h-full object-contain" loading="lazy" decoding="async"
                                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                             </div>
                             <div className="flex-1 text-center sm:text-left min-w-0">
@@ -178,7 +178,7 @@ export default function AssociationCompetitions() {
                                             <div className="min-w-0 flex items-center gap-3">
                                                 <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-zinc-100 dark:border-zinc-700/50">
                                                     {c.logo_url ? (
-                                                        <img src={c.logo_url} alt="" className="w-10 h-10 object-contain" />
+                                                        <img src={c.logo_url} alt="" className="w-10 h-10 object-contain" loading="lazy" decoding="async" />
                                                     ) : c.abrev ? (
                                                         <div className={`w-14 h-14 bg-gradient-to-br ${c.gradient_from} ${c.gradient_to} flex items-center justify-center`}>
                                                             <span className="text-[11px] font-black text-white">{c.abrev}</span>

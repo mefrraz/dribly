@@ -386,7 +386,7 @@ export default function CompetitionDetail() {
                                                 <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center gap-4">
                                                     <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-700/50">
                                                         {topLogo ? (
-                                                            <img src={topLogo} alt="" className="w-14 h-14 sm:w-[72px] sm:h-[72px] object-contain" />
+                                                            <img src={topLogo} alt="" className="w-14 h-14 sm:w-[72px] sm:h-[72px] object-contain" loading="lazy" decoding="async" />
                                                         ) : (
                                                             <span className="text-2xl font-bold text-zinc-500">{top.name.charAt(0)}</span>
                                                         )}
@@ -441,7 +441,7 @@ export default function CompetitionDetail() {
                                                                         </p>
                                                                     </div>
                                                                     {photoUrl ? (
-                                                                        <img src={photoUrl} alt="" className="w-14 h-14 shrink-0 rounded-xl object-cover border-2 border-zinc-100 dark:border-zinc-700/50" onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                                                                        <img src={photoUrl} alt="" className="w-14 h-14 shrink-0 rounded-xl object-cover border-2 border-zinc-100 dark:border-zinc-700/50" loading="lazy" decoding="async" onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
                                                                     ) : (
                                                                         <div className="w-14 h-14 shrink-0 rounded-xl bg-gradient-to-br from-dribly-purple/20 to-dribly-purple/5 flex items-center justify-center border border-dribly-purple/10">
                                                                             <span className="text-lg font-black text-dribly-purple">{best ? best.nome.charAt(0).toUpperCase() : '?'}</span>
@@ -534,7 +534,7 @@ export default function CompetitionDetail() {
                                                             <div className="flex-1 flex items-center gap-2 min-w-0">
                                                                 <div className="w-9 h-9 rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                                                                     {t.logo_casa ? (
-                                                                        <img src={t.logo_casa} alt="" className="w-9 h-9 rounded-full object-contain" />
+                                                                        <img src={t.logo_casa} alt="" className="w-9 h-9 rounded-full object-contain" loading="lazy" decoding="async" />
                                                                     ) : null}
                                                                 </div>
                                                                 <span className="text-[11px] sm:text-xs font-bold text-zinc-800 dark:text-zinc-200 truncate">{t.casa || t.equipa}</span>
@@ -550,7 +550,7 @@ export default function CompetitionDetail() {
                                                                 <span className="text-[11px] sm:text-xs font-bold text-zinc-800 dark:text-zinc-200 truncate">{t.fora || ''}</span>
                                                                 <div className="w-9 h-9 rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                                                                     {t.logo_fora ? (
-                                                                        <img src={t.logo_fora} alt="" className="w-9 h-9 rounded-full object-contain" />
+                                                                        <img src={t.logo_fora} alt="" className="w-9 h-9 rounded-full object-contain" loading="lazy" decoding="async" />
                                                                     ) : null}
                                                                 </div>
                                                             </div>
