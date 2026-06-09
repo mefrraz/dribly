@@ -1,13 +1,6 @@
 /**
- * update-priorities — Atualiza a prioridade de cada clube com base nas competições
- * em que participa na época 2025/2026.
- *
- * Liga Betclic (10902) → priority 1
- * Proliga (10903) / 1ª Divisão (10904) → priority 2
- * 2ª Divisão (10905) → priority 3
- * Sem jogos ou outras → mantém priority atual
- *
- * Uso:  npx tsx web/scripts/update-priorities.ts
+ * Update club priorities based on actual 2025/2026 competition data.
+ * Single query — matches team names to clubs client-side.
  */
 
 import 'dotenv/config'
@@ -16,80 +9,77 @@ import WebSocket from 'ws'
 
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
-    process.exit(1)
-}
+if (!supabaseUrl || !supabaseKey) { console.error('Missing env vars'); process.exit(1) }
 
 const supabase = createClient(supabaseUrl, supabaseKey, { realtime: { transport: WebSocket } })
 
-const DIVISION_MAP: Record<number, number> = {
-    10902: 1, // Liga Betclic
-    10903: 2, // Proliga
-    10904: 2, // 1ª Divisão
-    10905: 3, // 2ª Divisão
+const DIVISION: Record<string, number> = {
+    'betclic': 1, 'liga masculina': 1,
+    'proliga': 2,
+    '1ª divisão': 2, 'primeira divisão': 2,
+    '2ª divisão': 3, 'segunda divisão': 3,
+}
+
+function norm(s: string): string {
+    return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 }
 
 async function main() {
     console.log('🔍 A analisar competições dos clubes...\n')
 
-    const { data: clubs } = await supabase.from('clubs').select('id, name, priority')
-    if (!clubs) { console.error('No clubs'); process.exit(1) }
+    const [{ data: clubs }, { data: games }] = await Promise.all([
+        supabase.from('clubs').select('id, name, priority'),
+        supabase.from('games_2025_2026').select('equipa_casa, equipa_fora, competicao'),
+    ])
 
-    const updated: string[] = []
-    const errors: string[] = []
+    if (!clubs || !games) { console.error('No data'); process.exit(1) }
 
-    for (const club of clubs as { id: number; name: string; priority: number | null }[]) {
-        // Check which competitions this club appears in (via game data)
-        const { data: games } = await supabase
-            .from('games_2025_2026')
-            .select('competicao, escalao')
-            .or(`equipa_casa.ilike.%${club.name}%,equipa_fora.ilike.%${club.name}%`)
-            .limit(50)
-
-        if (!games || games.length === 0) continue
-
-        // Determine division from game competition names
-        let newPriority = club.priority
-        const compNames = new Set((games as { competicao: string | null }[]).map(g => g.competicao).filter(Boolean))
-
-        // Try to match by known competition names
-        for (const cn of compNames) {
-            const name = (cn || '').toLowerCase()
-            if (name.includes('betclic') || name.includes('liga masculina') && !name.includes('proliga') && !name.includes('1ª') && !name.includes('2ª')) {
-                newPriority = 1
+    // Build team → best division map
+    const teamDivision = new Map<string, number>()
+    for (const g of games as { equipa_casa: string; equipa_fora: string; competicao: string | null }[]) {
+        const comp = (g.competicao || '').toLowerCase()
+        for (const [keyword, div] of Object.entries(DIVISION)) {
+            if (comp.includes(keyword)) {
+                for (const team of [g.equipa_casa, g.equipa_fora]) {
+                    const n = norm(team)
+                    const cur = teamDivision.get(n) ?? 99
+                    if (div < cur) teamDivision.set(n, div)
+                }
                 break
             }
-            if (name.includes('proliga')) { newPriority = 2; break }
-            if (name.includes('1ª divisão') || name.includes('primeira divisão')) { newPriority = 2; break }
-            if (name.includes('2ª divisão') || name.includes('segunda divisão')) { newPriority = 3; break }
         }
+    }
 
-        if (newPriority !== club.priority) {
-            const { error } = await supabase
-                .from('clubs')
-                .update({ priority: newPriority })
-                .eq('id', club.id)
+    console.log(`  📋 ${teamDivision.size} equipas encontradas em competições conhecidas\n`)
 
-            if (error) {
-                errors.push(`${club.name}: ${error.message}`)
-            } else {
-                updated.push(`${club.name}: ${club.priority} → ${newPriority}`)
+    // Match to clubs and update
+    let updated = 0
+    for (const club of clubs as { id: number; name: string; priority: number | null }[]) {
+        const cn = norm(club.name)
+        let newP: number | null = null
+
+        // Exact match
+        if (teamDivision.has(cn)) {
+            newP = teamDivision.get(cn)!
+        } else {
+            // Fallback by last word
+            const words = cn.split(/\s+/).filter(w => w.length > 3)
+            for (let i = words.length - 1; i >= 0; i--) {
+                for (const [tn, div] of teamDivision) {
+                    if (tn.includes(words[i])) { newP = div; break }
+                }
+                if (newP) break
             }
         }
+
+        if (newP && newP !== club.priority) {
+            await supabase.from('clubs').update({ priority: newP }).eq('id', club.id)
+            console.log(`  ${club.priority ?? '?'}→${newP}  ${club.name}`)
+            updated++
+        }
     }
 
-    console.log(`  ✅ ${updated.length} clubes atualizados`)
-    if (updated.length > 0) {
-        console.log('\n  Alterações:')
-        updated.forEach(u => console.log(`    ${u}`))
-    }
-    if (errors.length > 0) {
-        console.log('\n  ❌ Erros:')
-        errors.forEach(e => console.log(`    ${e}`))
-    }
-    console.log('\n🏆 Prioridades atualizadas!')
+    console.log(`\n✅ ${updated} clubes atualizados`)
 }
 
 main().catch(err => { console.error(err); process.exit(1) })
