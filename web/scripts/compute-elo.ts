@@ -216,16 +216,15 @@ async function main() {
         .eq('season', '2025/2026')
 
     if (currentSeason) {
-        const updates = (currentSeason as { club_id: number; elo_rating: number }[]).map(row => ({
-            id: row.club_id,
-            elo_rating: row.elo_rating,
-        }))
-        const { error: updErr } = await supabase.from('clubs').upsert(updates, { onConflict: 'id' })
-        if (updErr) {
-            console.error(`  ❌ Sync error: ${updErr.message}`)
-        } else {
-            console.log(`  ✅ ${updates.length} clubes sincronizados`)
+        let synced = 0
+        for (const row of currentSeason as { club_id: number; elo_rating: number }[]) {
+            const { error: updErr } = await supabase
+                .from('clubs')
+                .update({ elo_rating: row.elo_rating })
+                .eq('id', row.club_id)
+            if (!updErr) synced++
         }
+        console.log(`  ✅ ${synced} clubes sincronizados`)
     }
 
     console.log('\n🏆 ELO por época completo!')
