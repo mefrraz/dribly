@@ -143,7 +143,7 @@ function Ranking() {
                         <option value="2">2 - Proliga / 1ª Div</option>
                         <option value="3">3 - 1ª / 2ª Div</option>
                         <option value="4">4 - 2ª Divisão</option>
-                        <option value="5">5 - Sem dados</option>
+                        <option value="5">5 - Distrital / Regional</option>
                     </select>
                 </div>
             </div>
@@ -172,7 +172,7 @@ function Ranking() {
                             >
                                 <Link
                                 to={`/clube/${club.slug}/home`}
-                                className={`flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors group rounded-lg ${club.slug === highlight ? 'bg-dribly-purple/10 dark:bg-dribly-purple/20 ring-1 ring-dribly-purple/30 animate-pulse' : ''}`}
+                                className={`flex items-center gap-3 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors group ${club.slug === highlight ? 'bg-dribly-purple/10 dark:bg-dribly-purple/20 ring-1 ring-dribly-purple/30' : ''}`}
                             >
                                 <span className="w-6 text-xs font-bold text-zinc-400 dark:text-zinc-500 text-right shrink-0">
                                     {i + 1}
@@ -231,12 +231,14 @@ function Ranking() {
                             </div>
 
                             <div>
-                                <p className="font-bold text-zinc-700 dark:text-zinc-300 mb-1">Níveis dos clubes (prioridade):</p>
-                                <p className="mb-1">A prioridade reflete a <strong>divisão habitual</strong> do clube e ajusta ligeiramente o cálculo para evitar distorções:</p>
+                                <p className="font-bold text-zinc-700 dark:text-zinc-300 mb-1">Níveis dos clubes:</p>
+                                <p className="mb-1">Baseado nos <strong>jogos disputados em competições nacionais</strong> da época 2025/2026:</p>
                                 <div className="space-y-1 mt-1.5">
-                                    <div className="flex items-center gap-2"><span className="text-dribly-purple font-bold">-</span><span><strong>Nível 1</strong> - Liga Betclic (topo nacional)</span></div>
-                                    <div className="flex items-center gap-2"><span className="text-purple-400 font-bold">-</span><span><strong>Nível 2</strong> - Proliga, 1ª Divisão</span></div>
-                                    <div className="flex items-center gap-2"><span className="text-purple-300 font-bold">-</span><span><strong>Nível 3</strong> - 2ª Divisão e restantes</span></div>
+                                    <div className="flex items-center gap-2"><span className="text-dribly-purple font-bold">-</span><span><strong>Nível 1</strong> - Liga Betclic</span></div>
+                                    <div className="flex items-center gap-2"><span className="text-blue-500 font-bold">-</span><span><strong>Nível 2</strong> - Proliga / 1ª Divisão</span></div>
+                                    <div className="flex items-center gap-2"><span className="text-green-500 font-bold">-</span><span><strong>Nível 3</strong> - 1ª / 2ª Divisão</span></div>
+                                    <div className="flex items-center gap-2"><span className="text-amber-500 font-bold">-</span><span><strong>Nível 4</strong> - 2ª Divisão / Sub-23</span></div>
+                                    <div className="flex items-center gap-2"><span className="text-zinc-400 font-bold">-</span><span><strong>Nível 5</strong> - Distrital / Regional</span></div>
                                 </div>
                             </div>
 
