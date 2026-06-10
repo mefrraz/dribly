@@ -456,10 +456,17 @@ async function main() {
                     const internalId = href.match(/internalID=(\d+)/)?.[1] || ''
                     if (!internalId) return
 
-                    const names = []
-                    $link.find('.fullName, .sigla').each((___, el) => {
-                        names.push($(el).text().trim())
-                    })
+                    // Query each .team-container separately (home first, away second)
+                    // Old flat .find('.fullName, .sigla') was buggy:
+                    // if home had both .fullName + .sigla, names[1] = home sigla, not away team
+                    const $containers = $link.find('.team-container')
+                    const $home = $containers.eq(0)
+                    const $away = $containers.eq(1)
+                    const homeName = ($home.find('.fullName').text() || $home.find('.sigla').text()).trim()
+                    const awayName = ($away.find('.fullName').text() || $away.find('.sigla').text()).trim()
+
+                    // Skip self-matches (away team not properly parsed)
+                    if (homeName && homeName === awayName) return
 
                     const compText = $link.find('.competition span').text().trim()
                     let escalao = '', competicao = ''
@@ -500,13 +507,13 @@ async function main() {
                         if (src && !src.includes('placeholder')) logos.push(src)
                     })
 
-                    const teamSlug = (names[0] || 'x').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-                    const oppSlug = (names[1] || 'y').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+                    const teamSlug = (homeName || 'x').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+                    const oppSlug = (awayName || 'y').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
                     const slug = `${iso}-${teamSlug}-${oppSlug}`
 
                     games.push({
                         slug, data: iso, hora: timeText || null,
-                        equipa_casa: names[0] || '', equipa_fora: names[1] || '',
+                        equipa_casa: homeName, equipa_fora: awayName,
                         resultado_casa: scoreCasa,
                         resultado_fora: scoreFora,
                         escalao, competicao, local: locText || null,
