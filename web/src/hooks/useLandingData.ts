@@ -57,8 +57,14 @@ export function useLandingData() {
                 // Normalize data to YYYY-MM-DD (slice first 10 chars) in case some sources
                 // store full timestamps, which would break the per-date grouping
                 const seen = new Map<string, number>()
+                const seenSlugs = new Set<string>()
                 const varied: Match[] = []
                 for (const m of all) {
+                    // Dedup: skip duplicate games (same slug or same teams+date)
+                    const dedupKey = m.slug || `${m.data.slice(0, 10)}-${m.equipa_casa}-${m.equipa_fora}`
+                    if (seenSlugs.has(dedupKey)) continue
+                    seenSlugs.add(dedupKey)
+
                     const dateKey = m.data.slice(0, 10) // YYYY-MM-DD
                     const count = seen.get(dateKey) || 0
                     if (count < 2) {

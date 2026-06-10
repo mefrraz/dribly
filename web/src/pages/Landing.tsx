@@ -408,8 +408,8 @@ function Landing() {
                                     </div>
                                 ))}
                             </div>
-                            <div className="absolute left-0 top-0 bottom-0 w-20 md:w-44 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
-                            <div className="absolute right-0 top-0 bottom-0 w-20 md:w-44 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
+                            <div className="absolute left-0 top-0 bottom-0 w-28 md:w-56 bg-gradient-to-r from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
+                            <div className="absolute right-0 top-0 bottom-0 w-28 md:w-56 bg-gradient-to-l from-zinc-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 hidden md:block" />
                         </div>
                     )}
                 </div>
