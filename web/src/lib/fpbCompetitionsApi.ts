@@ -285,6 +285,10 @@ function scrapeGames(html: string, defaultStatus: Match['status']): FPBGame[] {
             const teamContainers = link.querySelectorAll('.team-container')
             const homeName = (teamContainers[0]?.querySelector('.fullName') || teamContainers[0]?.querySelector('.sigla'))?.textContent?.trim() || ''
             const awayName = (teamContainers[1]?.querySelector('.fullName') || teamContainers[1]?.querySelector('.sigla'))?.textContent?.trim() || ''
+
+            // Skip self-matches (away team not parsed — same as home)
+            if (homeName && homeName === awayName) return
+
             const logo_casa = teamContainers[0]?.querySelector('.image-container img')?.getAttribute('src') || undefined
             const logo_fora = teamContainers[1]?.querySelector('.image-container img')?.getAttribute('src') || undefined
 

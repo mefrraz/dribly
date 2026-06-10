@@ -63,6 +63,40 @@ function mapFPBData(fresh: Record<string, unknown>[], season: string): Match[] {
   })
 }
 
+/**
+ * Dedup games by game identity (same date + home + competition).
+ * When duplicates exist, prefer the version with a proper FPB id
+ * (which comes from the resultados page and has both teams correct)
+ * over self-match entries from the calendario page (id='').
+ */
+function dedupGames(games: Match[]): Match[] {
+  const groups = new Map<string, Match[]>()
+  for (const g of games) {
+    const key = `${g.data.slice(0, 10)}|${g.equipa_casa}|${g.competicao}`
+    const arr = groups.get(key) || []
+    arr.push(g)
+    groups.set(key, arr)
+  }
+
+  const result: Match[] = []
+  for (const [, group] of groups) {
+    if (group.length === 1) {
+      result.push(group[0])
+    } else {
+      // Prefer: has proper id > has diferentes teams > keep first
+      const withId = group.filter(g => g.id && g.id !== '')
+      const withDiffTeams = group.filter(g => g.equipa_casa !== g.equipa_fora)
+      const chosen = withId.length > 0
+        ? withId[0]
+        : withDiffTeams.length > 0
+          ? withDiffTeams[0]
+          : group[0]
+      result.push(chosen)
+    }
+  }
+  return result
+}
+
 export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
   const localCache = loadLocalCache(season, clube)
   const [games, setGames] = useState<Match[]>(localCache)
@@ -74,14 +108,9 @@ export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
 
   /** Background upsert to Supabase — never affects UI */
   const persistToSupabase = useCallback((data: Match[]) => {
-    const seen = new Map<string, boolean>()
-    const unique = data.filter(g => {
-      if (seen.has(g.slug)) return false
-      seen.set(g.slug, true)
-      return true
-    })
+    const deduped = dedupGames(data)
     supabase.from(tableName).upsert(
-      unique.map(g => ({ ...g, updated_at: new Date().toISOString() })),
+      deduped.map(g => ({ ...g, updated_at: new Date().toISOString() })),
       { onConflict: 'slug' }
     ).then(({ error: upsertError }) => {
       if (upsertError) logger.warn('Supabase upsert:', upsertError.message)
@@ -92,7 +121,7 @@ export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
   const fetchAndSet = useCallback(async () => {
     const fresh = await fetchFPBGames(season, clube)
     if (fresh.length === 0) return
-    const mapped = mapFPBData(fresh, season)
+    const mapped = dedupGames(mapFPBData(fresh, season))
 
     // Only update if data actually changed
     const currentKey = games.map(g => `${g.slug}|${g.resultado_casa}|${g.resultado_fora}`).sort().join(',')
@@ -114,7 +143,7 @@ export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
         setLoading(false)
         return
       }
-      const mapped = mapFPBData(fresh, season)
+      const mapped = dedupGames(mapFPBData(fresh, season))
       setGames(mapped)
       setLastUpdated(new Date())
       persistToSupabase(mapped)

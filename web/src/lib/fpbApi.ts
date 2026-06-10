@@ -54,7 +54,6 @@ function parseGamesHTML(html: string): Match[] {
     gameLinks.forEach((link: Element) => {
       const href = link.getAttribute('href') || ''
       const internalId = href.match(/internalID=(\d+)/)?.[1] || ''
-      if (!internalId) return
 
       // Teams: first .team-container = home, second = away
       const teamContainers = link.querySelectorAll('.team-container')
@@ -63,6 +62,16 @@ function parseGamesHTML(html: string): Match[] {
 
       const homeName = (homeTeamEl?.querySelector('.fullName') || homeTeamEl?.querySelector('.sigla'))?.textContent?.trim() || ''
       const awayName = (awayTeamEl?.querySelector('.fullName') || awayTeamEl?.querySelector('.sigla'))?.textContent?.trim() || ''
+
+      // Skip only if both teams are empty (completely unparseable)
+      if (!homeName && !awayName) return
+
+      // Generate fallback id for games without internalID (calendar page)
+      const gameId = internalId || `cal-${isoDate}-${slugify(homeName)}-${slugify(awayName)}`
+      if (!internalId && homeName === awayName && homeName) {
+        // Self-match without internalID: skip — the resultados page will have the correct version
+        return
+      }
 
       // Logos
       const homeLogo = homeTeamEl?.querySelector('.image-container img')?.getAttribute('src') || null
@@ -126,7 +135,7 @@ function parseGamesHTML(html: string): Match[] {
       const slug = `${isoDate}-${slugify(homeName)}-${slugify(awayName)}`
 
       games.push({
-        id: internalId,
+        id: gameId,
         slug,
         data: isoDate,
         hora,
