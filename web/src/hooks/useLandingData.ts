@@ -30,24 +30,39 @@ export function useLandingData() {
     const [allComps, setAllComps] = useState<LandingCompetition[]>([])
     const [compMetaMap, setCompMetaMap] = useState<Map<number, CompMeta>>(new Map())
 
-    // Featured games: only FINALIZADO Liga Betclic results, varied across rounds
+    // Featured games: only FINALIZADO Liga Betclic (Masculina, ID 10902) results, varied across rounds
     useEffect(() => {
+        // Get exact competition name(s) from the competitions table first
         supabase
-            .from('games_2025_2026')
-            .select('*')
-            .ilike('competicao', '%Liga Betclic%')
-            .eq('status', 'FINALIZADO')
-            .order('data', { ascending: false })
-            .limit(18)
+            .from('competitions')
+            .select('competition_name')
+            .eq('competition_id', 10902)
+            .eq('season', '2025/2026')
+            .then(({ data: comps }) => {
+                const names: string[] = (comps || []).map((c: { competition_name: string }) => c.competition_name)
+                // Fallback: also match the short name used by Tugabasket
+                if (!names.includes('Liga Betclic')) names.push('Liga Betclic')
+
+                return supabase
+                    .from('games_2025_2026')
+                    .select('*')
+                    .in('competicao', names)
+                    .eq('status', 'FINALIZADO')
+                    .order('data', { ascending: false })
+                    .limit(18)
+            })
             .then(({ data }) => {
                 const all = (data || []) as Match[]
                 // Pick at most 2 games per date for variety across rounds
+                // Normalize data to YYYY-MM-DD (slice first 10 chars) in case some sources
+                // store full timestamps, which would break the per-date grouping
                 const seen = new Map<string, number>()
                 const varied: Match[] = []
                 for (const m of all) {
-                    const count = seen.get(m.data) || 0
+                    const dateKey = m.data.slice(0, 10) // YYYY-MM-DD
+                    const count = seen.get(dateKey) || 0
                     if (count < 2) {
-                        seen.set(m.data, count + 1)
+                        seen.set(dateKey, count + 1)
                         varied.push(m)
                     }
                     if (varied.length >= 14) break
