@@ -47,9 +47,14 @@ const GameCardInner = ({ match, mode, clubName, clubSlug }: GameCardProps) => {
               {hasHora(match.hora) && ` · ${match.hora!.slice(0, 5)}`}
             </div>
           ) : badge && (
-            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${badge.className}`}>
-              <badge.icon size={10} />
-              {badge.label}
+            <div className="flex items-center gap-2">
+              <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${badge.className}`}>
+                <badge.icon size={10} />
+                {badge.label}
+              </div>
+              <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider">
+                {new Date(match.data).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })}
+              </span>
             </div>
           )}
         </div>
