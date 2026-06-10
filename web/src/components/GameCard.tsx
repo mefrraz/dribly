@@ -42,10 +42,10 @@ const GameCardInner = ({ match, mode, clubName, clubSlug }: GameCardProps) => {
       <div className="flex justify-between items-center px-4 py-2.5 border-b border-zinc-100 dark:border-white/5">
         <div className="flex items-center gap-2 min-w-0">
           {mode === 'agenda' ? (
-            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider">
+            <div className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider">
               {new Date(match.data).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })}
               {hasHora(match.hora) && ` · ${match.hora!.slice(0, 5)}`}
-            </span>
+            </div>
           ) : badge && (
             <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${badge.className}`}>
               <badge.icon size={10} />
@@ -113,8 +113,8 @@ function TeamRow({ name, logo, score, dimmed }: { name: string; logo: string | n
           {semiAbrev(name).toUpperCase()}
         </span>
       </div>
-      <span className="text-xl font-mono font-bold text-zinc-900 dark:text-white tabular-nums shrink-0 ml-2 min-w-[2ch] text-right">
-        {score !== null ? score : '\u00A0'}
+      <span className={`text-xl font-mono font-bold tabular-nums shrink-0 ml-2 min-w-[2ch] text-right ${score === null ? 'text-zinc-900 dark:text-white opacity-0' : 'text-zinc-900 dark:text-white'}`}>
+        {score !== null ? score : '0'}
       </span>
     </div>
   )
