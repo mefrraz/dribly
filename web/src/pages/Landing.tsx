@@ -404,7 +404,7 @@ function Landing() {
                             >
                                 {games.map((match, idx) => (
                                     <div key={match.slug || match.id + '-' + idx} className="w-[calc(100vw-2rem)] md:w-[320px] shrink-0 snap-center">
-                                        <GameCard match={match} mode="agenda" />
+                                        <GameCard match={match} mode="results" />
                                     </div>
                                 ))}
                             </div>

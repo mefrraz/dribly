@@ -113,11 +113,9 @@ function TeamRow({ name, logo, score, dimmed }: { name: string; logo: string | n
           {semiAbrev(name).toUpperCase()}
         </span>
       </div>
-      {score !== null && (
-        <span className="text-xl font-mono font-bold text-zinc-900 dark:text-white tabular-nums shrink-0 ml-2">
-          {score}
-        </span>
-      )}
+      <span className="text-xl font-mono font-bold text-zinc-900 dark:text-white tabular-nums shrink-0 ml-2 min-w-[2ch] text-right">
+        {score !== null ? score : '\u00A0'}
+      </span>
     </div>
   )
 }
