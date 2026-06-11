@@ -6,10 +6,13 @@ import { useFollows } from '../../hooks/useFollows'
 import { useAuth } from '../../lib/AuthContext'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { SeoHead } from '../../components/SeoHead'
-import { type Club, displayName } from '../../lib/ClubContext'
+import { type Club, displayName, useClub } from '../../lib/ClubContext'
+import { normalizeTeamDisplay } from '../../lib/fpbUtils'
 
 function ClubHome() {
     const { club } = useOutletContext<{ club: Club }>()
+    const { clubs } = useClub()
+    const dn = (name: string) => normalizeTeamDisplay(name, clubs)
     const { user } = useAuth()
 
     const { isFollowing, toggleFollow } = useFollows()
@@ -142,13 +145,13 @@ function ClubHome() {
                         </div>
                         <div className="px-6 py-8">
                             <div className="flex items-center justify-between gap-4">
-                                <TeamBlock name={nextGame.equipa_casa} logo={nextGame.logotipo_casa} />
+                                <TeamBlock name={dn(nextGame.equipa_casa)} logo={nextGame.logotipo_casa} />
                                 <div className="flex flex-col items-center gap-1 shrink-0">
                                     <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
                                         <span className="text-sm font-black text-zinc-400 dark:text-zinc-500">VS</span>
                                     </div>
                                 </div>
-                                <TeamBlock name={nextGame.equipa_fora} logo={nextGame.logotipo_fora} />
+                                <TeamBlock name={dn(nextGame.equipa_fora)} logo={nextGame.logotipo_fora} />
                             </div>
                             <div className="mt-6 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                                 <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
@@ -204,9 +207,9 @@ function ClubHome() {
                                     <div className="flex-1 min-w-0">
                                         <span className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate block leading-tight">{match.escalao || 'Sénior Masculino'}</span>
                                         <p className="text-xs text-zinc-900 dark:text-white truncate">
-                                            <span>{match.equipa_casa}</span>
+                                            <span>{dn(match.equipa_casa)}</span>
                                             <span className="text-zinc-400 mx-1">vs</span>
-                                            <span>{match.equipa_fora}</span>
+                                            <span>{dn(match.equipa_fora)}</span>
                                         </p>
                                     </div>
                                     <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300 tabular-nums">
@@ -236,9 +239,9 @@ function ClubHome() {
                                     <div className="flex-1 min-w-0">
                                         <span className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate block leading-tight">{match.escalao || 'Sénior Masculino'}</span>
                                         <p className="text-xs text-zinc-900 dark:text-white truncate">
-                                            <span>{match.equipa_casa}</span>
+                                            <span>{dn(match.equipa_casa)}</span>
                                             <span className="text-zinc-400 mx-1">vs</span>
-                                            <span>{match.equipa_fora}</span>
+                                            <span>{dn(match.equipa_fora)}</span>
                                         </p>
                                     </div>
                                     <span className="text-xs text-zinc-500">{formatDate(match.data)}</span>
@@ -265,7 +268,7 @@ function TeamBlock({ name, logo }: { name: string; logo: string | null }) {
                 )}
             </div>
             <p className="text-sm font-bold text-zinc-900 dark:text-white leading-tight truncate w-full">
-                {name.toUpperCase()}
+                {name}
             </p>
         </div>
     )
