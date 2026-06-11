@@ -458,7 +458,7 @@ async function main() {
                     const $link = $(link)
                     const href = $link.attr('href') || ''
                     const internalId = href.match(/internalID=(\d+)/)?.[1] || ''
-                    if (!internalId) return
+                    const gameId = internalId || `${iso}-${homeName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}-${awayName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`
 
                     // Query each .team-container separately (home first, away second)
                     // Old flat .find('.fullName, .sigla') was buggy:
@@ -516,6 +516,7 @@ async function main() {
                     const slug = `${iso}-${teamSlug}-${oppSlug}`
 
                     games.push({
+                        id: gameId,
                         slug, data: iso, hora: timeText || null,
                         equipa_casa: homeName, equipa_fora: awayName,
                         resultado_casa: scoreCasa,
