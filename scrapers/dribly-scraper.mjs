@@ -416,15 +416,11 @@ async function main() {
 
         log(`Scraping club ${clubId} — ${season}`)
 
-        const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), 15000)
-
         try {
             const [calRes, resRes] = await Promise.all([
-                fetch(url('calendario'), { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: controller.signal }),
-                fetch(url('resultados'), { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: controller.signal }),
+                fetch(url('calendario'), { headers: { 'User-Agent': 'Mozilla/5.0' } }),
+                fetch(url('resultados'), { headers: { 'User-Agent': 'Mozilla/5.0' } }),
             ])
-            clearTimeout(timeout)
             log(`  Fetched calendar (${calRes.status}) and results (${resRes.status})`)
 
         const calHtml = await calRes.text()
@@ -557,7 +553,7 @@ async function main() {
         log(`  Total after merge: ${all.length} games`)
         return all
         } finally {
-            clearTimeout(timeout)
+            // no timeout — wait as long as needed
         }
     }
 
