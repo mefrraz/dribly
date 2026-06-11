@@ -716,6 +716,25 @@ async function main() {
 
         for (let i = 0; i < selectedClubs.length && !stopped; i += PARALLEL) {
             const batch = selectedClubs.slice(i, i + PARALLEL)
+            const batchStart = i + 1
+            const batchEnd = Math.min(i + PARALLEL, selectedClubs.length)
+
+            // Show live "scraping..." header for this batch
+            process.stdout.write(C.clear)
+            process.stdout.write(C.hideCursor)
+            console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${currentSeason}` + C.reset)
+            console.log(C.dim + `  Clubes ${batchStart}-${batchEnd} de ${selectedClubs.length}  |  ${PARALLEL} em paralelo` + C.reset)
+            console.log(C.bold + C.yellow + `  Ctrl+C para parar  |  Época ${selectedSeasons.indexOf(currentSeason)+1}/${selectedSeasons.length}` + C.reset)
+            console.log()
+            console.log(`  ${C.cyan}⚡ A pesquisar ${batch.length} clubes em paralelo...${C.reset}`)
+            console.log()
+
+            let batchDone = 0
+            const liveUpdate = setInterval(() => {
+                const pct = batch.length > 0 ? Math.round((batchDone / batch.length) * 100) : 0
+                const bar = '█'.repeat(Math.round(batchDone / batch.length * 30)).padEnd(30, '░')
+                process.stdout.write(`\r  ${C.purple}${bar}${C.reset} ${batchDone}/${batch.length}  (${pct}%)  ${C.dim}${totalGames} jogos${C.reset}`)
+            }, 200)
 
             // Scrape all clubs in batch in parallel
             const results = await Promise.allSettled(
@@ -726,29 +745,32 @@ async function main() {
 
                     try {
                         const games = await scrapeClub(club.id, currentSeason)
+                        batchDone++
                         return { club, games, clubIdx }
                     } catch (e) {
+                        batchDone++
                         errors.push(club.name)
-                        process.stdout.write(C.clear)
-                        console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${currentSeason}` + C.reset)
-                        console.log(C.red + `  ❌ ${club.name}: ${e.message}` + C.reset)
-                        console.log()
-                        return null
+                        return { club, games: [], clubIdx, error: e.message }
                     }
                 })
             )
 
+            clearInterval(liveUpdate)
+            process.stdout.write('\r' + ' '.repeat(80) + '\r') // clear progress line
+
             // Process results and upsert in batch
             for (const r of results) {
                 if (r.status === 'rejected' || !r.value) continue
-                const { club, games, clubIdx } = r.value
+                const { club, games, clubIdx, error } = r.value
+
+                if (error) {
+                    console.log(`  ${C.red}❌ ${club.name}: ${error}${C.reset}`)
+                    console.log()
+                    continue
+                }
 
                 if (games.length === 0) {
-                    process.stdout.write(C.clear)
-                    console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${currentSeason}` + C.reset)
-                    console.log(C.dim + `  Clube ${clubIdx}/${selectedClubs.length} — ${club.name}` + C.reset)
-                    console.log(`  ${C.dim}Nenhum jogo encontrado${C.reset}`)
-                    console.log()
+                    console.log(`  ${C.dim}${club.name}: nenhum jogo${C.reset}`)
                     continue
                 }
 
@@ -767,17 +789,17 @@ async function main() {
                     const dateShort = g.data ? g.data.slice(5) : '??-??'
                     const score = g.resultado_casa != null ? `${g.resultado_casa}-${g.resultado_fora}` : null
                     const text = `${dateShort} ${(g.equipa_casa||'?').slice(0,10)} ${score||'vs'} ${(g.equipa_fora||'?').slice(0,10)}`
-                    recentGames.unshift({
-                        text,
-                        status: score ? 'FINALIZADO' : 'AGENDADO',
-                        score,
-                    })
+                    recentGames.unshift({ text, status: score ? 'FINALIZADO' : 'AGENDADO', score })
                     if (recentGames.length > 12) recentGames.pop()
                 }
 
-                // Draw final state for this club
-                await drawScreen(club, games.length, games.length, clubIdx, false)
+                console.log(`  ${C.green}✅${C.reset} ${club.name}: ${C.bold}${games.length} jogos${C.reset}`)
             }
+
+            console.log()
+            console.log(`  ${C.dim}${'─'.repeat(50)}${C.reset}`)
+            console.log(`  ${C.bold}Total: ${totalGames} jogos${C.reset}  |  ${C.dim}${done}/${selectedClubs.length} clubes${C.reset}`)
+            console.log()
         }
     }
 
