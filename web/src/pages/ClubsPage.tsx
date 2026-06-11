@@ -38,21 +38,21 @@ export default function ClubsPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#09090b] dark:via-zinc-950 dark:to-[#09090b]">
-            <div className="max-w-6xl mx-auto px-3 sm:px-5 pt-6 pb-24">
+            <div className="max-w-4xl mx-auto px-3 sm:px-5 pt-6 sm:pt-8 pb-24">
                 <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight mb-2 text-center">Clubes</h1>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-6">
-                    {clubs.length} clubes registados na FPB
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-6 max-w-md mx-auto">
+                    Todos os clubes de basquetebol registados na Federação Portuguesa de Basquetebol
                 </p>
 
-                {/* Search */}
-                <div className="relative max-w-sm mx-auto mb-6">
+                <div className="relative mb-8">
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                     <input
                         type="text"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder="Pesquisar clube..."
-                        className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl text-sm text-zinc-900 dark:text-white placeholder-zinc-400 outline-none transition-all focus:ring-2 focus:ring-dribly-purple/30 focus:border-dribly-purple"
+                        autoComplete="off"
+                        className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl text-xs font-medium text-zinc-900 dark:text-white placeholder-zinc-400 outline-none transition-all focus:ring-2 focus:ring-dribly-purple/30 focus:border-dribly-purple"
                     />
                 </div>
 
