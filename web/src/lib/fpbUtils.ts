@@ -65,7 +65,7 @@ export function semiAbrev(fullName: string): string {
  */
 export function normalizeTeamDisplay(teamName: string, clubs: { name: string; search_name?: string; short_name?: string | null; slug: string }[]): string {
     if (!teamName) return teamName
-    const n = teamName.trim().toUpperCase()
+    const n = teamName.trim().replace(/\s+/g, ' ').toUpperCase()
 
     // 1. Exact match
     for (const c of clubs) {

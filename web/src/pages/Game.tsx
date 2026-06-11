@@ -365,14 +365,14 @@ function Game() {
                                             foraHighlight ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
                                         }`}>{match.resultado_fora ?? '-'}</span>
                                     </div>
-                                    {/* Period scores — minimal, one line below the score */}
+                                    {/* Period scores — compact but readable, below the score */}
                                     {parciais.length > 0 && (
-                                        <div className="flex items-center gap-1.5 mt-0.5 text-[10px] font-mono tabular-nums text-zinc-400 dark:text-zinc-500">
+                                        <div className="flex items-center gap-2 mt-1 text-xs font-mono tabular-nums font-bold text-zinc-500 dark:text-zinc-400">
                                             {parciais.map((p, i) => (
                                                 <span key={i}>
-                                                    <span className="text-zinc-300 dark:text-zinc-600 text-[8px] font-sans font-bold uppercase">{p.periodo} </span>
+                                                    <span className="text-zinc-400 dark:text-zinc-500 font-sans font-bold text-[9px] uppercase mr-0.5">{p.periodo}</span>
                                                     {p.casa}-{p.fora}
-                                                    {i < parciais.length - 1 && <span className="text-zinc-200 dark:text-zinc-700 mx-0.5">·</span>}
+                                                    {i < parciais.length - 1 && <span className="text-zinc-300 dark:text-zinc-600 mx-1">·</span>}
                                                 </span>
                                             ))}
                                         </div>
