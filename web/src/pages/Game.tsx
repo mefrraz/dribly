@@ -96,6 +96,10 @@ function Game() {
                                 setTopPerfCasa(detail.topPerfCasa)
                                 setTopPerfFora(detail.topPerfFora)
                                 setTopPerfStats(detail.topPerfStats)
+                                // Fix bad location from Supabase with clean pavilhao from detail
+                                if (detail.pavilhao && m.local && m.local.includes('|')) {
+                                    setMatch(prev => prev ? { ...prev, local: detail.pavilhao } : prev)
+                                }
                             }
                         }).catch(() => {}).finally(() => setDetailLoading(false))
                     }
@@ -219,11 +223,12 @@ function Game() {
             })
     }, [match, slug])
 
-    // Look up pavilion by match.local name
+    // Look up pavilion by cleanLocal name
     useEffect(() => {
         if (!match?.local) return
+        const clean = match.local.split('|')[0].replace(/\s+/g, ' ').trim()
         fetchPavilions().then(pavs => {
-            const q = match.local!.toLowerCase().trim()
+            const q = clean.toLowerCase()
             const found = pavs.find(p => p.nome.toLowerCase().includes(q) || q.includes(p.nome.toLowerCase()))
             setPavilion(found || null)
         }).catch(() => {})
@@ -294,6 +299,10 @@ function Game() {
     const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
     const displayFora = normalizeTeamDisplay(match.equipa_fora, clubs)
     const dn = (name: string) => normalizeTeamDisplay(name, clubs)
+    // Clean location: if it contains "|", it has competition data mixed in — strip it
+    const cleanLocal = match.local
+        ? match.local.split('|')[0].replace(/\s+/g, ' ').trim()
+        : null
     const isDraw = hasScores && match.resultado_casa === match.resultado_fora
 
     return (
@@ -397,7 +406,7 @@ function Game() {
             </div>
 
             {/* Location Card — full-width, map on top, info below */}
-            {match.local ? (
+            {cleanLocal ? (
                 <div className="glass-card overflow-hidden">
                     {/* Mini map — full card width */}
                     {pavilion ? (
@@ -425,8 +434,8 @@ function Game() {
                                 <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm text-xs font-bold text-dribly-purple px-3 py-1.5 rounded-full">Ver pavilhão →</span>
                             </div>
                         </Link>
-                    ) : match.local ? (
-                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(match.local)}`}
+                    ) : cleanLocal ? (
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanLocal)}`}
                            target="_blank" rel="noopener noreferrer"
                            className="block h-40 w-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors group">
                             <div className="text-center">
@@ -441,11 +450,11 @@ function Game() {
                             <MapPin size={16} />
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">{match.local}</p>
+                            <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">{cleanLocal}</p>
                             {pavilion && <p className="text-[10px] text-zinc-400 truncate">{pavilion.cidade}{pavilion.distrito ? `, ${pavilion.distrito}` : ''}</p>}
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
-                            <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(match.local)}`}
+                            <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(cleanLocal)}`}
                                target="_blank" rel="noopener noreferrer"
                                className="p-1.5 rounded-lg bg-zinc-100 dark:bg-white/5 text-dribly-blue hover:bg-dribly-blue hover:text-white transition-colors"
                                title="Google Maps">
