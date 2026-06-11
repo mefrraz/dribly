@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Calendar, Trophy, Filter, RefreshCw, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Calendar, Trophy, Filter, RefreshCw, AlertCircle } from 'lucide-react'
 import { Link, useSearchParams, useOutletContext } from 'react-router-dom'
 import { useGames } from '../../hooks/useGames'
 import { useTimeAgo } from '../../hooks/useTimeAgo'
@@ -65,8 +65,12 @@ function ClubGames() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-4 pb-24">
-            {/* Segment */}
-            <div className="px-3 mt-2">
+            {/* Back + Segment */}
+            <div className="px-3 mt-2 flex items-center gap-3">
+                <Link to={`/clube/${club.slug}/home`} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
+                    <ArrowLeft size={20} />
+                </Link>
+                <div className="flex-1">
                 <SegmentControl
                 options={[
                     { value: 'agenda', label: 'AGENDA', icon: Calendar },
@@ -75,6 +79,7 @@ function ClubGames() {
                 value={view}
                 onChange={(v) => setView(v as 'agenda' | 'results')}
             />
+            </div>
             </div>
 
             {/* Filtro + Atualizado */}

@@ -21,8 +21,9 @@ function ClubHome() {
 
     const nextGame = useMemo(() => {
         if (games.length === 0) return null
+        const today = new Date().toISOString().split('T')[0]
         const upcoming = games
-            .filter(g => g.status !== 'FINALIZADO')
+            .filter(g => g.status !== 'FINALIZADO' && g.data >= today)
             .sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
         return upcoming.length > 0 ? upcoming[0] : null
     }, [games])
@@ -192,7 +193,7 @@ function ClubHome() {
                         <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
                             <Calendar size={20} />
                         </div>
-                        <h3 className="text-zinc-900 dark:text-white font-bold text-lg leading-tight">Jogos<br />& Agenda</h3>
+                        <h3 className="text-zinc-900 dark:text-white font-bold text-lg leading-tight">Resultados<br />& Agenda</h3>
                     </div>
                 </Link>
                 <Link to={`/clube/${club.slug}/team`} className="relative overflow-hidden rounded-2xl bg-[var(--club-color)] border border-[var(--club-color)] p-5 h-32 group shadow-sm shadow-[var(--club-color)]/10 transition-all active:scale-[0.98] hover:shadow-md">
