@@ -637,11 +637,16 @@ async function main() {
             console.log()
 
             let batchDone = 0
+            const startedAt = Date.now()
             const liveUpdate = setInterval(() => {
+                const elapsed = Math.round((Date.now() - startedAt) / 1000)
                 const pct = batch.length > 0 ? Math.round((batchDone / batch.length) * 100) : 0
                 const bar = '█'.repeat(Math.round(batchDone / batch.length * 30)).padEnd(30, '░')
-                process.stdout.write(`\r  ${C.purple}${bar}${C.reset} ${batchDone}/${batch.length}  (${pct}%)  ${C.dim}${totalGames} jogos${C.reset}`)
-            }, 200)
+                const status = batchDone === 0
+                    ? `${C.cyan}A pesquisar...${C.reset}`
+                    : `${batchDone}/${batch.length}`
+                process.stdout.write(`\r  ${C.purple}${bar}${C.reset} ${status}  (${pct}%)  |  ${C.dim}${elapsed}s  ${totalGames} jogos guardados${C.reset}     `)
+            }, 150)
 
             // Scrape all clubs in batch in parallel
             const results = await Promise.allSettled(
