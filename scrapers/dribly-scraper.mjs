@@ -603,13 +603,13 @@ async function main() {
         if (shouldClean) {
             process.stdout.write(C.clear)
             console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${currentSeason}` + C.reset)
-            console.log(C.yellow + `  🧹 A limpar jogos existentes...` + C.reset)
-            for (const club of selectedClubs) {
-                const name = club.name.replace(/'/g, "''")
-                await supabase.from(seasonTable).delete()
-                    .or(`equipa_casa.ilike.%${name}%,equipa_fora.ilike.%${name}%`)
+            console.log(C.yellow + `  🧹 A apagar TODOS os jogos da época ${currentSeason}...` + C.reset)
+            const { error: delErr } = await supabase.from(seasonTable).delete().neq('slug', '___none___')
+            if (delErr) {
+                console.log(C.red + `  ❌ Erro: ${delErr.message}` + C.reset)
+            } else {
+                console.log(C.green + '  ✅ Tabela limpa.' + C.reset)
             }
-            console.log(C.green + '  ✅ Dados anteriores removidos.' + C.reset)
         }
 
         // Initial draw
