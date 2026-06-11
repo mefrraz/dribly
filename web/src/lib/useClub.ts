@@ -13,7 +13,7 @@ export interface Club {
     elo_rating: number | null
 }
 
-/** Display name: short_name if available, otherwise name. */
+/** Display name: short_name if available, otherwise full name. */
 export function displayName(club: Club): string {
     return club.short_name || club.name
 }

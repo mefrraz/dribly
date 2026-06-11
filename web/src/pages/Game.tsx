@@ -10,7 +10,7 @@ import { SkeletonHero } from '../components/Skeleton'
 import { Match } from '../components/types'
 import { useClub, type Club } from '../lib/ClubContext'
 import { fetchPavilions, type Pavilion } from '../lib/mapData'
-import { semiAbrev } from '../lib/fpbUtils'
+import { semiAbrev, normalizeTeamDisplay } from '../lib/fpbUtils'
 import { logger } from '../lib/logger'
 import { TeamBlock } from '../components/TeamBlock'
 import { GameDueloCard } from '../components/GameDueloCard'
@@ -283,6 +283,10 @@ function Game() {
         (match.equipa_casa.toUpperCase().includes(clubUpper) && match.resultado_casa! > match.resultado_fora!) ||
         (match.equipa_fora.toUpperCase().includes(clubUpper) && match.resultado_fora! > match.resultado_casa!)
     ) : null
+
+    const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
+    const displayFora = normalizeTeamDisplay(match.equipa_fora, clubs)
+    const dn = (name: string) => normalizeTeamDisplay(name, clubs)
     const isDraw = hasScores && match.resultado_casa === match.resultado_fora
 
     return (
@@ -332,7 +336,7 @@ function Game() {
                     </div>
 
                     <div className="flex items-center justify-between gap-4">
-                        <TeamBlock name={match.equipa_casa} logo={match.logotipo_casa} clubSlug={findClubSlug(match.equipa_casa, clubs)} />
+                        <TeamBlock name={displayCasa} logo={match.logotipo_casa} clubSlug={findClubSlug(match.equipa_casa, clubs)} />
                         <div className="flex flex-col items-center gap-1 shrink-0">
                             {isFinished || isLive ? (
                                 <div className="flex items-center gap-1 sm:gap-3">
@@ -350,7 +354,7 @@ function Game() {
                                 </div>
                             )}
                         </div>
-                        <TeamBlock name={match.equipa_fora} logo={match.logotipo_fora} clubSlug={findClubSlug(match.equipa_fora, clubs)} />
+                        <TeamBlock name={displayFora} logo={match.logotipo_fora} clubSlug={findClubSlug(match.equipa_fora, clubs)} />
                     </div>
 
                     {/* FPB Link */}
@@ -464,14 +468,14 @@ function Game() {
                         <h3 className="text-xs font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-blue" />
                             Últimos Confrontos
-                            <span className="text-zinc-400 dark:text-zinc-500 font-medium truncate text-[10px]">{match.equipa_casa} vs {match.equipa_fora}</span>
+                            <span className="text-zinc-400 dark:text-zinc-500 font-medium truncate text-[10px]">{displayCasa} vs {displayFora}</span>
                         </h3>
                     </div>
                     <div className="divide-y divide-zinc-100 dark:divide-white/5">
                         {recentGames.map((game) => {
                             const isHome = game.equipa_casa.toUpperCase().includes(match.equipa_casa.toUpperCase().substring(0, 5))
-                            const firstTeam = isHome ? game.equipa_casa : game.equipa_fora
-                            const secondTeam = isHome ? game.equipa_fora : game.equipa_casa
+                            const firstTeam = isHome ? dn(game.equipa_casa) : dn(game.equipa_fora)
+                            const secondTeam = isHome ? dn(game.equipa_fora) : dn(game.equipa_casa)
                             const firstScore = isHome ? game.resultado_casa : game.resultado_fora
                             const secondScore = isHome ? game.resultado_fora : game.resultado_casa
                             const shortDate = new Date(game.data).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -515,13 +519,13 @@ function Game() {
                         <h3 className="text-xs font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-blue" />
                             Próximos Confrontos
-                            <span className="text-zinc-500 dark:text-zinc-500 font-medium truncate text-[10px]">{match.equipa_casa} vs {match.equipa_fora}</span>
+                            <span className="text-zinc-500 dark:text-zinc-500 font-medium truncate text-[10px]">{displayCasa} vs {displayFora}</span>
                         </h3>
                     </div>
                     <div className="divide-y divide-zinc-100 dark:divide-white/5">
                         {upcomingH2H.map((game) => {
                             const opponent = game.equipa_casa.toUpperCase().includes(match.equipa_casa.toUpperCase().substring(0, 5))
-                                ? game.equipa_fora : game.equipa_casa
+                                ? dn(game.equipa_fora) : dn(game.equipa_casa)
                             const shortDate = new Date(game.data).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short', year: 'numeric' })
 
                             return (
@@ -529,7 +533,7 @@ function Game() {
                                     <TrendingUp size={12} className="text-dribly-blue shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs text-zinc-900 dark:text-white truncate group-hover:text-dribly-blue transition-colors">
-                                            <span className="font-semibold">{match.equipa_casa}</span>
+                                            <span className="font-semibold">{displayCasa}</span>
                                             <span className="text-zinc-400 mx-1">vs</span>
                                             <span className="text-zinc-500">{opponent}</span>
                                         </p>

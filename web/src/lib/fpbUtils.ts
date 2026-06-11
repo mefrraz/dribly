@@ -55,3 +55,35 @@ export function semiAbrev(fullName: string): string {
     }
     return fullName
 }
+
+/**
+ * Map a team name from any source (FPB, Tugabasket) to the club's display name.
+ * Uses the same matching logic as findClubSlug in Game.tsx —
+ * exact match, substring both ways, and semi-abbreviated forms.
+ *
+ * @returns The club's short_name if matched, otherwise the original team name unchanged.
+ */
+export function normalizeTeamDisplay(teamName: string, clubs: { name: string; search_name?: string; short_name?: string | null; slug: string }[]): string {
+    if (!teamName) return teamName
+    const n = teamName.trim().toUpperCase()
+
+    // 1. Exact match
+    for (const c of clubs) {
+        const cn = c.name.toUpperCase()
+        const sn = (c.search_name || '').toUpperCase()
+        const sa = semiAbrev(c.name).toUpperCase()
+        if (n === cn || n === sn || n === sa) return c.short_name || c.name
+    }
+
+    // 2. Substring both ways
+    for (const c of clubs) {
+        const cn = c.name.toUpperCase()
+        const sn = (c.search_name || '').toUpperCase()
+        const sa = semiAbrev(c.name).toUpperCase()
+        if (cn.includes(n) || n.includes(cn) || sn.includes(n) || n.includes(sn) || sa.includes(n) || n.includes(sa))
+            return c.short_name || c.name
+    }
+
+    // No match — return original
+    return teamName
+}
