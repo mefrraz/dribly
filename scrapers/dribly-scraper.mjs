@@ -500,8 +500,10 @@ async function main() {
                     // Time: .time or .hour
                     const timeText = $link.find('.hour').text().trim() || $link.find('.time').text().trim()
 
-                    // Location: .location-wrapper text
-                    const locText = $link.find('.location-wrapper').text().trim() || $link.find('.location').text().trim()
+                    // Location: .location-wrapper b (venue name only, not the whole block)
+                    const locText = $link.find('.location-wrapper b').text().trim()
+                        || $link.find('.location-wrapper').first().contents().first().text().trim()
+                        || ''
 
                     // debug removed — scraper verified working
 
