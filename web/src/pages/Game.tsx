@@ -343,11 +343,11 @@ function Game() {
                         <div className="flex flex-col items-center gap-1 shrink-0">
                             {isFinished || isLive ? (
                                 <div className="flex items-center gap-1 sm:gap-2">
-                                    <span className={`text-xl sm:text-3xl font-bold font-mono tabular-nums tracking-tighter ${
+                                    <span className={`text-2xl sm:text-4xl font-bold font-mono tabular-nums tracking-tighter ${
                                         casaHighlight ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
                                     }`}>{match.resultado_casa ?? '-'}</span>
-                                    <span className="text-sm sm:text-xl font-light text-zinc-400">:</span>
-                                    <span className={`text-xl sm:text-3xl font-bold font-mono tabular-nums tracking-tighter ${
+                                    <span className="text-base sm:text-2xl font-light text-zinc-400">:</span>
+                                    <span className={`text-2xl sm:text-4xl font-bold font-mono tabular-nums tracking-tighter ${
                                         foraHighlight ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
                                     }`}>{match.resultado_fora ?? '-'}</span>
                                 </div>
@@ -537,14 +537,24 @@ function Game() {
                     </div>
                     <div className="divide-y divide-zinc-100 dark:divide-white/5">
                         {upcomingH2H.map((game) => {
-                            const opponent = game.equipa_casa.toUpperCase().includes(match.equipa_casa.toUpperCase().substring(0, 5))
-                                ? dn(game.equipa_fora) : dn(game.equipa_casa)
-                            const oppLogo = game.equipa_casa.toUpperCase().includes(match.equipa_casa.toUpperCase().substring(0, 5))
-                                ? game.logotipo_fora : game.logotipo_casa
+                            const isHome = game.equipa_casa.toUpperCase().includes(match.equipa_casa.toUpperCase().substring(0, 5))
+                            const opponent = isHome ? dn(game.equipa_fora) : dn(game.equipa_casa)
+                            const clubLogo = isHome ? game.logotipo_casa : game.logotipo_fora
+                            const oppLogo = isHome ? game.logotipo_fora : game.logotipo_casa
                             const shortDate = new Date(game.data).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short', year: 'numeric' })
 
                             return (
-                                <Link to={`/jogo/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-2.5 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
+                                <Link to={`/jogo/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
+                                    <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
+                                        {clubLogo ? (
+                                            <img src={clubLogo} alt="" className="w-5 h-5 object-contain" loading="lazy" decoding="async" />
+                                        ) : (
+                                            <span className="text-[9px] font-bold text-zinc-500">{displayCasa.charAt(0)}</span>
+                                        )}
+                                    </div>
+                                    <span className="text-[12px] font-semibold text-zinc-900 dark:text-white group-hover:text-dribly-blue transition-colors shrink-0">{displayCasa}</span>
+                                    <span className="text-zinc-400 font-medium text-[10px]">vs</span>
+                                    <span className="text-[12px] text-zinc-500 dark:text-zinc-400 shrink-0">{opponent}</span>
                                     <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
                                         {oppLogo ? (
                                             <img src={oppLogo} alt="" className="w-5 h-5 object-contain" loading="lazy" decoding="async" />
@@ -552,13 +562,7 @@ function Game() {
                                             <span className="text-[9px] font-bold text-zinc-500">{opponent.charAt(0)}</span>
                                         )}
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-xs text-zinc-900 dark:text-white truncate group-hover:text-dribly-blue transition-colors">
-                                            <span className="font-semibold">{displayCasa}</span>
-                                            <span className="text-zinc-400 mx-1">vs</span>
-                                            <span className="text-zinc-500">{opponent}</span>
-                                        </p>
-                                    </div>
+                                    <span className="flex-1" />
                                     <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase shrink-0">{shortDate}</span>
                                 </Link>
                             )
