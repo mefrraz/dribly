@@ -37,7 +37,7 @@ function ClubGames() {
     }, [matches])
 
     const filteredMatches = matches.filter(match => {
-        if (view === 'agenda' && match.status === 'FINALIZADO') return false
+        if (view === 'agenda' && (match.status === 'FINALIZADO' || match.data < new Date().toISOString().split('T')[0])) return false
         if (view === 'results' && match.status !== 'FINALIZADO') return false
         if (filterEscalao !== 'Todos' && match.escalao !== filterEscalao) return false
         return true

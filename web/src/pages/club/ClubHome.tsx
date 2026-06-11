@@ -135,39 +135,54 @@ function ClubHome() {
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">Este clube não tem jogos registados na FPB para esta época.</p>
                 </div>
             )}
-            {/* Hero: Next Game */}
-            {nextGame && (
-                <Link to={`/jogo/${nextGame.slug || ''}?clube=${club.slug}`} className="block group ">
+            {/* Hero: Next Game or Last Result */}
+            {(() => {
+                const heroGame = nextGame || recentResults[0]
+                if (!heroGame) return null
+                const isResult = !nextGame && !!recentResults[0]
+                return (
+                <Link to={`/jogo/${heroGame.slug || ''}?clube=${club.slug}`} className="block group ">
                     <div className="glass-card overflow-hidden group-hover:border-[var(--club-color)]/30 transition-all duration-200">
                         <div className="bg-gradient-to-r from-[var(--club-color)]/10 via-zinc-50 to-[var(--club-color)]/10 dark:from-[var(--club-color)]/5 dark:via-zinc-900 dark:to-[var(--club-color)]/5 border-b border-zinc-100 dark:border-white/5 p-3 flex justify-between items-center">
-                            <span className="text-[10px] font-bold text-[var(--club-color)] uppercase tracking-wide">{nextGame.escalao || 'Sénior Masculino'}</span>
-                            <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase truncate ml-2">{nextGame.competicao || ''}</span>
+                            <span className="text-[10px] font-bold text-[var(--club-color)] uppercase tracking-wide">
+                                {isResult ? 'Último Resultado' : (heroGame.escalao || 'Sénior Masculino')}
+                            </span>
+                            <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase truncate ml-2">{heroGame.competicao || ''}</span>
                         </div>
                         <div className="px-6 py-8">
                             <div className="flex items-center justify-between gap-4">
-                                <TeamBlock name={dn(nextGame.equipa_casa)} logo={nextGame.logotipo_casa} />
+                                <TeamBlock name={dn(heroGame.equipa_casa)} logo={heroGame.logotipo_casa} />
                                 <div className="flex flex-col items-center gap-1 shrink-0">
-                                    <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                                        <span className="text-sm font-black text-zinc-400 dark:text-zinc-500">VS</span>
-                                    </div>
+                                    {isResult ? (
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-white">{heroGame.resultado_casa}</span>
+                                            <span className="text-sm font-light text-zinc-400">:</span>
+                                            <span className="text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-white">{heroGame.resultado_fora}</span>
+                                        </div>
+                                    ) : (
+                                        <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                                            <span className="text-sm font-black text-zinc-400 dark:text-zinc-500">VS</span>
+                                        </div>
+                                    )}
                                 </div>
-                                <TeamBlock name={dn(nextGame.equipa_fora)} logo={nextGame.logotipo_fora} />
+                                <TeamBlock name={dn(heroGame.equipa_fora)} logo={heroGame.logotipo_fora} />
                             </div>
                             <div className="mt-6 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                                 <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
-                                <span className="capitalize font-medium">{formatDate(nextGame.data)} · {(nextGame.hora || '00:00').slice(0, 5)}</span>
+                                <span className="capitalize font-medium">{formatDate(heroGame.data)} · {isResult ? 'Finalizado' : (heroGame.hora || '00:00').slice(0, 5)}</span>
                                 <div className="h-px w-8 bg-zinc-200 dark:bg-white/10" />
                             </div>
-                            {nextGame.local && (
+                            {heroGame.local && (
                                 <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400">
                                     <MapPin size={10} className="text-[var(--club-color)]" />
-                                    <span className="truncate max-w-[220px]">{nextGame.local}</span>
+                                    <span className="truncate max-w-[220px]">{heroGame.local}</span>
                                 </div>
                             )}
                         </div>
                     </div>
                 </Link>
-            )}
+                );
+            })()}
 
             {/* Quick Links */}
             <div className="grid grid-cols-2 gap-3">
