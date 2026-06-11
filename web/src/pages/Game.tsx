@@ -227,9 +227,30 @@ function Game() {
     useEffect(() => {
         if (!match?.local) return
         const clean = match.local.split('|')[0].replace(/\s+/g, ' ').trim()
+        const core = clean.toLowerCase()
+            .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
+            .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
+            .replace(/\s*,.+$/, '') // remove city after comma
+            .trim()
         fetchPavilions().then(pavs => {
-            const q = clean.toLowerCase()
-            const found = pavs.find(p => p.nome.toLowerCase().includes(q) || q.includes(p.nome.toLowerCase()))
+            const q = core
+            // Match by core name (both directions), or by first word match if core is short
+            const found = pavs.find(p => {
+                const pn = p.nome.toLowerCase()
+                    .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
+                    .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
+                    .replace(/\s*,.+$/, '')
+                    .trim()
+                // Exact core match
+                if (pn === q || q === pn) return true
+                // Substring both ways
+                if (pn.includes(q) || q.includes(pn)) return true
+                // First significant word match (for short names like "Dragão Arena")
+                const qWords = q.split(/\s+/).filter(w => w.length > 2)
+                const pWords = pn.split(/\s+/).filter(w => w.length > 2)
+                if (qWords.length > 0 && pWords.length > 0 && qWords[0] === pWords[0]) return true
+                return false
+            })
             setPavilion(found || null)
         }).catch(() => {})
     }, [match?.local])
