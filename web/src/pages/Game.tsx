@@ -45,6 +45,7 @@ function Game() {
     const [match, setMatch] = useState<Match | null>(null)
     const [club, setClub] = useState<Club | null>(null)
     const [detailLeaders, setDetailLeaders] = useState<FPBGameDetail['gameLeaders']>([])
+    const [parciais, setParciais] = useState<FPBGameDetail['parciais']>([])
     const [topPerfCasa, setTopPerfCasa] = useState<{ nome: string; foto: string }>({ nome: '', foto: '' })
     const [topPerfFora, setTopPerfFora] = useState<{ nome: string; foto: string }>({ nome: '', foto: '' })
     const [topPerfStats, setTopPerfStats] = useState<{ label: string; casa: string; fora: string }[]>([])
@@ -89,6 +90,7 @@ function Game() {
                         fetchGameDetail(String(m.id)).then(detail => {
                             if (detail) {
                                 setDetailLeaders(detail.gameLeaders)
+                                setParciais(detail.parciais)
                                 setTopPerfCasa(detail.topPerfCasa)
                                 setTopPerfFora(detail.topPerfFora)
                                 setTopPerfStats(detail.topPerfStats)
@@ -105,6 +107,7 @@ function Game() {
                     if (detail) {
                         setMatch(detailToMatch(detail))
                         setDetailLeaders(detail.gameLeaders)
+                        setParciais(detail.parciais)
                         setTopPerfCasa(detail.topPerfCasa)
                         setTopPerfFora(detail.topPerfFora)
                         setTopPerfStats(detail.topPerfStats)
@@ -339,12 +342,12 @@ function Game() {
                         <TeamBlock name={displayCasa} logo={match.logotipo_casa} clubSlug={findClubSlug(match.equipa_casa, clubs)} />
                         <div className="flex flex-col items-center gap-1 shrink-0">
                             {isFinished || isLive ? (
-                                <div className="flex items-center gap-1 sm:gap-3">
-                                    <span className={`text-2xl sm:text-5xl font-bold font-mono tabular-nums tracking-tighter ${
+                                <div className="flex items-center gap-1 sm:gap-2">
+                                    <span className={`text-xl sm:text-3xl font-bold font-mono tabular-nums tracking-tighter ${
                                         casaHighlight ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
                                     }`}>{match.resultado_casa ?? '-'}</span>
-                                    <span className="text-base sm:text-2xl font-light text-zinc-400">:</span>
-                                    <span className={`text-2xl sm:text-5xl font-bold font-mono tabular-nums tracking-tighter ${
+                                    <span className="text-sm sm:text-xl font-light text-zinc-400">:</span>
+                                    <span className={`text-xl sm:text-3xl font-bold font-mono tabular-nums tracking-tighter ${
                                         foraHighlight ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
                                     }`}>{match.resultado_fora ?? '-'}</span>
                                 </div>
@@ -356,6 +359,18 @@ function Game() {
                         </div>
                         <TeamBlock name={displayFora} logo={match.logotipo_fora} clubSlug={findClubSlug(match.equipa_fora, clubs)} />
                     </div>
+
+                    {/* Period scores */}
+                    {parciais.length > 0 && (
+                        <div className="mt-4 flex justify-center gap-2 flex-wrap">
+                            {parciais.map((p, i) => (
+                                <div key={i} className="flex flex-col items-center bg-zinc-50 dark:bg-zinc-800/50 rounded-lg px-3 py-1.5 min-w-[3rem]">
+                                    <span className="text-[9px] font-bold text-zinc-400 uppercase">{p.periodo}</span>
+                                    <span className="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300 tabular-nums">{p.casa} - {p.fora}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {/* FPB Link */}
                     <div className="mt-6 flex justify-center">
@@ -468,7 +483,6 @@ function Game() {
                         <h3 className="text-xs font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-blue" />
                             Últimos Confrontos
-                            <span className="text-zinc-400 dark:text-zinc-500 font-medium truncate text-[10px]">{displayCasa} vs {displayFora}</span>
                         </h3>
                     </div>
                     <div className="divide-y divide-zinc-100 dark:divide-white/5">
@@ -515,22 +529,29 @@ function Game() {
             {/* Próximos Confrontos */}
             {upcomingH2H.length > 0 && (
                 <div className="glass-card overflow-hidden ">
-                    <div className="p-4 border-b border-zinc-100 dark:border-white/5">
+                    <div className="p-3.5 border-b border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02]">
                         <h3 className="text-xs font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-blue" />
                             Próximos Confrontos
-                            <span className="text-zinc-500 dark:text-zinc-500 font-medium truncate text-[10px]">{displayCasa} vs {displayFora}</span>
                         </h3>
                     </div>
                     <div className="divide-y divide-zinc-100 dark:divide-white/5">
                         {upcomingH2H.map((game) => {
                             const opponent = game.equipa_casa.toUpperCase().includes(match.equipa_casa.toUpperCase().substring(0, 5))
                                 ? dn(game.equipa_fora) : dn(game.equipa_casa)
+                            const oppLogo = game.equipa_casa.toUpperCase().includes(match.equipa_casa.toUpperCase().substring(0, 5))
+                                ? game.logotipo_fora : game.logotipo_casa
                             const shortDate = new Date(game.data).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short', year: 'numeric' })
 
                             return (
-                                <Link to={`/jogo/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-3 p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
-                                    <TrendingUp size={12} className="text-dribly-blue shrink-0" />
+                                <Link to={`/jogo/${game.slug}${clubSlug ? `?clube=${clubSlug}` : ''}`} key={game.slug} className="flex items-center gap-2.5 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
+                                    <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
+                                        {oppLogo ? (
+                                            <img src={oppLogo} alt="" className="w-5 h-5 object-contain" loading="lazy" decoding="async" />
+                                        ) : (
+                                            <span className="text-[9px] font-bold text-zinc-500">{opponent.charAt(0)}</span>
+                                        )}
+                                    </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs text-zinc-900 dark:text-white truncate group-hover:text-dribly-blue transition-colors">
                                             <span className="font-semibold">{displayCasa}</span>
