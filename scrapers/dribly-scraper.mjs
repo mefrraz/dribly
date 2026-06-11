@@ -12,7 +12,7 @@
  */
 
 import { execSync } from 'child_process'
-import { existsSync, mkdirSync, writeFileSync, appendFileSync, rmSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, rmSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 import { createInterface } from 'readline'
@@ -53,25 +53,8 @@ const C = {
     showCursor: '\x1b[?25h',
 }
 
-const COLORS = [C.purple, C.cyan, C.blue, C.yellow, C.green, C.red]
-
-function color(index) {
-    return COLORS[index % COLORS.length]
-}
-
-function progressBar(current, total, width = 40) {
-    const pct = current / total
-    const filled = Math.round(pct * width)
-    const empty = width - filled
-    return C.bgPurple + ' '.repeat(filled) + C.reset + C.dim + ' '.repeat(empty) + C.reset
-}
-
 function padRight(str, len) {
     return str.padEnd(len)
-}
-
-function padLeft(str, len) {
-    return str.padStart(len)
 }
 
 // ── Spinner ────────────────────────────────────────────
@@ -105,18 +88,17 @@ async function ensureDeps() {
     // Check if already installed
     const supabasePath = resolve(DEPS_DIR, 'node_modules', '@supabase', 'supabase-js')
     const cheerioPath = resolve(DEPS_DIR, 'node_modules', 'cheerio')
-    const pngjsPath = resolve(DEPS_DIR, 'node_modules', 'pngjs')
 
-    if (existsSync(supabasePath) && existsSync(cheerioPath) && existsSync(pngjsPath)) {
+    if (existsSync(supabasePath) && existsSync(cheerioPath)) {
         return
     }
 
     console.log(C.cyan + '\n  📦 A instalar dependências...' + C.reset)
-    console.log(C.dim + '     @supabase/supabase-js + cheerio + pngjs' + C.reset)
+    console.log(C.dim + '     @supabase/supabase-js + cheerio' + C.reset)
     console.log()
 
     try {
-        execSync('npm install @supabase/supabase-js cheerio pngjs', {
+        execSync('npm install @supabase/supabase-js cheerio', {
             cwd: DEPS_DIR,
             stdio: 'pipe',
         })
@@ -410,6 +392,22 @@ async function main() {
         return null
     }
 
+    async function scrapeClubWithRetry(clubId, szn, retries = 3) {
+        for (let attempt = 1; attempt <= retries; attempt++) {
+            try {
+                return await scrapeClub(clubId, szn)
+            } catch (e) {
+                if (attempt < retries) {
+                    const delay = attempt * 2000 // 2s, 4s, 6s
+                    log(`  Retry ${attempt}/${retries} for club ${clubId} in ${delay}ms: ${e.message}`)
+                    await new Promise(r => setTimeout(r, delay))
+                } else {
+                    throw e
+                }
+            }
+        }
+    }
+
     async function scrapeClub(clubId, szn) {
         const s = szn || season
         const url = (page) => `https://www.fpb.pt/${page}/clube_${clubId}/?epoca=${encodeURIComponent(s)}&escalao=S%C3%A9nior&genero=masculino`
@@ -560,128 +558,40 @@ async function main() {
     let totalGames = 0
     let done = 0
     const errors = []
-    const recentGames = [] // max 12, newest first
-    const termWidth = process.stdout.columns || 100
+    const startTime = Date.now()
+    const clubGameCounts = {} // club name → game count for summary
+    const PROGRESS_FILE = resolve(DEPS_DIR, 'progress.json')
 
-    // ── PNG to ASCII converter ─────────────────────────
-    const asciiCache = new Map()
-    const { PNG } = loadModuleSync('pngjs')
 
-    // Cache for fallback logo
-    let fallbackLogo = null
-    async function getFallbackLogo() {
-        if (fallbackLogo) return fallbackLogo
+
+    // ── Resume from interruption ──────────────────────
+    let startFromClub = 0
+    if (existsSync(PROGRESS_FILE)) {
         try {
-            const res = await fetch('https://dribly.pt/logo.png')
-            if (!res.ok) return null
-            const buffer = Buffer.from(await res.arrayBuffer())
-            const png = PNG.sync.read(buffer)
-            fallbackLogo = png
-            return png
-        } catch { return null }
-    }
-
-    async function getLogoAscii(clubId, logoUrl) {
-        if (asciiCache.has(clubId)) return asciiCache.get(clubId)
-
-        const SIZE = 30 // square
-        try {
-            let png
-            if (logoUrl) {
-                const ctrl = new AbortController()
-                const t = setTimeout(() => ctrl.abort(), 5000)
-                const res = await fetch(logoUrl, { signal: ctrl.signal })
-                clearTimeout(t)
-                if (!res.ok) throw new Error('fetch failed')
-                const buffer = Buffer.from(await res.arrayBuffer())
-                png = PNG.sync.read(buffer)
-            } else {
-                png = await getFallbackLogo()
-                if (!png) return null
-            }
-
-            const w = SIZE
-            const h = SIZE
-
-            const result = []
-            for (let y = 0; y < h; y++) {
-                let line = ''
-                for (let x = 0; x < w; x++) {
-                    const srcX = Math.floor(x * png.width / w)
-                    const srcY = Math.floor(y * png.height / h)
-                    const idx = (png.width * srcY + srcX) << 2
-                    const r = png.data[idx]
-                    const g = png.data[idx + 1]
-                    const b = png.data[idx + 2]
-                    const a = png.data[idx + 3]
-                    if (a < 128) { line += '  '; continue }
-                    line += `\x1b[48;2;${r};${g};${b}m  \x1b[0m`
+            const saved = JSON.parse(readFileSync(PROGRESS_FILE, 'utf8'))
+            if (saved.season === season && saved.clubIdx > 0) {
+                console.log(C.yellow + `\n  📂 Progresso anterior: ${saved.clubIdx}/${saved.totalClubs} clubes na época ${saved.season}` + C.reset)
+                const resumeRl = createInterface({ input: process.stdin, output: process.stdout })
+                const resumeAnswer = await new Promise(resolve => {
+                    resumeRl.question(C.cyan + '  Continuar? [S]/n ' + C.reset, resolve)
+                })
+                resumeRl.close()
+                if (resumeAnswer.trim().toLowerCase() !== 'n') {
+                    startFromClub = saved.clubIdx
+                    totalGames = saved.totalGames || 0
+                    console.log(C.green + `  ✅ A retomar do clube ${startFromClub + 1}...\n` + C.reset)
                 }
-                result.push(line)
             }
-            asciiCache.set(clubId, result)
-            return result
-        } catch {
-            // Try fallback
-            if (logoUrl) return getLogoAscii(clubId, null)
-            return null
-        }
+        } catch { /* ignore corrupt file */ }
     }
 
-    function clr() { process.stdout.write('\x1b[K') } // clear to end of line
-
-    async function drawScreen(club, gameDone, total, clubIdx, searching) {
-        if (clubIdx === 1 && searching) {
-            process.stdout.write(C.clear)
-            process.stdout.write(C.hideCursor)
-        } else {
-            process.stdout.write('\x1b[H') // cursor home, no clear
-        }
-
-        // Header
-        process.stdout.write(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset + C.dim + ` — ${season}` + C.reset); clr(); console.log()
-        process.stdout.write(C.dim + `  Clube ${clubIdx}/${selectedClubs.length}  |  ${totalGames} jogos guardados` + C.reset); clr(); console.log()
-        clr(); console.log()
-
-        // Club info
-        process.stdout.write(C.bold + club.name + C.reset + C.dim + `  #${club.id}` + C.reset + '                    '); clr(); console.log()
-        clr(); console.log()
-
-        const logoArt = await getLogoAscii(club.id, club.logo_url)
-        if (logoArt) {
-            for (const l of logoArt) { process.stdout.write('  ' + l); clr(); console.log() }
-        }
-        clr(); console.log()
-
-        // Progress bar OR searching — same position, alternating
-        if (searching) {
-            const barW = Math.min(60, termWidth - 20)
-            process.stdout.write(`  ${C.cyan}🔍 A pesquisar jogos...${C.reset}  ${C.dim}${'─'.repeat(barW)}${C.reset}`); clr(); console.log()
-        } else {
-            const gameBar = progressBar(gameDone, total, Math.min(50, termWidth - 20))
-            const pct = total > 0 ? Math.round((gameDone / total) * 100) : 0
-            process.stdout.write(`  Jogos: ${gameBar} ${gameDone}/${total} (${pct}%)`); clr(); console.log()
-        }
-        clr(); console.log()
-
-        // ── Histórico (always visible) ──────────────────
-        if (recentGames.length > 0) {
-            process.stdout.write(`  ${C.bold}📋 Histórico${C.reset}`); clr(); console.log()
-            process.stdout.write(`  ${C.dim}${'─'.repeat(Math.min(60, termWidth - 4))}${C.reset}`); clr(); console.log()
-            const toShow = recentGames.slice(0, Math.min(8, recentGames.length))
-            for (const g of toShow) {
-                const icon = g.status === 'FINALIZADO' ? C.green + '●' + C.reset : C.yellow + '○' + C.reset
-                const text = ('  ' + icon + ' ' + g.text).padEnd(termWidth - 2)
-                process.stdout.write(text); clr(); console.log()
-            }
-        } else {
-            process.stdout.write(`  ${C.dim}📋 Histórico — aguardando jogos...${C.reset}`); clr(); console.log()
-        }
-        clr(); console.log()
-
-        // Overall progress
-        const overallBar = progressBar(clubIdx, selectedClubs.length, Math.min(40, termWidth - 15))
-        process.stdout.write(`  ${overallBar} ${C.dim}${clubIdx}/${selectedClubs.length} clubes${C.reset}`); clr(); console.log()
+    function saveProgress(seasonName, clubIdx, totalClubs) {
+        try {
+            writeFileSync(PROGRESS_FILE, JSON.stringify({
+                season: seasonName, clubIdx, totalClubs, totalGames,
+                savedAt: new Date().toISOString(),
+            }, null, 2))
+        } catch { /* ignore */ }
     }
 
     for (const currentSeason of selectedSeasons) {
@@ -710,7 +620,8 @@ async function main() {
         console.log(C.bold + C.yellow + `  Ctrl+C para parar  |  Época ${selectedSeasons.indexOf(currentSeason)+1}/${selectedSeasons.length}` + C.reset)
         console.log()
 
-        for (let i = 0; i < selectedClubs.length && !stopped; i += PARALLEL) {
+        for (let i = startFromClub; i < selectedClubs.length && !stopped; i += PARALLEL) {
+            startFromClub = 0 // only skip on first season
             const batch = selectedClubs.slice(i, i + PARALLEL)
             const batchStart = i + 1
             const batchEnd = Math.min(i + PARALLEL, selectedClubs.length)
@@ -740,7 +651,7 @@ async function main() {
                     const clubIdx = done
 
                     try {
-                        const games = await scrapeClub(club.id, currentSeason)
+                        const games = await scrapeClubWithRetry(club.id, currentSeason)
                         batchDone++
                         return { club, games, clubIdx }
                     } catch (e) {
@@ -789,6 +700,7 @@ async function main() {
                     if (recentGames.length > 12) recentGames.pop()
                 }
 
+                clubGameCounts[club.name] = games.length
                 console.log(`  ${C.green}✅${C.reset} ${club.name}: ${C.bold}${games.length} jogos${C.reset}`)
             }
 
@@ -796,6 +708,9 @@ async function main() {
             console.log(`  ${C.dim}${'─'.repeat(50)}${C.reset}`)
             console.log(`  ${C.bold}Total: ${totalGames} jogos${C.reset}  |  ${C.dim}${done}/${selectedClubs.length} clubes${C.reset}`)
             console.log()
+
+            // Save progress after each batch
+            saveProgress(currentSeason, i + PARALLEL, selectedClubs.length)
         }
     }
 
@@ -803,13 +718,48 @@ async function main() {
     console.log(C.clear)
     console.log(C.bold + C.purple + '  🏀 Dribly Scraper' + C.reset)
     console.log()
-    console.log(C.bold + C.green + `  ✅ Concluído!` + C.reset)
-    console.log(C.dim + `     ${totalGames} jogos em ${done} clubes` + C.reset)
-    console.log(C.dim + `     ${selectedClubs.length - errors.length} sucesso, ${errors.length} com erros` + C.reset)
+
+    const elapsed = Math.round((Date.now() - startTime) / 1000)
+    const mins = Math.floor(elapsed / 60)
+    const secs = elapsed % 60
+    const rate = elapsed > 0 ? Math.round(totalGames / elapsed) : 0
+    const successCount = selectedClubs.length - errors.length
+    const pctSuccess = selectedClubs.length > 0 ? Math.round((successCount / selectedClubs.length) * 100) : 0
+
+    console.log(C.bold + C.green + `  ✅ Concluído em ${mins}m${secs}s!` + C.reset)
+    console.log()
+    console.log(`  ${C.bold}📊 Estatísticas${C.reset}`)
+    console.log(`  ${C.dim}${'─'.repeat(40)}${C.reset}`)
+    console.log(`  Jogos:       ${C.bold}${totalGames}${C.reset}`)
+    console.log(`  Clubes:      ${done}  (${pctSuccess}% sucesso)`)
+    console.log(`  Velocidade:  ${rate} jogos/segundo`)
+    console.log()
 
     if (errors.length > 0) {
-        console.log(C.red + `     Erros: ${errors.slice(0, 5).join(', ')}${errors.length > 5 ? '...' : ''}` + C.reset)
+        console.log(`  ${C.red}❌ ${errors.length} erros:${C.reset}`)
+        for (const e of errors.slice(0, 8)) {
+            console.log(`     • ${e}`)
+        }
+        if (errors.length > 8) console.log(`     ${C.dim}... +${errors.length - 8} mais${C.reset}`)
+        console.log()
     }
+
+    // Top 10 clubs by game count
+    const topClubs = Object.entries(clubGameCounts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 10)
+    if (topClubs.length > 0) {
+        console.log(`  ${C.bold}🏆 Top 10 clubes com mais jogos${C.reset}`)
+        console.log(`  ${C.dim}${'─'.repeat(40)}${C.reset}`)
+        for (const [name, count] of topClubs) {
+            const bar = '█'.repeat(Math.min(count, 30))
+            console.log(`  ${padRight(name.slice(0, 25), 26)} ${C.purple}${bar}${C.reset} ${count}`)
+        }
+        console.log()
+    }
+
+    // Clean up progress file on success
+    try { if (existsSync(PROGRESS_FILE)) rmSync(PROGRESS_FILE) } catch {}
 
     console.log(C.dim + '  🧹 A limpar ficheiros temporários...' + C.reset)
     cleanup()
