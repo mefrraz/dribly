@@ -691,15 +691,6 @@ async function main() {
                     } catch { /* continue */ }
                 }
 
-                // Add to recent games
-                for (const g of games) {
-                    const dateShort = g.data ? g.data.slice(5) : '??-??'
-                    const score = g.resultado_casa != null ? `${g.resultado_casa}-${g.resultado_fora}` : null
-                    const text = `${dateShort} ${(g.equipa_casa||'?').slice(0,10)} ${score||'vs'} ${(g.equipa_fora||'?').slice(0,10)}`
-                    recentGames.unshift({ text, status: score ? 'FINALIZADO' : 'AGENDADO', score })
-                    if (recentGames.length > 12) recentGames.pop()
-                }
-
                 clubGameCounts[club.name] = games.length
                 console.log(`  ${C.green}✅${C.reset} ${club.name}: ${C.bold}${games.length} jogos${C.reset}`)
             }
