@@ -97,18 +97,19 @@ function findLogo(teamName: string, maps: LogoMaps): string | null {
         if (logoHits.size === 1) return logoHits.keys().next().value ?? null
     }
 
-    // 4. Fuzzy fallback: match last significant word (team name almost always ends with city/team)
-    // Try each word from end to start, match the FIRST logo found (most likely correct for "FC Porto" → "Porto")
+    // 4. Fuzzy fallback: match last significant word, but only if it uniquely identifies one club
     for (let i = teamWords.length - 1; i >= 0; i--) {
         const tw = teamWords[i]
+        const hits = new Map<string, number>()
         for (const [cn, logo] of maps.logos) {
             const cw = cn.split(/\s+/).filter(w => w.length > 2)
-            if (cw.includes(tw)) return logo
+            if (cw.includes(tw)) hits.set(logo, (hits.get(logo) || 0) + 1)
         }
         for (const [sn, logo] of maps.searchNames) {
             const sw = sn.split(/\s+/).filter(w => w.length > 2)
-            if (sw.includes(tw)) return logo
+            if (sw.includes(tw)) hits.set(logo, (hits.get(logo) || 0) + 1)
         }
+        if (hits.size === 1) return hits.keys().next().value ?? null
     }
 
     return null
@@ -340,7 +341,7 @@ export default function CompetitionDetail() {
                 </div>
 
                 {/* Tab bar */}
-                <div className="sticky top-16 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl px-3 sm:px-5 py-2.5 mb-5 rounded-b-xl border border-zinc-200/60 dark:border-zinc-800/60 shadow-md overflow-x-auto">
+                <div className="sticky top-16 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl px-3 sm:px-5 py-2.5 mb-5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 shadow-md overflow-x-auto">
                     <div className="flex gap-1.5 min-w-max">
                         {getTabsFor().map(t => {
                             const active = tab === t.value
