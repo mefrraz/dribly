@@ -75,7 +75,27 @@ export function normalizeTeamDisplay(teamName: string, clubs: { name: string; se
         if (n === cn || n === sn || n === sa) return c.short_name || c.name
     }
 
-    // 2. Substring both ways
+    // 2. Word-level: first word matches AND team name is in club's short_name or vice versa
+    const teamWords = n.split(/\s+/).filter(w => w.length > 1)
+    if (teamWords.length >= 1) {
+        const firstWord = teamWords[0]
+        for (const c of clubs) {
+            const cn = c.name.toUpperCase()
+            const sn = (c.search_name || '').toUpperCase()
+            const sa = semiAbrev(c.name).toUpperCase()
+            const short = (c.short_name || '').toUpperCase()
+            const clubWords = cn.split(/\s+/)
+            const allClubWords = new Set([...clubWords, sa.split(/\s+/), sn.split(/\s+/)])
+            // First word matches AND team name is shorter (abbreviation)
+            if (allClubWords.has(firstWord) && n.length < cn.length)
+                return c.short_name || c.name
+            // Team name IS the short_name
+            if (n === short)
+                return c.short_name || c.name
+        }
+    }
+
+    // 3. Substring both ways
     for (const c of clubs) {
         const cn = c.name.toUpperCase()
         const sn = (c.search_name || '').toUpperCase()
