@@ -54,6 +54,7 @@ function Game() {
     const [upcomingH2H, setUpcomingH2H] = useState<Match[]>([])
     const [pavilion, setPavilion] = useState<Pavilion | null>(null)
     const [loading, setLoading] = useState(true)
+    const [detailLoading, setDetailLoading] = useState(false)
     const [copied, setCopied] = useState(false)
     const [darkMode, setDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
 
@@ -87,6 +88,7 @@ function Game() {
                     setMatch(m)
                     setLoading(false)
                     if (m.id) {
+                        setDetailLoading(true)
                         fetchGameDetail(String(m.id)).then(detail => {
                             if (detail) {
                                 setDetailLeaders(detail.gameLeaders)
@@ -95,7 +97,7 @@ function Game() {
                                 setTopPerfFora(detail.topPerfFora)
                                 setTopPerfStats(detail.topPerfStats)
                             }
-                        }).catch(() => {})
+                        }).catch(() => {}).finally(() => setDetailLoading(false))
                     }
                     return
                 }
@@ -103,6 +105,7 @@ function Game() {
 
             if (!clubSlug && /^\d+$/.test(slug)) {
                 try {
+                    setDetailLoading(true)
                     const detail = await fetchGameDetail(slug)
                     if (detail) {
                         setMatch(detailToMatch(detail))
@@ -112,6 +115,7 @@ function Game() {
                         setTopPerfFora(detail.topPerfFora)
                         setTopPerfStats(detail.topPerfStats)
                     }
+                    setDetailLoading(false)
                 } catch { /* ignore */ }
                 setLoading(false)
                 return
@@ -342,15 +346,28 @@ function Game() {
                         <TeamBlock name={displayCasa} logo={match.logotipo_casa} clubSlug={findClubSlug(match.equipa_casa, clubs)} />
                         <div className="flex flex-col items-center gap-1 shrink-0">
                             {isFinished || isLive ? (
-                                <div className="flex items-center gap-1 sm:gap-2">
-                                    <span className={`text-2xl sm:text-4xl font-bold font-mono tabular-nums tracking-tighter ${
-                                        casaHighlight ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
-                                    }`}>{match.resultado_casa ?? '-'}</span>
-                                    <span className="text-base sm:text-2xl font-light text-zinc-400">:</span>
-                                    <span className={`text-2xl sm:text-4xl font-bold font-mono tabular-nums tracking-tighter ${
-                                        foraHighlight ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
-                                    }`}>{match.resultado_fora ?? '-'}</span>
-                                </div>
+                                <>
+                                    <div className="flex items-center gap-1 sm:gap-2">
+                                        <span className={`text-2xl sm:text-4xl font-bold font-mono tabular-nums tracking-tighter ${
+                                            casaHighlight ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
+                                        }`}>{match.resultado_casa ?? '-'}</span>
+                                        <span className="text-base sm:text-2xl font-light text-zinc-400">:</span>
+                                        <span className={`text-2xl sm:text-4xl font-bold font-mono tabular-nums tracking-tighter ${
+                                            foraHighlight ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
+                                        }`}>{match.resultado_fora ?? '-'}</span>
+                                    </div>
+                                    {/* Period scores — compact, right below the score */}
+                                    {parciais.length > 0 && (
+                                        <div className="flex justify-center gap-1 mt-1">
+                                            {parciais.map((p, i) => (
+                                                <div key={i} className="flex flex-col items-center bg-zinc-50 dark:bg-zinc-800/50 rounded-md px-1.5 py-0.5">
+                                                    <span className="text-[8px] font-bold text-zinc-400 uppercase leading-none">{p.periodo}</span>
+                                                    <span className="text-[10px] font-mono font-bold text-zinc-600 dark:text-zinc-400 tabular-nums leading-tight">{p.casa}-{p.fora}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
                             ) : (
                                 <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
                                     <span className="text-sm font-black text-zinc-400 dark:text-zinc-500">VS</span>
@@ -360,20 +377,15 @@ function Game() {
                         <TeamBlock name={displayFora} logo={match.logotipo_fora} clubSlug={findClubSlug(match.equipa_fora, clubs)} />
                     </div>
 
-                    {/* Period scores */}
-                    {parciais.length > 0 && (
-                        <div className="mt-4 flex justify-center gap-2 flex-wrap">
-                            {parciais.map((p, i) => (
-                                <div key={i} className="flex flex-col items-center bg-zinc-50 dark:bg-zinc-800/50 rounded-lg px-3 py-1.5 min-w-[3rem]">
-                                    <span className="text-[9px] font-bold text-zinc-400 uppercase">{p.periodo}</span>
-                                    <span className="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300 tabular-nums">{p.casa} - {p.fora}</span>
-                                </div>
-                            ))}
+                    {/* Detail loading indicator */}
+                    {detailLoading && (
+                        <div className="mt-4 flex justify-center">
+                            <span className="text-[10px] text-zinc-400 animate-pulse">A carregar detalhes...</span>
                         </div>
                     )}
 
                     {/* FPB Link */}
-                    <div className="mt-6 flex justify-center">
+                    <div className="mt-4 flex justify-center">
                         {match.id && (
                             <a href={`https://www.fpb.pt/ficha-de-jogo?internalID=${match.id}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 hover:text-dribly-blue transition-colors">
                                 <ExternalLink size={10} />
