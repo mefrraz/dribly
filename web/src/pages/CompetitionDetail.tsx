@@ -58,8 +58,12 @@ function buildLogoMap(clubs: { name: string; search_name: string; logo_url: stri
     const searchNames = new Map<string, string>()
     for (const c of clubs) {
         if (c.logo_url) {
-            logos.set(normalize(c.name), c.logo_url)
+            const n = normalize(c.name)
+            logos.set(n, c.logo_url)
             if (c.search_name) searchNames.set(normalize(c.search_name), c.logo_url)
+            // Also index semi-abbreviated form (e.g. "SL Benfica" for "Sport Lisboa e Benfica")
+            const abrev = normalize(semiAbrev(c.name))
+            if (abrev !== n && abrev.length > 2) logos.set(abrev, c.logo_url)
         }
     }
     return { logos, searchNames }
@@ -383,6 +387,18 @@ export default function CompetitionDetail() {
                                                 </div>
                                             )
                                             const topLogo = findLogo(top.name, logoMaps)
+                                                || (() => {
+                                                    // Fallback: direct search in clubs array by any name match
+                                                    const n = normalize(top.name)
+                                                    const found = clubs.find(c =>
+                                                        normalize(c.name) === n ||
+                                                        (c.search_name && normalize(c.search_name) === n) ||
+                                                        normalize(c.name).includes(n) ||
+                                                        n.includes(normalize(c.name)) ||
+                                                        normalize(semiAbrev(c.name)) === n
+                                                    )
+                                                    return found?.logo_url ?? null
+                                                })()
                                             return (
                                                 <div className="lg:col-span-5 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex items-center gap-4">
                                                     <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-700/50">
