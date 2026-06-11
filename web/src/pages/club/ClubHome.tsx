@@ -155,10 +155,10 @@ function ClubHome() {
                                 <TeamBlock name={dn(heroGame.equipa_casa)} logo={heroGame.logotipo_casa} />
                                 <div className="flex flex-col items-center gap-1 shrink-0">
                                     {isResult ? (
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-white">{heroGame.resultado_casa}</span>
-                                            <span className="text-sm font-light text-zinc-400">:</span>
-                                            <span className="text-xl font-bold font-mono tabular-nums text-zinc-900 dark:text-white">{heroGame.resultado_fora}</span>
+                                        <div className="flex items-center gap-1 sm:gap-2">
+                                            <span className="text-2xl sm:text-3xl font-bold font-mono tabular-nums tracking-tighter text-zinc-900 dark:text-white">{heroGame.resultado_casa}</span>
+                                            <span className="text-base sm:text-xl font-light text-zinc-400">:</span>
+                                            <span className="text-2xl sm:text-3xl font-bold font-mono tabular-nums tracking-tighter text-zinc-900 dark:text-white">{heroGame.resultado_fora}</span>
                                         </div>
                                     ) : (
                                         <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">

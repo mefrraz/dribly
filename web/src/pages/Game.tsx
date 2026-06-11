@@ -441,7 +441,7 @@ function Game() {
                                 />
                             </MapContainer>
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm text-xs font-bold text-dribly-purple px-3 py-1.5 rounded-full">Ver pavilhão →</span>
+                                <span className="opacity-90 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm text-xs font-bold text-dribly-purple px-3 py-1.5 rounded-full shadow-sm">Ver pavilhão →</span>
                             </div>
                         </Link>
                     ) : cleanLocal ? (
