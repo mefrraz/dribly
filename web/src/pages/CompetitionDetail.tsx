@@ -340,7 +340,7 @@ export default function CompetitionDetail() {
                 </div>
 
                 {/* Tab bar */}
-                <div className="sticky top-16 z-40 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl -mx-3 sm:-mx-5 px-3 sm:px-5 pb-2 mb-5 border-b border-zinc-100 dark:border-white/5 overflow-x-auto">
+                <div className="sticky top-16 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl px-3 sm:px-5 py-2.5 mb-5 rounded-b-xl border border-zinc-200/60 dark:border-zinc-800/60 shadow-md overflow-x-auto">
                     <div className="flex gap-1.5 min-w-max">
                         {getTabsFor().map(t => {
                             const active = tab === t.value
