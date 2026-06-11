@@ -901,9 +901,11 @@ function scrapeGameDetail(html: string, internalID: string): FPBGameDetail | nul
         }
     })
 
-    // Pavilhao: .location a or .location
-    const locEl = doc.querySelector('.location a') || doc.querySelector('.location')
-    const pavilhao = locEl?.textContent?.trim() || ''
+    // Pavilhao: .location a (just the venue link, not the whole .location block)
+    const locLink = doc.querySelector('.location a')
+    const pavilhao = locLink?.textContent?.trim()
+        || doc.querySelector('.location')?.firstChild?.textContent?.trim()
+        || ''
 
     // Espetadores: .attendance element (e.g., "1286 Espectadores")
     const attEl = doc.querySelector('.attendance')

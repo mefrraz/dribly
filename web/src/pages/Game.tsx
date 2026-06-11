@@ -547,8 +547,22 @@ function Game() {
 }
 
 function findClubSlug(name: string, clubs: Club[]): string | null {
-    const found = clubs.find(c => name.toUpperCase().includes(c.name.toUpperCase()))
-    return found ? found.slug : null
+    if (!name) return null
+    const n = name.toUpperCase().trim()
+    // Try exact match first, then semi-abbreviated, then substring both ways
+    for (const c of clubs) {
+        const cn = c.name.toUpperCase()
+        const sn = (c.search_name || '').toUpperCase()
+        const sa = semiAbrev(c.name).toUpperCase()
+        if (n === cn || n === sn || n === sa) return c.slug
+    }
+    for (const c of clubs) {
+        const cn = c.name.toUpperCase()
+        const sn = (c.search_name || '').toUpperCase()
+        const sa = semiAbrev(c.name).toUpperCase()
+        if (cn.includes(n) || n.includes(cn) || sn.includes(n) || n.includes(sn) || sa.includes(n) || n.includes(sa)) return c.slug
+    }
+    return null
 }
 
 export default Game
