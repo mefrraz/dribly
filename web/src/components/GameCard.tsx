@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { MapPin, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Match } from './types'
 import { isClubWin } from '../lib/matchUtils'
-import { semiAbrev } from '../lib/fpbUtils'
+
 
 interface GameCardProps {
   match: Match
@@ -115,7 +115,7 @@ function TeamRow({ name, logo, score, dimmed }: { name: string; logo: string | n
           </div>
         )}
         <span className="text-sm font-bold text-zinc-900 dark:text-white leading-tight truncate">
-          {semiAbrev(name).toUpperCase()}
+          {name}
         </span>
       </div>
       <span className={`text-xl font-mono font-bold tabular-nums shrink-0 ml-2 min-w-[2ch] text-right ${score === null ? 'text-zinc-900 dark:text-white opacity-0' : 'text-zinc-900 dark:text-white'}`}>

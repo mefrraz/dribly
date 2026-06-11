@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { semiAbrev } from '../lib/fpbUtils'
+
 
 /**
  * Team logo + name block used in the game hero card.
@@ -16,11 +16,11 @@ export function TeamBlock({ name, logo, clubSlug }: {
                 {logo ? (
                     <img src={logo} alt="" className="w-14 h-14 object-contain" />
                 ) : (
-                    <span className="text-2xl font-bold text-zinc-500">{semiAbrev(name).charAt(0)}</span>
+                    <span className="text-2xl font-bold text-zinc-500">{name.charAt(0)}</span>
                 )}
             </div>
             <p className="text-xs font-black text-zinc-900 dark:text-white leading-tight truncate w-full">
-                {semiAbrev(name)}
+                {name}
             </p>
         </div>
     )

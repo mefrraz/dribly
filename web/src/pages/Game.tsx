@@ -464,7 +464,7 @@ function Game() {
                         <h3 className="text-xs font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-blue" />
                             Últimos Confrontos
-                            <span className="text-zinc-400 dark:text-zinc-500 font-medium truncate text-[10px]">{semiAbrev(match.equipa_casa)} vs {semiAbrev(match.equipa_fora)}</span>
+                            <span className="text-zinc-400 dark:text-zinc-500 font-medium truncate text-[10px]">{match.equipa_casa} vs {match.equipa_fora}</span>
                         </h3>
                     </div>
                     <div className="divide-y divide-zinc-100 dark:divide-white/5">
@@ -486,17 +486,17 @@ function Game() {
                                         {firstLogo ? (
                                             <img src={firstLogo} alt="" className="w-5 h-5 object-contain" loading="lazy" decoding="async" />
                                         ) : (
-                                            <span className="text-[9px] font-bold text-zinc-500">{semiAbrev(firstTeam).charAt(0)}</span>
+                                            <span className="text-[9px] font-bold text-zinc-500">{firstTeam.charAt(0)}</span>
                                         )}
                                     </div>
-                                    <span className="text-[12px] font-semibold text-zinc-900 dark:text-white group-hover:text-dribly-blue transition-colors shrink-0">{semiAbrev(firstTeam)}</span>
+                                    <span className="text-[12px] font-semibold text-zinc-900 dark:text-white group-hover:text-dribly-blue transition-colors shrink-0">{firstTeam}</span>
                                     <span className="text-zinc-400 font-medium text-xs tabular-nums shrink-0">{firstScore}-{secondScore}</span>
-                                    <span className="text-[12px] text-zinc-500 dark:text-zinc-400 shrink-0">{semiAbrev(secondTeam)}</span>
+                                    <span className="text-[12px] text-zinc-500 dark:text-zinc-400 shrink-0">{secondTeam}</span>
                                     <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
                                         {secondLogo ? (
                                             <img src={secondLogo} alt="" className="w-5 h-5 object-contain" loading="lazy" decoding="async" />
                                         ) : (
-                                            <span className="text-[9px] font-bold text-zinc-500">{semiAbrev(secondTeam).charAt(0)}</span>
+                                            <span className="text-[9px] font-bold text-zinc-500">{secondTeam.charAt(0)}</span>
                                         )}
                                     </div>
                                     <span className="flex-1" />
@@ -515,7 +515,7 @@ function Game() {
                         <h3 className="text-xs font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-dribly-blue" />
                             Próximos Confrontos
-                            <span className="text-zinc-500 dark:text-zinc-500 font-medium truncate text-[10px]">{semiAbrev(match.equipa_casa)} vs {semiAbrev(match.equipa_fora)}</span>
+                            <span className="text-zinc-500 dark:text-zinc-500 font-medium truncate text-[10px]">{match.equipa_casa} vs {match.equipa_fora}</span>
                         </h3>
                     </div>
                     <div className="divide-y divide-zinc-100 dark:divide-white/5">
@@ -529,9 +529,9 @@ function Game() {
                                     <TrendingUp size={12} className="text-dribly-blue shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs text-zinc-900 dark:text-white truncate group-hover:text-dribly-blue transition-colors">
-                                            <span className="font-semibold">{semiAbrev(match.equipa_casa)}</span>
+                                            <span className="font-semibold">{match.equipa_casa}</span>
                                             <span className="text-zinc-400 mx-1">vs</span>
-                                            <span className="text-zinc-500">{semiAbrev(opponent)}</span>
+                                            <span className="text-zinc-500">{opponent}</span>
                                         </p>
                                     </div>
                                     <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase shrink-0">{shortDate}</span>

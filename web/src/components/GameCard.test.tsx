@@ -41,8 +41,8 @@ describe('GameCard', () => {
 
         // Date format varies: "15 abr · 18:00" or "15/04 · 18:00" depending on Node ICU
         expect(screen.getByText(/15.*18:00/)).toBeTruthy()
-        expect(screen.getByText('FC PORTO')).toBeTruthy()
-        expect(screen.getByText('SL BENFICA')).toBeTruthy()
+        expect(screen.getByText('FC Porto')).toBeTruthy()
+        expect(screen.getByText('SL Benfica')).toBeTruthy()
         expect(screen.getByText('Dragão Arena')).toBeTruthy()
     })
 
@@ -83,7 +83,7 @@ describe('GameCard', () => {
 
         // FC Porto (home) has 65 < 78 (away) → home row should be dimmed
         // The TeamRow container with opacity-60 wraps the inner div
-        const portoName = screen.getByText('FC PORTO')
+        const portoName = screen.getByText('FC Porto')
         const teamRow = portoName.closest('.flex.items-center.justify-between')
         expect(teamRow?.className).toContain('opacity-60')
     })

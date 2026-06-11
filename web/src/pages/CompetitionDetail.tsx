@@ -604,7 +604,7 @@ export default function CompetitionDetail() {
                                                                 <td className="pl-2 pr-3 py-2.5">
                                                                     <span className="inline-flex items-center gap-2">
                                                                         {team.logo ? <img src={team.logo} alt="" className="w-5 h-5 rounded-full object-contain shrink-0" /> : null}
-                                                                        <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200 break-words">{semiAbrev(team.equipa)}</span>
+                                                                        <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200 break-words">{team.equipa}</span>
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-2 py-2.5 text-center"><span className="text-xs text-zinc-500 tabular-nums">{team.j}</span></td>
