@@ -7,7 +7,7 @@ import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { EmptyState } from '../../components/EmptyState'
 import { GameCard } from '../../components/GameCard'
 import type { Match } from '../../components/types'
-import type { Club } from '../../lib/ClubContext'
+import { type Club, useClub } from '../../lib/ClubContext'
 
 function slugify(text: string): string {
     return text
@@ -33,6 +33,7 @@ function formatDate(dateStr: string) {
 
 function ClubTeamDetail() {
     const { club } = useOutletContext<{ club: Club }>()
+    const { clubs } = useClub()
     const { teamId: teamSlug } = useParams<{ teamId: string }>()
     const [searchParams, setSearchParams] = useSearchParams()
 
@@ -228,7 +229,7 @@ function ClubTeamDetail() {
                             {upcoming.length > 0 ? (
                                 <div className="space-y-2">
                                     {upcoming.slice(0, 3).map((m, i) => (
-                                        <GameCard key={i} match={m} mode="agenda" clubName={club.name} clubSlug={club.slug} />
+                                        <GameCard key={i} match={m} mode="agenda" clubName={club.name} clubSlug={club.slug} clubs={clubs} />
                                     ))}
                                 </div>
                             ) : (
@@ -245,7 +246,7 @@ function ClubTeamDetail() {
                             {finished.length > 0 ? (
                                 <div className="space-y-2">
                                     {finished.slice(0, 3).map((m, i) => (
-                                        <GameCard key={i} match={m} mode="results" clubName={club.name} clubSlug={club.slug} />
+                                        <GameCard key={i} match={m} mode="results" clubName={club.name} clubSlug={club.slug} clubs={clubs} />
                                     ))}
                                 </div>
                             ) : (
@@ -271,7 +272,7 @@ function ClubTeamDetail() {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                         {groupedMatches[date].map(match => (
-                                            <GameCard key={match.id || match.slug} match={match} mode={tab === 'agenda' ? 'agenda' : 'results'} clubName={club.name} clubSlug={club.slug} />
+                                            <GameCard key={match.id || match.slug} match={match} mode={tab === 'agenda' ? 'agenda' : 'results'} clubName={club.name} clubSlug={club.slug} clubs={clubs} />
                                         ))}
                                     </div>
                                 </div>

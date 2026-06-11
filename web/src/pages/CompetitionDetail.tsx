@@ -489,7 +489,7 @@ export default function CompetitionDetail() {
                                             {scheduleList.length > 0 ? (
                                                 <div className="space-y-2">
                                                     {scheduleList.slice(0, 3).map((g, i) => (
-                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="agenda" />
+                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="agenda" clubs={clubs} />
                                                     ))}
                                                 </div>
                                             ) : (
@@ -506,7 +506,7 @@ export default function CompetitionDetail() {
                                             {resultsList.length > 0 ? (
                                                 <div className="space-y-2">
                                                     {resultsList.slice(0, 3).map((g, i) => (
-                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="results" />
+                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="results" clubs={clubs} />
                                                     ))}
                                                 </div>
                                             ) : (
@@ -647,7 +647,7 @@ export default function CompetitionDetail() {
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                                     {dateGames.map((g, i) => (
-                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="results" />
+                                                        <GameCard key={i} match={fpbGameToMatch(g, logoMaps)} mode="results" clubs={clubs} />
                                                     ))}
                                                 </div>
                                             </div>
@@ -668,7 +668,7 @@ export default function CompetitionDetail() {
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                                     {dateGames.map(g => (
-                                                        <GameCard key={g.jogo_id || g.data+g.equipa_casa} match={fpbGameToMatch(g, logoMaps)} mode="agenda" />
+                                                        <GameCard key={g.jogo_id || g.data+g.equipa_casa} match={fpbGameToMatch(g, logoMaps)} mode="agenda" clubs={clubs} />
                                                     ))}
                                                 </div>
                                             </div>
