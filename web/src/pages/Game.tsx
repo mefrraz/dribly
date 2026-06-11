@@ -365,16 +365,19 @@ function Game() {
                                             foraHighlight ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
                                         }`}>{match.resultado_fora ?? '-'}</span>
                                     </div>
-                                    {/* Period scores — compact but readable, below the score */}
+                                    {/* Period scores — two compact lines, home above away */}
                                     {parciais.length > 0 && (
-                                        <div className="flex items-center gap-2 mt-1 text-xs font-mono tabular-nums font-bold text-zinc-500 dark:text-zinc-400">
-                                            {parciais.map((p, i) => (
-                                                <span key={i}>
-                                                    <span className="text-zinc-400 dark:text-zinc-500 font-sans font-bold text-[9px] uppercase mr-0.5">{p.periodo}</span>
-                                                    {p.casa}-{p.fora}
-                                                    {i < parciais.length - 1 && <span className="text-zinc-300 dark:text-zinc-600 mx-1">·</span>}
-                                                </span>
-                                            ))}
+                                        <div className="flex flex-col items-center gap-0 mt-0.5">
+                                            <div className="flex gap-1.5 text-[11px] font-mono font-bold tabular-nums text-zinc-600 dark:text-zinc-300">
+                                                {parciais.map((p, i) => (
+                                                    <span key={i} className="min-w-[2ch] text-center">{p.casa}</span>
+                                                ))}
+                                            </div>
+                                            <div className="flex gap-1.5 text-[11px] font-mono font-bold tabular-nums text-zinc-400 dark:text-zinc-500">
+                                                {parciais.map((p, i) => (
+                                                    <span key={i} className="min-w-[2ch] text-center">{p.fora}</span>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                 </>
