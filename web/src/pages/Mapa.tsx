@@ -215,6 +215,7 @@ export default function Mapa() {
     const [activePavilionIds, setActivePavilionIds] = useState<Set<number>>(new Set())
     const [loading, setLoading] = useState(true)
     const [zoom, setZoom] = useState(() => Number(searchParams.get('z')) || 8)
+    const isNarrow = typeof window !== 'undefined' && window.innerWidth < 768
     const [center] = useState<[number, number]>(() => {
         const lat = searchParams.get('lat')
         const lng = searchParams.get('lng')
@@ -276,7 +277,9 @@ export default function Mapa() {
         return pavilions.filter(p => p.distrito === selectedDistrict)
     }, [pavilions, selectedDistrict])
 
-    const clusters = useClusters(filteredPavilions, zoom)
+    // Mobile screens see less area at same zoom → compensate +1 for clustering
+    const clusterZoom = isNarrow ? zoom + 1 : zoom
+    const clusters = useClusters(filteredPavilions, clusterZoom)
 
     const handleMarkerClick = (pavilion: Pavilion) => {
         setSelected(pavilion)
