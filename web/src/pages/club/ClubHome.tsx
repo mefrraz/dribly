@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { Calendar, Trophy, ChevronRight, Clock, MapPin, RefreshCw, AlertCircle, Heart, ExternalLink } from 'lucide-react'
+import { Calendar, Trophy, ChevronRight, Clock, MapPin, RefreshCw, AlertCircle, Heart, ExternalLink, TrendingUp } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
 import { useFollows } from '../../hooks/useFollows'
 import { useAuth } from '../../lib/AuthContext'
@@ -101,8 +101,10 @@ function ClubHome() {
                 <h1 className="text-lg font-bold text-zinc-900 dark:text-white truncate flex-1">
                     {displayName(club)}
                     {club.elo_rating != null && (
-                        <Link to={`/ranking?destaque=${club.slug}`} className="ml-2 text-xs font-bold text-white bg-[var(--club-color)] px-1.5 py-0.5 rounded-md hover:opacity-80 transition-opacity">
-                            #{club.elo_rating}
+                        <Link to={`/ranking?destaque=${club.slug}`} className="ml-2 text-xs font-bold text-white bg-[var(--club-color)] px-1.5 py-0.5 rounded-md hover:opacity-80 transition-opacity inline-flex items-center gap-1"
+                            title="Rating de força — baseado nos resultados históricos">
+                            <TrendingUp size={11} />
+                            {club.elo_rating}
                         </Link>
                     )}
                 </h1>
