@@ -223,32 +223,34 @@ function Game() {
             })
     }, [match, slug])
 
-    // Look up pavilion by cleanLocal name
+    // Look up pavilion by recinto_id (exact) or fallback to name match
     useEffect(() => {
-        if (!match?.local) return
-        const clean = match.local.split('|')[0].replace(/\s+/g, ' ').trim()
-        const core = clean.toLowerCase()
-            .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
-            .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
-            .replace(/\s*,.+$/, '') // remove city after comma
-            .trim()
-        fetchPavilions().then(pavs => {
+        if (!match) return
+        const lookupPavilion = async () => {
+            // 1. Try recinto_id from game data (exact match)
+            if (match.recinto_id) {
+                const { data } = await supabase.from('pavilions').select('*').eq('recinto_id', match.recinto_id).single()
+                if (data) { setPavilion(data as Pavilion); return }
+            }
+            // 2. Fallback: fuzzy name match (legacy)
+            if (!match.local) { setPavilion(null); return }
+            const clean = match.local.split('|')[0].replace(/\s+/g, ' ').trim()
+            const core = clean.toLowerCase()
+                .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
+                .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
+                .replace(/\s*,.+$/, '').trim()
+            const pavs = await fetchPavilions()
             const q = core
-            // Score-based matching: exact > substring > word overlap
             let bestScore = 0
             let bestPav: Pavilion | null = null
             for (const p of pavs) {
                 const pn = p.nome.toLowerCase()
                     .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
                     .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
-                    .replace(/\s*,.+$/, '')
-                    .trim()
+                    .replace(/\s*,.+$/, '').trim()
                 let score = 0
-                // Exact match = 100
-                if (pn === q || q === pn) { score = 100 }
-                // Full substring containment = 80
-                else if (pn.includes(q) || q.includes(pn)) { score = 80 }
-                // Word overlap (require 2+ words matching)
+                if (pn === q || q === pn) score = 100
+                else if (pn.includes(q) || q.includes(pn)) score = 80
                 else {
                     const qWords = q.split(/\s+/).filter(w => w.length > 2)
                     const pWords = pn.split(/\s+/).filter(w => w.length > 2)
@@ -261,10 +263,10 @@ function Game() {
                 }
                 if (score > bestScore) { bestScore = score; bestPav = p }
             }
-            // Only match if score is high enough
             setPavilion(bestScore >= 20 ? bestPav : null)
-        }).catch(() => {})
-    }, [match?.local])
+        }
+        lookupPavilion().catch(() => {})
+    }, [match?.local, match?.recinto_id])
 
     const shareGame = async () => {
         if (!match) return

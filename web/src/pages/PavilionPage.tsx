@@ -86,37 +86,40 @@ export default function PavilionPage() {
             const pav = pavRes.data as Pavilion
             setPavilion(pav)
 
-            // Try multiple search strategies for game matching
-            const namesToTry: string[] = []
-            // 1. Full name without prefixes
-            const clean = pav.nome
-                .replace(/^Pavilhão\s+/i, '').replace(/^Pav\.\s*/i, '').replace(/^Mun\.\s*/i, '')
-                .replace(/^Municipal\s+/i, '').trim()
-            if (clean.length >= 3) namesToTry.push(clean)
-            // 2. First 2 significant words
-            const words = clean.split(/\s+/).filter(w => w.length > 2)
-            if (words.length >= 2 && words.slice(0, 2).join(' ').length >= 5) {
-                namesToTry.push(words.slice(0, 2).join(' '))
-            }
-            // 3. City + first word
-            if (pav.cidade && words.length > 0) {
-                namesToTry.push(`${words[0]} ${pav.cidade}`)
-            }
-
+            // Load games: prefer recinto_id (exact), fallback to name matching
             let allGames: Record<string, unknown>[] = []
-            for (const name of namesToTry) {
+            if (pav.recinto_id) {
                 const { data } = await supabase.from('games_2025_2026').select('*')
-                    .ilike('local', `%${name.substring(0, 40)}%`)
+                    .eq('recinto_id', pav.recinto_id)
                     .order('data', { ascending: false })
                     .limit(100)
-                if (data) {
-                    for (const g of data) {
-                        if (!allGames.find(existing => (existing as { slug: string }).slug === (g as { slug: string }).slug)) {
-                            allGames.push(g)
+                if (data) allGames = data
+            }
+            // Fallback: name matching (if no recinto_id or no games found)
+            if (allGames.length === 0) {
+                const namesToTry: string[] = []
+                const clean = pav.nome
+                    .replace(/^Pavilhão\s+/i, '').replace(/^Pav\.\s*/i, '').replace(/^Mun\.\s*/i, '')
+                    .replace(/^Municipal\s+/i, '').trim()
+                if (clean.length >= 3) namesToTry.push(clean)
+                const words = clean.split(/\s+/).filter(w => w.length > 2)
+                if (words.length >= 2 && words.slice(0, 2).join(' ').length >= 5) {
+                    namesToTry.push(words.slice(0, 2).join(' '))
+                }
+                for (const name of namesToTry) {
+                    const { data } = await supabase.from('games_2025_2026').select('*')
+                        .ilike('local', `%${name.substring(0, 40)}%`)
+                        .order('data', { ascending: false })
+                        .limit(100)
+                    if (data) {
+                        for (const g of data) {
+                            if (!allGames.find(e => (e as { slug: string }).slug === (g as { slug: string }).slug)) {
+                                allGames.push(g)
+                            }
                         }
                     }
+                    if (allGames.length >= 50) break
                 }
-                if (allGames.length >= 50) break // enough
             }
 
             if (allGames.length > 0) {

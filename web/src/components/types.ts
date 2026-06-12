@@ -28,6 +28,7 @@ export type Match = {
     logotipo_casa: string | null
     logotipo_fora: string | null
     status: 'AGENDADO' | 'A DECORRER' | 'FINALIZADO'
+    recinto_id?: number
     epoca?: string
     createdAt?: string
     updatedAt?: string

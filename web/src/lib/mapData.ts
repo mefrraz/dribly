@@ -73,6 +73,7 @@ export interface GameAtPavilion {
     logotipo_casa: string | null
     logotipo_fora: string | null
     local: string
+    recinto_id?: number
 }
 
 /** Fetch all pavilions with coordinates */
