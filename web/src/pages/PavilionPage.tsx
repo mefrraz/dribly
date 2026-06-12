@@ -86,17 +86,41 @@ export default function PavilionPage() {
             const pav = pavRes.data as Pavilion
             setPavilion(pav)
 
-            const searchName = pav.nome
+            // Try multiple search strategies for game matching
+            const namesToTry: string[] = []
+            // 1. Full name without prefixes
+            const clean = pav.nome
                 .replace(/^Pavilhão\s+/i, '').replace(/^Pav\.\s*/i, '').replace(/^Mun\.\s*/i, '')
-                .trim().substring(0, 40)
+                .replace(/^Municipal\s+/i, '').trim()
+            if (clean.length >= 3) namesToTry.push(clean)
+            // 2. First 2 significant words
+            const words = clean.split(/\s+/).filter(w => w.length > 2)
+            if (words.length >= 2 && words.slice(0, 2).join(' ').length >= 5) {
+                namesToTry.push(words.slice(0, 2).join(' '))
+            }
+            // 3. City + first word
+            if (pav.cidade && words.length > 0) {
+                namesToTry.push(`${words[0]} ${pav.cidade}`)
+            }
 
-            const gamesRes = await supabase.from('games_2025_2026').select('*')
-                .ilike('local', `%${searchName}%`)
-                .order('data', { ascending: false })
-                .limit(100)
+            let allGames: Record<string, unknown>[] = []
+            for (const name of namesToTry) {
+                const { data } = await supabase.from('games_2025_2026').select('*')
+                    .ilike('local', `%${name.substring(0, 40)}%`)
+                    .order('data', { ascending: false })
+                    .limit(100)
+                if (data) {
+                    for (const g of data) {
+                        if (!allGames.find(existing => (existing as { slug: string }).slug === (g as { slug: string }).slug)) {
+                            allGames.push(g)
+                        }
+                    }
+                }
+                if (allGames.length >= 50) break // enough
+            }
 
-            if (gamesRes.data) {
-                setGames(gamesRes.data.map((g: Record<string, unknown>) => ({
+            if (allGames.length > 0) {
+                setGames(allGames.map((g: Record<string, unknown>) => ({
                     ...g, id: g.id || g.slug, status: g.status as Match['status'],
                 })) as Match[])
             }
@@ -260,7 +284,7 @@ export default function PavilionPage() {
 
                             {/* Rating — only if exists, 1/3 width */}
                             {pavilion.google_rating && (
-                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex flex-col items-center justify-center text-center">
+                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 aspect-square p-5 flex flex-col items-center justify-center text-center">
                                     <p className="text-4xl font-black text-zinc-900 dark:text-white">
                                         {pavilion.google_rating.toFixed(1)}
                                     </p>
