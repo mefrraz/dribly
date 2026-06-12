@@ -95,8 +95,7 @@ function FitBounds({ pavilions, skip }: { pavilions: Pavilion[]; skip: boolean }
     return null
 }
 
-/** Cluster pavilions by proximity. At zoom >= 17 every pavilion gets its own marker.
- *  Grid size: zoom 8→1° (~111km), zoom 10→0.5° (~55km), zoom 12→0.125° (~14km). */
+/** Cluster pavilions by proximity. At zoom >= 17 every pavilion gets its own marker. */
 function useClusters(pavilions: Pavilion[], zoom: number): Map<string, Pavilion[]> {
     return useMemo(() => {
         // At high zoom, don't cluster — show individual pins
@@ -108,8 +107,8 @@ function useClusters(pavilions: Pavilion[], zoom: number): Map<string, Pavilion[
             }
             return singles
         }
-        // Aggressive clustering: bigger cells at lower zooms
-        const precision = Math.max(0.5, Math.pow(2, zoom - 10))
+        // Original grid: zoom-8 base, min 2 (0.5° cells). At zoom ≤ 5 use bigger cells (0.5 precision = 2° grid).
+        const precision = zoom <= 5 ? 0.5 : Math.max(2, Math.pow(2, zoom - 8))
         const clusters = new Map<string, Pavilion[]>()
         for (const p of pavilions) {
             const latR = Math.round(p.lat * precision) / precision
