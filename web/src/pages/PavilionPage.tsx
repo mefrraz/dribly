@@ -9,8 +9,8 @@
  *   Resultados — past results at this pavilion (date-separated)
  */
 import { useEffect, useState, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
-import { MapPin, CalendarDays, Trophy, Info, Navigation, Star, ArrowUpRight } from 'lucide-react'
+import { useParams, Link } from 'react-router-dom'
+import { MapPin, CalendarDays, Trophy, Info, Navigation, Star, ArrowUpRight, Maximize2 } from 'lucide-react'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { PageHeader } from '../components/PageHeader'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
@@ -288,11 +288,10 @@ export default function PavilionPage() {
                                             })}
                                         />
                                     </MapContainer>
-                                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || pavilion.nome)}`}
-                                       target="_blank" rel="noopener noreferrer"
-                                       className="absolute top-3 right-3 px-2.5 py-1.5 rounded-lg bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm text-[10px] font-bold text-dribly-purple shadow-lg hover:bg-dribly-purple hover:text-white transition-colors inline-flex items-center gap-1 opacity-0 group-hover:opacity-100">
-                                        <Navigation size={11} /> Maps
-                                    </a>
+                                    <Link to={`/mapa?lat=${pavilion.lat}&lng=${pavilion.lng}&z=16`}
+                                       className="absolute bottom-3 right-3 px-2 py-1.5 rounded-lg bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm text-[10px] font-bold text-dribly-purple shadow-lg hover:bg-dribly-purple hover:text-white transition-colors inline-flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                                        <Maximize2 size={11} /> Mapa
+                                    </Link>
                                 </div>
                                 <div className="p-5 flex items-center gap-4">
                                     <div className="min-w-0 flex-1 space-y-2">
