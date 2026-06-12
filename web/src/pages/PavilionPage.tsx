@@ -289,7 +289,7 @@ export default function PavilionPage() {
                                             {pavilion.distrito && <span>· {pavilion.distrito}</span>}
                                         </div>
                                     </div>
-                                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || pavilion.nome)}`}
+                                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(pavilion.morada_completa || pavilion.rua + (pavilion.cidade ? ', ' + pavilion.cidade : '') || pavilion.nome)}`}
                                        target="_blank" rel="noopener noreferrer"
                                        className="shrink-0 px-3 py-1.5 rounded-xl bg-dribly-purple text-white text-[10px] font-bold hover:bg-dribly-purple/90 transition-colors inline-flex items-center gap-1 self-center">
                                         <Navigation size={11} />
