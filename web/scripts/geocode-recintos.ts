@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename)
 const INPUT = path.join(__dirname, '..', '..', 'scripts', 'recintos_com_morada.json')
 const OUTPUT = path.join(__dirname, '..', '..', 'scripts', 'pavilions_enriched.json')
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org'
-const DELAY_MS = 1200
+const DELAY_MS = 800
 
 interface Recinto {
     recinto_id: number
@@ -143,7 +143,7 @@ async function main() {
     let failCount = 0
 
     // Process in parallel batches of 3 for speed (Nominatim ≈ 1 req/s per IP)
-    const PARALLEL = 3
+    const PARALLEL = 5
     for (let i = startIdx; i < recintos.length; i += PARALLEL) {
         const batch = recintos.slice(i, i + PARALLEL)
         const geoResults = await Promise.all(
