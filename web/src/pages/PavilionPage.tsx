@@ -156,6 +156,9 @@ export default function PavilionPage() {
     const servicesItems = info?.Serviços?.flatMap(a => Object.keys(a)) || []
     const parkingItems = info?.Estacionamento?.flatMap(a => Object.keys(a)) || []
 
+    const hasContactos = !!(pavilion?.phone || pavilion?.website || (pavilion?.opening_hours && pavilion.opening_hours.length > 0) || pavilion?.google_maps_url || pavilion?.fpb_url)
+    const hasOutros = accessibilityItems.length > 0 || servicesItems.length > 0 || parkingItems.length > 0
+
     const tabs: { value: Tab; label: string; icon: React.ComponentType<Record<string, unknown>> }[] = [
         { value: 'geral', label: 'Geral', icon: Info },
         { value: 'agenda', label: 'Agenda', icon: CalendarDays },
@@ -305,98 +308,55 @@ export default function PavilionPage() {
                             )}
                         </div>
 
-                        {/* Row 2: Acessibilidade + Serviços | Contactos (2 cards) */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Acessibilidade + Serviços */}
-                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
-                                {accessibilityItems.length > 0 && (
-                                    <div>
-                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Acessibilidade</p>
+                        {/* Row 2: Smart layout — adapts to available data */}
+                        {hasContactos && hasOutros ? (
+                            /* Both: side by side */
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <ContactosCard pavilion={pavilion} showHours={showHours} setShowHours={setShowHours} />
+                                <OutrosCard accessibilityItems={accessibilityItems} servicesItems={servicesItems} parkingItems={parkingItems} />
+                            </div>
+                        ) : hasContactos ? (
+                            /* Only contacts: full width */
+                            <ContactosCard pavilion={pavilion} showHours={showHours} setShowHours={setShowHours} />
+                        ) : hasOutros ? (
+                            /* Only outros: split acessibilidade left, serviços right */
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
+                                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Acessibilidade</p>
+                                    {accessibilityItems.length > 0 ? (
                                         <div className="space-y-1.5">
                                             {accessibilityItems.map((item) => (
                                                 <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
                                             ))}
                                         </div>
-                                    </div>
-                                )}
-                                {servicesItems.length > 0 && (
-                                    <div>
-                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Serviços</p>
+                                    ) : (
+                                        <p className="text-sm text-zinc-400">Sem dados</p>
+                                    )}
+                                    {parkingItems.length > 0 && (
+                                        <div className="mt-4">
+                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Estacionamento</p>
+                                            <div className="space-y-1.5">
+                                                {parkingItems.map((item) => (
+                                                    <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
+                                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Serviços</p>
+                                    {servicesItems.length > 0 ? (
                                         <div className="space-y-1.5">
                                             {servicesItems.map((item) => (
                                                 <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
                                             ))}
                                         </div>
-                                    </div>
-                                )}
-                                {parkingItems.length > 0 && (
-                                    <div>
-                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Estacionamento</p>
-                                        <div className="space-y-1.5">
-                                            {parkingItems.map((item) => (
-                                                <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Contactos + Horários */}
-                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
-                                {pavilion.phone && (
-                                    <div>
-                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Telefone</p>
-                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.phone}</p>
-                                    </div>
-                                )}
-                                {pavilion.website && (
-                                    <div>
-                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Website</p>
-                                        <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-900 dark:text-white hover:underline inline-flex items-center gap-1">
-                                            {(() => { try { return new URL(pavilion.website).hostname.replace('www.', '') } catch { return pavilion.website } })()}
-                                            <ArrowUpRight size={11} className="text-zinc-400" />
-                                        </a>
-                                    </div>
-                                )}
-                                {pavilion.opening_hours && pavilion.opening_hours.length > 0 && (
-                                    <div>
-                                        <button onClick={() => setShowHours(!showHours)} className="w-full text-left">
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Horários</p>
-                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                {pavilion.opening_hours[0].hours.replace(' to ', '–')}
-                                                <span className="text-[10px] text-dribly-purple font-bold ml-2">
-                                                    {showHours ? '▲' : '▼'} todos
-                                                </span>
-                                            </p>
-                                        </button>
-                                        {showHours && (
-                                            <div className="mt-2 space-y-1">
-                                                {pavilion.opening_hours.map((h, i) => (
-                                                    <div key={i} className="flex justify-between text-xs py-1 border-b border-zinc-50 dark:border-white/5 last:border-0">
-                                                        <span className="text-zinc-500">{DAY_MAP[h.day] || h.day}</span>
-                                                        <span className="font-medium text-zinc-700 dark:text-zinc-300">{h.hours.replace(' to ', ' – ')}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                                <div className="flex items-center gap-3 pt-1">
-                                    {pavilion.google_maps_url && (
-                                        <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
-                                            className="text-[10px] text-dribly-purple hover:underline font-bold">
-                                            Google Maps <ArrowUpRight size={10} className="inline" />
-                                        </a>
-                                    )}
-                                    {pavilion.fpb_url && (
-                                        <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
-                                            className="text-[10px] text-dribly-purple hover:underline font-bold">
-                                            FPB <ArrowUpRight size={10} className="inline" />
-                                        </a>
+                                    ) : (
+                                        <p className="text-sm text-zinc-400">Sem dados</p>
                                     )}
                                 </div>
                             </div>
-                        </div>
+                        ) : null}
                     </div>
                 )}
 
@@ -444,6 +404,113 @@ export default function PavilionPage() {
                     )
                 )}
             </div>
+        </div>
+    )
+}
+
+// ── Sub-components ──────────────────────────────────────
+
+function ContactosCard({ pavilion, showHours, setShowHours }: {
+    pavilion: Pavilion
+    showHours: boolean
+    setShowHours: (v: boolean) => void
+}) {
+    return (
+        <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
+            {pavilion.phone && (
+                <div>
+                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Telefone</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.phone}</p>
+                </div>
+            )}
+            {pavilion.website && (
+                <div>
+                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Website</p>
+                    <a href={pavilion.website} target="_blank" rel="noopener noreferrer"
+                        className="text-sm font-medium text-zinc-900 dark:text-white hover:underline inline-flex items-center gap-1">
+                        {(() => { try { return new URL(pavilion.website).hostname.replace('www.', '') } catch { return pavilion.website } })()}
+                        <ArrowUpRight size={11} className="text-zinc-400" />
+                    </a>
+                </div>
+            )}
+            {pavilion.opening_hours && pavilion.opening_hours.length > 0 && (
+                <div>
+                    <button onClick={() => setShowHours(!showHours)} className="w-full text-left">
+                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Horários</p>
+                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
+                            {pavilion.opening_hours[0].hours.replace(' to ', '–')}
+                            <span className="text-[10px] text-dribly-purple font-bold ml-2">
+                                {showHours ? '▲' : '▼'} todos
+                            </span>
+                        </p>
+                    </button>
+                    {showHours && (
+                        <div className="mt-2 space-y-1">
+                            {pavilion.opening_hours.map((h, i) => (
+                                <div key={i} className="flex justify-between text-xs py-1 border-b border-zinc-50 dark:border-white/5 last:border-0">
+                                    <span className="text-zinc-500">{DAY_MAP[h.day] || h.day}</span>
+                                    <span className="font-medium text-zinc-700 dark:text-zinc-300">{h.hours.replace(' to ', ' – ')}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+            <div className="flex items-center gap-3 pt-1">
+                {pavilion.google_maps_url && (
+                    <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
+                        className="text-[10px] text-dribly-purple hover:underline font-bold">
+                        Google Maps <ArrowUpRight size={10} className="inline" />
+                    </a>
+                )}
+                {pavilion.fpb_url && (
+                    <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
+                        className="text-[10px] text-dribly-purple hover:underline font-bold">
+                        FPB <ArrowUpRight size={10} className="inline" />
+                    </a>
+                )}
+            </div>
+        </div>
+    )
+}
+
+function OutrosCard({ accessibilityItems, servicesItems, parkingItems }: {
+    accessibilityItems: string[]
+    servicesItems: string[]
+    parkingItems: string[]
+}) {
+    return (
+        <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
+            {accessibilityItems.length > 0 && (
+                <div>
+                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Acessibilidade</p>
+                    <div className="space-y-1.5">
+                        {accessibilityItems.map((item) => (
+                            <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
+                        ))}
+                    </div>
+                </div>
+            )}
+            {servicesItems.length > 0 && (
+                <div>
+                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Serviços</p>
+                    <div className="space-y-1.5">
+                        {servicesItems.map((item) => (
+                            <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
+                        ))}
+                    </div>
+                </div>
+            )}
+            {parkingItems.length > 0 && (
+                <div>
+                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Estacionamento</p>
+                    <div className="space-y-1.5">
+                        {parkingItems.map((item) => (
+                            <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
