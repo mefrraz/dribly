@@ -312,9 +312,19 @@ function Game() {
     const hasHora = match.hora && match.hora.replace(/[^0-9]/g, "").length > 0
 
     const clubUpper = club ? club.name.toUpperCase() : ''
+    const clubSearchName = club?.search_name?.toUpperCase() || ''
+    const clubShortName = club?.short_name?.toUpperCase() || ''
+    const clubSemiAbrev = club ? semiAbrev(club.name).toUpperCase() : ''
+    const matchClub = (teamName: string) => {
+        const t = teamName.toUpperCase()
+        return t.includes(clubUpper) || clubUpper.includes(t)
+            || (clubSearchName && (t.includes(clubSearchName) || clubSearchName.includes(t)))
+            || (clubShortName && (t.includes(clubShortName) || clubShortName.includes(t)))
+            || (clubSemiAbrev && (t.includes(clubSemiAbrev) || clubSemiAbrev.includes(t)))
+    }
     const isClubWin = clubUpper && hasScores ? (
-        (match.equipa_casa.toUpperCase().includes(clubUpper) && match.resultado_casa! > match.resultado_fora!) ||
-        (match.equipa_fora.toUpperCase().includes(clubUpper) && match.resultado_fora! > match.resultado_casa!)
+        (matchClub(match.equipa_casa) && match.resultado_casa! > match.resultado_fora!) ||
+        (matchClub(match.equipa_fora) && match.resultado_fora! > match.resultado_casa!)
     ) : null
 
     const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
