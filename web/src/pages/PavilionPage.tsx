@@ -138,7 +138,8 @@ export default function PavilionPage() {
     const resultsByDate = useMemo(() => groupByDate(results), [results])
 
     const address = [pavilion?.rua, pavilion?.codigo_postal, pavilion?.cidade].filter(Boolean).join(', ')
-    const imageSrc = pavilion?.image_url || pavilion?.foto_url
+    // Best image: prefer high-res from image_urls[0] for hero, fallback to image_url/foto_url
+    const imageSrc = pavilion?.image_urls?.[0] || pavilion?.foto_url || pavilion?.image_url
     const info = pavilion?.additional_info
     const nearby = (pavilion?.people_also_search || []) as PeopleAlsoSearchItem[]
 
