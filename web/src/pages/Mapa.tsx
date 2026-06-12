@@ -83,7 +83,10 @@ function ForceCenter({ center, zoom, skip }: { center: [number, number]; zoom: n
     const map = useMap()
     useEffect(() => {
         if (skip) return
-        map.setView(center, zoom)
+        map.whenReady(() => {
+            // Force view AFTER everything else has initialized
+            setTimeout(() => map.setView(center, zoom), 100)
+        })
     }, [map, center, zoom, skip])
     return null
 }
