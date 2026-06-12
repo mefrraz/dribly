@@ -110,14 +110,12 @@ function useClusters(pavilions: Pavilion[], zoom: number): Map<string, Pavilion[
         // Clustering precision by zoom:
         //   ≤3  → 0.2  (5° grid, 1 circle for Portugal)
         //   4   → 0.33 (3° grid, ~2-3 circles)
-        //   5   → 0.5  (2° grid, ~3-5 circles)
-        //   6-7 → 1    (1° grid, ~10-15 circles)
+        //   5-7 → 0.5  (2° grid, ~3-5 circles)
         //   8+  → original Math.max(2, 2^(zoom-8))
         let precision: number
         if (zoom <= 3) precision = 0.2
         else if (zoom <= 4) precision = 0.33
-        else if (zoom <= 5) precision = 0.5
-        else if (zoom <= 7) precision = 1
+        else if (zoom <= 7) precision = 0.5
         else precision = Math.max(2, Math.pow(2, zoom - 8))
         const clusters = new Map<string, Pavilion[]>()
         for (const p of pavilions) {
