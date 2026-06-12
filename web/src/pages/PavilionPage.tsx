@@ -87,18 +87,30 @@ export default function PavilionPage() {
             const pav = pavRes.data as Pavilion
             setPavilion(pav)
 
-            // Cross-reference nearby places with pavilion IDs
+            // Cross-reference nearby places with pavilion IDs (fuzzy match)
             const nearby = (pav.people_also_search || []) as PeopleAlsoSearchItem[]
             if (nearby.length > 0) {
-                const names = nearby.map(p => p.title)
-                const { data: matched } = await supabase
+                // Fetch ALL pavilion names for fuzzy matching
+                const { data: allPavs } = await supabase
                     .from('pavilions')
                     .select('id, nome')
-                    .in('nome', names)
-                if (matched) {
+                if (allPavs) {
                     const map = new Map<string, number>()
-                    for (const m of matched as { id: number; nome: string }[]) {
-                        map.set(m.nome, m.id)
+                    for (const place of nearby) {
+                        const q = place.title.toLowerCase()
+                            .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
+                            .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
+                            .trim()
+                        for (const p of allPavs as { id: number; nome: string }[]) {
+                            const pn = p.nome.toLowerCase()
+                                .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
+                                .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
+                                .trim()
+                            if (pn === q || pn.includes(q) || q.includes(pn)) {
+                                map.set(place.title, p.id)
+                                break
+                            }
+                        }
                     }
                     setNearbyPavs(map)
                 }
@@ -268,8 +280,8 @@ export default function PavilionPage() {
                             </div>
                         </div>
 
-                        {/* Two-column: Info (left) + Accessibility/Services (right) */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Two-column: Info (left, wider) + Accessibility/Services (right, narrower) */}
+                        <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4">
                             {/* Left: Morada, CP, Telefone, Website */}
                             <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
                                 <div className="flex items-start gap-3">
@@ -392,23 +404,26 @@ export default function PavilionPage() {
                             </div>
                         )}
 
-                        {/* Nearby places — clickable links to pavilion pages */}
+                        {/* Nearby pavilions — distinct card with accent border */}
                         {nearby.length > 0 && (
-                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
+                            <div className="bg-dribly-purple/[0.02] dark:bg-dribly-purple/5 rounded-2xl border border-dribly-purple/20 dark:border-dribly-purple/30 p-5">
                                 <div className="flex items-center gap-2.5 mb-3">
-                                    <MapPin size={14} className="text-dribly-purple" />
-                                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Pavilhões próximos</span>
+                                    <span className="w-6 h-6 rounded-lg bg-dribly-purple/10 flex items-center justify-center">
+                                        <MapPin size={12} className="text-dribly-purple" />
+                                    </span>
+                                    <span className="text-xs font-bold text-dribly-purple">Pavilhões próximos</span>
+                                    <span className="text-[10px] text-zinc-400">{nearby.length}</span>
                                 </div>
-                                <div className="space-y-1">
-                                    {nearby.slice(0, 6).map((place, i) => {
+                                <div className="space-y-0.5">
+                                    {nearby.slice(0, 8).map((place, i) => {
                                         const pavId = nearbyPavs.get(place.title)
                                         const content = (
-                                            <div className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
+                                            <div className="flex items-center justify-between py-2 first:pt-0 last:pb-0">
                                                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                                                    <span className="w-6 h-6 rounded-full bg-dribly-purple/10 flex items-center justify-center shrink-0">
-                                                        <MapPin size={11} className="text-dribly-purple" />
+                                                    <span className="w-5 h-5 rounded-full bg-dribly-purple/10 flex items-center justify-center shrink-0">
+                                                        <MapPin size={10} className="text-dribly-purple" />
                                                     </span>
-                                                    <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate">{place.title}</span>
+                                                    <span className="text-xs text-zinc-700 dark:text-zinc-300 truncate">{place.title}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2 shrink-0 ml-2">
                                                     {place.totalScore > 0 && (
@@ -426,12 +441,12 @@ export default function PavilionPage() {
                                         if (pavId) {
                                             return (
                                                 <Link key={i} to={`/pavilhao/${pavId}`}
-                                                    className="block hover:bg-zinc-50 dark:hover:bg-white/5 rounded-xl px-3 -mx-3 transition-colors">
+                                                    className="block hover:bg-dribly-purple/5 rounded-lg px-2 -mx-2 transition-colors">
                                                     {content}
                                                 </Link>
                                             )
                                         }
-                                        return <div key={i} className="px-3 -mx-3">{content}</div>
+                                        return <div key={i} className="px-2 -mx-2">{content}</div>
                                     })}
                                 </div>
                             </div>
