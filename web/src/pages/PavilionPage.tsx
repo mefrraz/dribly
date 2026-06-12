@@ -287,7 +287,7 @@ export default function PavilionPage() {
 
                             {/* Rating — only if exists, 1/3 width */}
                             {pavilion.google_rating && (
-                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 aspect-square p-5 flex flex-col items-center justify-center text-center">
+                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex flex-col items-center justify-center text-center">
                                     <p className="text-4xl font-black text-zinc-900 dark:text-white">
                                         {pavilion.google_rating.toFixed(1)}
                                     </p>
