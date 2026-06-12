@@ -40,15 +40,21 @@ function groupByDate(matches: Match[]): [string, Match[]][] {
     return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b))
 }
 
-/** Translate day names from PT to short form */
+/** Translate day names from PT to short form (week starts Sunday) */
 const DAY_MAP: Record<string, string> = {
+    'domingo': 'Dom',
     'segunda-feira': 'Seg',
     'terça-feira': 'Ter',
     'quarta-feira': 'Qua',
     'quinta-feira': 'Qui',
     'sexta-feira': 'Sex',
     'sábado': 'Sáb',
-    'domingo': 'Dom',
+}
+
+/** Sort opening hours starting from Sunday */
+function sortHoursByDay(hours: { day: string; hours: string }[]): { day: string; hours: string }[] {
+    const order = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado']
+    return [...hours].sort((a, b) => order.indexOf(a.day) - order.indexOf(b.day))
 }
 
 export default function PavilionPage() {
@@ -58,8 +64,6 @@ export default function PavilionPage() {
     const [loading, setLoading] = useState(true)
     const [tab, setTab] = useState<Tab>('geral')
     const [darkMode, setDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
-    const [showHours, setShowHours] = useState(false)
-
     useEffect(() => {
         const observer = new MutationObserver(() => {
             setDarkMode(document.documentElement.classList.contains('dark'))
@@ -156,7 +160,7 @@ export default function PavilionPage() {
     const servicesItems = info?.Serviços?.flatMap(a => Object.keys(a)) || []
     const parkingItems = info?.Estacionamento?.flatMap(a => Object.keys(a)) || []
 
-    const hasContactos = !!(pavilion?.phone || pavilion?.website || (pavilion?.opening_hours && pavilion.opening_hours.length > 0))
+    const hasContactos = !!(pavilion?.phone || pavilion?.website)
     const hasOutros = accessibilityItems.length > 0 || servicesItems.length > 0 || parkingItems.length > 0
 
     const tabs: { value: Tab; label: string; icon: React.ComponentType<Record<string, unknown>> }[] = [
@@ -249,8 +253,12 @@ export default function PavilionPage() {
 
                 {tab === 'geral' && (
                     <div className="space-y-4">
-                        {/* Row 1: Map+Morada (2/3) + Rating (1/3, if exists) */}
-                        <div className={`grid grid-cols-1 ${pavilion.google_rating ? 'md:grid-cols-[2fr_1fr]' : ''} gap-4`}>
+                        {/* Row 1: Map+Morada + Hours (priority) or Rating */}
+                        {(() => {
+                            const hasHours = pavilion.opening_hours && pavilion.opening_hours.length > 0
+                            const sideContent = hasHours ? 'hours' : pavilion.google_rating ? 'rating' : null
+                            return (
+                        <div className={`grid grid-cols-1 ${sideContent ? 'md:grid-cols-[2fr_1fr]' : ''} gap-4`}>
                             {/* Localização */}
                             <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
                                 <div className="h-40 md:h-48 relative group">
@@ -298,8 +306,20 @@ export default function PavilionPage() {
                                 </div>
                             </div>
 
-                            {/* Rating — only if exists, 1/3 width */}
-                            {pavilion.google_rating && (
+                            {/* Side: Hours (square, open by default) or Rating */}
+                            {sideContent === 'hours' && pavilion.opening_hours ? (
+                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 aspect-square p-5 flex flex-col">
+                                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-3">Horários</p>
+                                    <div className="flex-1 space-y-1 overflow-y-auto">
+                                        {sortHoursByDay(pavilion.opening_hours).map((h, i) => (
+                                            <div key={i} className="flex justify-between text-xs py-1 border-b border-zinc-50 dark:border-white/5 last:border-0">
+                                                <span className="text-zinc-500">{DAY_MAP[h.day] || h.day}</span>
+                                                <span className="font-medium text-zinc-700 dark:text-zinc-300">{h.hours.replace(' to ', ' – ')}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : sideContent === 'rating' && pavilion.google_rating ? (
                                 <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex flex-col items-center justify-center text-center">
                                     <p className="text-4xl font-black text-zinc-900 dark:text-white">
                                         {pavilion.google_rating.toFixed(1)}
@@ -315,17 +335,18 @@ export default function PavilionPage() {
                                     )}
                                     <p className="text-[10px] text-zinc-400 mt-0.5">no Google</p>
                                 </div>
-                            )}
+                            ) : null}
                         </div>
+                        )})()}
 
                         {/* Row 2: Smart layout */}
                         {hasContactos && hasOutros ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <ContactosCard pavilion={pavilion} showHours={showHours} setShowHours={setShowHours} />
+                                <ContactosCard pavilion={pavilion} />
                                 <OutrosCard accessibilityItems={accessibilityItems} servicesItems={servicesItems} parkingItems={parkingItems} />
                             </div>
                         ) : hasContactos ? (
-                            <ContactosCard pavilion={pavilion} showHours={showHours} setShowHours={setShowHours} />
+                            <ContactosCard pavilion={pavilion} />
                         ) : hasOutros ? (
                             accessibilityItems.length > 0 && servicesItems.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -431,11 +452,7 @@ export default function PavilionPage() {
 
 // ── Sub-components ──────────────────────────────────────
 
-function ContactosCard({ pavilion, showHours, setShowHours }: {
-    pavilion: Pavilion
-    showHours: boolean
-    setShowHours: (v: boolean) => void
-}) {
+function ContactosCard({ pavilion }: { pavilion: Pavilion }) {
     return (
         <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
             {pavilion.phone && (
@@ -454,29 +471,7 @@ function ContactosCard({ pavilion, showHours, setShowHours }: {
                     </a>
                 </div>
             )}
-            {pavilion.opening_hours && pavilion.opening_hours.length > 0 && (
-                <div>
-                    <button onClick={() => setShowHours(!showHours)} className="w-full text-left">
-                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Horários</p>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                            {pavilion.opening_hours[0].hours.replace(' to ', '–')}
-                            <span className="text-[10px] text-dribly-purple font-bold ml-2">
-                                {showHours ? '▲' : '▼'} todos
-                            </span>
-                        </p>
-                    </button>
-                    {showHours && (
-                        <div className="mt-2 space-y-1">
-                            {pavilion.opening_hours.map((h, i) => (
-                                <div key={i} className="flex justify-between text-xs py-1 border-b border-zinc-50 dark:border-white/5 last:border-0">
-                                    <span className="text-zinc-500">{DAY_MAP[h.day] || h.day}</span>
-                                    <span className="font-medium text-zinc-700 dark:text-zinc-300">{h.hours.replace(' to ', ' – ')}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
+
         </div>
     )
 }
