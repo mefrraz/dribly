@@ -389,17 +389,17 @@ export default function PavilionPage() {
                         ) : null}
 
                         {/* Links row — always at the bottom */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3 flex-wrap">
                             {pavilion.google_maps_url && (
                                 <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
-                                    className="text-[10px] text-dribly-purple hover:underline font-bold">
-                                    Google Maps <ArrowUpRight size={10} className="inline" />
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
+                                    Google Maps <ArrowUpRight size={10} />
                                 </a>
                             )}
                             {(pavilion.fpb_url || pavilion.recinto_id) && (
                                 <a href={pavilion.fpb_url || `https://www.fpb.pt/recinto/${pavilion.recinto_id}/`} target="_blank" rel="noopener noreferrer"
-                                    className="text-[10px] text-dribly-purple hover:underline font-bold">
-                                    FPB <ArrowUpRight size={10} className="inline" />
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dribly-purple/10 text-[10px] font-bold text-dribly-purple hover:bg-dribly-purple/20 transition-colors">
+                                    Ver na FPB <ArrowUpRight size={10} />
                                 </a>
                             )}
                         </div>
