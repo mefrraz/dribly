@@ -9,8 +9,8 @@
  *   Resultados — past results at this pavilion (date-separated)
  */
 import { useEffect, useState, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
-import { MapPin, CalendarDays, Trophy, Info, Navigation, Home, Mail, Phone, Globe, Star, Clock, ChevronDown, ChevronUp, ExternalLink, Accessibility, BadgeCheck } from 'lucide-react'
+import { useParams, Link } from 'react-router-dom'
+import { MapPin, CalendarDays, Trophy, Info, Navigation, Home, Mail, Phone, Globe, Star, Clock, ChevronDown, ChevronUp, Accessibility, BadgeCheck, ArrowUpRight } from 'lucide-react'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { PageHeader } from '../components/PageHeader'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
@@ -59,6 +59,7 @@ export default function PavilionPage() {
     const [tab, setTab] = useState<Tab>('geral')
     const [darkMode, setDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
     const [showHours, setShowHours] = useState(false)
+    const [nearbyPavs, setNearbyPavs] = useState<Map<string, number>>(new Map()) // title → id
 
     useEffect(() => {
         const observer = new MutationObserver(() => {
@@ -85,6 +86,23 @@ export default function PavilionPage() {
 
             const pav = pavRes.data as Pavilion
             setPavilion(pav)
+
+            // Cross-reference nearby places with pavilion IDs
+            const nearby = (pav.people_also_search || []) as PeopleAlsoSearchItem[]
+            if (nearby.length > 0) {
+                const names = nearby.map(p => p.title)
+                const { data: matched } = await supabase
+                    .from('pavilions')
+                    .select('id, nome')
+                    .in('nome', names)
+                if (matched) {
+                    const map = new Map<string, number>()
+                    for (const m of matched as { id: number; nome: string }[]) {
+                        map.set(m.nome, m.id)
+                    }
+                    setNearbyPavs(map)
+                }
+            }
 
             const searchName = pav.nome
                 .replace(/^Pavilhão\s+/i, '').replace(/^Pav\.\s*/i, '').replace(/^Mun\.\s*/i, '')
@@ -249,53 +267,101 @@ export default function PavilionPage() {
                             </div>
                         </div>
 
-                        {/* Info cards */}
-                        <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
-                            {/* Address + Postal Code */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="flex items-start gap-2.5">
-                                    <Home size={14} className="text-zinc-400 shrink-0 mt-0.5" />
+                        {/* Two-column: Info (left) + Accessibility/Services (right) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Left: Morada, CP, Telefone, Website */}
+                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
+                                <div className="flex items-start gap-3">
+                                    <Home size={15} className="text-dribly-purple shrink-0 mt-0.5" />
                                     <div className="min-w-0">
-                                        <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Morada</p>
+                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Morada</p>
                                         <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.rua || pavilion.morada_completa || '—'}</p>
                                     </div>
                                 </div>
-                                <div className="flex items-start gap-2.5">
-                                    <Mail size={14} className="text-zinc-400 shrink-0 mt-0.5" />
+                                <div className="flex items-start gap-3">
+                                    <Mail size={15} className="text-dribly-purple shrink-0 mt-0.5" />
                                     <div className="min-w-0">
-                                        <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Código Postal</p>
+                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Código Postal</p>
                                         <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.codigo_postal || '—'}</p>
                                     </div>
                                 </div>
+                                {pavilion.phone && (
+                                    <div className="flex items-start gap-3">
+                                        <Phone size={15} className="text-dribly-purple shrink-0 mt-0.5" />
+                                        <div className="min-w-0">
+                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Telefone</p>
+                                            <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.phone}</p>
+                                        </div>
+                                    </div>
+                                )}
+                                {pavilion.website && (
+                                    <div className="flex items-start gap-3">
+                                        <Globe size={15} className="text-dribly-purple shrink-0 mt-0.5" />
+                                        <div className="min-w-0">
+                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Website</p>
+                                            <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-900 dark:text-white hover:underline break-words inline-flex items-center gap-1">
+                                                {(() => { try { return new URL(pavilion.website).hostname.replace('www.', '') } catch { return pavilion.website } })()}
+                                                <ArrowUpRight size={11} className="text-zinc-400" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Phone + Website */}
-                            {(pavilion.phone || pavilion.website) && (
-                                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-zinc-100 dark:border-white/5">
-                                    {pavilion.phone && (
-                                        <div className="flex items-start gap-2.5">
-                                            <Phone size={14} className="text-dribly-purple shrink-0 mt-0.5" />
-                                            <div className="min-w-0">
-                                                <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Telefone</p>
-                                                <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.phone}</p>
+                            {/* Right: Accessibility, Services, Parking */}
+                            {(accessibilityItems.length > 0 || servicesItems.length > 0 || parkingItems.length > 0) ? (
+                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
+                                    {accessibilityItems.length > 0 && (
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-2.5">
+                                                <Accessibility size={14} className="text-dribly-purple" />
+                                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Acessibilidade</span>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                {accessibilityItems.map((item) => (
+                                                    <div key={item} className="flex items-center gap-2.5">
+                                                        <BadgeCheck size={13} className="text-dribly-purple shrink-0" />
+                                                        <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     )}
-                                    {pavilion.website && (
-                                        <div className="flex items-start gap-2.5">
-                                            <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="shrink-0 mt-0.5">
-                                                <Globe size={14} className="text-dribly-purple" />
-                                            </a>
-                                            <div className="min-w-0">
-                                                <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Website</p>
-                                                <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-900 dark:text-white hover:underline break-words inline-flex items-center gap-1">
-                                                    {new URL(pavilion.website).hostname.replace('www.', '')}
-                                                    <ExternalLink size={10} className="text-zinc-400" />
-                                                </a>
+                                    {servicesItems.length > 0 && (
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-2.5">
+                                                <Trophy size={14} className="text-dribly-purple" />
+                                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Serviços</span>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                {servicesItems.map((item) => (
+                                                    <div key={item} className="flex items-center gap-2.5">
+                                                        <BadgeCheck size={13} className="text-dribly-purple shrink-0" />
+                                                        <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {parkingItems.length > 0 && (
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-2.5">
+                                                <span className="text-sm">🅿️</span>
+                                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Estacionamento</span>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                {parkingItems.map((item) => (
+                                                    <div key={item} className="flex items-center gap-2.5">
+                                                        <BadgeCheck size={13} className="text-dribly-purple shrink-0" />
+                                                        <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     )}
                                 </div>
+                            ) : (
+                                <div className="hidden md:block" />
                             )}
                         </div>
 
@@ -307,7 +373,7 @@ export default function PavilionPage() {
                                     className="w-full p-5 flex items-center justify-between text-left hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors"
                                 >
                                     <div className="flex items-center gap-2.5">
-                                        <Clock size={14} className="text-zinc-400" />
+                                        <Clock size={14} className="text-dribly-purple" />
                                         <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Horários</span>
                                     </div>
                                     {showHours ? <ChevronUp size={14} className="text-zinc-400" /> : <ChevronDown size={14} className="text-zinc-400" />}
@@ -325,105 +391,66 @@ export default function PavilionPage() {
                             </div>
                         )}
 
-                        {/* Accessibility + Services + Parking — combined card */}
-                        {(accessibilityItems.length > 0 || servicesItems.length > 0 || parkingItems.length > 0) && (
-                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
-                                {accessibilityItems.length > 0 && (
-                                    <div className="p-5 border-b border-zinc-100 dark:border-white/5 last:border-0">
-                                        <div className="flex items-center gap-2.5 mb-3">
-                                            <Accessibility size={14} className="text-green-600" />
-                                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Acessibilidade</span>
-                                        </div>
-                                        <div className="space-y-2">
-                                            {accessibilityItems.map((item) => (
-                                                <div key={item} className="flex items-center gap-2.5">
-                                                    <BadgeCheck size={13} className="text-green-500 shrink-0" />
-                                                    <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                {servicesItems.length > 0 && (
-                                    <div className="p-5 border-b border-zinc-100 dark:border-white/5 last:border-0">
-                                        <div className="flex items-center gap-2.5 mb-3">
-                                            <Trophy size={14} className="text-dribly-purple" />
-                                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Serviços</span>
-                                        </div>
-                                        <div className="space-y-2">
-                                            {servicesItems.map((item) => (
-                                                <div key={item} className="flex items-center gap-2.5">
-                                                    <BadgeCheck size={13} className="text-dribly-purple shrink-0" />
-                                                    <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                {parkingItems.length > 0 && (
-                                    <div className="p-5">
-                                        <div className="flex items-center gap-2.5 mb-3">
-                                            <span className="text-sm">🅿️</span>
-                                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Estacionamento</span>
-                                        </div>
-                                        <div className="space-y-2">
-                                            {parkingItems.map((item) => (
-                                                <div key={item} className="flex items-center gap-2.5">
-                                                    <BadgeCheck size={13} className="text-blue-500 shrink-0" />
-                                                    <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Nearby places (peopleAlsoSearch) */}
+                        {/* Nearby places — clickable links to pavilion pages */}
                         {nearby.length > 0 && (
                             <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
                                 <div className="flex items-center gap-2.5 mb-3">
-                                    <MapPin size={14} className="text-amber-500" />
-                                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Locais próximos</span>
+                                    <MapPin size={14} className="text-dribly-purple" />
+                                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Pavilhões próximos</span>
                                 </div>
-                                <div className="divide-y divide-zinc-100 dark:divide-white/5">
-                                    {nearby.slice(0, 6).map((place, i) => (
-                                        <div key={i} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
-                                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                                                <span className="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
-                                                    <MapPin size={10} className="text-amber-600 dark:text-amber-400" />
-                                                </span>
-                                                <span className="text-xs text-zinc-700 dark:text-zinc-300 truncate">{place.title}</span>
+                                <div className="space-y-1">
+                                    {nearby.slice(0, 6).map((place, i) => {
+                                        const pavId = nearbyPavs.get(place.title)
+                                        const content = (
+                                            <div className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
+                                                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                                    <span className="w-6 h-6 rounded-full bg-dribly-purple/10 flex items-center justify-center shrink-0">
+                                                        <MapPin size={11} className="text-dribly-purple" />
+                                                    </span>
+                                                    <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate">{place.title}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 shrink-0 ml-2">
+                                                    {place.totalScore > 0 && (
+                                                        <span className="text-[10px] text-zinc-400 flex items-center gap-0.5">
+                                                            <Star size={9} className="text-amber-500 fill-amber-500" />
+                                                            {place.totalScore.toFixed(1)}
+                                                        </span>
+                                                    )}
+                                                    {pavId && (
+                                                        <ArrowUpRight size={12} className="text-dribly-purple" />
+                                                    )}
+                                                </div>
                                             </div>
-                                            {place.totalScore > 0 ? (
-                                                <span className="text-[11px] font-medium text-zinc-500 shrink-0 ml-2 flex items-center gap-1">
-                                                    <Star size={10} className="text-amber-500 fill-amber-500" />
-                                                    {place.totalScore.toFixed(1)}
-                                                </span>
-                                            ) : (
-                                                <span className="text-[10px] text-zinc-300 shrink-0 ml-2">s/ avaliações</span>
-                                            )}
-                                        </div>
-                                    ))}
+                                        )
+                                        if (pavId) {
+                                            return (
+                                                <Link key={i} to={`/pavilhao/${pavId}`}
+                                                    className="block hover:bg-zinc-50 dark:hover:bg-white/5 rounded-xl px-3 -mx-3 transition-colors">
+                                                    {content}
+                                                </Link>
+                                            )
+                                        }
+                                        return <div key={i} className="px-3 -mx-3">{content}</div>
+                                    })}
                                 </div>
                             </div>
                         )}
 
-                        {/* Google Maps link */}
-                        {pavilion.google_maps_url && (
-                            <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 text-xs text-dribly-blue hover:underline font-medium">
-                                Ver no Google Maps →
-                            </a>
-                        )}
-
-                        {/* FPB link (legacy) */}
-                        {pavilion.fpb_url && (
-                            <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 ml-4 text-xs text-dribly-purple hover:underline font-medium">
-                                Ver na FPB →
-                            </a>
-                        )}
+                        {/* Links row */}
+                        <div className="flex items-center gap-4">
+                            {pavilion.google_maps_url && (
+                                <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1.5 text-xs text-dribly-purple hover:underline font-medium">
+                                    Ver no Google Maps <ArrowUpRight size={11} />
+                                </a>
+                            )}
+                            {pavilion.fpb_url && (
+                                <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1.5 text-xs text-dribly-purple hover:underline font-medium">
+                                    Ver na FPB <ArrowUpRight size={11} />
+                                </a>
+                            )}
+                        </div>
                     </div>
                 )}
 
