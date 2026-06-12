@@ -9,7 +9,7 @@
  *   Resultados — past results at this pavilion (date-separated)
  */
 import { useEffect, useState, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { MapPin, CalendarDays, Trophy, Info, Navigation, Star, ArrowUpRight } from 'lucide-react'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { PageHeader } from '../components/PageHeader'
@@ -266,11 +266,11 @@ export default function PavilionPage() {
 
                 {tab === 'geral' && (
                     <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                            {/* 1. Localização — mini mapa + morada */}
+                        {/* Row 1: Map+Morada (2/3) + Rating (1/3, if exists) */}
+                        <div className={`grid grid-cols-1 ${pavilion.google_rating ? 'md:grid-cols-[2fr_1fr]' : ''} gap-4`}>
+                            {/* Localização */}
                             <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
-                                <div className="h-36 relative group">
+                                <div className="h-40 md:h-48 relative group">
                                     <MapContainer
                                         center={[pavilion.lat, pavilion.lng]}
                                         zoom={15}
@@ -295,98 +295,39 @@ export default function PavilionPage() {
                                         <Navigation size={11} /> Maps
                                     </a>
                                 </div>
-                                <div className="p-5 space-y-3">
-                                    <div>
-                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Morada</p>
-                                        <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.rua || pavilion.morada_completa || '—'}</p>
-                                    </div>
-                                    <div className="flex gap-4 text-sm text-zinc-500 dark:text-zinc-400">
+                                <div className="p-5 space-y-2">
+                                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider">Morada</p>
+                                    <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.rua || pavilion.morada_completa || '—'}</p>
+                                    <div className="flex gap-3 text-xs text-zinc-500 dark:text-zinc-400">
                                         {pavilion.codigo_postal && <span>{pavilion.codigo_postal}</span>}
                                         {pavilion.distrito && <span>· {pavilion.distrito}</span>}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* 2. Contactos + Rating + Horários */}
-                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
-                                {/* Rating — bigger, centered */}
-                                {pavilion.google_rating && (
-                                    <div className="text-center py-2">
-                                        <p className="text-3xl font-black text-zinc-900 dark:text-white">
-                                            {pavilion.google_rating.toFixed(1)}
-                                        </p>
-                                        <div className="flex items-center justify-center gap-0.5 mt-1">
-                                            {[1,2,3,4,5].map(s => (
-                                                <Star key={s} size={14}
-                                                    className={s <= Math.round(pavilion.google_rating!) ? 'text-amber-500 fill-amber-500' : 'text-zinc-200 dark:text-zinc-700'} />
-                                            ))}
-                                        </div>
-                                        {pavilion.reviews_count && (
-                                            <p className="text-[10px] text-zinc-400 mt-1">{pavilion.reviews_count} avaliações no Google</p>
-                                        )}
+                            {/* Rating — only if exists, 1/3 width */}
+                            {pavilion.google_rating && (
+                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex flex-col items-center justify-center text-center">
+                                    <p className="text-4xl font-black text-zinc-900 dark:text-white">
+                                        {pavilion.google_rating.toFixed(1)}
+                                    </p>
+                                    <div className="flex items-center justify-center gap-0.5 mt-2">
+                                        {[1,2,3,4,5].map(s => (
+                                            <Star key={s} size={16}
+                                                className={s <= Math.round(pavilion.google_rating!) ? 'text-amber-500 fill-amber-500' : 'text-zinc-200 dark:text-zinc-700'} />
+                                        ))}
                                     </div>
-                                )}
-                                {/* Phone + Website — clean text */}
-                                <div className="space-y-2.5">
-                                    {pavilion.phone && (
-                                        <div>
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Telefone</p>
-                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.phone}</p>
-                                        </div>
+                                    {pavilion.reviews_count && (
+                                        <p className="text-[10px] text-zinc-400 mt-2">{pavilion.reviews_count} avaliações</p>
                                     )}
-                                    {pavilion.website && (
-                                        <div>
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Website</p>
-                                            <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-900 dark:text-white hover:underline inline-flex items-center gap-1">
-                                                {(() => { try { return new URL(pavilion.website).hostname.replace('www.', '') } catch { return pavilion.website } })()}
-                                                <ArrowUpRight size={11} className="text-zinc-400" />
-                                            </a>
-                                        </div>
-                                    )}
+                                    <p className="text-[10px] text-zinc-400 mt-0.5">no Google</p>
                                 </div>
-                                {/* Horários — inline */}
-                                {pavilion.opening_hours && pavilion.opening_hours.length > 0 && (
-                                    <div>
-                                        <button onClick={() => setShowHours(!showHours)}
-                                            className="w-full text-left">
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Horários</p>
-                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                {pavilion.opening_hours[0].hours.replace(' to ', '–')}
-                                                <span className="text-[10px] text-dribly-purple font-bold ml-2">
-                                                    {showHours ? '▲' : '▼'} ver todos
-                                                </span>
-                                            </p>
-                                        </button>
-                                        {showHours && (
-                                            <div className="mt-2 ml-0 space-y-1">
-                                                {pavilion.opening_hours.map((h, i) => (
-                                                    <div key={i} className="flex justify-between text-xs py-1 border-b border-zinc-50 dark:border-white/5 last:border-0">
-                                                        <span className="text-zinc-500">{DAY_MAP[h.day] || h.day}</span>
-                                                        <span className="font-medium text-zinc-700 dark:text-zinc-300">{h.hours.replace(' to ', ' – ')}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                                {/* Links */}
-                                <div className="flex items-center gap-3 pt-1">
-                                    {pavilion.google_maps_url && (
-                                        <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
-                                            className="text-[10px] text-dribly-purple hover:underline font-bold">
-                                            Google Maps <ArrowUpRight size={10} className="inline" />
-                                        </a>
-                                    )}
-                                    {pavilion.fpb_url && (
-                                        <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
-                                            className="text-[10px] text-dribly-purple hover:underline font-bold">
-                                            FPB <ArrowUpRight size={10} className="inline" />
-                                        </a>
-                                    )}
-                                </div>
-                            </div>
+                            )}
+                        </div>
 
-                            {/* 3. Acessibilidade + Serviços — clean text only */}
+                        {/* Row 2: Acessibilidade + Serviços | Contactos (2 cards) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Acessibilidade + Serviços */}
                             <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
                                 {accessibilityItems.length > 0 && (
                                     <div>
@@ -420,30 +361,60 @@ export default function PavilionPage() {
                                 )}
                             </div>
 
-                            {/* 4. Pavilhões próximos — inline compact */}
-                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
-                                <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">
-                                    Pavilhões próximos
-                                    <span className="text-zinc-300 ml-1">· {nearby.length}</span>
-                                </p>
-                                {nearby.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2">
-                                        {nearby.slice(0, 8).map((place, i) => {
-                                            const pavId = nearbyPavs.get(place.title)
-                                            const chip = (
-                                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-white/5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-dribly-purple/10 hover:text-dribly-purple transition-colors">
-                                                    {place.title}
-                                                    {pavId && <ArrowUpRight size={10} className="text-dribly-purple" />}
-                                                </span>
-                                            )
-                                            return pavId
-                                                ? <Link key={i} to={`/pavilhao/${pavId}`}>{chip}</Link>
-                                                : <span key={i}>{chip}</span>
-                                        })}
+                            {/* Contactos + Horários */}
+                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
+                                {pavilion.phone && (
+                                    <div>
+                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Telefone</p>
+                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.phone}</p>
                                     </div>
-                                ) : (
-                                    <p className="text-sm text-zinc-400">Sem dados</p>
                                 )}
+                                {pavilion.website && (
+                                    <div>
+                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Website</p>
+                                        <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-900 dark:text-white hover:underline inline-flex items-center gap-1">
+                                            {(() => { try { return new URL(pavilion.website).hostname.replace('www.', '') } catch { return pavilion.website } })()}
+                                            <ArrowUpRight size={11} className="text-zinc-400" />
+                                        </a>
+                                    </div>
+                                )}
+                                {pavilion.opening_hours && pavilion.opening_hours.length > 0 && (
+                                    <div>
+                                        <button onClick={() => setShowHours(!showHours)} className="w-full text-left">
+                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Horários</p>
+                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">
+                                                {pavilion.opening_hours[0].hours.replace(' to ', '–')}
+                                                <span className="text-[10px] text-dribly-purple font-bold ml-2">
+                                                    {showHours ? '▲' : '▼'} todos
+                                                </span>
+                                            </p>
+                                        </button>
+                                        {showHours && (
+                                            <div className="mt-2 space-y-1">
+                                                {pavilion.opening_hours.map((h, i) => (
+                                                    <div key={i} className="flex justify-between text-xs py-1 border-b border-zinc-50 dark:border-white/5 last:border-0">
+                                                        <span className="text-zinc-500">{DAY_MAP[h.day] || h.day}</span>
+                                                        <span className="font-medium text-zinc-700 dark:text-zinc-300">{h.hours.replace(' to ', ' – ')}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-3 pt-1">
+                                    {pavilion.google_maps_url && (
+                                        <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
+                                            className="text-[10px] text-dribly-purple hover:underline font-bold">
+                                            Google Maps <ArrowUpRight size={10} className="inline" />
+                                        </a>
+                                    )}
+                                    {pavilion.fpb_url && (
+                                        <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
+                                            className="text-[10px] text-dribly-purple hover:underline font-bold">
+                                            FPB <ArrowUpRight size={10} className="inline" />
+                                        </a>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
