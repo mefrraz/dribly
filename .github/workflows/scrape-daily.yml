@@ -68,6 +68,7 @@ jobs:
         run: |
           git config user.name "Dribly Bot"
           git config user.email "bot@dribly.pt"
+          git pull --rebase origin main
           git add public/sitemap.xml
           git diff --staged --quiet || git commit -m "sitemap: daily regeneration"
           git push
