@@ -109,13 +109,13 @@ function TeamRow({ name, logo, score, dimmed }: { name: string; logo: string | n
           <img 
             src={logo} 
             alt="" 
-            className="w-8 h-8 object-contain rounded-full bg-zinc-50 dark:bg-zinc-800" 
+            className="w-7 h-7 object-contain" 
             loading="lazy"
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-8 h-8 bg-zinc-100 dark:bg-white/10 rounded-full flex items-center justify-center shrink-0">
-            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">{name.charAt(0).toUpperCase()}</span>
+          <div className="w-7 h-7 flex items-center justify-center shrink-0">
+            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500">{name.charAt(0).toUpperCase()}</span>
           </div>
         )}
         <span className="text-sm font-bold text-zinc-900 dark:text-white leading-tight truncate">
