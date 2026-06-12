@@ -16,7 +16,7 @@ import { PageHeader } from '../components/PageHeader'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabase'
-import type { Pavilion, PeopleAlsoSearchItem } from '../lib/mapData'
+import type { Pavilion } from '../lib/mapData'
 import { displayPavilionName } from '../lib/mapData'
 import { GameCard } from '../components/GameCard'
 import { EmptyState } from '../components/EmptyState'
@@ -59,7 +59,6 @@ export default function PavilionPage() {
     const [tab, setTab] = useState<Tab>('geral')
     const [darkMode, setDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
     const [showHours, setShowHours] = useState(false)
-    const [nearbyPavs, setNearbyPavs] = useState<Map<string, number>>(new Map()) // title → id
 
     useEffect(() => {
         const observer = new MutationObserver(() => {
@@ -86,51 +85,6 @@ export default function PavilionPage() {
 
             const pav = pavRes.data as Pavilion
             setPavilion(pav)
-
-            // Cross-reference nearby places with pavilion IDs (word-level fuzzy match)
-            const nearby = (pav.people_also_search || []) as PeopleAlsoSearchItem[]
-            if (nearby.length > 0) {
-                const { data: allPavs } = await supabase
-                    .from('pavilions')
-                    .select('id, nome')
-                if (allPavs) {
-                    const all = allPavs as { id: number; nome: string }[]
-                    const map = new Map<string, number>()
-                    for (const place of nearby) {
-                        const qWords = place.title.toLowerCase()
-                            .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
-                            .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
-                            .split(/\s+/).filter(w => w.length > 2)
-                        let bestScore = 0
-                        let bestId = 0
-                        for (const p of all) {
-                            const pn = p.nome.toLowerCase()
-                                .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
-                                .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
-                                .trim()
-                            // Exact or substring match = instant win
-                            if (pn === qWords.join(' ') || pn.includes(qWords.join(' ')) || qWords.join(' ').includes(pn)) {
-                                bestScore = qWords.length + 1
-                                bestId = p.id
-                                break
-                            }
-                            // Word-level: count matching words
-                            const pWords = pn.split(/\s+/)
-                            let score = 0
-                            for (const w of qWords) {
-                                if (pWords.some(pw => pw === w || pw.includes(w) || w.includes(pw))) score++
-                            }
-                            const threshold = Math.min(qWords.length, pWords.length) * 0.5
-                            if (score > bestScore && score >= threshold) {
-                                bestScore = score
-                                bestId = p.id
-                            }
-                        }
-                        if (bestId > 0) map.set(place.title, bestId)
-                    }
-                    setNearbyPavs(map)
-                }
-            }
 
             const searchName = pav.nome
                 .replace(/^Pavilhão\s+/i, '').replace(/^Pav\.\s*/i, '').replace(/^Mun\.\s*/i, '')
@@ -169,7 +123,6 @@ export default function PavilionPage() {
     // Best image: prefer high-res from image_urls[0] for hero, fallback to image_url/foto_url
     const imageSrc = pavilion?.image_urls?.[0] || pavilion?.foto_url || pavilion?.image_url
     const info = pavilion?.additional_info
-    const nearby = (pavilion?.people_also_search || []) as PeopleAlsoSearchItem[]
 
     // Extract flat lists from additional_info
     const accessibilityItems = info?.Acessibilidade?.flatMap(a => Object.keys(a)) || []
