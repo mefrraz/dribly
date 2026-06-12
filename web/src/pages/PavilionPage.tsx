@@ -156,7 +156,7 @@ export default function PavilionPage() {
     const servicesItems = info?.Serviços?.flatMap(a => Object.keys(a)) || []
     const parkingItems = info?.Estacionamento?.flatMap(a => Object.keys(a)) || []
 
-    const hasContactos = !!(pavilion?.phone || pavilion?.website || (pavilion?.opening_hours && pavilion.opening_hours.length > 0) || pavilion?.google_maps_url || pavilion?.fpb_url)
+    const hasContactos = !!(pavilion?.phone || pavilion?.website || (pavilion?.opening_hours && pavilion.opening_hours.length > 0))
     const hasOutros = accessibilityItems.length > 0 || servicesItems.length > 0 || parkingItems.length > 0
 
     const tabs: { value: Tab; label: string; icon: React.ComponentType<Record<string, unknown>> }[] = [
@@ -308,55 +308,66 @@ export default function PavilionPage() {
                             )}
                         </div>
 
-                        {/* Row 2: Smart layout — adapts to available data */}
+                        {/* Row 2: Smart layout */}
                         {hasContactos && hasOutros ? (
-                            /* Both: side by side */
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <ContactosCard pavilion={pavilion} showHours={showHours} setShowHours={setShowHours} />
                                 <OutrosCard accessibilityItems={accessibilityItems} servicesItems={servicesItems} parkingItems={parkingItems} />
                             </div>
                         ) : hasContactos ? (
-                            /* Only contacts: full width */
                             <ContactosCard pavilion={pavilion} showHours={showHours} setShowHours={setShowHours} />
                         ) : hasOutros ? (
-                            /* Only outros: split acessibilidade left, serviços right */
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
-                                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Acessibilidade</p>
-                                    {accessibilityItems.length > 0 ? (
+                            accessibilityItems.length > 0 && servicesItems.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
+                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Acessibilidade</p>
                                         <div className="space-y-1.5">
                                             {accessibilityItems.map((item) => (
                                                 <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
                                             ))}
                                         </div>
-                                    ) : (
-                                        <p className="text-sm text-zinc-400">Sem dados</p>
-                                    )}
-                                    {parkingItems.length > 0 && (
-                                        <div className="mt-4">
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Estacionamento</p>
-                                            <div className="space-y-1.5">
-                                                {parkingItems.map((item) => (
-                                                    <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
-                                                ))}
+                                        {parkingItems.length > 0 && (
+                                            <div className="mt-4">
+                                                <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Estacionamento</p>
+                                                <div className="space-y-1.5">
+                                                    {parkingItems.map((item) => (
+                                                        <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
-                                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Serviços</p>
-                                    {servicesItems.length > 0 ? (
+                                        )}
+                                    </div>
+                                    <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
+                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Serviços</p>
                                         <div className="space-y-1.5">
                                             {servicesItems.map((item) => (
                                                 <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
                                             ))}
                                         </div>
-                                    ) : (
-                                        <p className="text-sm text-zinc-400">Sem dados</p>
-                                    )}
+                                    </div>
                                 </div>
-                            </div>
+                            ) : (
+                                <OutrosCard accessibilityItems={accessibilityItems} servicesItems={servicesItems} parkingItems={parkingItems} />
+                            )
                         ) : null}
+
+                        {/* Links row — always at the bottom */}
+                        {(pavilion.google_maps_url || pavilion.fpb_url) && (
+                            <div className="flex items-center gap-4">
+                                {pavilion.google_maps_url && (
+                                    <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
+                                        className="text-[10px] text-dribly-purple hover:underline font-bold">
+                                        Google Maps <ArrowUpRight size={10} className="inline" />
+                                    </a>
+                                )}
+                                {pavilion.fpb_url && (
+                                    <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
+                                        className="text-[10px] text-dribly-purple hover:underline font-bold">
+                                        FPB <ArrowUpRight size={10} className="inline" />
+                                    </a>
+                                )}
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -456,20 +467,6 @@ function ContactosCard({ pavilion, showHours, setShowHours }: {
                     )}
                 </div>
             )}
-            <div className="flex items-center gap-3 pt-1">
-                {pavilion.google_maps_url && (
-                    <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
-                        className="text-[10px] text-dribly-purple hover:underline font-bold">
-                        Google Maps <ArrowUpRight size={10} className="inline" />
-                    </a>
-                )}
-                {pavilion.fpb_url && (
-                    <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
-                        className="text-[10px] text-dribly-purple hover:underline font-bold">
-                        FPB <ArrowUpRight size={10} className="inline" />
-                    </a>
-                )}
-            </div>
         </div>
     )
 }
