@@ -78,33 +78,33 @@ function clusterIcon(count: number): L.DivIcon {
     })
 }
 
-/** Force center + zoom from URL params — explicit, never skipped by FitBounds */
-function ForceCenter({ center, zoom, skip }: { center: [number, number]; zoom: number; skip: boolean }) {
+/** One-shot view initializer — URL params take priority over auto-fit */
+function InitView({ pavilions, center, zoom, hasUrlParams }: {
+    pavilions: Pavilion[]
+    center: [number, number]
+    zoom: number
+    hasUrlParams: boolean
+}) {
     const map = useMap()
+    const done = useRef(false)
     useEffect(() => {
-        if (skip) return
-        map.whenReady(() => {
-            // Force view AFTER everything else has initialized
-            setTimeout(() => map.setView(center, zoom), 100)
-        })
-    }, [map, center, zoom, skip])
-    return null
-}
-
-/** Fit bounds on first load only */
-function FitBounds({ pavilions, skip }: { pavilions: Pavilion[]; skip: boolean }) {
-    const map = useMap()
-    useEffect(() => {
-        if (skip || pavilions.length === 0) return
-        const bounds = L.latLngBounds(pavilions.map((p) => [p.lat, p.lng] as [number, number]))
+        if (done.current) return
         const isNarrow = typeof window !== 'undefined' && window.innerWidth < 768
         map.whenReady(() => {
-            setTimeout(() => map.fitBounds(bounds, {
-                padding: isNarrow ? [15, 15] : [30, 30],
-                maxZoom: isNarrow ? 8 : 13,
-            }), 300)
+            if (hasUrlParams) {
+                // Explicit center from URL
+                map.setView(center, zoom)
+            } else if (pavilions.length > 0) {
+                // Auto-fit all pavilions
+                const bounds = L.latLngBounds(pavilions.map((p) => [p.lat, p.lng] as [number, number]))
+                map.fitBounds(bounds, {
+                    padding: isNarrow ? [15, 15] : [30, 30],
+                    maxZoom: isNarrow ? 8 : 13,
+                })
+            }
+            done.current = true
         })
-    }, [map, pavilions, skip])
+    }, [map, pavilions, center, zoom, hasUrlParams])
     return null
 }
 
@@ -412,8 +412,7 @@ export default function Mapa() {
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
                         url={darkMode ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png' : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'}
                     />
-                    <FitBounds pavilions={filteredPavilions} skip={initialFitDone || !!selectedDistrict} />
-                    <ForceCenter center={center} zoom={zoom} skip={!initialFitDone} />
+                    <InitView pavilions={filteredPavilions} center={center} zoom={zoom} hasUrlParams={initialFitDone} />
                     <ZoomWatcher onZoom={setZoom} onMove={syncToUrl} />
 
                     {Array.from(clusters.entries()).map(([key, group]) => {
