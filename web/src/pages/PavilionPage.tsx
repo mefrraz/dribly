@@ -87,30 +87,46 @@ export default function PavilionPage() {
             const pav = pavRes.data as Pavilion
             setPavilion(pav)
 
-            // Cross-reference nearby places with pavilion IDs (fuzzy match)
+            // Cross-reference nearby places with pavilion IDs (word-level fuzzy match)
             const nearby = (pav.people_also_search || []) as PeopleAlsoSearchItem[]
             if (nearby.length > 0) {
-                // Fetch ALL pavilion names for fuzzy matching
                 const { data: allPavs } = await supabase
                     .from('pavilions')
                     .select('id, nome')
                 if (allPavs) {
+                    const all = allPavs as { id: number; nome: string }[]
                     const map = new Map<string, number>()
                     for (const place of nearby) {
-                        const q = place.title.toLowerCase()
+                        const qWords = place.title.toLowerCase()
                             .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
                             .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
-                            .trim()
-                        for (const p of allPavs as { id: number; nome: string }[]) {
+                            .split(/\s+/).filter(w => w.length > 2)
+                        let bestScore = 0
+                        let bestId = 0
+                        for (const p of all) {
                             const pn = p.nome.toLowerCase()
                                 .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
                                 .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
                                 .trim()
-                            if (pn === q || pn.includes(q) || q.includes(pn)) {
-                                map.set(place.title, p.id)
+                            // Exact or substring match = instant win
+                            if (pn === qWords.join(' ') || pn.includes(qWords.join(' ')) || qWords.join(' ').includes(pn)) {
+                                bestScore = qWords.length + 1
+                                bestId = p.id
                                 break
                             }
+                            // Word-level: count matching words
+                            const pWords = pn.split(/\s+/)
+                            let score = 0
+                            for (const w of qWords) {
+                                if (pWords.some(pw => pw === w || pw.includes(w) || w.includes(pw))) score++
+                            }
+                            const threshold = Math.min(qWords.length, pWords.length) * 0.5
+                            if (score > bestScore && score >= threshold) {
+                                bestScore = score
+                                bestId = p.id
+                            }
                         }
+                        if (bestId > 0) map.set(place.title, bestId)
                     }
                     setNearbyPavs(map)
                 }
@@ -321,20 +337,20 @@ export default function PavilionPage() {
                                 )}
                             </div>
 
-                            {/* Right: Accessibility, Services, Parking */}
+                            {/* Right: Accessibility, Services, Parking — same sizing as left card */}
                             {(accessibilityItems.length > 0 || servicesItems.length > 0 || parkingItems.length > 0) ? (
                                 <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
                                     {accessibilityItems.length > 0 && (
                                         <div>
-                                            <div className="flex items-center gap-2 mb-2.5">
-                                                <Accessibility size={14} className="text-dribly-purple" />
-                                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Acessibilidade</span>
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <Accessibility size={15} className="text-dribly-purple shrink-0" />
+                                                <span className="text-[10px] text-zinc-400 uppercase tracking-wider">Acessibilidade</span>
                                             </div>
-                                            <div className="space-y-1.5">
+                                            <div className="space-y-2">
                                                 {accessibilityItems.map((item) => (
-                                                    <div key={item} className="flex items-center gap-2.5">
-                                                        <BadgeCheck size={13} className="text-dribly-purple shrink-0" />
-                                                        <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
+                                                    <div key={item} className="flex items-center gap-3">
+                                                        <BadgeCheck size={15} className="text-dribly-purple shrink-0" />
+                                                        <span className="text-sm font-medium text-zinc-900 dark:text-white">{item}</span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -342,15 +358,15 @@ export default function PavilionPage() {
                                     )}
                                     {servicesItems.length > 0 && (
                                         <div>
-                                            <div className="flex items-center gap-2 mb-2.5">
-                                                <Trophy size={14} className="text-dribly-purple" />
-                                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Serviços</span>
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <Trophy size={15} className="text-dribly-purple shrink-0" />
+                                                <span className="text-[10px] text-zinc-400 uppercase tracking-wider">Serviços</span>
                                             </div>
-                                            <div className="space-y-1.5">
+                                            <div className="space-y-2">
                                                 {servicesItems.map((item) => (
-                                                    <div key={item} className="flex items-center gap-2.5">
-                                                        <BadgeCheck size={13} className="text-dribly-purple shrink-0" />
-                                                        <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
+                                                    <div key={item} className="flex items-center gap-3">
+                                                        <BadgeCheck size={15} className="text-dribly-purple shrink-0" />
+                                                        <span className="text-sm font-medium text-zinc-900 dark:text-white">{item}</span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -358,15 +374,15 @@ export default function PavilionPage() {
                                     )}
                                     {parkingItems.length > 0 && (
                                         <div>
-                                            <div className="flex items-center gap-2 mb-2.5">
-                                                <span className="text-sm">🅿️</span>
-                                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Estacionamento</span>
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <span className="text-base">🅿️</span>
+                                                <span className="text-[10px] text-zinc-400 uppercase tracking-wider">Estacionamento</span>
                                             </div>
-                                            <div className="space-y-1.5">
+                                            <div className="space-y-2">
                                                 {parkingItems.map((item) => (
-                                                    <div key={item} className="flex items-center gap-2.5">
-                                                        <BadgeCheck size={13} className="text-dribly-purple shrink-0" />
-                                                        <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
+                                                    <div key={item} className="flex items-center gap-3">
+                                                        <BadgeCheck size={15} className="text-dribly-purple shrink-0" />
+                                                        <span className="text-sm font-medium text-zinc-900 dark:text-white">{item}</span>
                                                     </div>
                                                 ))}
                                             </div>
