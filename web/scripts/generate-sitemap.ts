@@ -15,11 +15,11 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in .env')
+    console.error('Missing Supabase credentials. Set VITE_SUPABASE_URL/SUPABASE_URL and VITE_SUPABASE_ANON_KEY/SUPABASE_SERVICE_ROLE_KEY')
     process.exit(1)
 }
 
