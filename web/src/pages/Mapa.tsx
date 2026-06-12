@@ -78,6 +78,16 @@ function clusterIcon(count: number): L.DivIcon {
     })
 }
 
+/** Force center + zoom from URL params — explicit, never skipped by FitBounds */
+function ForceCenter({ center, zoom, skip }: { center: [number, number]; zoom: number; skip: boolean }) {
+    const map = useMap()
+    useEffect(() => {
+        if (skip) return
+        map.setView(center, zoom)
+    }, [map, center, zoom, skip])
+    return null
+}
+
 /** Fit bounds on first load only */
 function FitBounds({ pavilions, skip }: { pavilions: Pavilion[]; skip: boolean }) {
     const map = useMap()
@@ -400,6 +410,7 @@ export default function Mapa() {
                         url={darkMode ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png' : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'}
                     />
                     <FitBounds pavilions={filteredPavilions} skip={initialFitDone || !!selectedDistrict} />
+                    <ForceCenter center={center} zoom={zoom} skip={!initialFitDone} />
                     <ZoomWatcher onZoom={setZoom} onMove={syncToUrl} />
 
                     {Array.from(clusters.entries()).map(([key, group]) => {
