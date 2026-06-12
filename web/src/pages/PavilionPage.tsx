@@ -10,7 +10,7 @@
  */
 import { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { MapPin, CalendarDays, Trophy, Info, Navigation, Home, Mail, Phone, Globe, Star, Clock, ChevronDown, ChevronUp, ExternalLink, Wheelchair, BadgeCheck } from 'lucide-react'
+import { MapPin, CalendarDays, Trophy, Info, Navigation, Home, Mail, Phone, Globe, Star, Clock, ChevronDown, ChevronUp, ExternalLink, Accessibility, BadgeCheck } from 'lucide-react'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { PageHeader } from '../components/PageHeader'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
@@ -329,7 +329,7 @@ export default function PavilionPage() {
                         {accessibilityItems.length > 0 && (
                             <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
                                 <div className="flex items-center gap-2.5 mb-3">
-                                    <Wheelchair size={14} className="text-green-600" />
+                                    <Accessibility size={14} className="text-green-600" />
                                     <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Acessibilidade</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
