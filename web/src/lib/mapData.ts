@@ -50,6 +50,7 @@ export interface Pavilion {
     phone: string | null
     google_rating: number | null
     reviews_count: number | null
+    images_count: number | null
     opening_hours: OpeningHoursDay[] | null
     additional_info: AdditionalInfo | null
     people_also_search: PeopleAlsoSearchItem[] | null

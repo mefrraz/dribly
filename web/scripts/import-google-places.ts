@@ -100,6 +100,7 @@ interface ImportRow {
     phone: string | null
     google_rating: number | null
     reviews_count: number | null
+    images_count: number | null
     opening_hours: Record<string, unknown>[] | null
     additional_info: Record<string, unknown> | null
     people_also_search: Record<string, unknown>[] | null
@@ -185,6 +186,7 @@ async function main() {
             phone: p.phone || null,
             google_rating: p.totalScore ?? null,
             reviews_count: p.reviewsCount ?? null,
+            images_count: p.imagesCount ?? null,
             opening_hours: p.openingHours?.length ? p.openingHours : null,
             additional_info: p.additionalInfo && Object.keys(p.additionalInfo).length > 0 ? p.additionalInfo : null,
             people_also_search: p.peopleAlsoSearch?.length ? p.peopleAlsoSearch : null,

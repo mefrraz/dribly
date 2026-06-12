@@ -501,7 +501,7 @@ export default function PavilionPage() {
                                         <Camera size={15} className="text-dribly-purple shrink-0 mt-0.5" />
                                         <div className="min-w-0">
                                             <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Fotos</p>
-                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.imagesCount ?? '—'} no Google</p>
+                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.images_count ?? '—'} no Google</p>
                                         </div>
                                     </div>
                                 )}
