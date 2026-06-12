@@ -279,8 +279,18 @@ export default function PavilionPage() {
                                     </a>
                                 </div>
                                 <div className="p-5 space-y-2">
-                                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider">Morada</p>
-                                    <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.rua || pavilion.morada_completa || '—'}</p>
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider">Morada</p>
+                                            <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.rua || pavilion.morada_completa || '—'}</p>
+                                        </div>
+                                        <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || pavilion.nome)}`}
+                                           target="_blank" rel="noopener noreferrer"
+                                           className="shrink-0 px-3 py-1.5 rounded-xl bg-dribly-purple text-white text-[10px] font-bold hover:bg-dribly-purple/90 transition-colors inline-flex items-center gap-1">
+                                            <Navigation size={11} />
+                                            Direções
+                                        </a>
+                                    </div>
                                     <div className="flex gap-3 text-xs text-zinc-500 dark:text-zinc-400">
                                         {pavilion.codigo_postal && <span>{pavilion.codigo_postal}</span>}
                                         {pavilion.distrito && <span>· {pavilion.distrito}</span>}
