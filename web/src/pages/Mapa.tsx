@@ -88,7 +88,7 @@ function FitBounds({ pavilions, skip }: { pavilions: Pavilion[]; skip: boolean }
         map.whenReady(() => {
             setTimeout(() => map.fitBounds(bounds, {
                 padding: isNarrow ? [15, 15] : [30, 30],
-                maxZoom: isNarrow ? 7 : 13,
+                maxZoom: isNarrow ? 8 : 13,
             }), 300)
         })
     }, [map, pavilions, skip])
@@ -393,7 +393,7 @@ export default function Mapa() {
                     <p className="text-sm text-zinc-400">Nenhum pavilhão neste distrito.</p>
                 </div>
             ) : (
-                <MapContainer center={center} zoom={zoom} minZoom={5} maxZoom={18} ref={mapRef}
+                <MapContainer center={center} zoom={zoom} minZoom={6} maxZoom={18} ref={mapRef}
                     className="w-full h-full" zoomControl={true} scrollWheelZoom={true}>
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'

@@ -268,7 +268,7 @@ export default function PavilionPage() {
                         <div className={`grid grid-cols-1 ${sideContent ? 'md:grid-cols-[2fr_1fr]' : ''} gap-4`}>
                             {/* Localização */}
                             <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
-                                <div className="h-40 md:h-48 relative group">
+                                <div className="h-40 md:h-48 relative group z-0">
                                     <MapContainer
                                         center={[pavilion.lat, pavilion.lng]}
                                         zoom={15}
@@ -277,7 +277,7 @@ export default function PavilionPage() {
                                         scrollWheelZoom={false}
                                         doubleClickZoom={false}
                                         attributionControl={false}
-                                        className="w-full h-full"
+                                        className="w-full h-full z-0"
                                     >
                                         <TileLayer url={darkMode ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png' : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'} />
                                         <Marker position={[pavilion.lat, pavilion.lng]}

@@ -101,9 +101,9 @@ function ClubHome() {
                 <h1 className="text-lg font-bold text-zinc-900 dark:text-white truncate flex-1">
                     {displayName(club)}
                     {club.elo_rating != null && (
-                        <Link to={`/ranking?destaque=${club.slug}`} className="ml-2 text-xs font-bold text-white bg-[var(--club-color)] px-1.5 py-0.5 rounded-md hover:opacity-80 transition-opacity inline-flex items-center gap-1"
+                        <Link to={`/ranking?destaque=${club.slug}`} className="ml-2 text-sm font-black text-white bg-[var(--club-color)] px-2 py-0.5 rounded-lg hover:opacity-80 transition-opacity inline-flex items-center gap-1.5"
                             title="Rating de força — baseado nos resultados históricos">
-                            <TrendingUp size={11} />
+                            <TrendingUp size={14} />
                             {club.elo_rating}
                         </Link>
                     )}
