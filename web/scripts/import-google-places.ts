@@ -46,14 +46,14 @@ interface GooglePlace {
     title: string
     subTitle: string | null
     description: string | null
-    address: string
+    address: string | null
     street: string | null
     city: string | null
     postalCode: string | null
     countryCode: string | null
     website: string | null
     phone: string | null
-    location: { lat: number; lng: number }
+    location: { lat: number; lng: number } | null
     placeId: string | null
     totalScore: number | null
     reviewsCount: number | null
@@ -154,8 +154,15 @@ async function main() {
         console.log(`   ${backups.length} backup pavilions loaded`)
     }
 
-    // 2. Map to import rows
-    const rows: ImportRow[] = places.map((p) => {
+    // 2. Filter out records without location, then map to import rows
+    const skipped = places.filter(p => !p.location)
+    if (skipped.length > 0) {
+        console.log(`   ⚠️  ${skipped.length} places skipped (no location):`)
+        skipped.forEach(p => console.log(`      - ${p.title}`))
+    }
+    const withLocation = places.filter(p => p.location)
+
+    const rows: ImportRow[] = withLocation.map((p) => {
         const match = backups.length > 0 ? findMatch(p.title, backups) : null
         return {
             nome: p.title,
@@ -164,8 +171,8 @@ async function main() {
             cidade: p.city || null,
             distrito: match?.distrito ?? null,
             concelho: match?.concelho ?? null,
-            lat: p.location.lat,
-            lng: p.location.lng,
+            lat: p.location!.lat,
+            lng: p.location!.lng,
             morada_completa: p.address || null,
             foto_url: p.imageUrl || null,
             fpb_url: null, // Google data doesn't have FPB URLs
@@ -190,13 +197,14 @@ async function main() {
     const withImage = rows.filter(r => r.image_url).length
     const withRating = rows.filter(r => r.google_rating).length
     const withDistrito = rows.filter(r => r.distrito).length
-    console.log(`\n📊 Stats:`)
-    console.log(`   ${withImage}/${rows.length} with images`)
-    console.log(`   ${withRating}/${rows.length} with ratings`)
-    console.log(`   ${withDistrito}/${rows.length} matched distrito from backup`)
+    const total = rows.length
+    console.log(`\n📊 Stats (${total} with coordinates, ${skipped.length} skipped):`)
+    console.log(`   ${withImage}/${total} with images`)
+    console.log(`   ${withRating}/${total} with ratings`)
+    console.log(`   ${withDistrito}/${total} matched distrito from backup`)
 
     // 3. Confirm
-    console.log(`\n⚠️  About to DELETE all ${backups.length} existing pavilions and INSERT ${rows.length} new ones.`)
+    console.log(`\n⚠️  About to DELETE all existing pavilions and INSERT ${rows.length} new ones.`)
     console.log('   Press Ctrl+C within 5s to abort...')
     await new Promise(r => setTimeout(r, 5000))
 
