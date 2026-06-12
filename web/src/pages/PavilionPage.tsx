@@ -308,7 +308,7 @@ export default function PavilionPage() {
 
                             {/* Side: Hours (square, open by default) or Rating */}
                             {sideContent === 'hours' && pavilion.opening_hours ? (
-                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 aspect-square p-5 flex flex-col">
+                                <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 flex flex-col">
                                     <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-3">Horários</p>
                                     <div className="flex-1 space-y-1 overflow-y-auto">
                                         {sortHoursByDay(pavilion.opening_hours).map((h, i) => (
