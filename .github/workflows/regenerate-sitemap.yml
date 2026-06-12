@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: web
-        run: npm install
+        run: npm install --no-save
 
       - name: Generate sitemap
         working-directory: web

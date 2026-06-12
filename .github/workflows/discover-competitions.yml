@@ -18,7 +18,7 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         working-directory: scrapers
-        run: npm ci
+        run: npm install
       - name: Discover competitions
         working-directory: scrapers
         run: npm run discover
