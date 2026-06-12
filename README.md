@@ -33,23 +33,26 @@
 
 ## 🎯 Porquê a Dribly
 
-O basquetebol português tem centenas de clubes e dezenas de competições, mas as plataformas disponíveis ou são pagas, ou desktop-only, ou limitadas a uma competição. A Dribly preenche essa lacuna com uma app 100% gratuita, mobile-first e open source.
+O basquetebol português tem centenas de clubes e dezenas de competições, mas não existia uma plataforma **gratuita, mobile-first e open source** que reunisse tudo num só sítio. A FPB tem dados oficiais mas sem app, o Swish é pago, o TugaBasket não é mobile. A Dribly nasceu para ocupar esse espaço — feita por um fã de basquetebol, para a comunidade.
 
 | Funcionalidade | Dribly | FPB.pt | Swish | TugaBasket |
 |---|---|---|---|---|
 | Mobile-first | ✅ | ✅ | ✅ | ❌ |
-| App instalável | ✅ | ❌ | ✅ | ❌ |
+| App instalável (PWA) | ✅ | ❌ | ✅ | ❌ |
 | **Open source** | ✅ | ❌ | ❌ | ❌ |
 | **100% gratuito** | ✅ | ✅ | ❌ | ✅ |
 | Multi-clube | ✅ | ✅ | ⚠️ | ❌ |
 | Multi-escalão | ✅ | ✅ | ⚠️ | ❌ |
 | Offline parcial | ✅ | ❌ | ❌ | ❌ |
-| Ficha de jogo detalhada | ✅ | ✅ | ✅ | ❌ |
+| Ficha de jogo (períodos, H2H) | ✅ | ✅ | ✅ | ❌ |
 | Estatísticas individuais | ✅ | ✅ | ✅ | ❌ |
+| Atletas e equipas | ✅ | ❌ | ❌ | ❌ |
 | Contas / Seguir clubes | ✅ | ❌ | ✅ | ❌ |
 | Perfil + Segurança | ✅ | ❌ | ✅ | ❌ |
-| Mapa de pavilhões | ✅ | ❌ | ❌ | ❌ |
-| Pavilhões (detalhe) | ✅ | ✅ | ❌ | ❌ |
+| Mapa de pavilhões (400+) | ✅ | ❌ | ❌ | ❌ |
+| Pavilhões com fotos, rating ⭐ | ✅ | ❌ | ❌ | ❌ |
+| Ranking ELO nacional | ✅ | ❌ | ❌ | ❌ |
+| Modo escuro | ✅ | ❌ | ✅ | ❌ |
 
 ---
 
@@ -71,8 +74,10 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 | 🏆 Classificações | 3.3 | Tabelas com J, V, D, PM, PS, DIF, PTS |
 | 📊 Estatísticas individuais | 3.4 | 22 campos — PTS, REB, AST, VAL, %L2, %L3, %LL |
 | 🗺️ Mapa de pavilhões | 6.0 | Leaflet interativo com 400+ pavilhões, clustering, geolocalização |
-| 🏟️ Pavilhões Google Places | 11.0 | Fotos, ratings, horários, acessibilidade, serviços por pavilhão |
-| 🏆 ELO Ranking | 10.0 | Rating ELO nacional por época, top 20 clubes |
+| 🏟️ Pavilhões Google Places | 11.0 | Fotos, ratings ⭐, horários 🕐, acessibilidade ♿, serviços |
+| 🏀 Atletas e equipas | 7.24 | Página de atleta com stats, carreira, biografia. Plantel com fotos |
+| 📸 Fotos de equipas | 7.24 | Scraping de fotos oficiais da FPB, filtro de placeholders |
+| 🏆 ELO Ranking | 10.0 | Rating ELO nacional por época, top 20 clubes, explicação do sistema |
 | ⚡ Pre-warming de cache | 7.12 | Dados pré-carregados antes do pico de utilização |
 | 🛠️ Scraper automático | 7.2 | GitHub Action diária para dados sempre frescos |
 
