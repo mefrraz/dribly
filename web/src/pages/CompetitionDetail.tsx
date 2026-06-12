@@ -361,7 +361,7 @@ export default function CompetitionDetail() {
                 {/* Tab bar */}
                 <div ref={tabBarRef}
                     className={`sticky top-16 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl px-3 sm:px-5 py-2.5 mb-5 border border-zinc-200/60 dark:border-zinc-800/60 shadow-md overflow-x-auto transition-[border-radius] duration-200 ${
-                        isStuck ? 'rounded-none' : 'rounded-xl'
+                        isStuck ? 'rounded-b-xl' : 'rounded-xl'
                     }`}>
                     <div className="flex gap-1.5 min-w-max">
                         {getTabsFor().map(t => {
