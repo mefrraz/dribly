@@ -142,13 +142,35 @@ async function main() {
     let okCount = 0
     let failCount = 0
 
-    // Process in parallel batches of 3 for speed (Nominatim ≈ 1 req/s per IP)
+    // Process in parallel batches. Auto-throttle on rate limit.
     const PARALLEL = 5
+    let dynDelay = DELAY_MS
     for (let i = startIdx; i < recintos.length; i += PARALLEL) {
         const batch = recintos.slice(i, i + PARALLEL)
         const geoResults = await Promise.all(
             batch.map(r => geocodeAddress(r.rua || '', r.codigo_postal || '', r.cidade || '', r.nome))
         )
+
+        // Detect rate limit: if all failed, back off
+        const allFailed = geoResults.every(g => g.lat === null)
+        if (allFailed && batch.length >= 3) {
+            dynDelay = Math.min(dynDelay * 2, 30000)
+            console.log(`  ⚠️  Rate limit detected — backing off to ${(dynDelay / 1000).toFixed(0)}s...`)
+            await sleep(dynDelay)
+            // Retry this batch one by one
+            const retryResults = []
+            for (const r of batch) {
+                const geo = await geocodeAddress(r.rua || '', r.codigo_postal || '', r.cidade || '', r.nome)
+                retryResults.push(geo)
+                await sleep(1500)
+            }
+            // Use retry results
+            for (let bi = 0; bi < batch.length; bi++) {
+                geoResults[bi] = retryResults[bi]
+            }
+        } else if (dynDelay > DELAY_MS) {
+            dynDelay = Math.max(dynDelay / 2, DELAY_MS)
+        }
 
         for (let bi = 0; bi < batch.length; bi++) {
             const r = batch[bi]
@@ -175,7 +197,7 @@ async function main() {
             fs.writeFileSync(ckptPath, JSON.stringify(results, null, 2), 'utf-8')
         }
 
-        if (i + PARALLEL < recintos.length) await sleep(DELAY_MS)
+        if (i + PARALLEL < recintos.length) await sleep(dynDelay)
     }
 
     if (fs.existsSync(ckptPath)) fs.unlinkSync(ckptPath)
