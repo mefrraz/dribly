@@ -189,13 +189,21 @@ export default function PavilionPage() {
             <div className="max-w-6xl mx-auto px-4 pt-6 pb-24">
                 <PageHeader />
 
-                {/* Hero image — 16:9, full width */}
+                {/* Hero image — 16:9, full width, with loading spinner */}
                 {imageSrc && (
-                    <div className="rounded-2xl overflow-hidden aspect-[16/9] mb-6 bg-zinc-100 dark:bg-zinc-800">
+                    <div className="rounded-2xl overflow-hidden aspect-[16/9] mb-6 bg-zinc-100 dark:bg-zinc-800 relative">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-8 h-8 border-2 border-dribly-purple/30 border-t-dribly-purple rounded-full animate-spin" />
+                        </div>
                         <img
                             src={imageSrc}
                             alt={pavilion.nome}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover relative z-10"
+                            loading="lazy"
+                            onLoad={(e) => {
+                                const spinner = (e.target as HTMLImageElement).previousElementSibling as HTMLElement
+                                if (spinner) spinner.style.display = 'none'
+                            }}
                             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                         />
                     </div>
@@ -383,22 +391,20 @@ export default function PavilionPage() {
                         ) : null}
 
                         {/* Links row — always at the bottom */}
-                        {(pavilion.google_maps_url || pavilion.fpb_url) && (
-                            <div className="flex items-center gap-4">
-                                {pavilion.google_maps_url && (
-                                    <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
-                                        className="text-[10px] text-dribly-purple hover:underline font-bold">
-                                        Google Maps <ArrowUpRight size={10} className="inline" />
-                                    </a>
-                                )}
-                                {pavilion.fpb_url && (
-                                    <a href={pavilion.fpb_url} target="_blank" rel="noopener noreferrer"
-                                        className="text-[10px] text-dribly-purple hover:underline font-bold">
-                                        FPB <ArrowUpRight size={10} className="inline" />
-                                    </a>
-                                )}
-                            </div>
-                        )}
+                        <div className="flex items-center gap-4">
+                            {pavilion.google_maps_url && (
+                                <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
+                                    className="text-[10px] text-dribly-purple hover:underline font-bold">
+                                    Google Maps <ArrowUpRight size={10} className="inline" />
+                                </a>
+                            )}
+                            {(pavilion.fpb_url || pavilion.recinto_id) && (
+                                <a href={pavilion.fpb_url || `https://www.fpb.pt/recinto/${pavilion.recinto_id}/`} target="_blank" rel="noopener noreferrer"
+                                    className="text-[10px] text-dribly-purple hover:underline font-bold">
+                                    FPB <ArrowUpRight size={10} className="inline" />
+                                </a>
+                            )}
+                        </div>
                     </div>
                 )}
 

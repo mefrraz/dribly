@@ -107,7 +107,7 @@ function useClusters(pavilions: Pavilion[], zoom: number): Map<string, Pavilion[
             }
             return singles
         }
-        const precision = Math.max(2, Math.pow(2, zoom - 7))
+        const precision = Math.max(2, Math.pow(2, zoom - 8))
         const clusters = new Map<string, Pavilion[]>()
         for (const p of pavilions) {
             const latR = Math.round(p.lat * precision) / precision
