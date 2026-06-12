@@ -32,8 +32,17 @@ export default defineConfig({
     plugins: [
         react(),
         VitePWA({
+            // Custom SW (sw.ts) — injectManifest strategy
+            strategies: 'injectManifest',
+            srcDir: 'src',
+            filename: 'sw.ts',
             registerType: 'autoUpdate',
-            includeAssets: ['logo.png', 'index.html'],
+            injectManifest: {
+                // Exclude index.html from precache — HTML is served via
+                // NetworkFirst in the custom SW so it's never stale.
+                globIgnores: ['**/index.html'],
+            },
+            includeAssets: ['logo.png'],
             manifest: {
                 name: 'Dribly',
                 short_name: 'Dribly',
@@ -62,66 +71,6 @@ export default defineConfig({
                         sizes: '512x512',
                         type: 'image/png',
                         purpose: 'maskable'
-                    }
-                ]
-            },
-            workbox: {
-                // Force SW to take control immediately (avoids stale bundles)
-                skipWaiting: true,
-                clientsClaim: true,
-                // Cache Supabase API responses for offline access
-                runtimeCaching: [
-                    {
-                        // Always fetch fresh HTML (never serve stale)
-                        urlPattern: ({ request }) => request.destination === 'document',
-                        handler: 'NetworkFirst',
-                        options: {
-                            cacheName: 'html-cache',
-                            expiration: { maxEntries: 5, maxAgeSeconds: 60 },
-                            cacheableResponse: { statuses: [0, 200] }
-                        }
-                    },
-                    {
-                        // Cache FPB proxy responses (stale-while-revalidate)
-                        urlPattern: /\/api\/fpb/i,
-                        handler: 'StaleWhileRevalidate',
-                        options: {
-                            cacheName: 'fpb-api-cache',
-                            expiration: {
-                                maxEntries: 50,
-                                maxAgeSeconds: 60 * 15 // 15 minutes
-                            },
-                            cacheableResponse: {
-                                statuses: [0, 200]
-                            }
-                        }
-                    },
-                    {
-                        // Cache Supabase REST API calls
-                        urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/i,
-                        handler: 'NetworkFirst',
-                        options: {
-                            cacheName: 'supabase-api-cache',
-                            expiration: {
-                                maxEntries: 100,
-                                maxAgeSeconds: 60 * 60 * 2 // 2 hours
-                            },
-                            cacheableResponse: {
-                                statuses: [0, 200]
-                            }
-                        }
-                    },
-                    {
-                        // Cache Google Fonts
-                        urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-                        handler: 'CacheFirst',
-                        options: {
-                            cacheName: 'google-fonts-cache',
-                            expiration: {
-                                maxEntries: 10,
-                                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
-                            }
-                        }
                     }
                 ]
             }
