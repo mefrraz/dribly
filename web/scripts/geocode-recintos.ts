@@ -142,40 +142,40 @@ async function main() {
     let okCount = 0
     let failCount = 0
 
-    for (let i = startIdx; i < recintos.length; i++) {
-        const r = recintos[i]
-        const addr = [r.rua, r.codigo_postal, r.cidade].filter(Boolean).join(', ')
+    // Process in parallel batches of 3 for speed (Nominatim ≈ 1 req/s per IP)
+    const PARALLEL = 3
+    for (let i = startIdx; i < recintos.length; i += PARALLEL) {
+        const batch = recintos.slice(i, i + PARALLEL)
+        const geoResults = await Promise.all(
+            batch.map(r => geocodeAddress(r.rua || '', r.codigo_postal || '', r.cidade || '', r.nome))
+        )
 
-        const geo = await geocodeAddress(r.rua || '', r.codigo_postal || '', r.cidade || '', r.nome)
-        const ok = geo.lat !== null
-        if (ok) okCount++
-        else failCount++
+        for (let bi = 0; bi < batch.length; bi++) {
+            const r = batch[bi]
+            const geo = geoResults[bi]
+            const idx = i + bi
+            const ok = geo.lat !== null
+            if (ok) okCount++
+            else failCount++
 
-        const icon = ok ? '✅' : '❌'
-        const detail = ok ? `→ ${geo.lat!.toFixed(4)}, ${geo.lng!.toFixed(4)} (${geo.distrito || '?'})` : 'no results'
-        console.log(`  [${i + 1}/${recintos.length}] ${icon} ${r.nome} ${detail}`)
+            const icon = ok ? '✅' : '❌'
+            const detail = ok ? `→ ${geo.lat!.toFixed(4)}, ${geo.lng!.toFixed(4)} (${geo.distrito || '?'})` : 'no results'
+            console.log(`  [${idx + 1}/${recintos.length}] ${icon} ${r.nome} ${detail}`)
 
-        results.push({
-            recinto_id: r.recinto_id,
-            nome: r.nome,
-            rua: r.rua,
-            codigo_postal: r.codigo_postal,
-            cidade: r.cidade,
-            url: r.url,
-            lat: geo.lat,
-            lng: geo.lng,
-            distrito: geo.distrito,
-            concelho: geo.concelho,
-            morada_completa: geo.morada,
-            foto_url: null,
-            geocode_ok: ok,
-        })
+            results.push({
+                recinto_id: r.recinto_id, nome: r.nome, rua: r.rua,
+                codigo_postal: r.codigo_postal, cidade: r.cidade, url: r.url,
+                lat: geo.lat, lng: geo.lng, distrito: geo.distrito,
+                concelho: geo.concelho, morada_completa: geo.morada,
+                foto_url: null, geocode_ok: ok,
+            })
+        }
 
-        if ((i + 1) % 20 === 0) {
+        if ((i + PARALLEL) % 25 < PARALLEL) {
             fs.writeFileSync(ckptPath, JSON.stringify(results, null, 2), 'utf-8')
         }
 
-        if (i < recintos.length - 1) await sleep(DELAY_MS)
+        if (i + PARALLEL < recintos.length) await sleep(DELAY_MS)
     }
 
     if (fs.existsSync(ckptPath)) fs.unlinkSync(ckptPath)

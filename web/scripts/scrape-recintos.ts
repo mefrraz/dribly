@@ -18,8 +18,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const FPB_BASE = 'https://www.fpb.pt'
-const OUTPUT = path.join(__dirname, '..', '..', 'recintos_com_morada.json')
-const CKPT = path.join(__dirname, '..', '..', 'recintos_ckpt.json')
+const OUTPUT = path.join(__dirname, '..', '..', 'scripts', 'recintos_com_morada.json')
+const CKPT = path.join(__dirname, '..', '..', 'scripts', 'recintos_ckpt.json')
 
 const MIN_ID = 9100
 const MAX_ID = 10200
