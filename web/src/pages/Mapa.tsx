@@ -108,8 +108,8 @@ function useClusters(pavilions: Pavilion[], zoom: number): Map<string, Pavilion[
             }
             return singles
         }
-        // More aggressive clustering: zoom-9 base instead of zoom-8
-        const precision = Math.max(1, Math.pow(2, zoom - 9))
+        // Aggressive clustering: bigger cells at lower zooms
+        const precision = Math.max(0.5, Math.pow(2, zoom - 10))
         const clusters = new Map<string, Pavilion[]>()
         for (const p of pavilions) {
             const latR = Math.round(p.lat * precision) / precision
