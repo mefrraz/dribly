@@ -155,9 +155,9 @@ export default function PavilionPage() {
             <div className="max-w-6xl mx-auto px-4 pt-6 pb-24">
                 <PageHeader />
 
-                {/* Hero image — full width, rounded */}
+                {/* Hero image — 16:9, full width */}
                 {imageSrc && (
-                    <div className="rounded-2xl overflow-hidden h-48 md:h-64 mb-6 bg-zinc-100 dark:bg-zinc-800">
+                    <div className="rounded-2xl overflow-hidden aspect-[16/9] mb-6 bg-zinc-100 dark:bg-zinc-800">
                         <img
                             src={imageSrc}
                             alt={pavilion.nome}
@@ -274,23 +274,23 @@ export default function PavilionPage() {
                                 <div className="grid grid-cols-2 gap-4 pt-2 border-t border-zinc-100 dark:border-white/5">
                                     {pavilion.phone && (
                                         <div className="flex items-start gap-2.5">
-                                            <Phone size={14} className="text-zinc-400 shrink-0 mt-0.5" />
+                                            <Phone size={14} className="text-dribly-purple shrink-0 mt-0.5" />
                                             <div className="min-w-0">
                                                 <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Telefone</p>
-                                                <a href={`tel:${pavilion.phone}`} className="text-sm font-medium text-dribly-blue hover:underline break-words">
-                                                    {pavilion.phone}
-                                                </a>
+                                                <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.phone}</p>
                                             </div>
                                         </div>
                                     )}
                                     {pavilion.website && (
                                         <div className="flex items-start gap-2.5">
-                                            <Globe size={14} className="text-zinc-400 shrink-0 mt-0.5" />
+                                            <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="shrink-0 mt-0.5">
+                                                <Globe size={14} className="text-dribly-purple" />
+                                            </a>
                                             <div className="min-w-0">
                                                 <p className="text-[10px] text-zinc-400 uppercase mb-0.5">Website</p>
-                                                <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-dribly-blue hover:underline break-words inline-flex items-center gap-1">
+                                                <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-900 dark:text-white hover:underline break-words inline-flex items-center gap-1">
                                                     {new URL(pavilion.website).hostname.replace('www.', '')}
-                                                    <ExternalLink size={10} />
+                                                    <ExternalLink size={10} className="text-zinc-400" />
                                                 </a>
                                             </div>
                                         </div>
@@ -325,55 +325,57 @@ export default function PavilionPage() {
                             </div>
                         )}
 
-                        {/* Accessibility */}
-                        {accessibilityItems.length > 0 && (
-                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
-                                <div className="flex items-center gap-2.5 mb-3">
-                                    <Accessibility size={14} className="text-green-600" />
-                                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Acessibilidade</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {accessibilityItems.map((item) => (
-                                        <span key={item} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-50 dark:bg-green-900/20 text-[11px] font-medium text-green-700 dark:text-green-400">
-                                            <BadgeCheck size={11} />
-                                            {item}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Services */}
-                        {servicesItems.length > 0 && (
-                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
-                                <div className="flex items-center gap-2.5 mb-3">
-                                    <Trophy size={14} className="text-dribly-purple" />
-                                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Serviços</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {servicesItems.map((item) => (
-                                        <span key={item} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-dribly-purple/10 text-[11px] font-medium text-dribly-purple">
-                                            {item}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Parking */}
-                        {parkingItems.length > 0 && (
-                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
-                                <div className="flex items-center gap-2.5 mb-3">
-                                    <span className="text-sm">🅿️</span>
-                                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Estacionamento</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {parkingItems.map((item) => (
-                                        <span key={item} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-[11px] font-medium text-blue-700 dark:text-blue-400">
-                                            {item}
-                                        </span>
-                                    ))}
-                                </div>
+                        {/* Accessibility + Services + Parking — combined card */}
+                        {(accessibilityItems.length > 0 || servicesItems.length > 0 || parkingItems.length > 0) && (
+                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
+                                {accessibilityItems.length > 0 && (
+                                    <div className="p-5 border-b border-zinc-100 dark:border-white/5 last:border-0">
+                                        <div className="flex items-center gap-2.5 mb-3">
+                                            <Accessibility size={14} className="text-green-600" />
+                                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Acessibilidade</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {accessibilityItems.map((item) => (
+                                                <div key={item} className="flex items-center gap-2.5">
+                                                    <BadgeCheck size={13} className="text-green-500 shrink-0" />
+                                                    <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {servicesItems.length > 0 && (
+                                    <div className="p-5 border-b border-zinc-100 dark:border-white/5 last:border-0">
+                                        <div className="flex items-center gap-2.5 mb-3">
+                                            <Trophy size={14} className="text-dribly-purple" />
+                                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Serviços</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {servicesItems.map((item) => (
+                                                <div key={item} className="flex items-center gap-2.5">
+                                                    <BadgeCheck size={13} className="text-dribly-purple shrink-0" />
+                                                    <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {parkingItems.length > 0 && (
+                                    <div className="p-5">
+                                        <div className="flex items-center gap-2.5 mb-3">
+                                            <span className="text-sm">🅿️</span>
+                                            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Estacionamento</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {parkingItems.map((item) => (
+                                                <div key={item} className="flex items-center gap-2.5">
+                                                    <BadgeCheck size={13} className="text-blue-500 shrink-0" />
+                                                    <span className="text-xs text-zinc-600 dark:text-zinc-400">{item}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -384,18 +386,22 @@ export default function PavilionPage() {
                                     <MapPin size={14} className="text-amber-500" />
                                     <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Locais próximos</span>
                                 </div>
-                                <div className="space-y-1.5">
+                                <div className="divide-y divide-zinc-100 dark:divide-white/5">
                                     {nearby.slice(0, 6).map((place, i) => (
-                                        <div key={i} className="flex items-center justify-between py-1.5 border-b border-zinc-50 dark:border-white/5 last:border-0">
-                                            <div className="flex items-center gap-2 min-w-0">
-                                                <MapPin size={11} className="text-zinc-400 shrink-0" />
+                                        <div key={i} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
+                                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                                <span className="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+                                                    <MapPin size={10} className="text-amber-600 dark:text-amber-400" />
+                                                </span>
                                                 <span className="text-xs text-zinc-700 dark:text-zinc-300 truncate">{place.title}</span>
                                             </div>
-                                            {place.totalScore > 0 && (
-                                                <span className="text-[10px] text-zinc-400 shrink-0 ml-2 flex items-center gap-0.5">
-                                                    <Star size={9} className="text-amber-500 fill-amber-500" />
+                                            {place.totalScore > 0 ? (
+                                                <span className="text-[11px] font-medium text-zinc-500 shrink-0 ml-2 flex items-center gap-1">
+                                                    <Star size={10} className="text-amber-500 fill-amber-500" />
                                                     {place.totalScore.toFixed(1)}
                                                 </span>
+                                            ) : (
+                                                <span className="text-[10px] text-zinc-300 shrink-0 ml-2">s/ avaliações</span>
                                             )}
                                         </div>
                                     ))}

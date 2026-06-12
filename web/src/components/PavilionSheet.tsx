@@ -74,9 +74,9 @@ export function PavilionSheet({ pavilion, isOpen, onClose }: Props) {
                 border-t md:border border-zinc-200 dark:border-white/10
                 shadow-2xl
             `}>
-                {/* Photo — above the name */}
+                {/* Photo — 16:9 above the name */}
                 {(pavilion.image_url || pavilion.foto_url) && (
-                    <div className="shrink-0 h-28 md:h-36 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                    <div className="shrink-0 aspect-[16/9] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
                         <img
                             src={pavilion.image_url || pavilion.foto_url || undefined}
                             alt={pavilion.nome}
