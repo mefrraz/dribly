@@ -234,24 +234,35 @@ function Game() {
             .trim()
         fetchPavilions().then(pavs => {
             const q = core
-            // Match by core name (both directions), or by first word match if core is short
-            const found = pavs.find(p => {
+            // Score-based matching: exact > substring > word overlap
+            let bestScore = 0
+            let bestPav: Pavilion | null = null
+            for (const p of pavs) {
                 const pn = p.nome.toLowerCase()
                     .replace(/^pavilhão\s+/i, '').replace(/^pav\.?\s*/i, '')
                     .replace(/^mun\.?\s*/i, '').replace(/^municipal\s+/i, '')
                     .replace(/\s*,.+$/, '')
                     .trim()
-                // Exact core match
-                if (pn === q || q === pn) return true
-                // Substring both ways
-                if (pn.includes(q) || q.includes(pn)) return true
-                // First significant word match (for short names like "Dragão Arena")
-                const qWords = q.split(/\s+/).filter(w => w.length > 2)
-                const pWords = pn.split(/\s+/).filter(w => w.length > 2)
-                if (qWords.length > 0 && pWords.length > 0 && qWords[0] === pWords[0]) return true
-                return false
-            })
-            setPavilion(found || null)
+                let score = 0
+                // Exact match = 100
+                if (pn === q || q === pn) { score = 100 }
+                // Full substring containment = 80
+                else if (pn.includes(q) || q.includes(pn)) { score = 80 }
+                // Word overlap (require 2+ words matching)
+                else {
+                    const qWords = q.split(/\s+/).filter(w => w.length > 2)
+                    const pWords = pn.split(/\s+/).filter(w => w.length > 2)
+                    let matches = 0
+                    for (const w of qWords) {
+                        if (pWords.some(pw => pw === w || pw.includes(w) || w.includes(pw))) matches++
+                    }
+                    if (matches >= 2) score = 40 + matches * 10
+                    else if (matches === 1 && qWords.length === 1 && qWords[0].length > 4) score = 20
+                }
+                if (score > bestScore) { bestScore = score; bestPav = p }
+            }
+            // Only match if score is high enough
+            setPavilion(bestScore >= 20 ? bestPav : null)
         }).catch(() => {})
     }, [match?.local])
 
