@@ -15,6 +15,8 @@ import { useUser } from '@clerk/clerk-react'
 // ── Page view beacon (once per session per page) ──────
 
 const VIEWED_KEY = 'dribly_viewed_pages'
+declare const __GIT_HASH__: string
+
 function trackPageView() {
     const today = new Date().toISOString().split('T')[0]
     const raw = localStorage.getItem(VIEWED_KEY)
@@ -195,6 +197,8 @@ function Layout() {
                         <span>&copy; {new Date().getFullYear()}</span>
                         <span className="text-zinc-400">•</span>
                         <Link to="/privacidade" className="hover:text-dribly-purple transition-colors">Privacidade</Link>
+                        <span className="text-zinc-400">•</span>
+                        <span className="text-xs text-zinc-400 font-mono">{__GIT_HASH__}</span>
                     </div>
                     <div className="flex gap-4">
                         <a href="https://www.instagram.com/dribly" target="_blank" rel="noopener noreferrer" className="hover:text-dribly-purple transition-colors">

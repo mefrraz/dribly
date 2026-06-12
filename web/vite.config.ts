@@ -3,7 +3,14 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+    // Inject git hash at build time — visible in footer for version checks
+    define: {
+        __GIT_HASH__: JSON.stringify(
+            process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'dev'
+        ),
+        __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    },
     server: {
         proxy: {
             '/api/fpb': {
@@ -31,6 +38,13 @@ export default defineConfig({
     },
     plugins: [
         react(),
+        {
+            name: 'html-version',
+            transformIndexHtml(html) {
+                const hash = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'dev'
+                return html.replace('</head>', `    <meta name="version" content="${hash}">\n  </head>`)
+            }
+        },
         VitePWA({
             // Custom SW (sw.ts) — injectManifest strategy
             strategies: 'injectManifest',
@@ -76,4 +90,4 @@ export default defineConfig({
             }
         })
     ],
-})
+}))
