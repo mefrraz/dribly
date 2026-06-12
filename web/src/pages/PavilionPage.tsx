@@ -10,7 +10,7 @@
  */
 import { useEffect, useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { MapPin, CalendarDays, Trophy, Info, Navigation, Home, Mail, Phone, Globe, Star, Clock, Accessibility, BadgeCheck, ArrowUpRight, Camera } from 'lucide-react'
+import { MapPin, CalendarDays, Trophy, Info, Navigation, Star, ArrowUpRight } from 'lucide-react'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { PageHeader } from '../components/PageHeader'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
@@ -266,10 +266,9 @@ export default function PavilionPage() {
 
                 {tab === 'geral' && (
                     <div className="space-y-4">
-                        {/* ── 4-card grid: 2×2 on desktop, stack on mobile ── */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                            {/* 1. Localização */}
+                            {/* 1. Localização — mini mapa + morada */}
                             <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
                                 <div className="h-36 relative group">
                                     <MapContainer
@@ -293,91 +292,73 @@ export default function PavilionPage() {
                                     <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || pavilion.nome)}`}
                                        target="_blank" rel="noopener noreferrer"
                                        className="absolute top-3 right-3 px-2.5 py-1.5 rounded-lg bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm text-[10px] font-bold text-dribly-purple shadow-lg hover:bg-dribly-purple hover:text-white transition-colors inline-flex items-center gap-1 opacity-0 group-hover:opacity-100">
-                                        <Navigation size={11} />
-                                        Maps
+                                        <Navigation size={11} /> Maps
                                     </a>
                                 </div>
                                 <div className="p-5 space-y-3">
-                                    <div className="flex items-start gap-3">
-                                        <Home size={15} className="text-dribly-purple shrink-0 mt-0.5" />
-                                        <div className="min-w-0">
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Morada</p>
-                                            <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.rua || pavilion.morada_completa || '—'}</p>
-                                        </div>
+                                    <div>
+                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Morada</p>
+                                        <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.rua || pavilion.morada_completa || '—'}</p>
                                     </div>
-                                    <div className="flex items-start gap-3">
-                                        <Mail size={15} className="text-dribly-purple shrink-0 mt-0.5" />
-                                        <div className="min-w-0">
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Código Postal</p>
-                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.codigo_postal || '—'}</p>
-                                        </div>
+                                    <div className="flex gap-4 text-sm text-zinc-500 dark:text-zinc-400">
+                                        {pavilion.codigo_postal && <span>{pavilion.codigo_postal}</span>}
+                                        {pavilion.distrito && <span>· {pavilion.distrito}</span>}
                                     </div>
-                                    {pavilion.distrito && (
-                                        <div className="flex items-start gap-3">
-                                            <MapPin size={15} className="text-dribly-purple shrink-0 mt-0.5" />
-                                            <div className="min-w-0">
-                                                <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Distrito</p>
-                                                <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.distrito}</p>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
 
-                            {/* 2. Contactos + Horários */}
+                            {/* 2. Contactos + Rating + Horários */}
                             <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
-                                {pavilion.phone && (
-                                    <div className="flex items-start gap-3">
-                                        <Phone size={15} className="text-dribly-purple shrink-0 mt-0.5" />
-                                        <div className="min-w-0">
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Telefone</p>
-                                            <p className="text-sm font-medium text-zinc-900 dark:text-white break-words">{pavilion.phone}</p>
+                                {/* Rating — bigger, centered */}
+                                {pavilion.google_rating && (
+                                    <div className="text-center py-2">
+                                        <p className="text-3xl font-black text-zinc-900 dark:text-white">
+                                            {pavilion.google_rating.toFixed(1)}
+                                        </p>
+                                        <div className="flex items-center justify-center gap-0.5 mt-1">
+                                            {[1,2,3,4,5].map(s => (
+                                                <Star key={s} size={14}
+                                                    className={s <= Math.round(pavilion.google_rating!) ? 'text-amber-500 fill-amber-500' : 'text-zinc-200 dark:text-zinc-700'} />
+                                            ))}
                                         </div>
+                                        {pavilion.reviews_count && (
+                                            <p className="text-[10px] text-zinc-400 mt-1">{pavilion.reviews_count} avaliações no Google</p>
+                                        )}
                                     </div>
                                 )}
-                                {pavilion.website && (
-                                    <div className="flex items-start gap-3">
-                                        <Globe size={15} className="text-dribly-purple shrink-0 mt-0.5" />
-                                        <div className="min-w-0">
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Website</p>
-                                            <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-900 dark:text-white hover:underline break-words inline-flex items-center gap-1">
+                                {/* Phone + Website — clean text */}
+                                <div className="space-y-2.5">
+                                    {pavilion.phone && (
+                                        <div>
+                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Telefone</p>
+                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.phone}</p>
+                                        </div>
+                                    )}
+                                    {pavilion.website && (
+                                        <div>
+                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Website</p>
+                                            <a href={pavilion.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-zinc-900 dark:text-white hover:underline inline-flex items-center gap-1">
                                                 {(() => { try { return new URL(pavilion.website).hostname.replace('www.', '') } catch { return pavilion.website } })()}
                                                 <ArrowUpRight size={11} className="text-zinc-400" />
                                             </a>
                                         </div>
-                                    </div>
-                                )}
-                                {pavilion.google_rating && (
-                                    <div className="flex items-start gap-3">
-                                        <Star size={15} className="text-dribly-purple shrink-0 mt-0.5" />
-                                        <div className="min-w-0">
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Google Rating</p>
-                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                ⭐ {pavilion.google_rating.toFixed(1)}
-                                                {pavilion.reviews_count ? (
-                                                    <span className="text-zinc-400 font-normal"> · {pavilion.reviews_count} avaliações</span>
-                                                ) : null}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
+                                {/* Horários — inline */}
                                 {pavilion.opening_hours && pavilion.opening_hours.length > 0 && (
                                     <div>
                                         <button onClick={() => setShowHours(!showHours)}
-                                            className="flex items-center gap-3 w-full text-left group">
-                                            <Clock size={15} className="text-dribly-purple shrink-0 mt-0.5" />
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Horários</p>
-                                                <p className="text-sm font-medium text-zinc-900 dark:text-white inline-flex items-center gap-1">
-                                                    {pavilion.opening_hours[0].hours.replace(' to ', '–')}
-                                                    <span className="text-[10px] text-dribly-purple font-bold">
-                                                        {showHours ? '▲' : '▼'} ver todos
-                                                    </span>
-                                                </p>
-                                            </div>
+                                            className="w-full text-left">
+                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-0.5">Horários</p>
+                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">
+                                                {pavilion.opening_hours[0].hours.replace(' to ', '–')}
+                                                <span className="text-[10px] text-dribly-purple font-bold ml-2">
+                                                    {showHours ? '▲' : '▼'} ver todos
+                                                </span>
+                                            </p>
                                         </button>
                                         {showHours && (
-                                            <div className="mt-3 ml-8 space-y-1">
+                                            <div className="mt-2 ml-0 space-y-1">
                                                 {pavilion.opening_hours.map((h, i) => (
                                                     <div key={i} className="flex justify-between text-xs py-1 border-b border-zinc-50 dark:border-white/5 last:border-0">
                                                         <span className="text-zinc-500">{DAY_MAP[h.day] || h.day}</span>
@@ -388,7 +369,7 @@ export default function PavilionPage() {
                                         )}
                                     </div>
                                 )}
-                                {/* Google Maps + FPB links */}
+                                {/* Links */}
                                 <div className="flex items-center gap-3 pt-1">
                                     {pavilion.google_maps_url && (
                                         <a href={pavilion.google_maps_url} target="_blank" rel="noopener noreferrer"
@@ -405,105 +386,63 @@ export default function PavilionPage() {
                                 </div>
                             </div>
 
-                            {/* 3. Pavilhões Próximos */}
-                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <MapPin size={15} className="text-dribly-purple shrink-0" />
-                                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider">Pavilhões próximos</p>
-                                    <span className="text-[10px] text-zinc-300 ml-auto">{nearby.length}</span>
-                                </div>
-                                {nearby.length > 0 ? (
-                                    <div className="space-y-0.5">
-                                        {nearby.slice(0, 6).map((place, i) => {
-                                            const pavId = nearbyPavs.get(place.title)
-                                            const inner = (
-                                                <div className="flex items-center justify-between py-2 first:pt-0 last:pb-0">
-                                                    <span className="text-sm text-zinc-700 dark:text-zinc-300 truncate flex-1 min-w-0">{place.title}</span>
-                                                    <div className="flex items-center gap-2 shrink-0 ml-2">
-                                                        {place.totalScore > 0 && (
-                                                            <span className="text-[10px] text-zinc-400 flex items-center gap-0.5">
-                                                                <Star size={9} className="text-amber-500 fill-amber-500" />
-                                                                {place.totalScore.toFixed(1)}
-                                                            </span>
-                                                        )}
-                                                        {pavId && <ArrowUpRight size={12} className="text-dribly-purple" />}
-                                                    </div>
-                                                </div>
-                                            )
-                                            if (pavId) {
-                                                return (
-                                                    <Link key={i} to={`/pavilhao/${pavId}`}
-                                                        className="block hover:bg-dribly-purple/5 rounded-lg px-2 -mx-2 transition-colors">
-                                                        {inner}
-                                                    </Link>
-                                                )
-                                            }
-                                            return <div key={i} className="px-2 -mx-2">{inner}</div>
-                                        })}
-                                    </div>
-                                ) : (
-                                    <p className="text-sm text-zinc-400">Sem dados</p>
-                                )}
-                            </div>
-
-                            {/* 4. Outros: Acessibilidade + Serviços + Estacionamento */}
+                            {/* 3. Acessibilidade + Serviços — clean text only */}
                             <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5 space-y-4">
                                 {accessibilityItems.length > 0 && (
                                     <div>
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <Accessibility size={15} className="text-dribly-purple shrink-0" />
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider">Acessibilidade</p>
-                                        </div>
-                                        <div className="space-y-2">
+                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Acessibilidade</p>
+                                        <div className="space-y-1.5">
                                             {accessibilityItems.map((item) => (
-                                                <div key={item} className="flex items-center gap-3">
-                                                    <BadgeCheck size={15} className="text-dribly-purple shrink-0" />
-                                                    <span className="text-sm font-medium text-zinc-900 dark:text-white">{item}</span>
-                                                </div>
+                                                <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
                                             ))}
                                         </div>
                                     </div>
                                 )}
                                 {servicesItems.length > 0 && (
                                     <div>
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <Trophy size={15} className="text-dribly-purple shrink-0" />
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider">Serviços</p>
-                                        </div>
-                                        <div className="space-y-2">
+                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Serviços</p>
+                                        <div className="space-y-1.5">
                                             {servicesItems.map((item) => (
-                                                <div key={item} className="flex items-center gap-3">
-                                                    <BadgeCheck size={15} className="text-dribly-purple shrink-0" />
-                                                    <span className="text-sm font-medium text-zinc-900 dark:text-white">{item}</span>
-                                                </div>
+                                                <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
                                             ))}
                                         </div>
                                     </div>
                                 )}
                                 {parkingItems.length > 0 && (
                                     <div>
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <span className="text-base">🅿️</span>
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider">Estacionamento</p>
-                                        </div>
-                                        <div className="space-y-2">
+                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Estacionamento</p>
+                                        <div className="space-y-1.5">
                                             {parkingItems.map((item) => (
-                                                <div key={item} className="flex items-center gap-3">
-                                                    <BadgeCheck size={15} className="text-dribly-purple shrink-0" />
-                                                    <span className="text-sm font-medium text-zinc-900 dark:text-white">{item}</span>
-                                                </div>
+                                                <p key={item} className="text-sm font-medium text-zinc-900 dark:text-white">{item}</p>
                                             ))}
                                         </div>
                                     </div>
                                 )}
-                                {accessibilityItems.length === 0 && servicesItems.length === 0 && parkingItems.length === 0 && (
-                                    <div className="flex items-start gap-3">
-                                        <Camera size={15} className="text-dribly-purple shrink-0 mt-0.5" />
-                                        <div className="min-w-0">
-                                            <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Fotos</p>
-                                            <p className="text-sm font-medium text-zinc-900 dark:text-white">{pavilion.images_count ?? '—'} no Google</p>
-                                        </div>
+                            </div>
+
+                            {/* 4. Pavilhões próximos — inline compact */}
+                            <div className="bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 p-5">
+                                <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">
+                                    Pavilhões próximos
+                                    <span className="text-zinc-300 ml-1">· {nearby.length}</span>
+                                </p>
+                                {nearby.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                        {nearby.slice(0, 8).map((place, i) => {
+                                            const pavId = nearbyPavs.get(place.title)
+                                            const chip = (
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-white/5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-dribly-purple/10 hover:text-dribly-purple transition-colors">
+                                                    {place.title}
+                                                    {pavId && <ArrowUpRight size={10} className="text-dribly-purple" />}
+                                                </span>
+                                            )
+                                            return pavId
+                                                ? <Link key={i} to={`/pavilhao/${pavId}`}>{chip}</Link>
+                                                : <span key={i}>{chip}</span>
+                                        })}
                                     </div>
+                                ) : (
+                                    <p className="text-sm text-zinc-400">Sem dados</p>
                                 )}
                             </div>
                         </div>
