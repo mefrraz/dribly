@@ -66,8 +66,9 @@
     }
     </script>
 
-    <!-- Google Fonts for premium look -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts for premium look — preloaded for instant render -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap" as="style" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap" />
   </head>
   <body class="bg-zinc-50 text-zinc-900 font-sans antialiased">
     <div id="root"></div>
