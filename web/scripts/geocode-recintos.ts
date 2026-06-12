@@ -143,8 +143,9 @@ async function main() {
     let failCount = 0
 
     // Process in parallel batches. Auto-throttle on rate limit.
-    const PARALLEL = 5
-    let dynDelay = DELAY_MS
+    const PARALLEL = 1 // Start slow, ramp up
+    let dynDelay = 2000
+    let consecutiveFails = 0
     for (let i = startIdx; i < recintos.length; i += PARALLEL) {
         const batch = recintos.slice(i, i + PARALLEL)
         const geoResults = await Promise.all(
@@ -153,23 +154,21 @@ async function main() {
 
         // Detect rate limit: if all failed, back off
         const allFailed = geoResults.every(g => g.lat === null)
-        if (allFailed && batch.length >= 3) {
-            dynDelay = Math.min(dynDelay * 2, 30000)
-            console.log(`  ⚠️  Rate limit detected — backing off to ${(dynDelay / 1000).toFixed(0)}s...`)
+        if (allFailed) {
+            consecutiveFails++
+            dynDelay = Math.min(dynDelay * 2, 120000)
+            console.log(`  ⚠️  Rate limited (${consecutiveFails}x) — waiting ${(dynDelay / 1000).toFixed(0)}s...`)
             await sleep(dynDelay)
-            // Retry this batch one by one
-            const retryResults = []
-            for (const r of batch) {
-                const geo = await geocodeAddress(r.rua || '', r.codigo_postal || '', r.cidade || '', r.nome)
-                retryResults.push(geo)
-                await sleep(1500)
-            }
-            // Use retry results
+            // Retry this batch one by one with longer delays
             for (let bi = 0; bi < batch.length; bi++) {
-                geoResults[bi] = retryResults[bi]
+                const r = batch[bi]
+                const geo = await geocodeAddress(r.rua || '', r.codigo_postal || '', r.cidade || '', r.nome)
+                geoResults[bi] = geo
+                await sleep(2000)
             }
-        } else if (dynDelay > DELAY_MS) {
-            dynDelay = Math.max(dynDelay / 2, DELAY_MS)
+        } else {
+            consecutiveFails = 0
+            if (dynDelay > 2000) dynDelay = Math.max(dynDelay / 2, 2000)
         }
 
         for (let bi = 0; bi < batch.length; bi++) {
