@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/PRs-welcome-7C3AED" alt="PRs Welcome" />
 </p>
 
-> **v9** — 🛡️ Painel admin · 🔐 Client Trust 2FA · ✉️ Verificação email · ⚡ Speed Insights · CSP completo · [dribly.pt](https://dribly.pt)
+> **v11** — 🏟️ Pavilhões com fotos Google Places · 🏆 ELO Ranking · 🎨 Melhorias visuais · [dribly.pt](https://dribly.pt)
 
 ---
 
@@ -71,6 +71,8 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 | 🏆 Classificações | 3.3 | Tabelas com J, V, D, PM, PS, DIF, PTS |
 | 📊 Estatísticas individuais | 3.4 | 22 campos — PTS, REB, AST, VAL, %L2, %L3, %LL |
 | 🗺️ Mapa de pavilhões | 6.0 | Leaflet interativo com 400+ pavilhões, clustering, geolocalização |
+| 🏟️ Pavilhões Google Places | 11.0 | Fotos, ratings, horários, acessibilidade, serviços por pavilhão |
+| 🏆 ELO Ranking | 10.0 | Rating ELO nacional por época, top 20 clubes |
 | ⚡ Pre-warming de cache | 7.12 | Dados pré-carregados antes do pico de utilização |
 | 🛠️ Scraper automático | 7.2 | GitHub Action diária para dados sempre frescos |
 
