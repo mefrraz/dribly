@@ -1,11 +1,11 @@
 /**
- * Fix pavilion image URLs: set image_urls to the highest-res Supabase Storage version.
+ * Fix pavilion image URLs: find the best (largest) photo for each pavilion.
  *
- * For each pavilion, finds all photos in Storage with the same place_id prefix,
- * picks the LARGEST file (best quality), and stores it in image_urls.
+ * For each pavilion with a Supabase Storage image_url, checks if there's
+ * a _0, _1, _2, _3, _4 variant that's larger, and stores it in image_urls.
  *
- * The upload script stored: placeId.jpg (70KB) + placeId_1.jpg (450KB)
- * Some places have _2, _3, _4 variants. This picks the biggest.
+ * Downloads each candidate to check size (HEAD doesn't give Content-Length
+ * reliably on Supabase Storage), then picks the largest.
  *
  * Usage:
  *   $env:SUPABASE_SERVICE_KEY = "..."
@@ -25,87 +25,83 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 const BUCKET = 'pavilions'
 const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}`
 
+const SUFFIXES = ['', '_1', '_2', '_3', '_4']
+
+async function getFileSize(filename: string): Promise<number | null> {
+    const url = `${STORAGE_BASE}/${filename}`
+    try {
+        const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(8000) })
+        if (!res.ok) return null
+        const len = res.headers.get('content-length')
+        return len ? parseInt(len) : null
+    } catch {
+        return null
+    }
+}
+
 async function main() {
-    // 1. List ALL files in the bucket to get sizes
-    console.log('📋 Listing all photos in Storage...')
-    const { data: allFiles, error: listErr } = await supabase.storage.from(BUCKET).list()
-    if (listErr) {
-        console.error('❌ Failed to list bucket:', listErr.message)
-        process.exit(1)
-    }
-    if (!allFiles || allFiles.length === 0) {
-        console.log('No files in bucket.')
-        return
-    }
-    console.log(`   ${allFiles.length} files found\n`)
-
-    // 2. Group by base name: strip _1, _2, _3, _4 suffix
-    const groups = new Map<string, { name: string; size: number }[]>()
-    for (const f of allFiles) {
-        const base = f.name.replace(/_\d+\.(jpg|png)$/, '.$1').replace(/\.(jpg|png)$/, '')
-        if (!groups.has(base)) groups.set(base, [])
-        groups.get(base)!.push({ name: f.name, size: f.metadata?.size ?? 0 })
-    }
-
-    console.log(`📊 ${groups.size} unique places with photos\n`)
-
-    // 3. Fetch pavilions that have image_url
+    // Fetch all pavilions with Supabase image_url (not Google URLs)
     const { data: pavs, error } = await supabase
         .from('pavilions')
-        .select('id, nome, image_url')
+        .select('id, nome, image_url, image_urls')
         .not('image_url', 'is', null)
 
     if (error || !pavs) {
-        console.error('❌ Failed to fetch pavilions:', error?.message)
+        console.error('❌ Failed to fetch:', error?.message)
         process.exit(1)
     }
 
-    console.log(`📋 ${pavs.length} pavilions with image_url\n`)
+    // Filter to only those with Supabase Storage URLs
+    const supabasePavs = (pavs as { id: number; nome: string; image_url: string; image_urls: string[] | null }[])
+        .filter(p => p.image_url.includes('supabase.co'))
 
-    // 4. For each pavilion, find the largest matching photo
+    console.log(`📋 ${supabasePavs.length} pavilions with Supabase photos\n`)
+
     let updated = 0
     let skipped = 0
     let errors = 0
 
-    for (const pav of pavs as { id: number; nome: string; image_url: string }[]) {
-        // Extract base name from image_url (the Supabase public URL)
-        const match = pav.image_url.match(new RegExp(`/${BUCKET}/(.+)\\.(jpg|png)$`))
+    for (const pav of supabasePavs) {
+        // Extract base filename from Supabase URL: .../pavilions/ChIJxxx.jpg → ChIJxxx
+        const match = pav.image_url.match(new RegExp(`/${BUCKET}/(.+)\\.(jpg|png|jpeg)$`, 'i'))
         if (!match) { skipped++; continue }
 
-        // The filename might be e.g. "ChIJxxx.jpg" or "ChIJxxx_1.jpg"
-        // Strip suffix to get base
-        const filename = match[1]
-        const base = filename.replace(/_\d+$/, '')
+        const baseName = match[1].replace(/_\d+$/, '') // strip existing suffix if any
 
-        const group = groups.get(base)
-        if (!group || group.length === 0) { skipped++; continue }
+        // Check all suffix variants, find the largest
+        let bestName = match[1] + '.' + (match[0].match(/\.(jpg|png|jpeg)$/i)?.[1] || 'jpg')
+        let bestSize = 0
 
-        // Find the largest file
-        let best = group[0]
-        for (const f of group) {
-            if (f.size > best.size) best = f
+        for (const suffix of SUFFIXES) {
+            const candidate = `${baseName}${suffix}.jpg`
+            const size = await getFileSize(candidate)
+            if (size && size > bestSize) {
+                bestSize = size
+                bestName = candidate
+            }
         }
 
-        // If the largest is the same as what's already in image_url, skip
-        if (best.name === `${filename}.jpg` || best.name === filename) { skipped++; continue }
+        // Update if we found a better version (different from current)
+        if (bestName !== `${match[1]}.jpg` && bestName !== match[1]) {
+            const newUrl = `${STORAGE_BASE}/${bestName}`
+            const { error: updateErr } = await supabase
+                .from('pavilions')
+                .update({ image_urls: [newUrl] })
+                .eq('id', pav.id)
 
-        const hdUrl = `${STORAGE_BASE}/${best.name}`
-        const { error: updateErr } = await supabase
-            .from('pavilions')
-            .update({ image_urls: [hdUrl] })
-            .eq('id', pav.id)
-
-        if (updateErr) {
-            errors++
-            if (errors <= 3) console.log(`   ❌ ${pav.nome.substring(0, 45)}: ${updateErr.message}`)
+            if (updateErr) {
+                errors++
+                if (errors <= 3) console.log(`   ❌ ${pav.nome.substring(0, 45)}: ${updateErr.message}`)
+            } else {
+                updated++
+                console.log(`   ✅ ${pav.nome.substring(0, 45)} → ${bestName} (${Math.round(bestSize / 1024)}KB)`)
+            }
         } else {
-            updated++
-            const sizeKB = Math.round(best.size / 1024)
-            console.log(`   ✅ ${pav.nome.substring(0, 45)} → ${best.name} (${sizeKB}KB)`)
+            skipped++
         }
     }
 
-    console.log(`\n✅ Done! ${updated} updated with HD images, ${skipped} skipped, ${errors} errors`)
+    console.log(`\n✅ Done! ${updated} HD updated, ${skipped} skipped (no better version), ${errors} errors`)
 }
 
 main().catch((err) => {
