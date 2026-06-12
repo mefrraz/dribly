@@ -73,26 +73,35 @@ async function main() {
     )
     console.log(`  ✅ ${compUrls.length} competições`)
 
-    // ── Games (current season) — paginated (Supabase max 1000/request) ──
+    // ── Games (all seasons) — paginated ──
+    const GAME_TABLES = ['games_2025_2026', 'games_2024_2025', 'games_2023_2024', 'games_2022_2023']
     const allGames: { slug: string }[] = []
-    let rangeStart = 0
+    const seenSlugs = new Set<string>()
     const PAGE_SIZE = 1000
-    while (true) {
-        const { data: batch } = await supabase
-            .from('games_2025_2026')
-            .select('slug')
-            .range(rangeStart, rangeStart + PAGE_SIZE - 1)
-            .order('data', { ascending: false })
-        if (!batch || batch.length === 0) break
-        allGames.push(...(batch as { slug: string }[]))
-        if (batch.length < PAGE_SIZE) break
-        rangeStart += PAGE_SIZE
+    for (const table of GAME_TABLES) {
+        let rangeStart = 0
+        while (true) {
+            const { data: batch } = await supabase
+                .from(table)
+                .select('slug')
+                .range(rangeStart, rangeStart + PAGE_SIZE - 1)
+                .order('data', { ascending: false })
+            if (!batch || batch.length === 0) break
+            for (const g of (batch as { slug: string }[])) {
+                if (!seenSlugs.has(g.slug)) {
+                    seenSlugs.add(g.slug)
+                    allGames.push(g)
+                }
+            }
+            if (batch.length < PAGE_SIZE) break
+            rangeStart += PAGE_SIZE
+        }
     }
 
     const gameUrls = allGames.map((g: { slug: string }) =>
-        url(`${BASE}/jogo/${g.slug}`, 'weekly', '0.5')
+        url(`${BASE}/jogo/${g.slug}`, 'monthly', '0.4')
     )
-    console.log(`  ✅ ${gameUrls.length} jogos`)
+    console.log(`  ✅ ${gameUrls.length} jogos (todas as épocas)`)
 
     // ── Pavilions (400+) ──
     const { data: pavs } = await supabase
