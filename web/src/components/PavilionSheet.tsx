@@ -4,7 +4,7 @@
  * Desktop: floating card (bottom-right, ~400px).
  */
 import { useEffect, useState } from 'react'
-import { X, MapPin, Loader2, ExternalLink } from 'lucide-react'
+import { X, MapPin, Loader2, ExternalLink, Star } from 'lucide-react'
 import type { Pavilion, GameAtPavilion } from '../lib/mapData'
 import { fetchGamesAtPavilion, displayPavilionName } from '../lib/mapData'
 import { GameCard } from './GameCard'
@@ -74,6 +74,21 @@ export function PavilionSheet({ pavilion, isOpen, onClose }: Props) {
                 border-t md:border border-zinc-200 dark:border-white/10
                 shadow-2xl
             `}>
+                {/* Photo — above the name */}
+                {(pavilion.image_url || pavilion.foto_url) && (
+                    <div className="shrink-0 h-28 md:h-36 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                        <img
+                            src={pavilion.image_url || pavilion.foto_url || undefined}
+                            alt={pavilion.nome}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none'
+                            }}
+                        />
+                    </div>
+                )}
+
                 {/* Header */}
                 <div className="px-5 pt-4 pb-3 border-b border-zinc-100 dark:border-white/5 shrink-0">
                     <div className="flex items-start justify-between gap-3">
@@ -85,6 +100,19 @@ export function PavilionSheet({ pavilion, isOpen, onClose }: Props) {
                                 <MapPin size={13} />
                                 <p className="text-xs truncate">{address || pavilion.cidade || 'Portugal'}</p>
                             </div>
+                            {pavilion.google_rating && (
+                                <div className="flex items-center gap-1 mt-1.5">
+                                    <Star size={12} className="text-amber-500 fill-amber-500" />
+                                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                                        {pavilion.google_rating.toFixed(1)}
+                                    </span>
+                                    {pavilion.reviews_count && (
+                                        <span className="text-[10px] text-zinc-400">
+                                            ({pavilion.reviews_count})
+                                        </span>
+                                    )}
+                                </div>
+                            )}
                         </div>
                         <button
                             onClick={onClose}
@@ -124,17 +152,15 @@ export function PavilionSheet({ pavilion, isOpen, onClose }: Props) {
                 </div>
 
                 {/* Footer — link to Dribly pavilion page */}
-                {pavilion.recinto_id && (
-                    <div className="px-5 py-2.5 border-t border-zinc-100 dark:border-white/5 shrink-0">
-                        <Link
-                            to={`/pavilhao/${pavilion.recinto_id}`}
-                            onClick={onClose}
-                            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-dribly-purple text-white text-xs font-bold hover:bg-dribly-purple/90 transition-colors"
-                        >
-                            Ver pavilhão <ExternalLink size={12} />
-                        </Link>
-                    </div>
-                )}
+                <div className="px-5 py-2.5 border-t border-zinc-100 dark:border-white/5 shrink-0">
+                    <Link
+                        to={`/pavilhao/${pavilion.id}`}
+                        onClick={onClose}
+                        className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-dribly-purple text-white text-xs font-bold hover:bg-dribly-purple/90 transition-colors"
+                    >
+                        Ver pavilhão <ExternalLink size={12} />
+                    </Link>
+                </div>
             </div>
         </>
     )

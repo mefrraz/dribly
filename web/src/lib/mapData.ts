@@ -5,6 +5,27 @@
 import { supabase } from './supabase'
 import { logger } from './logger'
 
+export interface OpeningHoursDay {
+    day: string
+    hours: string
+}
+
+export interface AdditionalInfo {
+    Acessibilidade?: { [key: string]: boolean }[]
+    Serviços?: { [key: string]: boolean }[]
+    Crianças?: { [key: string]: boolean }[]
+    Estacionamento?: { [key: string]: boolean }[]
+    Pagamentos?: { [key: string]: boolean }[]
+    [key: string]: { [key: string]: boolean }[] | undefined
+}
+
+export interface PeopleAlsoSearchItem {
+    category: string
+    title: string
+    reviewsCount: number
+    totalScore: number
+}
+
 export interface Pavilion {
     id: number
     recinto_id: number | null
@@ -21,6 +42,19 @@ export interface Pavilion {
     fpb_url: string | null
     geocode_ok: boolean
     game_count?: number // computed
+    // Google Places fields
+    google_place_id: string | null
+    image_url: string | null
+    image_urls: string[] | null
+    website: string | null
+    phone: string | null
+    google_rating: number | null
+    reviews_count: number | null
+    opening_hours: OpeningHoursDay[] | null
+    additional_info: AdditionalInfo | null
+    people_also_search: PeopleAlsoSearchItem[] | null
+    google_maps_url: string | null
+    search_string: string | null
 }
 
 export interface GameAtPavilion {

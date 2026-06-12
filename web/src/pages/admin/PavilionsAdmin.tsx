@@ -15,6 +15,8 @@ interface PavilionRow {
     lng: number | null
     fpb_url: string | null
     geocode_ok: boolean
+    image_url: string | null
+    google_rating: number | null
 }
 
 export default function PavilionsAdmin() {
@@ -76,6 +78,8 @@ export default function PavilionsAdmin() {
                 lat: editForm.lat ?? null,
                 lng: editForm.lng ?? null,
                 fpb_url: editForm.fpb_url || null,
+                image_url: editForm.image_url || null,
+                google_rating: editForm.google_rating ?? null,
             })
             .eq('id', editingId)
 
@@ -143,6 +147,8 @@ export default function PavilionsAdmin() {
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Cidade</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Distrito</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-16">Coord</th>
+                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-12">Foto</th>
+                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-12">★</th>
                                 <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-16">FPB</th>
                                 <th className="px-4 py-2.5 w-16"></th>
                             </tr>
@@ -188,9 +194,17 @@ export default function PavilionsAdmin() {
                                             )}
                                         </td>
                                         <td className="px-4 py-2">
+                                            {p.image_url ? (
+                                                <img src={p.image_url} alt="" className="w-8 h-8 rounded object-cover" />
+                                            ) : '—'}
+                                        </td>
+                                        <td className="px-4 py-2 text-zinc-500">
+                                            {p.google_rating ? p.google_rating.toFixed(1) : '—'}
+                                        </td>
+                                        <td className="px-4 py-2">
                                             {p.fpb_url ? (
                                                 <a href={p.fpb_url} target="_blank" rel="noopener noreferrer"
-                                                    className="text-drably-purple hover:underline inline-flex items-center gap-1">
+                                                    className="text-dribly-purple hover:underline inline-flex items-center gap-1">
                                                     <ExternalLink size={11} />
                                                 </a>
                                             ) : '—'}
@@ -261,6 +275,12 @@ function EditRow({
                         onChange={(e) => setForm({ ...form, lng: e.target.value ? parseFloat(e.target.value) : null })}
                         placeholder="lng" className="w-20 px-1 py-1 text-[10px] rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white" />
                 </div>
+            </td>
+            <td className="px-4 py-2">{field('Foto URL', 'image_url', 'w-28')}</td>
+            <td className="px-4 py-2">
+                <input type="number" step="0.1" value={form.google_rating ?? ''}
+                    onChange={(e) => setForm({ ...form, google_rating: e.target.value ? parseFloat(e.target.value) : null })}
+                    placeholder="rating" className="w-14 px-1 py-1 text-[10px] rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white" />
             </td>
             <td className="px-4 py-2">{field('URL FPB', 'fpb_url', 'w-40')}</td>
             <td className="px-4 py-2">

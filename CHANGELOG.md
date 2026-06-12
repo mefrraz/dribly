@@ -4,6 +4,45 @@
 
 ---
 
+## [v11.0.0] — 2026-06-12
+
+### 🏟️ Pavilhões — Google Places
+
+- **373 pavilhões do Google Maps** (via Apify) com dados reais: fotos, ratings, horários, telefone, website, acessibilidade, serviços
+- **Foto no card flutuante do mapa** — imagem acima do nome do pavilhão com rating ★ e contagem de avaliações
+- **Página de pavilhão redesenhada:** hero image no topo, rating com estrelas, telefone clicável, website, horários (colapsável), acessibilidade (badges verdes), serviços, estacionamento, locais próximos
+- **Admin:** colunas `image_url` (thumbnail) e `google_rating` (★) na tabela de pavilhões
+- **12 novas colunas** na BD: `google_place_id`, `image_url`, `image_urls`, `website`, `phone`, `google_rating`, `reviews_count`, `opening_hours` (JSONB), `additional_info` (JSONB), `people_also_search` (JSONB), `google_maps_url`, `search_string`
+- **Script de importação** com fuzzy match para preservar distrito/concelho
+- **Backup automático** da tabela antes da substituição
+
+### 🏆 ELO Ranking
+
+- **Ranking ELO nacional** (`/ranking`) — rating dinâmico por época, top 20 clubes, explicação do sistema ELO
+- **ELO no perfil do clube** — badge `#rating` no ClubHome
+
+### 🔍 Club Matching & Nomes
+
+- **Matching de clubes melhorado:** `isClubWin` bidirecional com `search_name`, `short_name` e `semiAbrev`
+- **Matching de pavilhões:** remove prefixos, cidades, match por core name + primeira palavra significativa
+- **Nomes normalizados:** `normalizeTeamDisplay` colapsa espaços duplos, `semiAbrev` para abreviaturas
+
+### 🎨 Melhorias Visuais
+
+- **Página de clubes:** score do último resultado maior, botão "Ver Pavilhão" sempre visível
+- **Página de ligas:** labels "Resultados & Agenda", filtro de jogos futuros por data
+- **Ficha de jogo:** períodos com vencedor destacado a negrito, quartos em duas linhas (casa acima, fora abaixo), quartos minimalistas com bullets
+
+### 🛠️ Scripts & Infra
+
+- Geocode inteligente: 5 paralelo, backoff exponencial, fallback por rua/CP/nome+cidade/cidade
+- Scraper de recintos com HEAD scan + paralelo
+- Script de análise e limpeza de nomes de pavilhões
+- Script de prioridades (classificação automática de pavilhões)
+- Script de cores de clubes (extração e aplicação)
+
+---
+
 ## [v8.0.0] — 2026-06-06
 
 ### 🧹 Qualidade de Código
@@ -2094,6 +2133,9 @@ Layout antigo + seletor de clube modal + navegação Meu Clube/Jogos.
 | `v6.x` | Mapa de pavilhões interativo (Leaflet) |
 | `v7.x` | Estabilização: backend, scraper, SEO, a11y, performance, CI/CD |
 | `v8.x` | Qualidade de código, SEO 10 páginas, a11y, Playwright E2E, Vite 6, CSP |
+| `v9.x` | Estabilização contínua: scraping, fixtures, correções |
+| `v10.x` | ELO Ranking, matching de clubes/pavilhões, melhorias visuais, geocode |
+| `v11.x` | Google Places — pavilhões com fotos, ratings, horários, acessibilidade |
 
 ---
 

@@ -13,13 +13,6 @@ if (!supabaseUrl || !supabaseKey) { console.error('Missing env vars'); process.e
 
 const supabase = createClient(supabaseUrl, supabaseKey, { realtime: { transport: WebSocket } })
 
-const DIVISION: Record<string, number> = {
-    'betclic': 1, 'liga masculina': 1,
-    'proliga': 2,
-    '1ª divisão': 2, 'primeira divisão': 2,
-    '2ª divisão': 3, 'segunda divisão': 3,
-}
-
 function norm(s: string): string {
     return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 }
@@ -29,24 +22,36 @@ async function main() {
 
     const [{ data: clubs }, { data: games }] = await Promise.all([
         supabase.from('clubs').select('id, name, priority'),
-        supabase.from('games_2025_2026').select('equipa_casa, equipa_fora, competicao'),
+        supabase.from('games_2025_2026')
+            .select('equipa_casa, equipa_fora, competicao, escalao')
+            .or('escalao.ilike.*Sénior*, escalao.ilike.*Senior*, escalao.eq.'),
     ])
 
     if (!clubs || !games) { console.error('No data'); process.exit(1) }
 
-    // Build team → best division map
+    // Build team → best division map (only from national competitions)
     const teamDivision = new Map<string, number>()
     for (const g of games as { equipa_casa: string; equipa_fora: string; competicao: string | null }[]) {
         const comp = (g.competicao || '').toLowerCase()
-        for (const [keyword, div] of Object.entries(DIVISION)) {
-            if (comp.includes(keyword)) {
-                for (const team of [g.equipa_casa, g.equipa_fora]) {
-                    const n = norm(team)
-                    const cur = teamDivision.get(n) ?? 99
-                    if (div < cur) teamDivision.set(n, div)
-                }
-                break
-            }
+        let div: number | null = null
+        // Only match KNOWN national competitions
+        if (comp.includes('liga betclic') || (comp.includes('liga') && comp.includes('masculina') && !comp.includes('proliga') && !comp.includes('1ª') && !comp.includes('2ª'))) {
+            div = 1
+        } else if (comp.includes('proliga')) {
+            div = 2
+        } else if (comp.includes('1ª divisão') || comp.includes('primeira divisão')) {
+            div = 2
+        } else if (comp.includes('2ª divisão') || comp.includes('segunda divisão')) {
+            div = 3
+        } else if (comp.includes('3ª divisão') || comp.includes('terceira divisão')) {
+            div = 4
+        }
+        if (!div) continue // skip district/cup/youth games
+
+        for (const team of [g.equipa_casa, g.equipa_fora]) {
+            const n = norm(team)
+            const cur = teamDivision.get(n) ?? 99
+            if (div < cur) teamDivision.set(n, div)
         }
     }
 
@@ -58,19 +63,30 @@ async function main() {
         const cn = norm(club.name)
         let newP: number | null = null
 
+        // Find best priority from all matching team names
+        let bestP = 99
         // Exact match
         if (teamDivision.has(cn)) {
-            newP = teamDivision.get(cn)!
-        } else {
-            // Fallback by last word
+            bestP = teamDivision.get(cn)!
+        }
+        // Substring match
+        for (const [tn, div] of teamDivision) {
+            if (cn.includes(tn) || tn.includes(cn)) {
+                if (div < bestP) bestP = div
+            }
+        }
+        // Fallback by last word
+        if (bestP === 99) {
             const words = cn.split(/\s+/).filter(w => w.length > 3)
             for (let i = words.length - 1; i >= 0; i--) {
                 for (const [tn, div] of teamDivision) {
-                    if (tn.includes(words[i])) { newP = div; break }
+                    if (tn.includes(words[i]) && div < bestP) {
+                        bestP = div
+                    }
                 }
-                if (newP) break
             }
         }
+        if (bestP < 99) newP = bestP
 
         if (newP && newP !== club.priority) {
             await supabase.from('clubs').update({ priority: newP }).eq('id', club.id)

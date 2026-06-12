@@ -1,0 +1,3611 @@
+[
+  {
+    "id": 9,
+    "nome": "Pavilhão Mário Navega",
+    "lat": 41.1811079,
+    "lng": -8.5832986,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 10,
+    "nome": "Municipal de Medas",
+    "lat": 41.0622433,
+    "lng": -8.434151,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 11,
+    "nome": "Pavilhão Gimnodesportivo Alfenense",
+    "lat": 41.2307724,
+    "lng": -8.5381224,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 12,
+    "nome": "Pavilhão Salesianos do Porto",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 13,
+    "nome": "Pavilhão do Clube Desportivo Póvoa",
+    "lat": 41.3877214,
+    "lng": -8.7681305,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 14,
+    "nome": "Pavilhão Municipal Ermesinde",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 15,
+    "nome": "CPN",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 16,
+    "nome": "Centro de Desportos e Congressos de Matosinhos",
+    "lat": 41.1841526,
+    "lng": -8.6565511,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 17,
+    "nome": "Pavilhão Futebol Clube Gaia",
+    "lat": 41.1281496,
+    "lng": -8.608529,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 18,
+    "nome": "Pavilhão Municipal de Matosinhos",
+    "lat": 41.179182,
+    "lng": -8.6758271,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 19,
+    "nome": "Pavilhão Engº António Maia (Guifões)",
+    "lat": 41.1979733,
+    "lng": -8.6728875,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 20,
+    "nome": "Pavilhão Municipal de Castelo Maia",
+    "lat": 41.2600535,
+    "lng": -8.6088963,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 21,
+    "nome": "Pavilhão Desportivo Municipal de Paços de Ferreira",
+    "lat": 41.2841412,
+    "lng": -8.3861446,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 22,
+    "nome": "Pavilhão Municipal de Águas Santas III - Formigueiro",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 23,
+    "nome": "Pavilhão Municipal de Valongo",
+    "lat": 41.1966274,
+    "lng": -8.5027947,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 24,
+    "nome": "Pavilhão Esc. Sec. Canidelo",
+    "lat": 41.1263411,
+    "lng": -8.6413454,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 25,
+    "nome": "Escola T. Lopes",
+    "lat": 41.1410179,
+    "lng": -8.6371355,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 26,
+    "nome": "Pavilhão Rosa Mota",
+    "lat": 41.1482537,
+    "lng": -8.6242898,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 27,
+    "nome": "Escola Básica 2.3 de Aldoar",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 28,
+    "nome": "Liceu de Gaia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 29,
+    "nome": "Colégio de Gaia",
+    "lat": 41.1259651,
+    "lng": -8.6073658,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 30,
+    "nome": "Pavilhão Prof. Doutor Galvão Telles",
+    "lat": 41.1511496,
+    "lng": -8.6378227,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 31,
+    "nome": "Pavilhão Desportos de Vila do Conde",
+    "lat": 41.3661783,
+    "lng": -8.7402999,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 32,
+    "nome": "Pavilhão Desportivo de Mindelo",
+    "lat": 41.3110061,
+    "lng": -8.7187995,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 33,
+    "nome": "Pavilhão Municipal de Penafiel",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 34,
+    "nome": "Escola Secundária de Valbom",
+    "lat": 41.1303322,
+    "lng": -8.561867,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 35,
+    "nome": "Pavilhão Municipal de Lousada",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 36,
+    "nome": "Pavilhão Municipal do Corim",
+    "lat": 41.2044755,
+    "lng": -8.574205,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 37,
+    "nome": "Pavilhão Municipal de Ponte de Lima",
+    "lat": 41.7634034,
+    "lng": -8.5771073,
+    "distrito": "Viana do Castelo",
+    "concelho": "Viana do Castelo",
+    "geocode_ok": true
+  },
+  {
+    "id": 38,
+    "nome": "Pavilhão Municipal Stª Maria Maior",
+    "lat": 41.7006247,
+    "lng": -8.8231169,
+    "distrito": "Viana do Castelo",
+    "concelho": "Viana do Castelo",
+    "geocode_ok": true
+  },
+  {
+    "id": 39,
+    "nome": "Escola Básica 2.3 de Monção",
+    "lat": 42.072985,
+    "lng": -8.4906665,
+    "distrito": "Viana do Castelo",
+    "concelho": "Viana do Castelo",
+    "geocode_ok": true
+  },
+  {
+    "id": 40,
+    "nome": "Pavilhão Municipal de Paredes de Coura",
+    "lat": 41.9121806,
+    "lng": -8.5603001,
+    "distrito": "Viana do Castelo",
+    "concelho": "Viana do Castelo",
+    "geocode_ok": true
+  },
+  {
+    "id": 41,
+    "nome": "Pavilhão da Escola EB 2.3/S de Julião de Freixo",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 42,
+    "nome": "Pavilhão da Escola EB 2.3/S de Arcozelo",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 43,
+    "nome": "Pavilhão da Casa Povo Lanheses",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 44,
+    "nome": "Pavilhão Mestre Luís Braga",
+    "lat": 41.6743772,
+    "lng": -8.8127693,
+    "distrito": "Viana do Castelo",
+    "concelho": "Viana do Castelo",
+    "geocode_ok": true
+  },
+  {
+    "id": 45,
+    "nome": "Pavilhão Escola EB2,3/S Monte Ola",
+    "lat": 41.6686498,
+    "lng": -8.7828677,
+    "distrito": "Viana do Castelo",
+    "concelho": "Viana do Castelo",
+    "geocode_ok": true
+  },
+  {
+    "id": 46,
+    "nome": "Pavilhão Centro Estágio de Melgaço",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 47,
+    "nome": "Pavilhão Clube Amigos do Basquete1",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 48,
+    "nome": "Pavilhão OLI",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 49,
+    "nome": "Polidesportivo Rio Maior",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 50,
+    "nome": "Pavilhão Portugal Telecom",
+    "lat": 40.2048977,
+    "lng": -8.4123148,
+    "distrito": "Coimbra",
+    "concelho": "Coimbra",
+    "geocode_ok": true
+  },
+  {
+    "id": 51,
+    "nome": "Pavilhão Municipal de Angra do Heroísmo",
+    "lat": 38.6551987,
+    "lng": -27.2239937,
+    "distrito": null,
+    "concelho": "Angra do Heroísmo",
+    "geocode_ok": true
+  },
+  {
+    "id": 52,
+    "nome": "Pavilhão Engenheiro Augusto Correia",
+    "lat": 40.2152277,
+    "lng": -8.4101747,
+    "distrito": "Coimbra",
+    "concelho": "Coimbra",
+    "geocode_ok": true
+  },
+  {
+    "id": 53,
+    "nome": "Pavilhão Desportivo da Gafanha Nazaré",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 54,
+    "nome": "Complexo Municipal Desportivo da Cidade Almada",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 55,
+    "nome": "Pavilhão do Clube dos Galitos",
+    "lat": 40.8638016,
+    "lng": -8.6195694,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 56,
+    "nome": "Pavilhão da Tapadinha -  Engº Santos e Castro",
+    "lat": 38.7097014,
+    "lng": -9.1808232,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 57,
+    "nome": "Pavilhão da Escola Secundária de Albufeira",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 58,
+    "nome": "Pavilhão Municipal Dr. José de Sousa Pires",
+    "lat": 37.1578027,
+    "lng": -7.8893812,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 59,
+    "nome": "Pavilhão Municipal Francisco Neves - Imortal",
+    "lat": 37.0867328,
+    "lng": -8.2571512,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 60,
+    "nome": "Pavilhão Municipal de Vila Real de Santo António",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 61,
+    "nome": "Pavilhão Escola Sec.Dra. Laura Ayres",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 62,
+    "nome": "Pavilhão Municipal Afonso III",
+    "lat": 37.02359,
+    "lng": -7.9412253,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 63,
+    "nome": "Pavilhão Municipal de Olhão",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 64,
+    "nome": "Pavilhão Municipal Dr. Eduardo Mansinho - Tavira",
+    "lat": 37.1315475,
+    "lng": -7.6416524,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 65,
+    "nome": "Pavilhão Gimnodesportivo de Portimão",
+    "lat": 37.1331717,
+    "lng": -8.5435859,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 66,
+    "nome": "Escola Secundária do Douro",
+    "lat": 41.1162559,
+    "lng": -8.5763124,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 67,
+    "nome": "Pavilhão Engº Antº Maia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 68,
+    "nome": "Pavilhão Associação Ed. Física de Torres Vedras",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 69,
+    "nome": "Pavilhão Gimnodesportivo Alfredo da Silva",
+    "lat": 38.6587621,
+    "lng": -9.052754,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 70,
+    "nome": "Pavilhão Associação Cultural Recreativo Vale Cambra",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 71,
+    "nome": "Pavilhão Municipal Capitão Adriano Nordeste",
+    "lat": 40.6003657,
+    "lng": -8.6664912,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 72,
+    "nome": "Pavilhão Comendador Serafim Marques",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 73,
+    "nome": "Complexo Desportivo de Sangalhos",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 74,
+    "nome": "Pavilhão Raimundo Rodrigues",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 75,
+    "nome": "Pavilhão Escola Manuel Cargaleiro",
+    "lat": 38.6163859,
+    "lng": -9.1151862,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 76,
+    "nome": "Pavilhão Galamba Marques",
+    "lat": 40.1618402,
+    "lng": -8.8577744,
+    "distrito": "Coimbra",
+    "concelho": "Coimbra",
+    "geocode_ok": true
+  },
+  {
+    "id": 77,
+    "nome": "Pavilhão Henrique Miranda",
+    "lat": 38.7541968,
+    "lng": -9.2533715,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 78,
+    "nome": "Pavilhão Municipal Prof Luís de Carvalho",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 79,
+    "nome": "Pavilhão Acácio Rosa",
+    "lat": 38.7042006,
+    "lng": -9.2078195,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 80,
+    "nome": "Pavilhão Municipal de Anadia",
+    "lat": 32.6503884,
+    "lng": -16.9079878,
+    "distrito": null,
+    "concelho": "Funchal",
+    "geocode_ok": true
+  },
+  {
+    "id": 81,
+    "nome": "Pavilhão Municipal de Sever do Vouga",
+    "lat": 40.729573,
+    "lng": -8.3870901,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 82,
+    "nome": "Pavilhão Municipal de Vagos",
+    "lat": 40.5332419,
+    "lng": -8.6891572,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 83,
+    "nome": "Pavilhão Municipal de Anadia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 84,
+    "nome": "Pavilhão do Sport Clube Beira-Mar",
+    "lat": 40.6379618,
+    "lng": -8.6584908,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 85,
+    "nome": "Pavilhão da Escola EB 2,3 de Paços de Brandão",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 86,
+    "nome": "Pavilhão Municipal de Albergaria-a-Velha",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 87,
+    "nome": "Pavilhão Ginásio do CENAP",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 88,
+    "nome": "Pavilhão do Colégio Nª Srª Apresentação-Calvão",
+    "lat": 40.4645739,
+    "lng": -8.6988333,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 89,
+    "nome": "Pavilhão Ginásio Clube de Águeda",
+    "lat": 40.5716464,
+    "lng": -8.444819,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 90,
+    "nome": "Pavilhão Municipal de Tondela",
+    "lat": 40.5192304,
+    "lng": -8.0889907,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 91,
+    "nome": "Pavilhão Municipal de Mangualde",
+    "lat": 40.5866363,
+    "lng": -7.7602024,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 92,
+    "nome": "Pavilhão Municipal de Vila Nova de Paiva",
+    "lat": 40.8522085,
+    "lng": -7.7289147,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 93,
+    "nome": "Pavilhão Municipal de Sernancelhe",
+    "lat": 40.9001611,
+    "lng": -7.4947825,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 94,
+    "nome": "Pavilhão Municipal de Resende",
+    "lat": 41.105831,
+    "lng": -7.9644114,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 95,
+    "nome": "Pavilhão Municipal Santa Comba Dão",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 96,
+    "nome": "Pavilhão Municipal de Vouzela",
+    "lat": 40.7226362,
+    "lng": -8.1097201,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 97,
+    "nome": "Pavilhão Municipal de Lamego",
+    "lat": 41.1031703,
+    "lng": -7.8108512,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 98,
+    "nome": "Pavilhão Municipal de Satão",
+    "lat": 40.7456409,
+    "lng": -7.7499948,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 99,
+    "nome": "Pavilhão Municipal de Mortágua",
+    "lat": 40.3908559,
+    "lng": -8.2412463,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 100,
+    "nome": "Pavilhão Municipal de Oliveira de Frades",
+    "lat": 40.7327088,
+    "lng": -8.1760723,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 101,
+    "nome": "Pavilhão Municipal de Penalva do Castelo",
+    "lat": 40.6755392,
+    "lng": -7.6997219,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 102,
+    "nome": "Pavilhão Municipal Gimnodesportivo de Moimenta da Beira",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 103,
+    "nome": "Pavilhão Municipal Pinhal Novo",
+    "lat": 38.628488,
+    "lng": -8.9116853,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 104,
+    "nome": "Pavilhão Municipal Costa da Caparica",
+    "lat": 38.6489702,
+    "lng": -9.2323192,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 105,
+    "nome": "Pavilhão Municipal do Laranjeiro",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 106,
+    "nome": "Pavilhão Municipal nº 1 do Montijo",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 107,
+    "nome": "Pavilhão Sede Seixal",
+    "lat": 38.6439045,
+    "lng": -9.1023731,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 108,
+    "nome": "Ginásio Sede Futebol Clube Barreirense",
+    "lat": 38.6616809,
+    "lng": -9.0798213,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 109,
+    "nome": "Complexo Desportivo Municipal José Afonso",
+    "lat": 38.1730547,
+    "lng": -8.5633644,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 110,
+    "nome": "Pavilhão Clube Naval Setubalense",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 111,
+    "nome": "Pavilhão da Escola Secundária de Santo André",
+    "lat": 38.6486562,
+    "lng": -9.0627749,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 112,
+    "nome": "Pavilhão Municipal de Paredes",
+    "lat": 41.2123637,
+    "lng": -8.3475802,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 113,
+    "nome": "Pavilhão Municipal de Paredes",
+    "lat": 41.2123637,
+    "lng": -8.3475802,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 114,
+    "nome": "Escola Secundária Barcelos",
+    "lat": 41.529691,
+    "lng": -8.6143519,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 115,
+    "nome": "Pavilhão Municipal Montemor - o - Velho",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 116,
+    "nome": "Pavilhão Municipal Paulo Pinto",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 117,
+    "nome": "Pavilhão da Palmeira",
+    "lat": 40.2125772,
+    "lng": -8.4314977,
+    "distrito": "Coimbra",
+    "concelho": "Coimbra",
+    "geocode_ok": true
+  },
+  {
+    "id": 118,
+    "nome": "Pavilhão EB23 André Resende",
+    "lat": 38.6459595,
+    "lng": -8.202091,
+    "distrito": "Évora",
+    "concelho": "Évora",
+    "geocode_ok": true
+  },
+  {
+    "id": 119,
+    "nome": "Municipal de Elvas",
+    "lat": 38.8955156,
+    "lng": -7.1422728,
+    "distrito": "Portalegre",
+    "concelho": "Portalegre",
+    "geocode_ok": true
+  },
+  {
+    "id": 120,
+    "nome": "Pavilhão da Escola Dr.Correia Mateus",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 121,
+    "nome": "Pavilhão da Embra",
+    "lat": 39.7493352,
+    "lng": -8.9200308,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 122,
+    "nome": "Pavilhão da Escola Sede de São Martinho do Porto",
+    "lat": 39.5148895,
+    "lng": -9.1293271,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 123,
+    "nome": "Escola Básica 2.3 da Madalena",
+    "lat": 41.1124119,
+    "lng": -8.6413256,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 124,
+    "nome": "Escola Secundária Póvoa Lanhoso",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 125,
+    "nome": "Pavilhão da Escola António Correia de Oliveira",
+    "lat": 41.5348677,
+    "lng": -8.7823566,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 126,
+    "nome": "Pavilhão do IND",
+    "lat": 41.3015109,
+    "lng": -7.7368828,
+    "distrito": "Vila Real",
+    "concelho": "Vila Real",
+    "geocode_ok": true
+  },
+  {
+    "id": 127,
+    "nome": "Pavilhão da Esc. Secundária Vitorino Nemesio",
+    "lat": 38.7332485,
+    "lng": -27.0637167,
+    "distrito": null,
+    "concelho": "Praia da Vitória",
+    "geocode_ok": true
+  },
+  {
+    "id": 128,
+    "nome": "Desportivo Agrupamento Escolas Diogo Cão",
+    "lat": 41.3015109,
+    "lng": -7.7368828,
+    "distrito": "Vila Real",
+    "concelho": "Vila Real",
+    "geocode_ok": true
+  },
+  {
+    "id": 129,
+    "nome": "Colégio dos Orfãos",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 130,
+    "nome": "Pavilhão Desportivo Sidónio Serpa",
+    "lat": 37.7484478,
+    "lng": -25.6765288,
+    "distrito": null,
+    "concelho": "Ponta Delgada",
+    "geocode_ok": true
+  },
+  {
+    "id": 131,
+    "nome": "Pavilhão Desportivo Dr. Gomes da Costa",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 132,
+    "nome": "Pavilhão Arquiteto Gomes Pereira",
+    "lat": 38.7015464,
+    "lng": -9.2294684,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 133,
+    "nome": "Pavilhão Escola Sec. Pedro Alexandrino",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 134,
+    "nome": "Pavilhão do Instituto Superior Técnico",
+    "lat": 38.7354149,
+    "lng": -9.1384181,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 135,
+    "nome": "Pavilhão da Póvoa",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 136,
+    "nome": "Pavilhão Municipal do Tramagal",
+    "lat": 39.4518205,
+    "lng": -8.2515128,
+    "distrito": "Santarém",
+    "concelho": "Santarém",
+    "geocode_ok": true
+  },
+  {
+    "id": 137,
+    "nome": "Estádio Universitário de Lisboa",
+    "lat": 38.7501223,
+    "lng": -9.1639716,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 138,
+    "nome": "Pavilhão Municipal da Malveira",
+    "lat": 38.9356577,
+    "lng": -9.258786,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 139,
+    "nome": "Pavilhão Municipal de Alverca",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 140,
+    "nome": "Pavilhão Esc.Sec.Pedro Nunes",
+    "lat": 38.7195594,
+    "lng": -9.155944,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 141,
+    "nome": "Pavilhão Atlético Clube de Moscavide",
+    "lat": 38.7751234,
+    "lng": -9.1025212,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 142,
+    "nome": "Pavilhão Municipal São Miguel da Guarda",
+    "lat": 40.5485134,
+    "lng": -7.2494096,
+    "distrito": "Guarda",
+    "concelho": "Guarda",
+    "geocode_ok": true
+  },
+  {
+    "id": 143,
+    "nome": "Pavilhão do Salesianos 1",
+    "lat": 38.7036126,
+    "lng": -9.4008556,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 144,
+    "nome": "Pavilhão Clube Desportivo Covilhã",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 145,
+    "nome": "Pavilhão Municipal de Pombal",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 146,
+    "nome": "Ginásio do Juventude SC",
+    "lat": 38.3576223,
+    "lng": -7.910747,
+    "distrito": "Évora",
+    "concelho": "Évora",
+    "geocode_ok": true
+  },
+  {
+    "id": 147,
+    "nome": "Pavilhão Escola Sec. Campo Maior",
+    "lat": 39.0186435,
+    "lng": -7.0643604,
+    "distrito": "Portalegre",
+    "concelho": "Portalegre",
+    "geocode_ok": true
+  },
+  {
+    "id": 148,
+    "nome": "Pavilhão Municipal Reguengos - Arq. Rosado Correia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 149,
+    "nome": "Grupo Caras Direitas",
+    "lat": 40.1639839,
+    "lng": -8.8718532,
+    "distrito": "Coimbra",
+    "concelho": "Coimbra",
+    "geocode_ok": true
+  },
+  {
+    "id": 150,
+    "nome": "Pavilhão Municipal Beja",
+    "lat": 38.0097886,
+    "lng": -7.8611847,
+    "distrito": "Beja",
+    "concelho": "Beja",
+    "geocode_ok": true
+  },
+  {
+    "id": 151,
+    "nome": "Pavilhão Hermínio Barreto - FMH",
+    "lat": 38.6997693,
+    "lng": -9.2513201,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 152,
+    "nome": "Pavilhão Rainha D. Leonor",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 153,
+    "nome": "Pavilhão S.C. Marinhense",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 154,
+    "nome": "Pavilhão Municipal de Ermesinde",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 155,
+    "nome": "Escola Secundária Mario Silva - Monte Gordo",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 156,
+    "nome": "Escola Básica 23 Manoel de Oliveira",
+    "lat": 41.1685358,
+    "lng": -8.666496,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 157,
+    "nome": "Escola Secundária de Pedro da Cova",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 158,
+    "nome": "Desportivo Municipal de Santa Eufémia",
+    "lat": 39.76131,
+    "lng": -8.7506439,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 159,
+    "nome": "Pavilhão Dr. Salvador Machado",
+    "lat": 40.8308703,
+    "lng": -8.4857249,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 160,
+    "nome": "Pavilhão Gimnodesportivo Amiense",
+    "lat": 39.4430964,
+    "lng": -8.7412814,
+    "distrito": "Santarém",
+    "concelho": "Santarém",
+    "geocode_ok": true
+  },
+  {
+    "id": 161,
+    "nome": "Escola Básica 2,3 de Alenquer",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 162,
+    "nome": "Escola Básica Maria Alberta Menéres",
+    "lat": 38.7970644,
+    "lng": -9.3339599,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 163,
+    "nome": "Escola Secundária Vergílio Ferreira",
+    "lat": 38.762916,
+    "lng": -9.1808255,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 164,
+    "nome": "Pavilhão Esc.Sec.Rafael Bordalo Pinheiro",
+    "lat": 39.4066529,
+    "lng": -9.1323793,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 165,
+    "nome": "Pavilhão da Escola E.B.2/3 Prof.Nery Capucho",
+    "lat": 39.7436339,
+    "lng": -8.9195795,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 166,
+    "nome": "Pavilhão Domingos Fernandes",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 167,
+    "nome": "Colégio Salesiano de Lisboa-O.S.J.",
+    "lat": 38.7140485,
+    "lng": -9.1677285,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 168,
+    "nome": "Pavilhão do Inatel  -  Cartaxo",
+    "lat": 39.1576233,
+    "lng": -8.7894129,
+    "distrito": "Santarém",
+    "concelho": "Santarém",
+    "geocode_ok": true
+  },
+  {
+    "id": 169,
+    "nome": "Pavilhão Escola do Algueirão",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 170,
+    "nome": "Escola Básica Integrada de São Domingos",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 171,
+    "nome": "Unidos Futebol Clube do Tortosendo",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 172,
+    "nome": "Pavilhão Gimnodesportivo do Teixoso",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 173,
+    "nome": "Pavilhão Municipal de Fundão",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 174,
+    "nome": "Pavilhão Municipal de Castelo Branco",
+    "lat": 39.8266322,
+    "lng": -7.4919318,
+    "distrito": "Castelo Branco",
+    "concelho": "Castelo Branco",
+    "geocode_ok": true
+  },
+  {
+    "id": 175,
+    "nome": "Pavilhão Municipal da Covilhã - INATEL",
+    "lat": 40.2776076,
+    "lng": -7.4931581,
+    "distrito": "Castelo Branco",
+    "concelho": "Castelo Branco",
+    "geocode_ok": true
+  },
+  {
+    "id": 176,
+    "nome": "Pavilhão da Boa-Hora",
+    "lat": 38.9407899,
+    "lng": -9.0162125,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 177,
+    "nome": "Pavilhão do Ginásio Clube Olhanense",
+    "lat": 37.0375468,
+    "lng": -7.8398823,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 178,
+    "nome": "Pavilhão da Escola Secundária Manuel Teixeira Gomes",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 179,
+    "nome": "Pavilhão da Escola Dr Francisco Fernandes Lopes",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 180,
+    "nome": "Pavilhão da Escola Pevidem",
+    "lat": 41.4272512,
+    "lng": -8.3540351,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 181,
+    "nome": "Pavilhão Gimnodesportivo de Vila Nova",
+    "lat": 40.4021935,
+    "lng": -8.3952444,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 182,
+    "nome": "Pavilhão Clube Ana (Santa Maria)",
+    "lat": 36.9681908,
+    "lng": -25.1562746,
+    "distrito": null,
+    "concelho": "Vila do Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 183,
+    "nome": "Pavilhão Escola Básica de Santa Maria",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 184,
+    "nome": "Pavilhão Municipal de Gaia",
+    "lat": 41.0834862,
+    "lng": -8.5968593,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 185,
+    "nome": "Escola Básica Integrada de Canto da Maia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 186,
+    "nome": "Escola Básica Integrada de Rabo de Peixe",
+    "lat": 37.8108806,
+    "lng": -25.5782547,
+    "distrito": null,
+    "concelho": "Ribeira Grande",
+    "geocode_ok": true
+  },
+  {
+    "id": 187,
+    "nome": "Escola Secundária da Lagoa",
+    "lat": 37.7450426,
+    "lng": -25.5847354,
+    "distrito": null,
+    "concelho": "Lagoa",
+    "geocode_ok": true
+  },
+  {
+    "id": 188,
+    "nome": "Escola Básica e Integrada Roberto Ivens",
+    "lat": 37.7422793,
+    "lng": -25.6639327,
+    "distrito": null,
+    "concelho": "Ponta Delgada",
+    "geocode_ok": true
+  },
+  {
+    "id": 189,
+    "nome": "Alice Gouveia",
+    "lat": 40.1972413,
+    "lng": -8.4011663,
+    "distrito": "Coimbra",
+    "concelho": "Coimbra",
+    "geocode_ok": true
+  },
+  {
+    "id": 190,
+    "nome": "Escola C + S de Febres",
+    "lat": 40.3974853,
+    "lng": -8.6323254,
+    "distrito": "Coimbra",
+    "concelho": "Coimbra",
+    "geocode_ok": true
+  },
+  {
+    "id": 191,
+    "nome": "Pavilhão Municipal de Oliveira do Bairro",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 192,
+    "nome": "Escola Básica e Secundária de Febres",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 193,
+    "nome": "Mun. Gaia B",
+    "lat": 41.0834862,
+    "lng": -8.5968593,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 194,
+    "nome": "Pavilhão Municipal da Póvoa de Varzim",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 195,
+    "nome": "Pavilhão Fayal Sport Club",
+    "lat": 38.5429868,
+    "lng": -28.6232843,
+    "distrito": null,
+    "concelho": "Horta",
+    "geocode_ok": true
+  },
+  {
+    "id": 196,
+    "nome": "Pavilhão Escola Cardeal Costa Nunes",
+    "lat": 38.5236268,
+    "lng": -28.5376662,
+    "distrito": null,
+    "concelho": "Madalena",
+    "geocode_ok": true
+  },
+  {
+    "id": 197,
+    "nome": "Pavilhão Desportivo da Horta",
+    "lat": 38.5333075,
+    "lng": -28.6307333,
+    "distrito": null,
+    "concelho": "Horta",
+    "geocode_ok": true
+  },
+  {
+    "id": 198,
+    "nome": "Pavilhão Escola B I/S das Lajes do Pico",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 199,
+    "nome": "Pavilhão da Chemina",
+    "lat": 39.0508135,
+    "lng": -9.0085815,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 200,
+    "nome": "Pavilhão da Escola Secundária Sabugal",
+    "lat": 40.3549253,
+    "lng": -7.0846629,
+    "distrito": "Guarda",
+    "concelho": "Guarda",
+    "geocode_ok": true
+  },
+  {
+    "id": 201,
+    "nome": "Câmara Municipal de Baião",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 202,
+    "nome": "Pavilhão Municipal de Gouveia",
+    "lat": 40.4845729,
+    "lng": -7.59518,
+    "distrito": "Guarda",
+    "concelho": "Guarda",
+    "geocode_ok": true
+  },
+  {
+    "id": 203,
+    "nome": "Pavilhão Municipal do Sabugal",
+    "lat": 40.3549253,
+    "lng": -7.0846629,
+    "distrito": "Guarda",
+    "concelho": "Guarda",
+    "geocode_ok": true
+  },
+  {
+    "id": 204,
+    "nome": "Pavilhão Fidelidade",
+    "lat": 38.758557,
+    "lng": -9.1578904,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 205,
+    "nome": "Esc. Pintor José de Brito",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 206,
+    "nome": "Pavilhão da Escola EB 23 de S. Romão do Coronado",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 207,
+    "nome": "Municipal de Gaia B",
+    "lat": 41.3821981,
+    "lng": -8.7569645,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 208,
+    "nome": "Pavilhão Escola Santa Maria - Beja",
+    "lat": 38.0205425,
+    "lng": -7.8634569,
+    "distrito": "Beja",
+    "concelho": "Beja",
+    "geocode_ok": true
+  },
+  {
+    "id": 209,
+    "nome": "Pavilhão Escola B. 2,3 Santa Maria",
+    "lat": 38.0205425,
+    "lng": -7.8634569,
+    "distrito": "Beja",
+    "concelho": "Beja",
+    "geocode_ok": true
+  },
+  {
+    "id": 210,
+    "nome": "Pavilhão Escola B. 2,3 Santa Maria",
+    "lat": 38.0205425,
+    "lng": -7.8634569,
+    "distrito": "Beja",
+    "concelho": "Beja",
+    "geocode_ok": true
+  },
+  {
+    "id": 211,
+    "nome": "Polidesportivo do Colégio Campo Flores",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 212,
+    "nome": "Pavilhão Gimnodesportivo Municipal Padre Martinho",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 213,
+    "nome": "Pavilhão Desportivo CRECUS",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 214,
+    "nome": "Pavilhão Gimnodesportivo do Gaeirense",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 215,
+    "nome": "Pavilhão Municipal de Coimbrões",
+    "lat": 41.1270956,
+    "lng": -8.6292454,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 216,
+    "nome": "Escola do Pintor José de Brito",
+    "lat": 38.7057122,
+    "lng": -9.186108,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 217,
+    "nome": "Escola Soeiro Pereira Gomes",
+    "lat": 38.9277068,
+    "lng": -9.0061055,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 218,
+    "nome": "Escola do Cego do Maio",
+    "lat": 41.1442049,
+    "lng": -8.6054519,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 219,
+    "nome": "Municipal Cadaval",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 220,
+    "nome": "Pavilhão Municipal de Mira",
+    "lat": 40.4286069,
+    "lng": -8.7392251,
+    "distrito": "Coimbra",
+    "concelho": "Coimbra",
+    "geocode_ok": true
+  },
+  {
+    "id": 221,
+    "nome": "Polidesportivo do Colégio Campo Flores",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 222,
+    "nome": "Instituto Profissional do Terço",
+    "lat": 41.1609937,
+    "lng": -8.6045455,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 223,
+    "nome": "Pavilhão da Escola Manuel Cargaleiro",
+    "lat": 38.6163859,
+    "lng": -9.1151862,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 224,
+    "nome": "Polidesportivo do Folhadal",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 225,
+    "nome": "Escola Secundária D. João de Castro",
+    "lat": 38.7045011,
+    "lng": -9.1849274,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 226,
+    "nome": "Pavilhão Desportivo Vale São Cosme",
+    "lat": 41.4437638,
+    "lng": -8.4742946,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 227,
+    "nome": "Pavilhão do Complexo Desportivo João Paulo II",
+    "lat": 38.6575926,
+    "lng": -27.2022575,
+    "distrito": null,
+    "concelho": "Angra do Heroísmo",
+    "geocode_ok": true
+  },
+  {
+    "id": 228,
+    "nome": "Pavilhão Desportivo CRECUS",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 229,
+    "nome": "Pav. Mun. Prof. Miranda de Carvalho (Vila DEste)",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 230,
+    "nome": "Campo Exterior Externato D Manuel Mello",
+    "lat": 38.6577787,
+    "lng": -9.0670738,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 231,
+    "nome": "Pavilhão  Alcabideche",
+    "lat": 38.7357534,
+    "lng": -9.4058808,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 232,
+    "nome": "Polidesportivo Casa do Povo Cadima",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 233,
+    "nome": "Pavilhão Escola Básica 2,3 Dr. António João Eusébio (Moncarapacho)",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 234,
+    "nome": "Pavilhão Municipal de Loulé",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 235,
+    "nome": "Escola Básica 2,3 Paços Ferreira",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 236,
+    "nome": "Pavilhão Polivalente",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 237,
+    "nome": "Pavilhão Centro Desportivo Recreio Fogueteiro",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 238,
+    "nome": "Pavilhão Desportivo dos Lombos",
+    "lat": 38.6871005,
+    "lng": -9.3264078,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 239,
+    "nome": "Liga Betclic Feminina",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 240,
+    "nome": "Campo Exterior GDR Os Leças",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 241,
+    "nome": "Pavilhão Desportivo do Quintajense Futebol Clube",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 242,
+    "nome": "Escola Básica de Santa Carolina Michaellis",
+    "lat": 41.1122016,
+    "lng": -8.609344,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 243,
+    "nome": "Palácio dos Desportos Helena Sentieiro - Torres Novas",
+    "lat": 39.4727729,
+    "lng": -8.5352442,
+    "distrito": "Santarém",
+    "concelho": "Santarém",
+    "geocode_ok": true
+  },
+  {
+    "id": 244,
+    "nome": "Escola Básica e Secundária de Vila Franca do Campo",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 245,
+    "nome": "Pavilhão Multidesportos Dr. Mário Mexia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 246,
+    "nome": "Pavilhão Municipal Proença-a-Nova",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 247,
+    "nome": "Pavilhão Desportivo Escola Secundária Alvide",
+    "lat": 38.7179788,
+    "lng": -9.4241263,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 248,
+    "nome": "Escola de São Gonçalo Teixeira de Vasconcellos",
+    "lat": 39.0927769,
+    "lng": -9.2542554,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 249,
+    "nome": "Pavilhão Esc. Bartolomeu Perestrelo",
+    "lat": 32.6588349,
+    "lng": -16.9130479,
+    "distrito": null,
+    "concelho": "Funchal",
+    "geocode_ok": true
+  },
+  {
+    "id": 250,
+    "nome": "Pavilhão Liceu do Porto Santo",
+    "lat": 33.0589695,
+    "lng": -16.3340474,
+    "distrito": null,
+    "concelho": "Porto Santo",
+    "geocode_ok": true
+  },
+  {
+    "id": 251,
+    "nome": "Escola Soeiro Pereira Gomes-Alhandra",
+    "lat": 38.9702357,
+    "lng": -9.0323319,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 252,
+    "nome": "Escola D. Martinho Vaz Câmara Branco-Póvoa de Sta. Iria",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 253,
+    "nome": "Pavilhão Unidade Vimaranense",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 254,
+    "nome": "Pavilhão Desportivo da Amarense",
+    "lat": 39.671045,
+    "lng": -8.8525735,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 255,
+    "nome": "Escola Secundária de São João do Estoril",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 256,
+    "nome": "Pavilhão Gimnodesportivo da Redinha",
+    "lat": 40.0045497,
+    "lng": -8.5889284,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 257,
+    "nome": "Multiusos Rota dos Móveis",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 258,
+    "nome": "Pavilhão Municipal de Santiago de Besteiros",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 259,
+    "nome": "Pavilhão das Actividades Económicas e Desportivas de Pombal",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 260,
+    "nome": "Pavilhão da Escola EB23 da Alapraia",
+    "lat": 38.7094212,
+    "lng": -9.3733458,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 261,
+    "nome": "Pavilhão Municipal de Queijas",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 262,
+    "nome": "Pavilhão Municipal da Escola Francisco Freitas Branco",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 263,
+    "nome": "Pavilhão Municipal de Caramulo",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 264,
+    "nome": "Pavilhão Municipal do Samouco",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 265,
+    "nome": "Colégio Luso Internacional do Porto",
+    "lat": 41.1733342,
+    "lng": -8.6710041,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 266,
+    "nome": "Pavilhão do C.I.F.",
+    "lat": 38.7118468,
+    "lng": -9.2109272,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 267,
+    "nome": "Complexo Desportivo da Ribeira Grande",
+    "lat": 37.8176574,
+    "lng": -25.5207437,
+    "distrito": null,
+    "concelho": "Ribeira Grande",
+    "geocode_ok": true
+  },
+  {
+    "id": 268,
+    "nome": "Pavilhão Vitória SC",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 269,
+    "nome": "Pavilhão Municipal de Leça Palmeira",
+    "lat": 41.2028978,
+    "lng": -8.6930638,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 270,
+    "nome": "Pavilhão Gimnodesportivo Municipal de Albergaria dos Doze",
+    "lat": 39.7974549,
+    "lng": -8.5892126,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 271,
+    "nome": "Polidesportivo de Sever",
+    "lat": 40.9898628,
+    "lng": -7.600615,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 272,
+    "nome": "Pavilhão do Caniçal",
+    "lat": 32.7394262,
+    "lng": -16.7405859,
+    "distrito": null,
+    "concelho": "Machico",
+    "geocode_ok": true
+  },
+  {
+    "id": 273,
+    "nome": "Polidesportivo de Varzea",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 274,
+    "nome": "Pavilhão do Club Sport Marítimo",
+    "lat": 32.6636875,
+    "lng": -16.9386493,
+    "distrito": null,
+    "concelho": "Funchal",
+    "geocode_ok": true
+  },
+  {
+    "id": 275,
+    "nome": "Pavilhão Escola Mouzinho Silveira",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 276,
+    "nome": "Pavilhão Escola Sec Santo António",
+    "lat": 38.6338863,
+    "lng": -9.0383036,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 277,
+    "nome": "Pavilhão Escola Básica 2,3 Real",
+    "lat": 41.5588281,
+    "lng": -8.4344609,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 278,
+    "nome": "Escola Básica 23 Engenheiro Nuno Mergulhão",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 279,
+    "nome": "Pavilhão Escola Secundária Moimenta",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 280,
+    "nome": "Escola Básica 2.3 Nicolau Nasoni",
+    "lat": 41.1737175,
+    "lng": -8.5799915,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 281,
+    "nome": "Escola Básica 2.3 Nevogilde",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 282,
+    "nome": "Pavilhão Municipal Senhora da Hora",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 283,
+    "nome": "Complexo Desportivo Municipal São Pedro do Sul",
+    "lat": 40.7594419,
+    "lng": -8.0679308,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 284,
+    "nome": "Pavilhão da Escola Sª Daniel Faria",
+    "lat": 41.1922193,
+    "lng": -8.3840576,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 285,
+    "nome": "Arena de Ovar",
+    "lat": 40.873898,
+    "lng": -8.6341076,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 286,
+    "nome": "Pavilhão Municipal n. º 2 - Paços de Ferreira",
+    "lat": 41.2589713,
+    "lng": -8.3800408,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 287,
+    "nome": "Pavilhão Municipal de Campo",
+    "lat": 41.1811011,
+    "lng": -8.47758,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 288,
+    "nome": "Pavilhão Galpenergia Núcleo Sul",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 289,
+    "nome": "Pavilhão Aristides Hall - Univ. de Aveiro",
+    "lat": 40.6312278,
+    "lng": -8.6545185,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 290,
+    "nome": "Escola Secundária Pero Vaz Caminha",
+    "lat": 41.1785862,
+    "lng": -8.6190272,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 291,
+    "nome": "Pavilhão Municipal Dr. Manuel Ramos - Grijó",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 292,
+    "nome": "Coliseu Comendador José Rondão Almeida",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 293,
+    "nome": "Pavilhão Urgezes",
+    "lat": 41.4261157,
+    "lng": -8.2970042,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 294,
+    "nome": "Escola Básica 2.3 de Amarante",
+    "lat": 41.2748483,
+    "lng": -8.0779812,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 295,
+    "nome": "Escola Básica 2.3 Meixomil",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 296,
+    "nome": "Escola Básica 2,3 Vasco Santana",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 297,
+    "nome": "Polidesportivo da Associação Cerca",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 298,
+    "nome": "Complexo Desportivo de Santa Maria",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 299,
+    "nome": "Pavilhão Escola Secundária Gil Eanes",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 300,
+    "nome": "Escola Básica 2,3 Ribeirão",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 301,
+    "nome": "Escola Básica de Apúlia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 302,
+    "nome": "Pavilhão da Escola Secundária Manuel de Arriaga",
+    "lat": 38.5286331,
+    "lng": -28.6362037,
+    "distrito": null,
+    "concelho": "Horta",
+    "geocode_ok": true
+  },
+  {
+    "id": 303,
+    "nome": "Pavilhão Municipal dos Pousos",
+    "lat": 39.7343119,
+    "lng": -8.7741328,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 304,
+    "nome": "Pavilhão Municipal de Sobrado",
+    "lat": 41.2113752,
+    "lng": -8.4643239,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 305,
+    "nome": "Pavilhão Desportivo do Politécnico do Porto",
+    "lat": 41.1804181,
+    "lng": -8.5969974,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 306,
+    "nome": "Associação Social e Solidária de Caparrosa",
+    "lat": 40.6233811,
+    "lng": -8.0981211,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 307,
+    "nome": "Pavilhão Luís Barreto da Cruz Júnior",
+    "lat": 38.6623884,
+    "lng": -9.0810206,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 308,
+    "nome": "Pavilhão Municipal do Arrabal",
+    "lat": 39.6971671,
+    "lng": -8.7248093,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 309,
+    "nome": "Pavilhão Escola Básica de Aplicação - Vale Pedras",
+    "lat": 37.1026333,
+    "lng": -8.2360526,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 310,
+    "nome": "Pavilhão Municipal Nogueira da Maia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 311,
+    "nome": "Pavilhão Municipal Aranguêz",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 312,
+    "nome": "Escola Secundária de Paredes",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 313,
+    "nome": "Pavilhão Municipal de Guifões",
+    "lat": 41.1973353,
+    "lng": -8.6640114,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 314,
+    "nome": "Pavilhão Jesus Correia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 315,
+    "nome": "Pavilhão Desportivo Municipal de Rio de Minhos",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 316,
+    "nome": "Pavilhão Desportivo Municipal de Rio de Moínhos",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 317,
+    "nome": "Pavilhão Municipal de Guifões (L1)",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 318,
+    "nome": "Pavilhão Municipal de Guifões (L2)",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 319,
+    "nome": "Escola Secundária de Mem Martins",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 320,
+    "nome": "Pavilhão Desportivo Anibal Nascimento",
+    "lat": 41.6208472,
+    "lng": -8.1535289,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 321,
+    "nome": "Pavilhão António Júlio Silva",
+    "lat": 40.9718759,
+    "lng": -8.5933433,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 322,
+    "nome": "Liga Betclic Feminina",
+    "lat": 38.7859534,
+    "lng": -9.3367493,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 323,
+    "nome": "Pavilhão Escola Ruy Belo Monte Abrão",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 324,
+    "nome": "Pavilhão do Colégio Frei Gil",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 325,
+    "nome": "Pavilhão Dragão Arena",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 326,
+    "nome": "Pavilhão António Júlio Silva 2",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 327,
+    "nome": "Pavilhão António Júlio Silva 1",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 328,
+    "nome": "Pavilhão Gimnodesportivo do Colégio São João de Brito",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 329,
+    "nome": "Multiusos de Tábua",
+    "lat": 38.7743194,
+    "lng": -9.1566648,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 330,
+    "nome": "Liga Betclic Feminina",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 331,
+    "nome": "Pavilhão Desportivo de Albufeira",
+    "lat": 37.1032855,
+    "lng": -8.2382164,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 332,
+    "nome": "Pavilhão Desportivo Escola E.B.2,3 -Canas Senhorim",
+    "lat": 40.5014753,
+    "lng": -7.9022908,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 333,
+    "nome": "Nave Desportiva de Ferragudo",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 334,
+    "nome": "Gimnodesportivo de Meinedo",
+    "lat": 37.1313353,
+    "lng": -8.5154838,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 335,
+    "nome": "Pavilhão do Centro de Educação e Recreio de Mira",
+    "lat": 41.2463367,
+    "lng": -8.2549668,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 336,
+    "nome": "Escola Básica 2,3 de Viso (Porto)",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 337,
+    "nome": "Pavilhão Desportivo dos Olhos De Agua",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 338,
+    "nome": "Escola EB 2.3 Viso (Porto)",
+    "lat": 41.1992086,
+    "lng": -8.5732306,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 339,
+    "nome": "Escola Básica 2.3 Irene Lisboa",
+    "lat": 41.1609289,
+    "lng": -8.6124777,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 340,
+    "nome": "Escola Secundária Domingos Rebelo",
+    "lat": 37.7453743,
+    "lng": -25.6760647,
+    "distrito": null,
+    "concelho": "Ponta Delgada",
+    "geocode_ok": true
+  },
+  {
+    "id": 341,
+    "nome": "Escola Básica 23 Monsenhor Jerónimo Amaral",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 342,
+    "nome": "Escola Secundária António Nobre",
+    "lat": 41.165836,
+    "lng": -8.6007624,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 343,
+    "nome": "Pavilhão Municipal de Custoias",
+    "lat": 41.2024492,
+    "lng": -8.6388057,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 344,
+    "nome": "Pavilhão  Municipal de Sampaio",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 345,
+    "nome": "Associação Social Cultural Desportiva e Recreativa de Calde",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 346,
+    "nome": "Escola Secundária dos Carvalhos",
+    "lat": 41.0671104,
+    "lng": -8.5780054,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 347,
+    "nome": "Pavilhão Desp. Municipal de Colmeias",
+    "lat": 39.7995539,
+    "lng": -8.706464,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 348,
+    "nome": "Pavilhão Multiusos de Fafe",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 349,
+    "nome": "Pavilhão Desportivo INATEL da Guarda",
+    "lat": 40.4212284,
+    "lng": -7.7128007,
+    "distrito": "Guarda",
+    "concelho": "Guarda",
+    "geocode_ok": true
+  },
+  {
+    "id": 350,
+    "nome": "Escola Básica Integrada de Vila de Capelas",
+    "lat": 37.8313129,
+    "lng": -25.6820461,
+    "distrito": null,
+    "concelho": "Ponta Delgada",
+    "geocode_ok": true
+  },
+  {
+    "id": 351,
+    "nome": "Salão Nobre D José Cárcamo Lobo",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 352,
+    "nome": "Escola Básica 2/3 Acácio de Azevedo",
+    "lat": 40.5100837,
+    "lng": -8.4988661,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 353,
+    "nome": "Pavilhão Gimnodesportivo de Crestuma",
+    "lat": 41.0640907,
+    "lng": -8.5035853,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 354,
+    "nome": "Pavilhão Lamaçães",
+    "lat": 41.542382,
+    "lng": -8.3911495,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 355,
+    "nome": "Pavilhão Municipal do Souto da Carpalhosa",
+    "lat": 39.8481815,
+    "lng": -8.8217252,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 356,
+    "nome": "Escola Secundária de Felgueiras",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 357,
+    "nome": "Pavilhão da Escola Secundária Morgado de Mateus",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 358,
+    "nome": "Pavilhão Municipal de Póvoa de Varzim",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 359,
+    "nome": "Pavilhão Multiusos de Montalegre",
+    "lat": 41.8190024,
+    "lng": -7.7897488,
+    "distrito": "Vila Real",
+    "concelho": "Vila Real",
+    "geocode_ok": true
+  },
+  {
+    "id": 360,
+    "nome": "Pavilhão Municipal das Manteigadas",
+    "lat": 38.5192017,
+    "lng": -8.8538708,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 361,
+    "nome": "Pavilhão Municipal do Padrão da Légua",
+    "lat": 41.1848769,
+    "lng": -8.6337556,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 362,
+    "nome": "Pavilhão Municipal Padre Amadeu Pinto",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 363,
+    "nome": "Escola Secundária Dom Dinis",
+    "lat": 40.2429754,
+    "lng": -8.4332224,
+    "distrito": "Coimbra",
+    "concelho": "Coimbra",
+    "geocode_ok": true
+  },
+  {
+    "id": 364,
+    "nome": "Pavilhão Municipal de Óbidos",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 365,
+    "nome": "Colégio de Albergaria",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 366,
+    "nome": "Escola Básica e Secundária Ferreira Castro (OLZ)",
+    "lat": 40.8553413,
+    "lng": -8.4661887,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 367,
+    "nome": "Açore Arena",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 368,
+    "nome": "Escola Faria Vasconcelos / Carapalha",
+    "lat": 39.8266322,
+    "lng": -7.4919318,
+    "distrito": "Castelo Branco",
+    "concelho": "Castelo Branco",
+    "geocode_ok": true
+  },
+  {
+    "id": 369,
+    "nome": "Pavilhão Gimnodesportivo do Lagarteiro",
+    "lat": 41.1551725,
+    "lng": -8.5683754,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 370,
+    "nome": "Pavilhão Desportivo de Ponta Garça",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 371,
+    "nome": "Pavilhão da Escola Básica 1 de Vale Flores",
+    "lat": 38.6495581,
+    "lng": -9.1723167,
+    "distrito": "Setúbal",
+    "concelho": "Setúbal",
+    "geocode_ok": true
+  },
+  {
+    "id": 372,
+    "nome": "Pavilhão Municipal de Cinfães do Douro",
+    "lat": 41.078951,
+    "lng": -8.1050116,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 373,
+    "nome": "Escola Básica 2,3 de Pedome",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 374,
+    "nome": "Colégio La Salle",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 375,
+    "nome": "Escola Francisco Sanches",
+    "lat": 41.5552479,
+    "lng": -8.4119797,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 376,
+    "nome": "Pavilhão Desportivo Albufeira 1",
+    "lat": 37.1032855,
+    "lng": -8.2382164,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 377,
+    "nome": "Pavilhão Desportivo Albufeira 2",
+    "lat": 37.1032855,
+    "lng": -8.2382164,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 378,
+    "nome": "Pavilhão EB23 Dr. Francisco Cabrita",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 379,
+    "nome": "Pavilhão Multiusos de Odivelas",
+    "lat": 38.7904912,
+    "lng": -9.1865764,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 380,
+    "nome": "Ginásio da Escola Básica e Secundária do Cerco",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 381,
+    "nome": "Pavilhão EB23 Frei Bartolomeu dos Mártires",
+    "lat": 41.7006247,
+    "lng": -8.8231169,
+    "distrito": "Viana do Castelo",
+    "concelho": "Viana do Castelo",
+    "geocode_ok": true
+  },
+  {
+    "id": 382,
+    "nome": "Pavilhão da Escola Moinhos da Arroja",
+    "lat": 38.7921029,
+    "lng": -9.1922347,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 383,
+    "nome": "Pavilhão Municipal de Ardegães",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 384,
+    "nome": "Pavilhão Municipal de Ardegães",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 385,
+    "nome": "Pavilhão Desportivo da Guia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 386,
+    "nome": "Pavilhão Faculdade Desporto Univ. Porto",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 387,
+    "nome": "Pavilhão da Escola Secundária Martim Fernandes",
+    "lat": 37.0944778,
+    "lng": -8.247357,
+    "distrito": "Faro",
+    "concelho": "Faro",
+    "geocode_ok": true
+  },
+  {
+    "id": 388,
+    "nome": "Pavilhão Gim. Municipal de Valbom",
+    "lat": 41.1352899,
+    "lng": -8.5558272,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 389,
+    "nome": "Pavilhão Parque Desportivo de Grândola",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 390,
+    "nome": "Pavilhão Gimnodesportivo do GDR Parceiros",
+    "lat": 39.7299613,
+    "lng": -8.8396581,
+    "distrito": "Leiria",
+    "concelho": "Leiria",
+    "geocode_ok": true
+  },
+  {
+    "id": 391,
+    "nome": "Escola Básica 23 de Leça da Palmeira",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 392,
+    "nome": "Escola da Trofa",
+    "lat": 41.3835011,
+    "lng": -8.2315784,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 393,
+    "nome": "Pavilhão 2 do Complexo Desportivo do Sangalhos DC",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 394,
+    "nome": "Pavilhão Desportivo Municipal Venda do Pinheiro",
+    "lat": 38.9252202,
+    "lng": -9.2337501,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 395,
+    "nome": "Pavilhão EB1 Joaquim de Barros",
+    "lat": 38.6988468,
+    "lng": -9.2964972,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 396,
+    "nome": "Liga Betclic Feminina",
+    "lat": 40.4324197,
+    "lng": -7.9992796,
+    "distrito": "Viseu",
+    "concelho": "Viseu",
+    "geocode_ok": true
+  },
+  {
+    "id": 397,
+    "nome": "Pavilhão Desportivo da Meadela",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 398,
+    "nome": "Pavilhão Gimnodesportivo de Frossos",
+    "lat": 41.5696893,
+    "lng": -8.4485615,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 399,
+    "nome": "Pavilhão Municipal de Boticas",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 400,
+    "nome": "Escola Secundária de Freamunde",
+    "lat": 41.2902006,
+    "lng": -8.3454865,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 401,
+    "nome": "Pavilhão Polidesportivo de Fão",
+    "lat": 41.5075677,
+    "lng": -8.7735584,
+    "distrito": "Braga",
+    "concelho": "Braga",
+    "geocode_ok": true
+  },
+  {
+    "id": 402,
+    "nome": "Pavilhão Municipal de Gondomar",
+    "lat": 41.1344833,
+    "lng": -8.5392446,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 403,
+    "nome": "Pavilhão da Escola Secundária Rocha Peixoto",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 404,
+    "nome": "Escola Básica Nogueira",
+    "lat": 41.2803786,
+    "lng": -8.2620382,
+    "distrito": "Porto",
+    "concelho": "Porto",
+    "geocode_ok": true
+  },
+  {
+    "id": 405,
+    "nome": "Pavilhão da Escola Básica 2,3 João Afonso",
+    "lat": 40.6325821,
+    "lng": -8.6502225,
+    "distrito": "Aveiro",
+    "concelho": "Aveiro",
+    "geocode_ok": true
+  },
+  {
+    "id": 406,
+    "nome": "Pavilhão da Escola Secundária Emidio Garcia",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 407,
+    "nome": "Escola Secundária António Damásio",
+    "lat": 38.7696391,
+    "lng": -9.1117269,
+    "distrito": "Lisboa",
+    "concelho": "Lisboa",
+    "geocode_ok": true
+  },
+  {
+    "id": 408,
+    "nome": "Liga Betclic Feminina",
+    "lat": null,
+    "lng": null,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  },
+  {
+    "id": 409,
+    "nome": "Pavilhão",
+    "lat": 0,
+    "lng": 0,
+    "distrito": null,
+    "concelho": null,
+    "geocode_ok": false
+  }
+]
