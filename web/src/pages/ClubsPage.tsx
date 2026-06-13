@@ -88,7 +88,7 @@ export default function ClubsPage() {
                                                 <span className="text-xl font-bold text-zinc-400">{displayName(club).charAt(0)}</span>
                                             )}
                                         </div>
-                                        <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300 leading-tight line-clamp-2">
+                                        <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300 leading-tight line-clamp-2 min-h-[2rem]">
                                             {displayName(club)}
                                         </p>
                                     </Link>
