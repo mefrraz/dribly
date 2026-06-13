@@ -92,19 +92,39 @@ async function main() {
     fs.writeFileSync('scraped_clubs.json', JSON.stringify(clubs, null, 2), 'utf8')
     console.log('Saved to scraped_clubs.json')
 
+    // Fetch existing clubs to know which already have primary_color set
+    const { data: existing } = await supabase.from('clubs').select('id, primary_color')
+    const existingMap = new Map((existing || []).map(c => [c.id, c.primary_color]))
+    console.log(`Found ${existingMap.size} existing clubs in Supabase`)
+
     let updated = 0
     let errors = 0
+    let colorPreserved = 0
     for (const club of clubs) {
         const color = club.color
         const isBlack = color === '#000000' || color === '#000'
+        const existingColor = existingMap.get(club.id)
+
         const updateData = {
             id: club.id,
             name: club.name,
             search_name: club.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
             slug: club.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
-            primary_color: isBlack ? '#7C3AED' : color,
-            logo_url: club.logo_url,
         }
+
+        // Only set primary_color for NEW clubs or clubs with black/null color
+        if (existingColor && existingColor !== '#7C3AED') {
+            // Club already has a good extracted color — preserve it
+            updateData.primary_color = existingColor
+            colorPreserved++
+        } else if (!existingColor || existingColor === '#7C3AED') {
+            // New club or fallback-purple — set from FPB (or purple for black)
+            updateData.primary_color = isBlack ? '#7C3AED' : color
+        }
+
+        // Always update logo_url from FPB
+        updateData.logo_url = club.logo_url
+
         const result = await supabase.from('clubs').upsert(updateData, { onConflict: 'id' })
         if (result.error) {
             errors++
@@ -114,8 +134,7 @@ async function main() {
         }
     }
 
-    console.log('Supabase update: ' + updated + ' upserted, ' + errors + ' errors')
-    console.log('Black-colored clubs set to #7C3AED (purple)')
+    console.log(`Supabase update: ${updated} upserted, ${errors} errors, ${colorPreserved} colors preserved`)
 }
 
 main()

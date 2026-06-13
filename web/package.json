@@ -11,6 +11,7 @@
         "lint:fix": "eslint . --ext ts,tsx --fix",
         "test:e2e": "playwright test",
         "sitemap": "npx tsx scripts/generate-sitemap.ts",
+        "color-audit": "node scripts/generate-color-audit.mjs",
         "preview": "vite preview"
     },
     "dependencies": {
