@@ -160,7 +160,7 @@ function ClubHome() {
                                         const clubIsCasa = dn(club.name).toLowerCase() === dn(heroGame.equipa_casa).toLowerCase()
                                         const [ns, os] = clubIsCasa ? [heroGame.resultado_casa ?? 0, heroGame.resultado_fora ?? 0] : [heroGame.resultado_fora ?? 0, heroGame.resultado_casa ?? 0]
                                         const won = ns > os, draw = ns === os
-                                        const win = (n: number) => n === ns ? (won ? 'font-black text-[var(--club-color)]' : draw ? 'font-bold text-zinc-500' : 'font-medium text-zinc-400 dark:text-zinc-500') : (won ? 'font-medium text-zinc-400 dark:text-zinc-500' : draw ? 'font-bold text-zinc-500' : 'font-black text-zinc-900 dark:text-white')
+                                        const win = (n: number) => n === ns ? (won ? 'font-bold text-[var(--club-color)]' : draw ? 'font-bold text-zinc-500' : 'font-bold text-zinc-400 dark:text-zinc-500') : (won ? 'font-bold text-zinc-400 dark:text-zinc-500' : draw ? 'font-bold text-zinc-500' : 'font-bold text-zinc-900 dark:text-white')
                                         return (
                                         <div className="flex items-center gap-1 sm:gap-2">
                                             <span className={`text-2xl sm:text-3xl font-mono tabular-nums tracking-tighter ${win(heroGame.resultado_casa!)}`}>{heroGame.resultado_casa}</span>
@@ -182,7 +182,7 @@ function ClubHome() {
                             </div>
                             {heroGame.local && (
                                 <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400">
-                                    <MapPin size={10} className="text-[var(--club-color)]" />
+                                    <MapPin size={10} className="text-[var(--club-color)] dark:text-white/60" />
                                     <span className="truncate max-w-[220px]">{heroGame.local}</span>
                                 </div>
                             )}
