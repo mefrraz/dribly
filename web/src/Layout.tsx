@@ -145,11 +145,11 @@ function Layout() {
                                 <Search size={14} />
                             </button>
 
-                            <Link to="/sobre" className={`hidden sm:flex ${navIcon} ${isActive('/sobre') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Sobre">
-                                <Info size={17} />
-                            </Link>
                             <Link to="/definicoes" className={`sm:hidden ${navIcon} ${isActive('/definicoes') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Definições">
                                 <Settings2 size={18} />
+                            </Link>
+                            <Link to="/sobre" className={`${navIcon} ${isActive('/sobre') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Sobre">
+                                <Info size={17} />
                             </Link>
                             {user ? (
                                 <Link to="/perfil"

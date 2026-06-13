@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { MapPin, Building2, Heart, BarChart2, Trophy, Grid3X3, Shield, Settings2, Info } from 'lucide-react'
+import { MapPin, Building2, Heart, BarChart2, Trophy, Grid3X3, Settings2, User } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 
 function BottomNav() {
@@ -16,13 +16,14 @@ function BottomNav() {
     }
 
     const moreItems = [
-        ...(user ? [{ to: '/seguidos', icon: Heart, label: 'Seguidos' }] : []),
+        ...(user ? [
+            { to: '/seguidos', icon: Heart, label: 'Seguidos' },
+            { to: '/perfil', icon: User, label: 'Conta' },
+        ] : []),
         { to: '/ranking', icon: BarChart2, label: 'Ranking' },
         { to: '/clubes', icon: Building2, label: 'Clubes' },
         { to: '/classificacoes', icon: BarChart2, label: 'Classificações' },
-        { to: '/privacidade', icon: Shield, label: 'Privacidade' },
         { to: '/definicoes', icon: Settings2, label: 'Definições' },
-        { to: '/sobre', icon: Info, label: 'Sobre' },
     ]
 
     return (
