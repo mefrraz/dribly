@@ -51,17 +51,7 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-atl-tico-de-queluz/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/a-d-o-basquetebol-da-associa-o-desportiva-ovarense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/vit-ria-sport-clube/home</loc>
+    <loc>https://dribly.pt/clube/uni-o-desportiva-oliveirense/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -71,17 +61,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-do-povo-de-esgueira/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sporting-clube-de-portugal/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sport-lisboa-e-benfica/home</loc>
+    <loc>https://dribly.pt/clube/vit-ria-sport-clube/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -91,12 +71,22 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://dribly.pt/clube/galitos-futebol-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://dribly.pt/clube/sporting-clube-vasco-da-gama/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/galitos-futebol-clube/home</loc>
+    <loc>https://dribly.pt/clube/a-d-o-basquetebol-da-associa-o-desportiva-ovarense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/sporting-clube-de-portugal/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -106,32 +96,17 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/uni-o-desportiva-oliveirense/home</loc>
+    <loc>https://dribly.pt/clube/sport-lisboa-e-benfica/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-jos-r-gio/home</loc>
+    <loc>https://dribly.pt/clube/clube-atl-tico-de-queluz/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/sampaense-basket-club/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/acad-mico-futebol-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clip-teams-associa-o-desportiva/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-portuguesa-de-deficientes-sintra/home</loc>
+    <loc>https://dribly.pt/clube/clube-do-povo-de-esgueira/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -146,7 +121,27 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://dribly.pt/clube/sampaense-basket-club/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/acad-mico-futebol-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://dribly.pt/clube/maia-basket-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-portuguesa-de-deficientes-sintra/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-desportivo-jos-r-gio/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -156,27 +151,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/futebol-clube-de-gaia/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/pa-o-de-arcos-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/basquete-clube-de-barcelos/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/juvemaia-associa-o-cultural-desportiva-e-c-vica/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/seixal-clube-1925/home</loc>
+    <loc>https://dribly.pt/clube/clip-teams-associa-o-desportiva/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -191,12 +166,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/n-cleo-cultural-recreativo-de-valongo/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/centro-treino-municipal-vila-pouca-de-aguiar/home</loc>
+    <loc>https://dribly.pt/clube/juvemaia-associa-o-cultural-desportiva-e-c-vica/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -211,7 +181,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-basquete-de-le-a/home</loc>
+    <loc>https://dribly.pt/clube/basquete-clube-de-barcelos/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -221,12 +191,32 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/uni-o-desportiva-leiria/home</loc>
+    <loc>https://dribly.pt/clube/n-cleo-cultural-recreativo-de-valongo/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/lac-basquetebol-clube/home</loc>
+    <loc>https://dribly.pt/clube/centro-treino-municipal-vila-pouca-de-aguiar/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/futebol-clube-de-gaia/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-desportivo-basquete-de-le-a/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/seixal-clube-1925/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/pa-o-de-arcos-clube/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -236,12 +226,22 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://dribly.pt/clube/illiabum-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/lac-basquetebol-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://dribly.pt/clube/clube-desportivo-das-aves-1930/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/illiabum-clube/home</loc>
+    <loc>https://dribly.pt/clube/mon-o-basket-clube-2000/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -251,7 +251,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/mon-o-basket-clube-2000/home</loc>
+    <loc>https://dribly.pt/clube/uni-o-desportiva-leiria/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -272,16 +272,6 @@
   </url>
   <url>
     <loc>https://dribly.pt/clube/grupo-desportivo-da-azinhaga/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/alenquer-basket-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-cultural-e-desportivo-santa-marta-portuzelo/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -316,7 +306,52 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://dribly.pt/clube/alenquer-basket-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-cultural-e-desportivo-santa-marta-portuzelo/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/futebol-clube-beira-mar/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-portuguesa-de-deficientes-lisboa/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/gdd-alcoit-o/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-desportivo-de-trancoso/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-de-pais-e-encarregados-de-educa-o-do-agrupamento-de-escolas-de-tondela/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-desportivo-e-recreativo-de-portugal/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://dribly.pt/clube/juventude-ouriense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/atl-tico-basquete-clube-de-santo-andr/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -336,22 +371,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-portuguesa-de-deficientes-lisboa/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://dribly.pt/clube/clube-desportivo-e-cultural-juventude-pacense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-de-pais-e-encarregados-de-educa-o-do-agrupamento-de-escolas-de-tondela/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/atl-tico-basquete-clube-de-santo-andr/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -361,42 +381,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/futebol-clube-beira-mar/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/gdd-alcoit-o/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-de-trancoso/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-e-recreativo-de-portugal/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/gin-sio-clube-de-gueda/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-desportiva-porto-da-cruz/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/uni-o-sport-clube-de-paredes/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-celorico-basket/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-desportiva-de-vagos/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -406,7 +391,12 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/sporting-clube-de-coimbr-es/home</loc>
+    <loc>https://dribly.pt/clube/estrela-calheta-futebol-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-celorico-basket/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -416,52 +406,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-desportiva-de-vagos/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-seia-basket/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/uni-o-desportiva-e-recreativa-da-zona-alta/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/ccrd-da-barreira-basquetebol-condeixa/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/n-cleo-basket-absma/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/estrela-calheta-futebol-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sporting-clube-barquinhense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-de-moradores-do-bairro-novo-da-moita/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-alcochetense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/estoril-basket-clube/home</loc>
+    <loc>https://dribly.pt/clube/centro-recreativo-do-casal-do-grilo/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -476,12 +421,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/salesianos-do-estoril/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/basket-clube-de-gaia/home</loc>
+    <loc>https://dribly.pt/clube/grupo-desportivo-alcochetense/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -491,7 +431,22 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/centro-recreativo-do-casal-do-grilo/home</loc>
+    <loc>https://dribly.pt/clube/restauradores-da-granja/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/sporting-clube-barquinhense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/uni-o-sport-clube-de-paredes/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-seia-basket/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -501,12 +456,57 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/unidos-futebol-clube-do-tortosendo/home</loc>
+    <loc>https://dribly.pt/clube/ccrd-da-barreira-basquetebol-condeixa/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/restauradores-da-granja/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-desportiva-porto-da-cruz/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/gin-sio-clube-de-gueda/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/sporting-clube-de-coimbr-es/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/uni-o-desportiva-e-recreativa-da-zona-alta/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/basket-clube-de-gaia/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/n-cleo-basket-absma/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-de-moradores-do-bairro-novo-da-moita/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/salesianos-do-estoril/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/estoril-basket-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/unidos-futebol-clube-do-tortosendo/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -516,17 +516,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/nucleo-basquetebol-amadora-nba/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-portuguesa-de-deficientes-braga-bcr/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-escolar-os-vitorinos/home</loc>
+    <loc>https://dribly.pt/clube/sporting-clube-da-madeira/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -536,32 +526,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-desportiva-flaviense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/centro-desportivo-municipal-de-mondim-de-basto/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/cinf-es-basket-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/basket-club-de-tomar/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-h-pica-e-psicomotora-de-viseu/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/vitfut-associa-o/home</loc>
+    <loc>https://dribly.pt/clube/clube-acad-mico-da-araucaria-de-vila-real/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -571,17 +536,12 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/sporting-clube-da-madeira/home</loc>
+    <loc>https://dribly.pt/clube/cinf-es-basket-clube/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/sporting-clube-das-caldas/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-hiper-activo-malveira/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-desportiva-flaviense/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -591,32 +551,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-olivais-e-moscavide/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/tabela-predileta/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/casa-do-povo-de-lanheses/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/appacdm-santa-comba-d-o/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/basket-club-limiense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-acad-mico-da-araucaria-de-vila-real/home</loc>
+    <loc>https://dribly.pt/clube/sporting-clube-das-caldas/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -626,7 +561,27 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/fides-orfe-o-de-valbom/home</loc>
+    <loc>https://dribly.pt/clube/clube-hiper-activo-malveira/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/centro-desportivo-municipal-de-mondim-de-basto/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/tabela-predileta/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-desportivo-olivais-e-moscavide/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-portuguesa-de-deficientes-braga-bcr/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -636,27 +591,47 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/ukrop-iniciativa-ofuscante-de-viseu/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-h-pica-e-psicomotora-de-viseu/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-ad-mealhada/home</loc>
+    <loc>https://dribly.pt/clube/appacdm-santa-comba-d-o/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-e-recreativo-andr-de-resende/home</loc>
+    <loc>https://dribly.pt/clube/vitfut-associa-o/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-de-basquete-de-viana/home</loc>
+    <loc>https://dribly.pt/clube/clube-desportivo-escolar-os-vitorinos/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/pesqueiraamiga-associa-o-de-solidariedade-social/home</loc>
+    <loc>https://dribly.pt/clube/nucleo-basquetebol-amadora-nba/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/basket-club-de-tomar/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/fides-orfe-o-de-valbom/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/casa-do-povo-de-lanheses/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/basket-club-limiense/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -666,47 +641,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-mar-e-serra/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/agrupamento-de-escolas-de-foz-c-a/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-desportiva-e-cultural-escola-diogo-c-o/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sport-clube-conimbricense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/biblioteca-instru-o-recreio/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-recreativo-desportivo-arrudense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/atl-tico-clube-de-astromil/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/fcs-basket-club-de-campo/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/real-clube-vale-de-cavala/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-ad-mealhada/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -716,12 +651,12 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/el-ctrico-futebol-clube/home</loc>
+    <loc>https://dribly.pt/clube/biblioteca-instru-o-recreio/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-tvde-45-18/home</loc>
+    <loc>https://dribly.pt/clube/pesqueiraamiga-associa-o-de-solidariedade-social/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -731,12 +666,37 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://dribly.pt/clube/el-ctrico-futebol-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/ukrop-iniciativa-ofuscante-de-viseu/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-tvde-45-18/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-desportivo-e-recreativo-andr-de-resende/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/real-clube-vale-de-cavala/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://dribly.pt/clube/clube-desportivo-amiense/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-cjd-sports/home</loc>
+    <loc>https://dribly.pt/clube/agrupamento-de-escolas-de-foz-c-a/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -746,42 +706,47 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://dribly.pt/clube/sport-clube-conimbricense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/atl-tico-clube-de-astromil/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://dribly.pt/clube/associa-ao-cultural-e-recreativa-vigorosa/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-basquetebol-de-leiria/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-cjd-sports/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/basket-clube-de-valen-a/home</loc>
+    <loc>https://dribly.pt/clube/fcs-basket-club-de-campo/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-cultural-e-desportiva-de-s-o-jo-o/home</loc>
+    <loc>https://dribly.pt/clube/clube-de-basquete-de-viana/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-ana-de-santa-maria/home</loc>
+    <loc>https://dribly.pt/clube/clube-recreativo-desportivo-arrudense/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/aveiro-ria-bc/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-desportiva-e-cultural-escola-diogo-c-o/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-educa-o-f-sica-desportiva-torres-vedras/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-recreativo-santanense/home</loc>
+    <loc>https://dribly.pt/clube/clube-desportivo-mar-e-serra/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -796,7 +761,72 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-e-cultural-escola-sec-ribeira-grande/home</loc>
+    <loc>https://dribly.pt/clube/basket-clube-de-valen-a/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/gin-sio-clube-olhanense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/centro-recreativo-e-cultural-quinta-dos-lombos/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-macedo-academy/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-basquetebol-de-leiria/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/centro-de-cultura-e-desporto-dos-hor-rios-do-funchal/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/aveiro-ria-bc/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-desportivo-recreativo-santanense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-desportivo-concha-azul/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-educa-o-f-sica-desportiva-torres-vedras/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/cbp2012-basquetebol-clube-de-penafiel/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/basquete-clube-do-porto-santo/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/gavi-es-de-s-o-br-s-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-basket-atl-ntico/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -811,47 +841,12 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/cbp2012-basquetebol-clube-de-penafiel/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/centro-de-cultura-e-desporto-dos-hor-rios-do-funchal/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/gavi-es-de-s-o-br-s-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://dribly.pt/clube/associa-o-cultural-e-desportiva-ferragudo/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/centro-recreativo-e-cultural-quinta-dos-lombos/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/gin-sio-clube-olhanense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/grupo-basket-atl-ntico/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-concha-azul/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-macedo-academy/home</loc>
+    <loc>https://dribly.pt/clube/clube-ana-de-santa-maria/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -861,92 +856,32 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-escolar-os-fuseiros/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/basquete-clube-do-porto-santo/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://dribly.pt/clube/associa-o-de-fam-lias-solid-rias-com-a-defici-ncia/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/santar-m-basket-clube/home</loc>
+    <loc>https://dribly.pt/clube/2010-odisseia-basket-clube/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/sociedade-cultural-e-recreativa-gaeirense/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-cultural-e-desportiva-de-s-o-jo-o/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/rbda-ribeir-o-basket-associa-o-desportiva/home</loc>
+    <loc>https://dribly.pt/clube/clube-desportivo-e-cultural-escola-sec-ribeira-grande/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/sporting-clube-marinhense/home</loc>
+    <loc>https://dribly.pt/clube/clube-desportivo-e-cultural-do-porto-moniz/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/benedita-hoopers-club/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/grupo-recreativo-independente-brandoense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sporting-clube-olhanense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-de-basquetebol-de-tavira/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-de-boticas/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/scalipus-clube-set-bal/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sines-surf-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/chamusca-basket-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/basket-club-de-vila-real/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/zora-basquetebol-clube-do-marco/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-clube-de-montanha-mur-a-desporto-e-aventura/home</loc>
+    <loc>https://dribly.pt/clube/clube-de-basquete-de-albufeira/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -956,7 +891,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-de-basquete-de-albufeira/home</loc>
+    <loc>https://dribly.pt/clube/clube-de-basquetebol-de-tavira/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -971,7 +906,17 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/futebol-clube-barreirense/home</loc>
+    <loc>https://dribly.pt/clube/sociedade-cultural-e-recreativa-gaeirense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/benedita-hoopers-club/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/chamusca-basket-clube/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -981,27 +926,67 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-e-cultural-do-porto-moniz/home</loc>
+    <loc>https://dribly.pt/clube/scalipus-clube-set-bal/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/n-cleo-do-sporting-do-cartaxo/home</loc>
+    <loc>https://dribly.pt/clube/zora-basquetebol-clube-do-marco/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/desportivo-do-nucleo-de-basquetebol-da-abit/home</loc>
+    <loc>https://dribly.pt/clube/sines-surf-clube/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/sporting-clube-da-cumieira/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-clube-de-montanha-mur-a-desporto-e-aventura/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-da-p-voa/home</loc>
+    <loc>https://dribly.pt/clube/sporting-clube-marinhense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/basket-club-de-vila-real/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-desportivo-de-boticas/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/sporting-clube-olhanense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/rbda-ribeir-o-basket-associa-o-desportiva/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/futebol-clube-barreirense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/santar-m-basket-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-recreativo-independente-brandoense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/sangalhos-desporto-clube/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1011,7 +996,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-n-utico-de-abrantes/home</loc>
+    <loc>https://dribly.pt/clube/desportivo-do-nucleo-de-basquetebol-da-abit/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1026,12 +1011,52 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-torres-novas-org-aut-basquetebol/home</loc>
+    <loc>https://dribly.pt/clube/salesianos-de-manique/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/sangalhos-desporto-clube/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-amigos-de-angrabasket/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/n-cleo-do-sporting-do-cartaxo/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/sporting-clube-da-cumieira/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-desportivo-da-p-voa/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-propaganda-de-nata-o/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/atletico-clube-de-moscavide/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/carnide-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-desportivo-os-especiais/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-desportivo-gumir-es-basket-viseu/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1046,37 +1071,12 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/salesianos-de-manique/home</loc>
+    <loc>https://dribly.pt/clube/clube-desportivo-torres-novas-org-aut-basquetebol/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-os-especiais/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sporting-clube-farense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-amigos-de-angrabasket/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-20kms-de-almeirim/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/carnide-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sociedade-de-instru-o-musical-escolar-cruz-quebradense/home</loc>
+    <loc>https://dribly.pt/clube/clube-n-utico-de-abrantes/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1086,87 +1086,17 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/atletico-clube-de-moscavide/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-20kms-de-almeirim/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-propaganda-de-nata-o/home</loc>
+    <loc>https://dribly.pt/clube/sporting-clube-farense/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-gumir-es-basket-viseu/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/n-cleo-de-minibasquete-de-canaviais/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sport-club-oper-rio-de-cem-soldos/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-juvenil-boa-viagem/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/n-cleo-desporto-amador-pombal/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/col-gio-jos-lvaro-vidal-funda-o-cebi/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/atl-tico-clube-de-portugal/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sociedade-de-instru-o-recreio-os-pimp-es/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/barca-basket-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-recreativa-amarense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/enesse-basquetebol-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-pinhalnovense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-cultural-recreativa-da-cerca-s-o-pedro/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/febres-sport-club/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-escola-secund-ria-de-santo-andr/home</loc>
+    <loc>https://dribly.pt/clube/sociedade-de-instru-o-musical-escolar-cruz-quebradense/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1176,27 +1106,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-andr-soares/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/valour-futebol-clube-assoc-cult-recreativa-e-desp-do-ros-rio/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-juvenil-do-clube-oper-rio-desportivo/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-de-tondela/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/basket-clube-lis/home</loc>
+    <loc>https://dribly.pt/clube/col-gio-jos-lvaro-vidal-funda-o-cebi/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1206,62 +1116,92 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/lmcb-associa-o-desportiva-linces-de-mafra/home</loc>
+    <loc>https://dribly.pt/clube/basket-clube-lis/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/anadia-futebol-clube/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-recreativa-amarense/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-desportivo-lousanense/home</loc>
+    <loc>https://dribly.pt/clube/clube-juvenil-boa-viagem/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-do-estreito/home</loc>
+    <loc>https://dribly.pt/clube/grupo-desportivo-escola-secund-ria-de-santo-andr/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-juvenil-estremoz/home</loc>
+    <loc>https://dribly.pt/clube/sociedade-de-instru-o-recreio-os-pimp-es/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/mirandela-basquete-clube/home</loc>
+    <loc>https://dribly.pt/clube/sport-club-oper-rio-de-cem-soldos/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-basquetebol-albicastrense/home</loc>
+    <loc>https://dribly.pt/clube/n-cleo-desporto-amador-pombal/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-portuguesa-de-deficientes-paredes/home</loc>
+    <loc>https://dribly.pt/clube/barca-basket-clube/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/associa-o-desportiva-sanjoanense/home</loc>
+    <loc>https://dribly.pt/clube/clube-desportivo-pinhalnovense/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-basket-de-queluz/home</loc>
+    <loc>https://dribly.pt/clube/atl-tico-clube-de-portugal/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-amigos-do-basquete/home</loc>
+    <loc>https://dribly.pt/clube/clube-desportivo-de-tondela/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-dos-galitos/home</loc>
+    <loc>https://dribly.pt/clube/n-cleo-de-minibasquete-de-canaviais/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/febres-sport-club/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-desportivo-andr-soares/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-juvenil-do-clube-oper-rio-desportivo/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/valour-futebol-clube-assoc-cult-recreativa-e-desp-do-ros-rio/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/enesse-basquetebol-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-cultural-recreativa-da-cerca-s-o-pedro/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1271,22 +1211,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/basket-clube-de-coura/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sport-alg-s-e-dafundo/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://dribly.pt/clube/gin-sio-clube-figueirense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/associa-o-desportiva-gua-de-pena/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1296,7 +1221,42 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://dribly.pt/clube/basket-clube-de-coura/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/anadia-futebol-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/mirandela-basquete-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://dribly.pt/clube/clube-desportivo-covilh/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-basket-de-queluz/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-desportivo-do-estreito/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-desportiva-sanjoanense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/lmcb-associa-o-desportiva-linces-de-mafra/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1306,12 +1266,52 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/2010-odisseia-basket-clube/home</loc>
+    <loc>https://dribly.pt/clube/associa-o-juvenil-estremoz/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://dribly.pt/clube/clube-stella-maris-peniche/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/sport-alg-s-e-dafundo/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-portuguesa-de-deficientes-paredes/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-desportivo-lousanense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-dos-galitos/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-basquetebol-albicastrense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-amigos-do-basquete/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/associa-o-desportiva-gua-de-pena/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/clube-desportivo-escolar-os-fuseiros/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1346,26 +1346,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/obc-odivelas-basket-clube/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/uni-o-desportiva-vilafranquense/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/uni-o-desportiva-e-cultural-de-machico/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/xky-clube-desportivo-internacional/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://dribly.pt/clube/ama-basket-associa-o-amigos-do-basquetebol/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -1391,12 +1371,22 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/clube-de-football-os-armacenenses/home</loc>
+    <loc>https://dribly.pt/clube/obc-odivelas-basket-clube/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/grupo-desportivo-escola-maria-alberta-men-res/home</loc>
+    <loc>https://dribly.pt/clube/uni-o-desportiva-vilafranquense/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/uni-o-desportiva-e-cultural-de-machico/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/xky-clube-desportivo-internacional/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1446,6 +1436,21 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://dribly.pt/clube/clube-de-football-os-armacenenses/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/grupo-desportivo-escola-maria-alberta-men-res/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/appacdm-da-figueira-da-foz/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://dribly.pt/clube/associa-o-clube-de-basquetebol-da-barca/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -1491,16 +1496,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://dribly.pt/clube/appacdm-da-figueira-da-foz/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://dribly.pt/clube/sec-test-del/home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://dribly.pt/clube/academia-musical-1-junho-1893/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -1517,6 +1512,11 @@
   </url>
   <url>
     <loc>https://dribly.pt/clube/famalicense-atl-tico-clube/home</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dribly.pt/clube/sec-test-del/home</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
