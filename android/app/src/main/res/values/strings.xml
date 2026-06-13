@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Dribly</string>
+    <string name="title_activity_main">Dribly</string>
+    <string name="package_name">pt.dribly.app</string>
+    <string name="custom_url_scheme">pt.dribly.app</string>
+</resources>

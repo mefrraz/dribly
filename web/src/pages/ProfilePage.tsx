@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
     User, AtSign, FileText, Check, Loader2, LogOut,
     Lock, Key, Monitor, X, Trash2, AlertTriangle, Eye, EyeOff, ArrowLeft,
+    Bell,
 } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 import { useUser, useSessionList } from '@clerk/clerk-react'
@@ -116,6 +117,21 @@ export default function ProfilePage() {
                         <p className="text-sm text-zinc-500 truncate">{user.email}</p>
                     </div>
                 </div>
+
+                {/* Quick link to Settings */}
+                <Link
+                    to="/definicoes"
+                    className="flex items-center gap-3 p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-white/10 hover:border-dribly-purple/40 transition-all mb-6"
+                >
+                    <div className="w-9 h-9 rounded-xl bg-dribly-purple/10 flex items-center justify-center shrink-0">
+                        <Bell size={18} className="text-dribly-purple" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Definições de notificações</p>
+                        <p className="text-[11px] text-zinc-400">Gere as tuas notificações push e preferências</p>
+                    </div>
+                    <ArrowLeft size={14} className="text-zinc-300 rotate-180" />
+                </Link>
 
                 {/* Profile form */}
                 <div className="space-y-4">

@@ -5,7 +5,7 @@ import { NetworkFirst, StaleWhileRevalidate, CacheFirst } from 'workbox-strategi
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 
-declare let self: ServiceWorkerGlobalScope;
+/// <reference lib="WebWorker" />
 
 // ── Take control immediately ──
 skipWaiting();
@@ -69,3 +69,75 @@ registerRoute(
   }),
   'GET'
 );
+
+// ── Push Notification Handler ──────────────────────────────
+// Handles incoming push events from the server.
+// Expects JSON payload: { title, body, icon?, badge?, url?, tag? }
+self.addEventListener('push', (event: PushEvent) => {
+    const fallback = {
+        title: 'Dribly',
+        body: 'Nova atualização disponível.',
+        icon: '/logo.png',
+        badge: '/logo.png',
+    };
+
+    const showNotification = (data: typeof fallback) => {
+        const { title, body, icon, badge, url, tag } = {
+            ...fallback,
+            ...data,
+        };
+        event.waitUntil(
+            self.registration.showNotification(title, {
+                body,
+                icon,
+                badge,
+                tag: tag || 'dribly-default',
+                data: { url: url || 'https://dribly.pt' },
+                vibrate: [200, 100, 200],
+                requireInteraction: false,
+                actions: [
+                    { action: 'open', title: 'Ver' },
+                    { action: 'close', title: 'Fechar' },
+                ],
+            })
+        );
+    };
+
+    if (event.data) {
+        try {
+            const payload = event.data.json();
+            showNotification(payload);
+        } catch {
+            // Non-JSON payload — try text
+            showNotification({ ...fallback, body: event.data.text() || fallback.body });
+        }
+    } else {
+        showNotification(fallback);
+    }
+});
+
+// ── Notification Click Handler ─────────────────────────────
+// Opens or focuses a Dribly window and navigates to the URL in payload.
+self.addEventListener('notificationclick', (event: NotificationEvent) => {
+    event.notification.close();
+
+    if (event.action === 'close') return;
+
+    const url = event.notification.data?.url || 'https://dribly.pt';
+
+    event.waitUntil(
+        (async () => {
+            const windows = await self.clients.matchAll({
+                type: 'window',
+                includeUncontrolled: true,
+            });
+            const existing = windows.find(w => w.url.startsWith(self.location.origin));
+            if (existing) {
+                await existing.focus();
+                existing.postMessage({ type: 'NOTIFICATION_CLICK', url });
+            } else {
+                await self.clients.openWindow(url);
+            }
+        })()
+    );
+});

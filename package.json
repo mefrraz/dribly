@@ -1,8 +1,23 @@
 {
+  "name": "dribly-capacitor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cap:sync": "npx cap sync",
+    "cap:open": "npx cap open android",
+    "cap:build": "cd web && npm run build && cd .. && npx cap sync",
+    "cap:doctor": "npx cap doctor"
+  },
   "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
     "@types/leaflet": "^1.9.21",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
     "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
   }
 }

@@ -4,12 +4,15 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-    // Inject git hash at build time — visible in footer for version checks
+    // Inject build-time constants — available in SW and app code
     define: {
         __GIT_HASH__: JSON.stringify(
             process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'dev'
         ),
         __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+        __VAPID_PUBLIC_KEY__: JSON.stringify(
+            process.env.VITE_VAPID_PUBLIC_KEY || ''
+        ),
     },
     server: {
         proxy: {
