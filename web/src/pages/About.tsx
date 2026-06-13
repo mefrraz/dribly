@@ -1,4 +1,4 @@
-import { Instagram, Github, Heart } from 'lucide-react'
+import { Instagram, Github } from 'lucide-react'
 
 declare const __GIT_HASH__: string
 import { PageHeader } from '../components/PageHeader'
@@ -52,13 +52,10 @@ function About() {
 
             {/* Data + Tech */}
             <div className="glass-card p-6">
-                <div className="flex items-start gap-2 mb-4">
-                    <Heart size={15} className="text-dribly-purple shrink-0 mt-0.5" />
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                        Os dados são obtidos diretamente do site oficial da <strong>Federação Portuguesa de Basquetebol (FPB)</strong>.
-                        Inclui jogos, resultados e classificações de todos os clubes registados.
-                    </p>
-                </div>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
+                    Os dados são obtidos diretamente do site oficial da <strong>Federação Portuguesa de Basquetebol (FPB)</strong>.
+                    Inclui jogos, resultados e classificações de todos os clubes registados.
+                </p>
                 <div className="flex flex-wrap gap-2">
                     {['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Supabase', 'Clerk', 'Capacitor', 'Vercel', 'PWA'].map(tech => (
                         <span key={tech} className="px-2.5 py-1 text-[10px] font-bold bg-zinc-100 dark:bg-white/10 text-zinc-700 dark:text-zinc-300 rounded-full">{tech}</span>
@@ -67,9 +64,14 @@ function About() {
             </div>
 
             {/* Version */}
-            <div className="glass-card p-4 text-center">
-                <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Versão atual</p>
-                <p className="text-xs font-mono font-bold text-zinc-600 dark:text-zinc-300">{__GIT_HASH__}</p>
+            <div className="glass-card p-5 text-center">
+                <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-2">Compilação atual</p>
+                <p className="text-sm font-mono font-bold text-zinc-700 dark:text-zinc-200 bg-zinc-50 dark:bg-white/5 rounded-lg px-3 py-1.5 inline-block">
+                    {__GIT_HASH__}
+                </p>
+                <p className="text-[10px] text-zinc-400 mt-2">
+                    Este site é atualizado automaticamente a cada alteração no código fonte.
+                </p>
             </div>
         </div>
     )
