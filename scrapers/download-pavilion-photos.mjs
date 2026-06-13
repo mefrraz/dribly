@@ -65,18 +65,32 @@ let ok = 0, err = 0
 
 for (const pav of needPhoto) {
     const entry = byPlaceId.get(pav.google_place_id)
-    // Pick the highest-res image: imageUrls[0] is usually 1920px
-    const imgUrl = entry.imageUrls?.[0] || entry.imageUrl
-    if (!imgUrl) continue
+    // Try all available image URLs, pick the heaviest (best resolution)
+    const urls = [...(entry.imageUrls || []), entry.imageUrl].filter(Boolean)
+    if (urls.length === 0) continue
+
+    let bestBuffer = null
+    let bestSize = 0
+    let bestUrl = null
+
+    for (const imgUrl of urls) {
+        try {
+            const res = await fetch(imgUrl)
+            if (!res.ok) continue
+            const buffer = Buffer.from(await res.arrayBuffer())
+            if (buffer.length > bestSize) {
+                bestBuffer = buffer
+                bestSize = buffer.length
+                bestUrl = imgUrl
+            }
+        } catch { /* try next URL */ }
+    }
+
+    if (!bestBuffer) { err++; continue }
 
     try {
-        // Download
-        const res = await fetch(imgUrl)
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const buffer = Buffer.from(await res.arrayBuffer())
-
         // Upload to Supabase
-        const ext = imgUrl.match(/\.(jpg|jpeg|png|webp)/i)?.[1] || 'jpg'
+        const ext = bestUrl.match(/\.(jpg|jpeg|png|webp)/i)?.[1] || 'jpg'
         const name = `${pav.google_place_id}.${ext}`
         const { data: up, error: upErr } = await supabase.storage.from(BUCKET).upload(name, buffer, {
             contentType: `image/${ext}`,
