@@ -195,7 +195,7 @@ function ClubHome() {
             {/* Quick Links */}
             <div className="grid grid-cols-2 gap-3">
                 <Link to={`/clube/${club.slug}/games?view=agenda`} className="relative overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-900 p-5 h-32 group shadow-sm transition-all active:scale-[0.98] hover:border-[var(--club-color)]/20">
-                    <Calendar size={56} className="absolute top-0 right-0 text-zinc-200 dark:text-zinc-800 transform rotate-12 translate-x-4 -translate-y-2 group-hover:scale-110 transition-transform" />
+                    <Calendar size={56} className="absolute top-0 right-0 text-zinc-300 dark:text-zinc-700 transform rotate-12 translate-x-2 -translate-y-1 group-hover:scale-110 transition-transform" />
                     <div className="relative z-10 h-full flex flex-col justify-between">
                         <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
                             <Calendar size={20} />
@@ -204,7 +204,7 @@ function ClubHome() {
                     </div>
                 </Link>
                 <Link to={`/clube/${club.slug}/team`} className="relative overflow-hidden rounded-2xl bg-[var(--club-color)] border border-[var(--club-color)] p-5 h-32 group shadow-sm shadow-[var(--club-color)]/10 transition-all active:scale-[0.98] hover:shadow-md">
-                    <Trophy size={56} strokeLinejoin="round" strokeLinecap="round" className="absolute top-0 right-0 text-white transform rotate-12 translate-x-4 -translate-y-2 group-hover:scale-110 transition-transform opacity-[0.04]" />
+                    <Trophy size={56} strokeLinejoin="round" strokeLinecap="round" className="absolute top-0 right-0 text-white transform rotate-12 translate-x-2 -translate-y-1 group-hover:scale-110 transition-transform opacity-[0.08]" />
                     <div className="relative z-10 h-full flex flex-col justify-between">
                         <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
                             <Trophy size={20} />
