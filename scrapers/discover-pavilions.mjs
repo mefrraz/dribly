@@ -30,6 +30,43 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 const GAME_TABLES = ['games_2025_2026', 'games_2024_2025', 'games_2023_2024', 'games_2022_2023']
 
+// ── Clean pavilion names from game data ────────────────
+
+const SKIP_PATTERNS = [
+    /^a\s+indicar/i,          // "a indicar" = TBA
+    /^a\s+designar/i,         // "a designar" = TBA
+    /^por\s+definir/i,        // "por definir"
+    /^indefinido/i,
+    /^campo\s+exterior/i,     // outdoor courts
+    /^campo\s+de\s+jogos/i,
+    /^ringue/i,
+    /^polidesportivo\s+descoberto/i,
+]
+
+function cleanPavilionName(raw) {
+    let name = raw.trim()
+
+    // Skip TBA / placeholders
+    for (const pat of SKIP_PATTERNS) {
+        if (pat.test(name)) return null
+    }
+
+    // Remove ",CityName" suffix (e.g., "Pavilhão X ,Porto")
+    name = name.replace(/\s*,[A-Z][a-z].*$/, '')
+
+    // Remove competition suffix: " | Liga Betclic Masculina", " Sub 14 Feminino | ..."
+    name = name.replace(/\s*(Sub|Sénior|Senior|Mini|Juniores)\s+\d{1,2}\s*(Feminino|Masculino|Fem|Masc)?\s*\|.*$/i, '')
+    name = name.replace(/\s*\|\s*(Liga|Taça|Campeonato|Torneio|Circuito|Jogos|FIBA|BCL|1ª|2ª|C\.I\.).*$/i, '')
+
+    // Remove trailing noise
+    name = name.replace(/\s*,\s*$/, '').trim()
+
+    // Must have at least 4 chars and contain letters
+    if (name.length < 4 || !/[a-zA-Z\u00C0-\u024F]/.test(name)) return null
+
+    return name
+}
+
 console.log('🔍 Scanning games for unique locations...')
 /** @type {Map<string, {nome: string, recinto_id: number|null}>} */
 const discovered = new Map()
@@ -40,8 +77,8 @@ for (const table of GAME_TABLES) {
         const { data } = await supabase.from(table).select('local, recinto_id').range(from, from + PAGE - 1).not('local', 'is', null)
         if (!data || data.length === 0) break
         for (const row of data) {
-            const nome = (row.local || '').trim()
-            if (!nome || nome.length < 3) continue
+            const nome = cleanPavilionName(row.local || '')
+            if (!nome) continue
             const key = nome.toLowerCase()
             if (!discovered.has(key)) {
                 discovered.set(key, { nome, recinto_id: row.recinto_id || null })
@@ -125,4 +162,50 @@ if (newPavilions.length > 0) {
     console.log('💡 Go to /admin/pavilhoes to add addresses, coords and photos.')
 } else {
     console.log('\n✅ All pavilions already in database.')
+}
+
+// ── Cleanup: delete garbage pavilions inserted earlier ─
+
+console.log('\n🧹 Cleaning up garbage pavilions...')
+const { data: allPavs } = await supabase.from('pavilions').select('id, nome, recinto_id')
+if (allPavs) {
+    const toDelete = []
+    for (const p of allPavs) {
+        const clean = cleanPavilionName(p.nome)
+        if (!clean) toDelete.push(p)
+    }
+    if (toDelete.length > 0) {
+        console.log(`  Deleting ${toDelete.length} garbage entries...`)
+        for (const p of toDelete) {
+            await supabase.from('pavilions').delete().eq('id', p.id)
+            console.log(`  🗑️  #${p.id} "${p.nome}"`)
+        }
+    }
+
+    // Deduplicate: same cleaned name, keep the one with recinto_id or most data
+    const seen = new Map()
+    const dupes = []
+    for (const p of allPavs.filter(p => cleanPavilionName(p.nome))) {
+        const key = cleanPavilionName(p.nome).toLowerCase()
+        if (seen.has(key)) {
+            const existing = seen.get(key)
+            // Keep the one with recinto_id, or the first one
+            if (!existing.recinto_id && p.recinto_id) {
+                dupes.push(existing.id) // delete the old one
+                seen.set(key, p)
+            } else {
+                dupes.push(p.id) // delete this duplicate
+            }
+        } else {
+            seen.set(key, p)
+        }
+    }
+    if (dupes.length > 0) {
+        console.log(`  Deduplicating ${dupes.length} duplicates...`)
+        for (const id of dupes) {
+            await supabase.from('pavilions').delete().eq('id', id)
+            console.log(`  🗑️  #${id} (duplicate)`)
+        }
+    }
+    console.log('  Done.')
 }
