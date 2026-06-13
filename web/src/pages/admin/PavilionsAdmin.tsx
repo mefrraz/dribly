@@ -41,8 +41,18 @@ export default function PavilionsAdmin() {
     useEffect(() => {
         const load = async () => {
             try {
-                const { data } = await supabase.from('pavilions').select('*').order('nome')
-                if (data) setPavilions(data as PavilionRow[])
+                // Fetch ALL pavilions (paginated — Supabase max 1000/request)
+                const all: PavilionRow[] = []
+                let from = 0
+                const PAGE = 1000
+                while (true) {
+                    const { data } = await supabase.from('pavilions').select('*').order('nome').range(from, from + PAGE - 1)
+                    if (!data || data.length === 0) break
+                    all.push(...(data as PavilionRow[]))
+                    if (data.length < PAGE) break
+                    from += PAGE
+                }
+                setPavilions(all)
             } catch (e) {
                 setError((e as Error).message)
             } finally {
