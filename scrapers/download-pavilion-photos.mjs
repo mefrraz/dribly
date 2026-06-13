@@ -44,13 +44,11 @@ console.log(`  ${byPlaceId.size} entries with photos`)
 
 // Fetch pavilions that need photos
 const { data: pavs } = await supabase.from('pavilions').select('id, nome, google_place_id, image_url').not('google_place_id', 'is', null)
-const needPhoto = (pavs || []).filter(p => !p.image_url && byPlaceId.has(p.google_place_id))
-console.log(`  ${needPhoto.length} pavilions need photos`)
+// Always download to our bucket (regardless of current image_url)
+const needPhoto = (pavs || []).filter(p => byPlaceId.has(p.google_place_id))
+console.log(`  ${needPhoto.length} pavilions to process`)
 
-if (needPhoto.length === 0) {
-    console.log('✅ All photos already set.')
-    process.exit(0)
-}
+if (needPhoto.length === 0) { console.log('✅ Nothing to do.'); process.exit(0) }
 
 // Ensure bucket exists (create if needed)
 const { data: buckets } = await supabase.storage.listBuckets()
