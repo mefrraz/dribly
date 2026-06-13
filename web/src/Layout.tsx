@@ -205,7 +205,14 @@ function Layout() {
                             <Instagram size={20} />
                         </a>
                         <a href="https://www.reddit.com/user/frraz_me" target="_blank" rel="noopener noreferrer" className="hover:text-dribly-purple transition-colors">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm4.67 10.67a1.67 1.67 0 0 1-2.83 1.17 8.23 8.23 0 0 1-4.48 1.44l.77-3.6 3.1.66a1.67 1.67 0 0 1 3.44.33zm-8.34 3a.83.83 0 0 1 0-1.66.83.83 0 0 1 0 1.66zm5 4a4.1 4.1 0 0 1-2.82-1.02.33.33 0 0 1 .46-.47 3.66 3.66 0 0 0 4.72 0 .33.33 0 0 1 .46.47A4.1 4.1 0 0 1 13.33 19.67z"/></svg>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M7.5 13.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM16.5 13.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                <path d="M9 14.5h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                                <path d="M12 15.5v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                                <circle cx="12" cy="3" r="1" fill="currentColor"/>
+                                <path d="M12 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                            </svg>
                         </a>
                         <a href="https://github.com/mefrraz/dribly" target="_blank" rel="noopener noreferrer" className="hover:text-dribly-purple transition-colors">
                             <Github size={20} />
