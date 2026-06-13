@@ -41,6 +41,7 @@ codewhale-tui.exe
 
 # Archive (old scripts, temp files)
 archive/
+pavilhoes_maps.txt
 
 # Playwright
 test-results/
