@@ -97,18 +97,6 @@ registerRoute(
   'GET'
 );
 
-// ── Google Fonts (CacheFirst, 1 year TTL) ──
-registerRoute(
-  /^https:\/\/fonts\.googleapis\.com\/.*/i,
-  new CacheFirst({
-    cacheName: 'google-fonts-cache',
-    plugins: [
-      new ExpirationPlugin({ maxEntries: 10, maxAgeSeconds: 31536000 }),
-    ],
-  }),
-  'GET'
-);
-
 // ── Push Notification Handler ──────────────────────────────
 // Handles incoming push events from the server.
 // Expects JSON payload: { title, body, icon?, badge?, url?, tag? }
