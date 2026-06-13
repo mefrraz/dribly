@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
-import { Search, Save, X, MapPin, ExternalLink } from 'lucide-react'
+import { useEffect, useState, useRef } from 'react'
+import { Search, Save, X, MapPin, Navigation, Upload, Loader2 } from 'lucide-react'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import L from 'leaflet'
 import { supabase } from '../../lib/supabase'
 
 interface PavilionRow {
@@ -13,11 +15,16 @@ interface PavilionRow {
     concelho: string | null
     lat: number | null
     lng: number | null
+    morada_completa: string | null
     fpb_url: string | null
-    geocode_ok: boolean
     image_url: string | null
     google_rating: number | null
+    google_maps_url: string | null
+    website: string | null
+    phone: string | null
 }
+
+const BUCKET = 'pavilions'
 
 export default function PavilionsAdmin() {
     const [pavilions, setPavilions] = useState<PavilionRow[]>([])
@@ -26,15 +33,15 @@ export default function PavilionsAdmin() {
     const [editingId, setEditingId] = useState<number | null>(null)
     const [editForm, setEditForm] = useState<Partial<PavilionRow>>({})
     const [saving, setSaving] = useState(false)
+    const [geocoding, setGeocoding] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [uploading, setUploading] = useState(false)
+    const fileInputRef = useRef<HTMLInputElement>(null!)
 
     useEffect(() => {
         const load = async () => {
             try {
-                const { data } = await supabase
-                    .from('pavilions')
-                    .select('*')
-                    .order('nome')
+                const { data } = await supabase.from('pavilions').select('*').order('nome')
                 if (data) setPavilions(data as PavilionRow[])
             } catch (e) {
                 setError((e as Error).message)
@@ -45,24 +52,64 @@ export default function PavilionsAdmin() {
         load()
     }, [])
 
-    const filtered = pavilions.filter(
-        (p) =>
-            !search ||
-            p.nome.toLowerCase().includes(search.toLowerCase()) ||
-            (p.cidade || '').toLowerCase().includes(search.toLowerCase()) ||
-            (p.distrito || '').toLowerCase().includes(search.toLowerCase()),
+    const filtered = pavilions.filter(p =>
+        !search ||
+        p.nome.toLowerCase().includes(search.toLowerCase()) ||
+        (p.cidade || '').toLowerCase().includes(search.toLowerCase()) ||
+        (p.distrito || '').toLowerCase().includes(search.toLowerCase()) ||
+        (p.concelho || '').toLowerCase().includes(search.toLowerCase())
     )
 
-    const startEdit = (p: PavilionRow) => {
-        setEditingId(p.id)
-        setEditForm({ ...p })
+    const startEdit = (p: PavilionRow) => { setEditingId(p.id); setEditForm({ ...p }) }
+    const cancelEdit = () => { setEditingId(null); setEditForm({}) }
+
+    // ── Geocode ──────────────────────────────────────
+    const geocode = async () => {
+        const parts = [
+            editForm.rua,
+            editForm.codigo_postal,
+            editForm.cidade,
+            editForm.distrito,
+            'Portugal',
+        ].filter(Boolean)
+        if (parts.length < 2) { setError('Preenche rua + cidade ou código postal.'); return }
+        setGeocoding(true)
+        setError(null)
+        try {
+            const q = parts.join(', ')
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`)
+            const json = await res.json()
+            if (json[0]) {
+                setEditForm(f => ({ ...f, lat: parseFloat(json[0].lat), lng: parseFloat(json[0].lon) }))
+            } else {
+                setError('Morada não encontrada.')
+            }
+        } catch { setError('Erro ao geocodificar.') }
+        setGeocoding(false)
     }
 
-    const cancelEdit = () => {
-        setEditingId(null)
-        setEditForm({})
+    // ── Image upload ─────────────────────────────────
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file || !editForm.recinto_id) return
+        setUploading(true)
+        setError(null)
+        try {
+            const ext = file.name.split('.').pop() || 'jpg'
+            const name = `${editForm.recinto_id}_${Date.now()}.${ext}`
+            const { data, error: upErr } = await supabase.storage.from(BUCKET).upload(name, file, {
+                cacheControl: '31536000',
+                upsert: false,
+            })
+            if (upErr) throw upErr
+            const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(data.path)
+            setEditForm(f => ({ ...f, image_url: urlData.publicUrl }))
+        } catch (err) { setError((err as Error).message) }
+        setUploading(false)
+        if (fileInputRef.current) fileInputRef.current.value = ''
     }
 
+    // ── Save ─────────────────────────────────────────
     const saveEdit = async () => {
         if (!editingId || !editForm.nome) return
         setSaving(true)
@@ -77,222 +124,255 @@ export default function PavilionsAdmin() {
                 concelho: editForm.concelho || null,
                 lat: editForm.lat ?? null,
                 lng: editForm.lng ?? null,
+                morada_completa: editForm.morada_completa || null,
                 fpb_url: editForm.fpb_url || null,
                 image_url: editForm.image_url || null,
                 google_rating: editForm.google_rating ?? null,
+                google_maps_url: editForm.google_maps_url || null,
+                website: editForm.website || null,
+                phone: editForm.phone || null,
             })
             .eq('id', editingId)
-
-        if (updateErr) {
-            setError(updateErr.message)
-        } else {
-            setPavilions((prev) =>
-                prev.map((p) =>
-                    p.id === editingId ? { ...p, ...editForm } : p,
-                ),
-            )
+        if (updateErr) { setError(updateErr.message) } else {
+            setPavilions(prev => prev.map(p => p.id === editingId ? { ...p, ...editForm } : p))
             setEditingId(null)
         }
         setSaving(false)
     }
 
-    if (loading) {
-        return <p className="text-zinc-500 text-sm">A carregar pavilhões...</p>
-    }
+    const withCoords = pavilions.filter(p => p.lat && p.lng).length
+    const withAddress = pavilions.filter(p => p.rua || p.morada_completa).length
+    const withPhotos = pavilions.filter(p => p.image_url).length
 
-    if (error) {
-        return <p className="text-red-500 text-sm font-bold">Erro: {error}</p>
-    }
-
-    // Stats
-    const withCoords = pavilions.filter((p) => p.lat && p.lng).length
-    const withoutCoords = pavilions.length - withCoords
+    if (loading) return <p className="text-zinc-500 text-sm">A carregar pavilhões...</p>
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-4">
+            {/* Header + stats */}
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                 <div>
-                    <h2 className="text-lg font-black text-zinc-900 dark:text-white">
-                        Pavilhões ({pavilions.length})
-                    </h2>
+                    <h2 className="text-lg font-black text-zinc-900 dark:text-white">Pavilhões ({pavilions.length})</h2>
                     <p className="text-[11px] text-zinc-400 mt-0.5">
-                        {withCoords} com coordenadas · {withoutCoords} sem
-                        geocode
+                        {withCoords} c/ coordenadas · {withAddress} c/ morada · {withPhotos} c/ foto
                     </p>
                 </div>
                 <div className="relative">
-                    <Search
-                        size={14}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="pl-8 pr-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white w-52 focus:outline-none focus:border-dribly-purple"
-                    />
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                    <input type="text" placeholder="Pesquisar..." value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        className="pl-8 pr-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white w-52 focus:outline-none focus:border-dribly-purple" />
                 </div>
             </div>
+
+            {error && (
+                <div className="mb-3 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-xs text-red-600 dark:text-red-400 flex items-center gap-2">
+                    <span className="flex-1">{error}</span>
+                    <button onClick={() => setError(null)}><X size={14} /></button>
+                </div>
+            )}
 
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-xs">
                         <thead>
                             <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
-                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-12">ID</th>
-                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Nome</th>
-                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Rua</th>
-                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Cód. Postal</th>
-                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Cidade</th>
-                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500">Distrito</th>
-                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-16">Coord</th>
-                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-12">Foto</th>
-                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-12">★</th>
-                                <th className="text-left px-4 py-2.5 font-bold text-zinc-500 w-16">FPB</th>
-                                <th className="px-4 py-2.5 w-16"></th>
+                                <th className="text-left px-3 py-2.5 font-bold text-zinc-500 w-10">ID</th>
+                                <th className="text-left px-3 py-2.5 font-bold text-zinc-500">Nome</th>
+                                <th className="text-left px-3 py-2.5 font-bold text-zinc-500 hidden md:table-cell">Morada</th>
+                                <th className="text-left px-3 py-2.5 font-bold text-zinc-500 hidden lg:table-cell">Cidade</th>
+                                <th className="text-left px-3 py-2.5 font-bold text-zinc-500 hidden lg:table-cell">Distrito</th>
+                                <th className="text-center px-3 py-2.5 font-bold text-zinc-500 w-12">📍</th>
+                                <th className="text-center px-3 py-2.5 font-bold text-zinc-500 w-12">📷</th>
+                                <th className="text-center px-3 py-2.5 font-bold text-zinc-500 w-12">★</th>
+                                <th className="px-3 py-2.5 w-14"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filtered.map((p) =>
-                                editingId === p.id ? (
-                                    <EditRow
-                                        key={p.id}
-                                        form={editForm}
-                                        setForm={setEditForm}
-                                        onSave={saveEdit}
-                                        onCancel={cancelEdit}
-                                        saving={saving}
-                                    />
-                                ) : (
-                                    <tr
-                                        key={p.id}
-                                        className="border-b border-zinc-50 dark:border-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-colors"
-                                    >
-                                        <td className="px-4 py-2 text-zinc-400 font-mono">
-                                            {p.id}
-                                        </td>
-                                        <td className="px-4 py-2 font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                                            <MapPin size={12} className="text-dribly-purple shrink-0" />
-                                            <span className="truncate max-w-[250px]">{p.nome}</span>
-                                        </td>
-                                        <td className="px-4 py-2 text-zinc-500 truncate max-w-[150px]">{p.rua || '—'}</td>
-                                        <td className="px-4 py-2 text-zinc-500 font-mono text-[11px]">{p.codigo_postal || '—'}</td>
-                                        <td className="px-4 py-2 text-zinc-500">{p.cidade || '—'}</td>
-                                        <td className="px-4 py-2">
-                                            {p.distrito ? (
-                                                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-dribly-purple/10 text-dribly-purple">
-                                                    {p.distrito}
-                                                </span>
-                                            ) : '—'}
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            {p.lat && p.lng ? (
-                                                <span className="text-green-600 dark:text-green-400 font-bold">✓</span>
-                                            ) : (
-                                                <span className="text-red-400">✗</span>
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            {p.image_url ? (
-                                                <img src={p.image_url} alt="" className="w-8 h-8 rounded object-cover" />
-                                            ) : '—'}
-                                        </td>
-                                        <td className="px-4 py-2 text-zinc-500">
-                                            {p.google_rating ? p.google_rating.toFixed(1) : '—'}
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            {p.fpb_url ? (
-                                                <a href={p.fpb_url} target="_blank" rel="noopener noreferrer"
-                                                    className="text-dribly-purple hover:underline inline-flex items-center gap-1">
-                                                    <ExternalLink size={11} />
-                                                </a>
-                                            ) : '—'}
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            <button
-                                                onClick={() => startEdit(p)}
-                                                className="text-xs font-bold text-dribly-purple hover:underline"
-                                            >
-                                                Editar
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ),
-                            )}
+                            {filtered.map(p => editingId === p.id ? (
+                                <EditRow key={p.id} form={editForm} setForm={setEditForm}
+                                    onSave={saveEdit} onCancel={cancelEdit} saving={saving}
+                                    geocoding={geocoding} onGeocode={geocode}
+                                    uploading={uploading} onUpload={handleUpload}
+                                    fileInputRef={fileInputRef} />
+                            ) : (
+                                <tr key={p.id} className="border-b border-zinc-50 dark:border-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-colors">
+                                    <td className="px-3 py-2 text-zinc-400 font-mono">{p.id}</td>
+                                    <td className="px-3 py-2 font-bold text-zinc-900 dark:text-white max-w-[200px] truncate">
+                                        {p.nome}
+                                    </td>
+                                    <td className="px-3 py-2 text-zinc-500 truncate max-w-[180px] hidden md:table-cell">
+                                        {p.rua || p.morada_completa || '—'}
+                                    </td>
+                                    <td className="px-3 py-2 text-zinc-500 hidden lg:table-cell">{p.cidade || '—'}</td>
+                                    <td className="px-3 py-2 hidden lg:table-cell">
+                                        {p.distrito ? <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-dribly-purple/10 text-dribly-purple">{p.distrito}</span> : '—'}
+                                    </td>
+                                    <td className="px-3 py-2 text-center">
+                                        {p.lat && p.lng ? <span className="text-green-500 font-bold">✓</span> : <span className="text-red-400">✗</span>}
+                                    </td>
+                                    <td className="px-3 py-2 text-center">
+                                        {p.image_url ? <span className="text-green-500 font-bold">✓</span> : '—'}
+                                    </td>
+                                    <td className="px-3 py-2 text-center text-zinc-500">
+                                        {p.google_rating?.toFixed(1) || '—'}
+                                    </td>
+                                    <td className="px-3 py-2">
+                                        <button onClick={() => startEdit(p)}
+                                            className="text-xs font-bold text-dribly-purple hover:underline">Editar</button>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
-                {filtered.length === 0 && (
-                    <p className="text-center py-8 text-zinc-400 text-xs">
-                        Nenhum pavilhão encontrado.
-                    </p>
-                )}
+                {filtered.length === 0 && <p className="text-center py-8 text-zinc-400 text-xs">Nenhum pavilhão.</p>}
             </div>
         </div>
     )
 }
 
-// ── Inline edit row ────────────────────────────────────
+// ── Expanded edit row ─────────────────────────────────
 
-function EditRow({
-    form,
-    setForm,
-    onSave,
-    onCancel,
-    saving,
-}: {
+function EditRow({ form, setForm, onSave, onCancel, saving, geocoding, onGeocode, uploading, onUpload, fileInputRef }: {
     form: Partial<PavilionRow>
     setForm: (f: Partial<PavilionRow>) => void
     onSave: () => void
     onCancel: () => void
     saving: boolean
+    geocoding: boolean
+    onGeocode: () => void
+    uploading: boolean
+    onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
+    fileInputRef: React.RefObject<HTMLInputElement>
 }) {
-    const field = (label: string, key: keyof PavilionRow, width: string) => (
-        <input
-            type="text"
-            value={(form[key] as string) || ''}
-            onChange={(e) => setForm({ ...form, [key]: e.target.value || null })}
-            placeholder={label}
-            className={`${width} px-2 py-1 text-[11px] rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white`}
-        />
+    const f = (key: keyof PavilionRow, placeholder: string, cls = '') => (
+        <input type="text" value={(form[key] as string) || ''}
+            onChange={e => setForm({ ...form, [key]: e.target.value || null })}
+            placeholder={placeholder}
+            className={`px-2 py-1 text-[11px] rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white ${cls}`} />
     )
 
+    const hasCoords = form.lat != null && form.lng != null && !isNaN(form.lat) && !isNaN(form.lng)
+
     return (
-        <tr className="bg-dribly-purple/5 dark:bg-dribly-purple/10 border-b border-dribly-purple/20">
-            <td className="px-4 py-2 text-zinc-400 font-mono">{form.id}</td>
-            <td className="px-4 py-2">{field('Nome', 'nome', 'w-40')}</td>
-            <td className="px-4 py-2">{field('Rua', 'rua', 'w-36')}</td>
-            <td className="px-4 py-2">{field('C.Postal', 'codigo_postal', 'w-24')}</td>
-            <td className="px-4 py-2">{field('Cidade', 'cidade', 'w-24')}</td>
-            <td className="px-4 py-2">{field('Distrito', 'distrito', 'w-28')}</td>
-            <td className="px-4 py-2">
-                <div className="flex items-center gap-1">
-                    <input type="number" step="any" value={form.lat ?? ''}
-                        onChange={(e) => setForm({ ...form, lat: e.target.value ? parseFloat(e.target.value) : null })}
-                        placeholder="lat" className="w-20 px-1 py-1 text-[10px] rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white" />
-                    <input type="number" step="any" value={form.lng ?? ''}
-                        onChange={(e) => setForm({ ...form, lng: e.target.value ? parseFloat(e.target.value) : null })}
-                        placeholder="lng" className="w-20 px-1 py-1 text-[10px] rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white" />
-                </div>
-            </td>
-            <td className="px-4 py-2">{field('Foto URL', 'image_url', 'w-28')}</td>
-            <td className="px-4 py-2">
-                <input type="number" step="0.1" value={form.google_rating ?? ''}
-                    onChange={(e) => setForm({ ...form, google_rating: e.target.value ? parseFloat(e.target.value) : null })}
-                    placeholder="rating" className="w-14 px-1 py-1 text-[10px] rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white" />
-            </td>
-            <td className="px-4 py-2">{field('URL FPB', 'fpb_url', 'w-40')}</td>
-            <td className="px-4 py-2">
-                <div className="flex items-center gap-1">
-                    <button onClick={onSave} disabled={saving}
-                        className="p-1.5 rounded-lg bg-dribly-purple text-white hover:bg-dribly-purple-dark transition-colors disabled:opacity-50" title="Guardar">
-                        <Save size={14} />
-                    </button>
-                    <button onClick={onCancel}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors" title="Cancelar">
-                        <X size={14} />
-                    </button>
+        <tr className="bg-dribly-purple/5 dark:bg-dribly-purple/10">
+            <td colSpan={9} className="px-4 py-3">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Left: form fields */}
+                    <div className="space-y-2.5">
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <label className="text-[10px] font-bold text-zinc-400 uppercase">Nome *</label>
+                                {f('nome', 'Nome do pavilhão', 'w-full mt-0.5')}
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold text-zinc-400 uppercase">Cidade</label>
+                                {f('cidade', 'Cidade', 'w-full mt-0.5')}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-bold text-zinc-400 uppercase">Rua / Morada</label>
+                            {f('rua', 'Rua', 'w-full mt-0.5')}
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            <div>
+                                <label className="text-[10px] font-bold text-zinc-400 uppercase">C. Postal</label>
+                                {f('codigo_postal', 'Cód. Postal', 'w-full mt-0.5')}
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold text-zinc-400 uppercase">Distrito</label>
+                                {f('distrito', 'Distrito', 'w-full mt-0.5')}
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold text-zinc-400 uppercase">Concelho</label>
+                                {f('concelho', 'Concelho', 'w-full mt-0.5')}
+                            </div>
+                        </div>
+                        <div className="flex items-end gap-2">
+                            <div className="flex-1">
+                                <label className="text-[10px] font-bold text-zinc-400 uppercase">Lat / Lng</label>
+                                <div className="flex gap-1 mt-0.5">
+                                    <input type="number" step="any" value={form.lat ?? ''}
+                                        onChange={e => setForm({ ...form, lat: e.target.value ? parseFloat(e.target.value) : null })}
+                                        placeholder="lat" className="w-1/2 px-2 py-1 text-[11px] rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white" />
+                                    <input type="number" step="any" value={form.lng ?? ''}
+                                        onChange={e => setForm({ ...form, lng: e.target.value ? parseFloat(e.target.value) : null })}
+                                        placeholder="lng" className="w-1/2 px-2 py-1 text-[11px] rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white" />
+                                </div>
+                            </div>
+                            <button onClick={onGeocode} disabled={geocoding}
+                                className="px-2.5 py-1.5 rounded-lg bg-dribly-purple text-white text-[10px] font-bold hover:bg-dribly-purple/90 transition-colors disabled:opacity-50 flex items-center gap-1 shrink-0">
+                                {geocoding ? <Loader2 size={12} className="animate-spin" /> : <Navigation size={12} />}
+                                Geo
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <label className="text-[10px] font-bold text-zinc-400 uppercase">Rating Google</label>
+                                <input type="number" step="0.1" value={form.google_rating ?? ''}
+                                    onChange={e => setForm({ ...form, google_rating: e.target.value ? parseFloat(e.target.value) : null })}
+                                    placeholder="4.5" className="w-full mt-0.5 px-2 py-1 text-[11px] rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white" />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-bold text-zinc-400 uppercase">URL FPB</label>
+                                {f('fpb_url', 'https://www.fpb.pt/...', 'w-full mt-0.5')}
+                            </div>
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-bold text-zinc-400 uppercase">Foto</label>
+                            <div className="flex items-center gap-2 mt-0.5">
+                                {f('image_url', 'URL ou upload abaixo', 'flex-1')}
+                                <input ref={fileInputRef} type="file" accept="image/*" onChange={onUpload}
+                                    className="hidden" id="pav-upload" />
+                                <label htmlFor="pav-upload"
+                                    className="px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer flex items-center gap-1">
+                                    {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                                    Upload
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right: mini-map preview */}
+                    <div>
+                        {hasCoords ? (
+                            <div>
+                                <label className="text-[10px] font-bold text-zinc-400 uppercase mb-1 block">Pré-visualização</label>
+                                <div className="h-48 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700">
+                                    <MapContainer center={[form.lat!, form.lng!]} zoom={16}
+                                        zoomControl={false} dragging={false} scrollWheelZoom={false}
+                                        doubleClickZoom={false} attributionControl={false}
+                                        className="w-full h-full">
+                                        <TileLayer url="https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png" />
+                                        <Marker position={[form.lat!, form.lng!]}
+                                            icon={L.divIcon({
+                                                html: '<div style="width:16px;height:16px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(124,58,237,0.5)"></div>',
+                                                className: '', iconSize: [16, 16], iconAnchor: [8, 8],
+                                            })} />
+                                    </MapContainer>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="h-48 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-zinc-400 text-[11px]">
+                                <div className="text-center">
+                                    <MapPin size={24} className="mx-auto mb-1 opacity-30" />
+                                    Preenche coordenadas ou usa o botão Geo
+                                </div>
+                            </div>
+                        )}
+                        {/* Save / Cancel */}
+                        <div className="flex items-center gap-2 mt-3 justify-end">
+                            <button onClick={onCancel}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors">
+                                Cancelar
+                            </button>
+                            <button onClick={onSave} disabled={saving || !form.nome}
+                                className="px-4 py-1.5 rounded-lg bg-dribly-purple text-white text-xs font-bold hover:bg-dribly-purple/90 transition-colors disabled:opacity-50 flex items-center gap-1.5">
+                                {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
