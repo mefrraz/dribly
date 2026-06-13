@@ -195,16 +195,16 @@ function ClubHome() {
                         <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
                             <Calendar size={20} />
                         </div>
-                        <h3 className="text-zinc-900 dark:text-white font-bold text-lg leading-tight">Resultados<br />& Agenda</h3>
+                        <h3 className="text-zinc-900 dark:text-white font-bold text-lg leading-tight">Resultados &amp; Agenda</h3>
                     </div>
                 </Link>
                 <Link to={`/clube/${club.slug}/team`} className="relative overflow-hidden rounded-2xl bg-[var(--club-color)] border border-[var(--club-color)] p-5 h-32 group shadow-sm shadow-[var(--club-color)]/10 transition-all active:scale-[0.98] hover:shadow-md">
-                    <Trophy size={56} className="absolute top-0 right-0 text-white/20 transform -rotate-12 translate-x-2 -translate-y-2 group-hover:scale-110 transition-transform" />
+                    <Trophy size={48} className="absolute bottom-0 right-0 text-white/10 transform translate-x-2 translate-y-2 group-hover:scale-110 transition-transform" />
                     <div className="relative z-10 h-full flex flex-col justify-between">
                         <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
                             <Trophy size={20} />
                         </div>
-                        <h3 className="text-white font-bold text-lg leading-tight">Equipas<br />& Escalões</h3>
+                        <h3 className="text-white font-bold text-lg leading-tight">Equipas &amp; Escalões</h3>
                     </div>
                 </Link>
             </div>
