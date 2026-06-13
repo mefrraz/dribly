@@ -41,7 +41,7 @@ export default function ClubsPage() {
             <div className="max-w-4xl mx-auto px-3 sm:px-5 pt-6 sm:pt-8 pb-24">
                 <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight mb-2 text-center">Clubes</h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-6 max-w-md mx-auto">
-                    Todos os clubes de basquetebol registados na Federação Portuguesa de Basquetebol
+                    Todos os clubes registados na Federação Portuguesa de Basquetebol
                 </p>
 
                 <div className="relative mb-8">
