@@ -23,6 +23,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 const OVERRIDES: Record<number, string> = {
     127: '#C30000',   // Benfica — keep original red
+    181: '#95a5a6',   // União Académica António Aroso — gray (logo is white/gray)
     704: '#27AE60',   // Brandoense — keep original green
     3155: '#387EFF',  // Powertogether — keep original blue
     866: '#E67E22',   // Queluz — more orange
