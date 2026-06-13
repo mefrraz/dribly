@@ -463,7 +463,7 @@ function Game() {
             {cleanLocal ? (
                 <div className="glass-card overflow-hidden">
                     {/* Mini map — full card width */}
-                    {pavilion ? (
+                    {pavilion && pavilion.lat && pavilion.lng ? (
                         <Link to={`/pavilhao/${pavilion.recinto_id || pavilion.id}`} className="block h-40 w-full relative cursor-pointer group">
                             <MapContainer
                                 center={[pavilion.lat, pavilion.lng]}
