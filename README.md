@@ -2,26 +2,7 @@
   <img src="assets/banner.png" alt="Dribly — Basquetebol português no teu bolso" width="100%" />
 </p>
 
-<p align="center">
-  <a href="https://dribly.pt"><img src="https://img.shields.io/badge/dribly.pt-7C3AED?style=for-the-badge&logo=vercel&logoColor=white" alt="Website" /></a>
-  <a href="https://github.com/mefrraz/dribly/blob/main/LICENSE"><img src="https://img.shields.io/badge/AGPLv3-7C3AED?style=for-the-badge&label=license" alt="AGPLv3" /></a>
-  <a href="https://github.com/mefrraz/dribly/stargazers"><img src="https://img.shields.io/github/stars/mefrraz/dribly?style=for-the-badge&color=7C3AED" alt="Stars" /></a>
-  <br/>
-  <img src="https://img.shields.io/badge/tests-111%20passing-7C3AED" alt="Tests" />
-  <img src="https://img.shields.io/badge/ESLint-0%20errors-7C3AED" alt="ESLint" />
-  <img src="https://img.shields.io/badge/PRs-welcome-7C3AED" alt="PRs Welcome" />
-</p>
-
-<p align="center">
-  <img src="assets/stack-badges.png" alt="Stack: React 18, TypeScript, Tailwind CSS, Vite 6, Supabase, Clerk, Vercel, PWA" width="800" />
-</p>
-
 > **v11** — 🏟️ Pavilhões com fotos Google Places · 🏆 ELO Ranking · 🎨 Melhorias visuais · [dribly.pt](https://dribly.pt)
-
-<!-- TODO: substituir por screenshot real -->
-<p align="center">
-  <i>📱 Screenshots em breve — visita <a href="https://dribly.pt">dribly.pt</a> para ver a app em ação.</i>
-</p>
 
 ---
 
