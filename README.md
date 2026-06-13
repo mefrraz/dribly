@@ -1,13 +1,5 @@
 <p align="center">
-  <img src="web/public/logo.svg" alt="Dribly" width="100" height="100" />
-</p>
-
-<h1 align="center">Dribly<span style="color:#7C3AED">.</span></h1>
-
-<p align="center">
-  <b>Basquetebol português no teu bolso</b>
-  <br />
-  App gratuita e open-source para acompanhar todos os clubes e competições da Federação Portuguesa de Basquetebol
+  <img src="assets/banner.png" alt="Dribly — Basquetebol português no teu bolso" width="100%" />
 </p>
 
 <p align="center">
@@ -20,20 +12,24 @@
   <img src="https://img.shields.io/badge/PRs-welcome-7C3AED" alt="PRs Welcome" />
 </p>
 
-> **v11** — 🏟️ Pavilhões com fotos Google Places · 🏆 ELO Ranking · 🎨 Melhorias visuais · [dribly.pt](https://dribly.pt)
+<p align="center">
+  <img src="assets/stack-badges.png" alt="Stack: React 18, TypeScript, Tailwind CSS, Vite 6, Supabase, Clerk, Vercel, PWA" width="800" />
+</p>
 
----
+> **v11** — 🏟️ Pavilhões com fotos Google Places · 🏆 ELO Ranking · 🎨 Melhorias visuais · [dribly.pt](https://dribly.pt)
 
 <!-- TODO: substituir por screenshot real -->
 <p align="center">
   <i>📱 Screenshots em breve — visita <a href="https://dribly.pt">dribly.pt</a> para ver a app em ação.</i>
 </p>
 
----
+<p align="center">
+  <img src="assets/divider.png" alt="" width="100%" />
+</p>
 
 ## 🎯 Porquê a Dribly
 
-O basquetebol português tem centenas de clubes e dezenas de competições, mas não existia uma plataforma **gratuita, mobile-first e open source** que reunisse tudo num só sítio. A FPB tem dados oficiais mas sem app, o Swish é pago, o TugaBasket não é mobile. A Dribly nasceu para ocupar esse espaço — feita por um fã de basquetebol, para a comunidade.
+O basquetebol português tem centenas de clubes e dezenas de competições, mas não existia uma plataforma **gratuita, mobile-first e open source** que reunisse tudo num só sítio. A FPB tem dados oficiais mas sem app, o Swish é pago, o TugaBasket não é mobile. A Dribly nasceu para ocupar esse espaço, feita por um fã de basquetebol, para a comunidade.
 
 | Funcionalidade | Dribly | FPB.pt | Swish | TugaBasket |
 |---|---|---|---|---|
@@ -54,7 +50,9 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 | Ranking ELO nacional | ✅ | ❌ | ❌ | ❌ |
 | Modo escuro | ✅ | ❌ | ✅ | ❌ |
 
----
+<p align="center">
+  <img src="assets/divider.png" alt="" width="100%" />
+</p>
 
 ## ✨ Funcionalidades
 
@@ -72,7 +70,7 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 |---|---|---|
 | 📅 Jogos e agenda | 1.0 | Calendário, resultados, fichas de jogo detalhadas |
 | 🏆 Classificações | 3.3 | Tabelas com J, V, D, PM, PS, DIF, PTS |
-| 📊 Estatísticas individuais | 3.4 | 22 campos — PTS, REB, AST, VAL, %L2, %L3, %LL |
+| 📊 Estatísticas individuais | 3.4 | 22 campos: PTS, REB, AST, VAL, %L2, %L3, %LL |
 | 🗺️ Mapa de pavilhões | 6.0 | Leaflet interativo com 400+ pavilhões, clustering, geolocalização |
 | 🏟️ Pavilhões Google Places | 11.0 | Fotos, ratings ⭐, horários 🕐, acessibilidade ♿, serviços |
 | 🏀 Atletas e equipas | 7.24 | Página de atleta com stats, carreira, biografia. Plantel com fotos |
@@ -109,7 +107,9 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 | ♿ Acessibilidade | 7.16 | `aria-label`, `role="dialog"`, breadcrumbs |
 | 🛡️ ErrorBoundary global | 7.9 | Fallback amigável em vez de ecrã branco |
 
----
+<p align="center">
+  <img src="assets/divider.png" alt="" width="100%" />
+</p>
 
 ## 🚀 Quick Start
 
@@ -134,7 +134,9 @@ npm run lint:fix   # ESLint auto-fix
 npm run build      # tsc + vitest + vite build
 ```
 
----
+<p align="center">
+  <img src="assets/divider.png" alt="" width="100%" />
+</p>
 
 ## 🛠️ Stack
 
@@ -150,7 +152,9 @@ npm run build      # tsc + vitest + vite build
 | Dados | FPB + TugaBasket (scraping HTML + WordPress AJAX) |
 | Testes | Vitest + Playwright + jsdom |
 
----
+<p align="center">
+  <img src="assets/divider.png" alt="" width="100%" />
+</p>
 
 ## ⚙️ Arquitetura
 
@@ -185,7 +189,9 @@ Browser (React SPA)
 - Tour onboarding só no sign-up (não no login)
 - JWT integrado com Supabase RLS (`auth.uid()::text`)
 
----
+<p align="center">
+  <img src="assets/divider.png" alt="" width="100%" />
+</p>
 
 ## 🏗️ Estrutura do Projeto
 
@@ -247,11 +253,13 @@ scrapers/                           # Scripts Node.js independentes
 └── fpb-manual.yml                  #   Manual: seed FPB
 ```
 
----
+<p align="center">
+  <img src="assets/divider.png" alt="" width="100%" />
+</p>
 
 ## 🧪 Testes
 
-**111 testes** em 14 ficheiros. Os testes correm em cada build — se falharem, o deploy não publica.
+**111 testes** em 14 ficheiros. Os testes correm em cada build, se falharem, o deploy não publica.
 
 ```bash
 cd web
@@ -267,29 +275,35 @@ npm run test:e2e                # end-to-end (Playwright)
 | Componentes | `GameCard.test.tsx`, `ErrorBoundary.test.tsx`, `StandingsTable.test.tsx`, `Toast.test.tsx` | 20 |
 | Contexto | `ClubContext.test.tsx` | 5 |
 
----
+<p align="center">
+  <img src="assets/divider.png" alt="" width="100%" />
+</p>
 
 ## 🤝 Contribuir
 
-PRs são bem-vindos! Lê o [CONTRIBUTING.md](CONTRIBUTING.md) para um guia completo (explica o que são PRs, issues, forks — mesmo que nunca tenhas contribuído para open source).
+PRs são bem-vindos! Lê o [CONTRIBUTING.md](CONTRIBUTING.md) para um guia completo (explica o que são PRs, issues, forks, mesmo que nunca tenhas contribuído para open source).
 
 Resumo rápido:
 1. **Escolhe uma [issue](https://github.com/mefrraz/dribly/issues)** ou cria uma nova
-2. **Faz fork, clone, branch** — mexe no que quiseres
+2. **Faz fork, clone, branch** e mexe no que quiseres
 3. **`npm run lint:fix`** para alinhar com ESLint
 4. **Adiciona testes** se mexeres em lógica de parsing, hooks ou componentes
-5. **`npm run build`** tem de passar — faz tsc + testes + build
-6. **Abre o PR** — eu revejo em 1-2 dias
+5. **`npm run build`** tem de passar: faz tsc + testes + build
+6. **Abre o PR**, eu revejo em 1-2 dias
 
-Não sabes o que é um PR? Sem stress — o [CONTRIBUTING.md](CONTRIBUTING.md) explica tudo, com glossário e passo a passo.
+Não sabes o que é um PR? Sem stress, o [CONTRIBUTING.md](CONTRIBUTING.md) explica tudo, com glossário e passo a passo.
 
----
+<p align="center">
+  <img src="assets/divider.png" alt="" width="100%" />
+</p>
 
 ## 📜 Licença
 
 GNU **AGPLv3** — código aberto, copyleft para serviços web. Vê o ficheiro [LICENSE](LICENSE).
 
----
+<p align="center">
+  <img src="assets/divider.png" alt="" width="100%" />
+</p>
 
 <p align="center">
   <a href="https://dribly.pt">🌐 dribly.pt</a>
