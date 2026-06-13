@@ -1,4 +1,6 @@
 import { Instagram, Github, Heart } from 'lucide-react'
+
+declare const __GIT_HASH__: string
 import { PageHeader } from '../components/PageHeader'
 import { SeoHead } from '../components/SeoHead'
 
@@ -62,6 +64,12 @@ function About() {
                         <span key={tech} className="px-2.5 py-1 text-[10px] font-bold bg-zinc-100 dark:bg-white/10 text-zinc-700 dark:text-zinc-300 rounded-full">{tech}</span>
                     ))}
                 </div>
+            </div>
+
+            {/* Version */}
+            <div className="glass-card p-4 text-center">
+                <p className="text-[10px] text-zinc-400 uppercase tracking-wider mb-1">Versão atual</p>
+                <p className="text-xs font-mono font-bold text-zinc-600 dark:text-zinc-300">{__GIT_HASH__}</p>
             </div>
         </div>
     )
