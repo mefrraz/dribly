@@ -1,0 +1,24 @@
+name: Discover Pavilions
+
+on:
+  schedule:
+    - cron: '0 5 * * 1'  # Every Monday at 5am UTC
+  workflow_dispatch:
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NOTIFY: 'true'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js
+      - name: Discover new pavilions
+        run: node scrapers/discover-pavilions.mjs
