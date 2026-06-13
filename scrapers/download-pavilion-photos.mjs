@@ -58,6 +58,16 @@ if (!buckets?.find(b => b.name === BUCKET)) {
     if (error) { console.error('  ❌', error.message); process.exit(1) }
 }
 
+// Clean bucket — remove all old files
+console.log('\n🧹 Cleaning bucket...')
+const { data: files } = await supabase.storage.from(BUCKET).list()
+if (files?.length > 0) {
+    const paths = files.map(f => f.name)
+    const { error: cleanErr } = await supabase.storage.from(BUCKET).remove(paths)
+    if (cleanErr) console.log(`  ⚠️  ${cleanErr.message}`)
+    else console.log(`  🗑️  ${paths.length} old files removed`)
+}
+
 console.log('\n📥 Downloading & uploading...')
 let ok = 0, err = 0
 
@@ -87,9 +97,10 @@ for (const pav of needPhoto) {
     if (!bestBuffer) { err++; continue }
 
     try {
-        // Upload to Supabase
+        // Upload to Supabase — name: pavilion slug + ext
         const ext = bestUrl.match(/\.(jpg|jpeg|png|webp)/i)?.[1] || 'jpg'
-        const name = `${pav.google_place_id}.${ext}`
+        const slug = pav.nome.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 60)
+        const name = `${slug}.${ext}`
         const { data: up, error: upErr } = await supabase.storage.from(BUCKET).upload(name, bestBuffer, {
             contentType: `image/${ext}`,
             cacheControl: '31536000',
