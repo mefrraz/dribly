@@ -26,7 +26,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 const GAME_TABLES = ['games_2025_2026', 'games_2024_2025', 'games_2023_2024', 'games_2022_2023']
 
 console.log('🔍 Scanning games for unique locations...')
-const discovered = new Map<string, { nome: string; recinto_id: number | null }>()
+/** @type {Map<string, {nome: string, recinto_id: number|null}>} */
+const discovered = new Map()
 for (const table of GAME_TABLES) {
     let from = 0
     const PAGE = 1000
@@ -70,9 +71,8 @@ if (missingFpbUrl.length > 0) {
 
 // ── Match & find new pavilions ─────────────────────────
 
-interface NewPavilion { nome: string; recinto_id: number | null; fpb_url: string | null }
-
-const newPavilions: NewPavilion[] = []
+/** @type {{nome: string, recinto_id: number|null, fpb_url: string|null}[]} */
+const newPavilions = []
 for (const [key, info] of discovered) {
     // Match by recinto_id first (most reliable)
     if (info.recinto_id && existingRecintos.has(info.recinto_id)) continue
