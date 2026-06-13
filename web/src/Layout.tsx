@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Sun, Moon, Instagram, Github, Info, Settings2, BarChart2, Home, Search, LogIn, Heart, Trophy, Building2, MapPin, Shield, TrendingUp } from 'lucide-react'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastContainer } from './components/Toast'
@@ -43,10 +43,27 @@ function Layout() {
     const [onboardingTrigger, setOnboardingTrigger] = useState<TourTrigger | null>(null)
     const [showSuggestions, setShowSuggestions] = useState(false)
     const location = useLocation()
+    const navigate = useNavigate()
     const { user } = useAuth()
     const { user: clerkUser } = useUser()
     const isAdmin = clerkUser?.publicMetadata?.role === 'admin'
     const isMapaPage = location.pathname === '/mapa'
+
+    // ── Deep link from notification click ──
+    useEffect(() => {
+        const handler = (event: MessageEvent) => {
+            if (event.data?.type === 'NOTIFICATION_CLICK' && event.data?.url) {
+                const url = new URL(event.data.url)
+                // Extract pathname + search from full URL for react-router
+                const target = url.pathname + url.search
+                navigate(target)
+            }
+        }
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', handler)
+            return () => navigator.serviceWorker.removeEventListener('message', handler)
+        }
+    }, [navigate])
 
     const handleAuthSuccess = useCallback((method: 'signin' | 'signup') => {
         if (method === 'signup') {
