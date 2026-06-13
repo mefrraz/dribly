@@ -4,13 +4,13 @@ import { SeoHead } from '../components/SeoHead'
 
 const RedditIcon = ({ size = 14 }: { size?: number }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-        <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/>
-        <path d="M7.5 13.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM16.5 13.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-        <path d="M9 14.5h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        <path d="M12 15.5v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        <circle cx="12" cy="3" r="1" fill="currentColor"/>
-        <path d="M12 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        <path d="M10 9l-2-1M14 9l2-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <ellipse cx="12" cy="16" rx="8" ry="6" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+        <ellipse cx="12" cy="9" rx="6" ry="5" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+        <circle cx="9.5" cy="8.5" r="1.2" fill="currentColor"/>
+        <circle cx="14.5" cy="8.5" r="1.2" fill="currentColor"/>
+        <path d="M9 11.5a2 2 0 0 0 3 1.5 2 2 0 0 0 3-1.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+        <path d="M12 4v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <circle cx="12" cy="3.5" r="1.3" fill="none" stroke="currentColor" strokeWidth="1.2"/>
     </svg>
 )
 
@@ -54,15 +54,15 @@ function About() {
 
             {/* Data + Tech */}
             <div className="glass-card p-6">
-                <div className="flex items-center gap-2 mb-4">
-                    <Heart size={16} className="text-dribly-purple" />
+                <div className="flex items-start gap-2 mb-4">
+                    <Heart size={15} className="text-dribly-purple shrink-0 mt-0.5" />
                     <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
                         Os dados são obtidos diretamente do site oficial da <strong>Federação Portuguesa de Basquetebol (FPB)</strong>.
                         Inclui jogos, resultados e classificações de todos os clubes registados.
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    {['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Supabase', 'Vercel', 'PWA'].map(tech => (
+                    {['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Supabase', 'Clerk', 'Capacitor', 'Vercel', 'PWA'].map(tech => (
                         <span key={tech} className="px-2.5 py-1 text-[10px] font-bold bg-zinc-100 dark:bg-white/10 text-zinc-700 dark:text-zinc-300 rounded-full">{tech}</span>
                     ))}
                 </div>

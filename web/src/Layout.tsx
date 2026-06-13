@@ -206,12 +206,13 @@ function Layout() {
                         </a>
                         <a href="https://www.reddit.com/user/frraz_me" target="_blank" rel="noopener noreferrer" className="hover:text-dribly-purple transition-colors">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M7.5 13.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM16.5 13.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-                                <path d="M9 14.5h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                                <path d="M12 15.5v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                                <circle cx="12" cy="3" r="1" fill="currentColor"/>
-                                <path d="M12 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                                <ellipse cx="12" cy="16" rx="8" ry="6" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                                <ellipse cx="12" cy="9" rx="6" ry="5" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                                <circle cx="9.5" cy="8.5" r="1.2" fill="currentColor"/>
+                                <circle cx="14.5" cy="8.5" r="1.2" fill="currentColor"/>
+                                <path d="M9 11.5a2 2 0 0 0 3 1.5 2 2 0 0 0 3-1.5" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                                <path d="M12 4v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                                <circle cx="12" cy="3.5" r="1.3" fill="none" stroke="currentColor" strokeWidth="1.2"/>
                             </svg>
                         </a>
                         <a href="https://github.com/mefrraz/dribly" target="_blank" rel="noopener noreferrer" className="hover:text-dribly-purple transition-colors">
