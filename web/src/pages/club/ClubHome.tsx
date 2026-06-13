@@ -156,13 +156,21 @@ function ClubHome() {
                             <div className="flex items-center justify-between gap-4">
                                 <TeamBlock name={dn(heroGame.equipa_casa)} logo={heroGame.logotipo_casa} />
                                 <div className="flex flex-col items-center gap-1 shrink-0">
-                                    {isResult ? (
+                                    {isResult ? (() => {
+                                        const clubIsCasa = dn(club.name).toLowerCase() === dn(heroGame.equipa_casa).toLowerCase()
+                                        const cs = clubIsCasa ? heroGame.resultado_casa : heroGame.resultado_fora
+                                        const os = clubIsCasa ? heroGame.resultado_fora : heroGame.resultado_casa
+                                        const won = (cs ?? 0) > (os ?? 0)
+                                        const casaWin = won ? clubIsCasa : !clubIsCasa
+                                        const casaClass = casaWin ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
+                                        const foraClass = !casaWin ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'
+                                        return (
                                         <div className="flex items-center gap-1 sm:gap-2">
-                                            <span className="text-2xl sm:text-3xl font-bold font-mono tabular-nums tracking-tighter text-zinc-900 dark:text-white">{heroGame.resultado_casa}</span>
-                                            <span className="text-base sm:text-xl font-light text-zinc-400">:</span>
-                                            <span className="text-2xl sm:text-3xl font-bold font-mono tabular-nums tracking-tighter text-zinc-900 dark:text-white">{heroGame.resultado_fora}</span>
+                                            <span className={`text-2xl sm:text-3xl font-mono tabular-nums tracking-tighter ${casaClass}`}>{heroGame.resultado_casa}</span>
+                                            <span className="text-base sm:text-xl text-zinc-300 dark:text-zinc-600">:</span>
+                                            <span className={`text-2xl sm:text-3xl font-mono tabular-nums tracking-tighter ${foraClass}`}>{heroGame.resultado_fora}</span>
                                         </div>
-                                    ) : (
+                                        )})() : (
                                         <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
                                             <span className="text-sm font-black text-zinc-400 dark:text-zinc-500">VS</span>
                                         </div>
