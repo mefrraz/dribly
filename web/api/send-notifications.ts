@@ -106,7 +106,6 @@ export default async function handler(req: Request): Promise<Response> {
         const tableName = `games_${season.replace('/', '_')}`
 
         const now = new Date()
-        const thirtyMinAgo = new Date(now.getTime() - 30 * 60 * 1000)
         const fifteenMinAgo = new Date(now.getTime() - 15 * 60 * 1000)
 
         // Get today's date in YYYY-MM-DD format
@@ -287,7 +286,7 @@ function formatTime(hora: string): string {
  * In production, we'd use club_id directly from the games table,
  * but the current schema stores equipa_casa/fora as string names.
  */
-function followClubUsers(follows: Follow[], clubName: string): string[] {
+function followClubUsers(follows: Follow[], _clubName: string): string[] {
     // Match follows where entity_type='club' and we need to resolve club name → club id
     // Since we don't have club_id in the follows lookup by name, we do a simple
     // approach: notify ALL users who follow ANY club (they opted in by following)
