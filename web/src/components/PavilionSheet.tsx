@@ -73,7 +73,10 @@ export function PavilionSheet({ pavilion, isOpen, onClose }: Props) {
                 bg-white dark:bg-zinc-900
                 border-t md:border border-zinc-200 dark:border-white/10
                 shadow-2xl
-            `}>
+                pb-safe
+            `}
+                style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+            >
                 {/* Photo — 16:9 above the name */}
                 {(pavilion.image_url || pavilion.foto_url) && (
                     <div className="shrink-0 aspect-[16/9] overflow-hidden bg-zinc-100 dark:bg-zinc-800">

@@ -17,10 +17,18 @@ function PWAInstallBanner() {
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches
         if (isStandalone) return
 
+        // Never show install banner inside Capacitor WebView or Android WebView
+        // (user already has the app installed via APK)
+        const ua = navigator.userAgent
+        const isWebView = /; wv\)/.test(ua) // Android WebView marker
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const isCapacitor = typeof (window as any).Capacitor !== 'undefined'
+        if (isWebView || isCapacitor) return
+
         const isDismissed = localStorage.getItem('pwa-banner-dismissed')
         if (isDismissed) return
 
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(ua)
         if (!isMobile) return
 
         let promptFired = false

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { MapPin, Building2, Heart, BarChart2, Trophy, Grid3X3, Shield, Settings2 } from 'lucide-react'
+import { MapPin, Building2, Heart, BarChart2, Trophy, Grid3X3, Shield, Settings2, Info } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 
 function BottomNav() {
@@ -22,6 +22,7 @@ function BottomNav() {
         { to: '/classificacoes', icon: BarChart2, label: 'Classificações' },
         { to: '/privacidade', icon: Shield, label: 'Privacidade' },
         { to: '/definicoes', icon: Settings2, label: 'Definições' },
+        { to: '/sobre', icon: Info, label: 'Sobre' },
     ]
 
     return (
@@ -29,7 +30,7 @@ function BottomNav() {
             {/* More menu overlay */}
             {showMore && (
                 <div className="fixed inset-0 z-40" onClick={() => setShowMore(false)}>
-                    <div className="absolute bottom-20 left-3 right-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 animate-in slide-in-from-bottom-4 duration-200" onClick={e => e.stopPropagation()}>
+                    <div className="absolute bottom-[5.5rem] left-3 right-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl p-4 animate-in slide-in-from-bottom-4 duration-200" onClick={e => e.stopPropagation()}>
                         <div className="grid grid-cols-3 gap-2">
                             {moreItems.map(item => {
                                 const Icon = item.icon

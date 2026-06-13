@@ -27,6 +27,9 @@ dist/
 Thumbs.db
 Desktop.ini
 
+# Capacitor Android build output
+android/app/build/
+
 # CodeWhale internal
 .codewhale/
 .deepseek/
@@ -54,6 +57,9 @@ web_antiga/
 scrapers/scraped_*.json
 scrapers/*.js
 scrapers/*.cjs
+scrapers/package*.json
+scrapers/node_modules/
+.dribly-deps/
 fpb_clubes*.json
 https___*.htm
 dribly_logos_finais.html

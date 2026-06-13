@@ -58,6 +58,45 @@ registerRoute(
   'GET'
 );
 
+// ── Supabase Storage: club logos (CacheFirst, 7 days) ──
+registerRoute(
+  /^https:\/\/.*\.supabase\.co\/storage\/v1\/object\/public\/club-logos\/.*/i,
+  new CacheFirst({
+    cacheName: 'club-logos-cache',
+    plugins: [
+      new ExpirationPlugin({ maxEntries: 200, maxAgeSeconds: 604800 }),
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+    ],
+  }),
+  'GET'
+);
+
+// ── Supabase Storage: pavilion photos (CacheFirst, 30 days) ──
+registerRoute(
+  /^https:\/\/.*\.supabase\.co\/storage\/v1\/object\/public\/pavilion-photos\/.*/i,
+  new CacheFirst({
+    cacheName: 'pavilion-photos-cache',
+    plugins: [
+      new ExpirationPlugin({ maxEntries: 500, maxAgeSeconds: 2592000 }),
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+    ],
+  }),
+  'GET'
+);
+
+// ── Supabase Storage: other public assets (CacheFirst, 1 day) ──
+registerRoute(
+  /^https:\/\/.*\.supabase\.co\/storage\/v1\/object\/public\/.*/i,
+  new CacheFirst({
+    cacheName: 'supabase-storage-cache',
+    plugins: [
+      new ExpirationPlugin({ maxEntries: 300, maxAgeSeconds: 86400 }),
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+    ],
+  }),
+  'GET'
+);
+
 // ── Google Fonts (CacheFirst, 1 year TTL) ──
 registerRoute(
   /^https:\/\/fonts\.googleapis\.com\/.*/i,
