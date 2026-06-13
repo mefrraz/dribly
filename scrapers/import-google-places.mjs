@@ -52,6 +52,7 @@ const entries = raw.map(e => {
         phone: e.phone || null,
         opening_hours: (e.openingHours || []).length > 0 ? e.openingHours.map(h => ({ day: h.day, hours: h.hours })) : null,
         google_maps_url: e.placeId ? `https://www.google.com/maps/place/?q=place_id:${e.placeId}` : null,
+        image_url: e.imageUrls?.[0] || e.imageUrl || null,
         geocode_ok: !!(loc.lat && loc.lng),
         from_google: true,
     }
