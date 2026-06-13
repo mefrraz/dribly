@@ -40,9 +40,15 @@ export function ClubProvider({ children }: { children: ReactNode }) {
             .select('id, name, short_name, slug, search_name, logo_url, logo_secondary, primary_color, priority, elo_rating')
             .order('name')
         if (data) {
+            // Sort by display name (short_name || name) so the card label matches the sort
+            const sorted = (data as Club[]).sort((a, b) => {
+                const da = (a.short_name || a.name).toLowerCase()
+                const db = (b.short_name || b.name).toLowerCase()
+                return da.localeCompare(db)
+            })
             setClubsFetched(true)
-            setClubs(data as Club[])
-            saveClubsCache(data as Club[])
+            setClubs(sorted)
+            saveClubsCache(sorted)
         }
     }, [clubsFetched])
 
