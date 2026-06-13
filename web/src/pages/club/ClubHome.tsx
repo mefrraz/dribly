@@ -147,7 +147,7 @@ function ClubHome() {
                 <Link to={`/jogo/${heroGame.slug || ''}?clube=${club.slug}`} className="block group ">
                     <div className="glass-card overflow-hidden group-hover:border-[var(--club-color)]/30 transition-all duration-200">
                         <div className="bg-gradient-to-r from-[var(--club-color)]/10 via-zinc-50 to-[var(--club-color)]/10 dark:from-[var(--club-color)]/5 dark:via-zinc-900 dark:to-[var(--club-color)]/5 border-b border-zinc-100 dark:border-white/5 p-3 flex justify-between items-center">
-                            <span className="text-[10px] font-bold text-[var(--club-color)] uppercase tracking-wide">
+                            <span className="text-[10px] font-bold text-[var(--club-color)] dark:text-white/80 uppercase tracking-wide">
                                 {isResult ? 'Último Resultado' : (heroGame.escalao || 'Sénior Masculino')}
                             </span>
                             <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase truncate ml-2">{heroGame.competicao || ''}</span>
@@ -214,7 +214,7 @@ function ClubHome() {
                 <div className="space-y-3 ">
                     <div className="flex items-center justify-between">
                         <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Últimos Resultados</h3>
-                        <Link to={`/clube/${club.slug}/games?view=results`} className="text-xs text-[var(--club-color)] font-bold hover:underline">Ver todos</Link>
+                        <Link to={`/clube/${club.slug}/games?view=results`} className="text-xs text-[var(--club-color)] dark:text-zinc-300 font-bold hover:underline">Ver todos</Link>
                     </div>
                     <div className="space-y-2">
                         {recentResults.map(match => {
@@ -246,7 +246,7 @@ function ClubHome() {
                 <div className="space-y-3 ">
                     <div className="flex items-center justify-between">
                         <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Próximos Jogos</h3>
-                        <Link to={`/clube/${club.slug}/games?view=agenda`} className="text-xs text-[var(--club-color)] font-bold hover:underline">Ver agenda</Link>
+                        <Link to={`/clube/${club.slug}/games?view=agenda`} className="text-xs text-[var(--club-color)] dark:text-zinc-300 font-bold hover:underline">Ver agenda</Link>
                     </div>
                     <div className="space-y-2">
                         {upcomingGames.map(match => {
