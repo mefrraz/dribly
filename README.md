@@ -23,9 +23,7 @@
   <i>📱 Screenshots em breve — visita <a href="https://dribly.pt">dribly.pt</a> para ver a app em ação.</i>
 </p>
 
-<p align="center">
-  <img src="assets/divider.png" alt="" width="100%" />
-</p>
+---
 
 ## 🎯 Porquê a Dribly
 
@@ -50,9 +48,7 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 | Ranking ELO nacional | ✅ | ❌ | ❌ | ❌ |
 | Modo escuro | ✅ | ❌ | ✅ | ❌ |
 
-<p align="center">
-  <img src="assets/divider.png" alt="" width="100%" />
-</p>
+---
 
 ## ✨ Funcionalidades
 
@@ -107,9 +103,7 @@ O basquetebol português tem centenas de clubes e dezenas de competições, mas 
 | ♿ Acessibilidade | 7.16 | `aria-label`, `role="dialog"`, breadcrumbs |
 | 🛡️ ErrorBoundary global | 7.9 | Fallback amigável em vez de ecrã branco |
 
-<p align="center">
-  <img src="assets/divider.png" alt="" width="100%" />
-</p>
+---
 
 ## 🚀 Quick Start
 
@@ -134,9 +128,7 @@ npm run lint:fix   # ESLint auto-fix
 npm run build      # tsc + vitest + vite build
 ```
 
-<p align="center">
-  <img src="assets/divider.png" alt="" width="100%" />
-</p>
+---
 
 ## 🛠️ Stack
 
@@ -152,9 +144,7 @@ npm run build      # tsc + vitest + vite build
 | Dados | FPB + TugaBasket (scraping HTML + WordPress AJAX) |
 | Testes | Vitest + Playwright + jsdom |
 
-<p align="center">
-  <img src="assets/divider.png" alt="" width="100%" />
-</p>
+---
 
 ## ⚙️ Arquitetura
 
@@ -189,9 +179,7 @@ Browser (React SPA)
 - Tour onboarding só no sign-up (não no login)
 - JWT integrado com Supabase RLS (`auth.uid()::text`)
 
-<p align="center">
-  <img src="assets/divider.png" alt="" width="100%" />
-</p>
+---
 
 ## 🏗️ Estrutura do Projeto
 
@@ -253,9 +241,7 @@ scrapers/                           # Scripts Node.js independentes
 └── fpb-manual.yml                  #   Manual: seed FPB
 ```
 
-<p align="center">
-  <img src="assets/divider.png" alt="" width="100%" />
-</p>
+---
 
 ## 🧪 Testes
 
@@ -275,9 +261,7 @@ npm run test:e2e                # end-to-end (Playwright)
 | Componentes | `GameCard.test.tsx`, `ErrorBoundary.test.tsx`, `StandingsTable.test.tsx`, `Toast.test.tsx` | 20 |
 | Contexto | `ClubContext.test.tsx` | 5 |
 
-<p align="center">
-  <img src="assets/divider.png" alt="" width="100%" />
-</p>
+---
 
 ## 🤝 Contribuir
 
@@ -293,17 +277,13 @@ Resumo rápido:
 
 Não sabes o que é um PR? Sem stress, o [CONTRIBUTING.md](CONTRIBUTING.md) explica tudo, com glossário e passo a passo.
 
-<p align="center">
-  <img src="assets/divider.png" alt="" width="100%" />
-</p>
+---
 
 ## 📜 Licença
 
 GNU **AGPLv3** — código aberto, copyleft para serviços web. Vê o ficheiro [LICENSE](LICENSE).
 
-<p align="center">
-  <img src="assets/divider.png" alt="" width="100%" />
-</p>
+---
 
 <p align="center">
   <a href="https://dribly.pt">🌐 dribly.pt</a>
