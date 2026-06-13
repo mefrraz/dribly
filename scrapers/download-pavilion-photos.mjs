@@ -7,7 +7,6 @@
  */
 
 import { readFileSync } from 'fs'
-import { Buffer } from 'node:buffer'
 import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
@@ -91,7 +90,7 @@ for (const pav of needPhoto) {
         // Upload to Supabase
         const ext = bestUrl.match(/\.(jpg|jpeg|png|webp)/i)?.[1] || 'jpg'
         const name = `${pav.google_place_id}.${ext}`
-        const { data: up, error: upErr } = await supabase.storage.from(BUCKET).upload(name, buffer, {
+        const { data: up, error: upErr } = await supabase.storage.from(BUCKET).upload(name, bestBuffer, {
             contentType: `image/${ext}`,
             cacheControl: '31536000',
             upsert: true,
@@ -106,7 +105,9 @@ for (const pav of needPhoto) {
         if (updateErr) throw updateErr
 
         ok++
-        if (ok % 20 === 0) console.log(`  ✅ ${ok}/${needPhoto.length}`)
+        const kb = Math.round(bestSize / 1024)
+        console.log(`  ✅ ${ok}/${needPhoto.length} ${pav.nome.substring(0, 50)} (${kb} KB)`)
+        if (ok % 50 === 0) console.log(`  ... ${ok}/${needPhoto.length}`)
     } catch (e) {
         err++
         if (err <= 5) console.log(`  ❌ ${pav.nome}: ${e.message}`)
