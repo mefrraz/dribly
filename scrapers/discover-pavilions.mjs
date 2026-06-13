@@ -1,211 +1,96 @@
 /**
- * Discover new pavilions from FPB game locations and add missing ones to Supabase.
- *
- * Scans all games_* tables for unique (local, recinto_id) pairs,
- * cross-references with the pavilions table by name AND recinto_id,
- * and inserts any missing pavilions with name + FPB URL.
+ * Discover new pavilions from FPB game locations.
+ * ONLY INSERTS — never updates existing pavilions.
+ * Skips if name or recinto_id already exists.
  *
  * Usage:
- *   SUPABASE_URL=... SUPABASE_KEY=... node scrapers/discover-pavilions.mjs
+ *   node scrapers/discover-pavilions.mjs
  */
 
-import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 dotenv.config({ path: join(__dirname, '.env') })
 
+const { createClient } = await import('@supabase/supabase-js')
+
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SUPABASE_KEY = process.env.SUPABASE_KEY
-
 if (!SUPABASE_URL || !SUPABASE_KEY) {
     console.error('Missing SUPABASE_URL or SUPABASE_KEY')
     process.exit(1)
 }
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-// ── Fetch all unique game (local, recinto_id) pairs ────
-
-const GAME_TABLES = ['games_2025_2026', 'games_2024_2025', 'games_2023_2024', 'games_2022_2023']
-
-// ── Clean pavilion names from game data ────────────────
-
-const SKIP_PATTERNS = [
-    /^a\s+indicar/i,          // "a indicar" = TBA
-    /^a\s+designar/i,         // "a designar" = TBA
-    /^por\s+definir/i,        // "por definir"
-    /^indefinido/i,
-    /^campo\s+exterior/i,     // outdoor courts
-    /^campo\s+de\s+jogos/i,
-    /^ringue/i,
-    /^polidesportivo\s+descoberto/i,
-]
-
-function cleanPavilionName(raw) {
+// ── Clean names ────────────────────────────────────────
+const SKIP = [/^a\s+indicar/i, /^a\s+designar/i, /^por\s+definir/i, /^indefinido/i, /^campo\s+exterior/i, /^ringue/i]
+function clean(raw) {
     let name = raw.trim()
-
-    // Skip TBA / placeholders
-    for (const pat of SKIP_PATTERNS) {
-        if (pat.test(name)) return null
-    }
-
-    // Remove ",CityName" suffix (e.g., "Pavilhão X ,Porto")
-    name = name.replace(/\s*,[A-Z][a-z].*$/, '')
-
-    // Remove competition suffix: " | Liga Betclic Masculina", " Sub 14 Feminino | ..."
-    name = name.replace(/\s*(Sub|Sénior|Senior|Mini|Juniores)\s+\d{1,2}\s*(Feminino|Masculino|Fem|Masc)?\s*\|.*$/i, '')
+    for (const p of SKIP) if (p.test(name)) return null
+    name = name.replace(/\s*,[A-Z][a-z].*$/, '')                         // ",Porto"
+    name = name.replace(/\s*(Sub|S[eé]nior|Senior|Mini|Juniores)\s+\d{1,2}\s*(Feminino|Masculino|Fem|Masc)?\s*\|.*$/i, '')
     name = name.replace(/\s*\|\s*(Liga|Taça|Campeonato|Torneio|Circuito|Jogos|FIBA|BCL|1ª|2ª|C\.I\.).*$/i, '')
-
-    // Remove trailing noise
     name = name.replace(/\s*,\s*$/, '').trim()
-
-    // Must have at least 4 chars and contain letters
     if (name.length < 4 || !/[a-zA-Z\u00C0-\u024F]/.test(name)) return null
-
     return name
 }
 
-console.log('🔍 Scanning games for unique locations...')
-/** @type {Map<string, {nome: string, recinto_id: number|null}>} */
-const discovered = new Map()
-for (const table of GAME_TABLES) {
+// ── Scan games ─────────────────────────────────────────
+const TABLES = ['games_2025_2026', 'games_2024_2025', 'games_2023_2024', 'games_2022_2023']
+console.log('🔍 Scanning games...')
+const found = new Map()
+for (const t of TABLES) {
     let from = 0
-    const PAGE = 1000
     while (true) {
-        const { data } = await supabase.from(table).select('local, recinto_id').range(from, from + PAGE - 1).not('local', 'is', null)
+        const { data } = await supabase.from(t).select('local, recinto_id').range(from, from + 999).not('local', 'is', null)
         if (!data || data.length === 0) break
-        for (const row of data) {
-            const nome = cleanPavilionName(row.local || '')
+        for (const r of data) {
+            const nome = clean(r.local || '')
             if (!nome) continue
-            const key = nome.toLowerCase()
-            if (!discovered.has(key)) {
-                discovered.set(key, { nome, recinto_id: row.recinto_id || null })
-            } else if (!discovered.get(key).recinto_id && row.recinto_id) {
-                // Upgrade: found a recinto_id for this name
-                discovered.get(key).recinto_id = row.recinto_id
-            }
+            const k = nome.toLowerCase()
+            if (!found.has(k)) found.set(k, { nome, recinto_id: r.recinto_id || null })
+            else if (!found.get(k).recinto_id && r.recinto_id) found.get(k).recinto_id = r.recinto_id
         }
-        if (data.length < PAGE) break
-        from += PAGE
+        if (data.length < 1000) break
+        from += 1000
     }
 }
-console.log(`  Found ${discovered.size} unique game locations`)
+console.log(`  ${found.size} unique locations`)
 
 // ── Fetch existing pavilions ───────────────────────────
+const { data: ex } = await supabase.from('pavilions').select('id, nome, recinto_id')
+const exNames = new Set((ex || []).map(p => p.nome.toLowerCase().trim()))
+const exRecintos = new Set((ex || []).filter(p => p.recinto_id).map(p => p.recinto_id))
+console.log(`  ${exNames.size} already in database`)
 
-const { data: existing } = await supabase.from('pavilions').select('id, nome, recinto_id, fpb_url')
-const existingNames = new Set((existing || []).map(p => p.nome.toLowerCase().trim()))
-const existingRecintos = new Set((existing || []).filter(p => p.recinto_id).map(p => p.recinto_id))
-console.log(`  ${existingNames.size} pavilions already in database`)
-
-// ── Backfill fpb_url for pavilions that have recinto_id but no URL ──
-const missingFpbUrl = (existing || []).filter(p => p.recinto_id && !p.fpb_url)
-if (missingFpbUrl.length > 0) {
-    console.log(`\n🔧 Backfilling fpb_url for ${missingFpbUrl.length} pavilions...`)
-    for (const p of missingFpbUrl) {
-        const url = `https://www.fpb.pt/recinto/${p.recinto_id}/`
-        await supabase.from('pavilions').update({ fpb_url: url }).eq('id', p.id)
-        console.log(`  ✅ ${p.nome} → ${url}`)
-    }
-}
-
-// ── Match & find new pavilions ─────────────────────────
-
-/** @type {{nome: string, recinto_id: number|null, fpb_url: string|null}[]} */
-const newPavilions = []
-for (const [key, info] of discovered) {
-    // Match by recinto_id first (most reliable)
-    if (info.recinto_id && existingRecintos.has(info.recinto_id)) continue
-
-    // Match by name
-    const norm = key
-    let foundByName = existingNames.has(norm)
-    if (!foundByName) {
-        for (const en of existingNames) {
-            if (en.includes(norm) || norm.includes(en)) { foundByName = true; break }
-        }
-    }
-    if (foundByName) continue
-
-    // New pavilion!
+// ── Find new ones ──────────────────────────────────────
+const news = []
+for (const [, info] of found) {
+    if (info.recinto_id && exRecintos.has(info.recinto_id)) continue
+    const n = info.nome.toLowerCase()
+    if (exNames.has(n)) continue
+    let dup = false
+    for (const en of exNames) { if (en.includes(n) || n.includes(en)) { dup = true; break } }
+    if (dup) continue
     const fpb_url = info.recinto_id ? `https://www.fpb.pt/recinto/${info.recinto_id}/` : null
-    newPavilions.push({ nome: info.nome, recinto_id: info.recinto_id, fpb_url })
+    news.push({ nome: info.nome, recinto_id: info.recinto_id, fpb_url, geocode_ok: false })
 }
 
-console.log(`\n📋 ${newPavilions.length} NEW pavilions found:`)
-newPavilions.slice(0, 40).forEach(p => console.log(`  • ${p.nome}${p.recinto_id ? ` (recinto ${p.recinto_id})` : ''}`))
-if (newPavilions.length > 40) console.log(`  ... and ${newPavilions.length - 40} more`)
+console.log(`\n📋 ${news.length} NEW pavilions:`)
+news.slice(0, 40).forEach(p => console.log(`  • ${p.nome}${p.recinto_id ? ' (recinto ' + p.recinto_id + ')' : ''}`))
+if (news.length > 40) console.log(`  ... and ${news.length - 40} more`)
 
-// ── Insert into Supabase ───────────────────────────────
-
-if (newPavilions.length > 0) {
-    console.log('\n💾 Inserting into Supabase...')
-    let inserted = 0
-    for (const p of newPavilions) {
-        const { error } = await supabase.from('pavilions').insert({
-            nome: p.nome,
-            recinto_id: p.recinto_id,
-            fpb_url: p.fpb_url,
-            geocode_ok: false,
-        })
-        if (error) {
-            if (error.code === '23505') continue // duplicate
-            console.log(`  ❌ ${p.nome}: ${error.message}`)
-        } else {
-            inserted++
-            console.log(`  ✅ ${p.nome}${p.fpb_url ? ' → ' + p.fpb_url : ''}`)
-        }
+// ── Insert only ────────────────────────────────────────
+if (news.length > 0) {
+    console.log('\n💾 Inserting...')
+    let ok = 0
+    for (const p of news) {
+        const { error } = await supabase.from('pavilions').insert(p)
+        if (error) { if (error.code !== '23505') console.log(`  ❌ ${p.nome}: ${error.message}`) }
+        else { ok++; console.log(`  ✅ ${p.nome}`) }
     }
-    console.log(`\n🏁 ${inserted} new pavilions inserted.`)
-    console.log('💡 Go to /admin/pavilhoes to add addresses, coords and photos.')
+    console.log(`\n🏁 ${ok} inserted.`)
 } else {
-    console.log('\n✅ All pavilions already in database.')
-}
-
-// ── Cleanup: delete garbage pavilions inserted earlier ─
-
-console.log('\n🧹 Cleaning up garbage pavilions...')
-const { data: allPavs } = await supabase.from('pavilions').select('id, nome, recinto_id')
-if (allPavs) {
-    const toDelete = []
-    for (const p of allPavs) {
-        const clean = cleanPavilionName(p.nome)
-        if (!clean) toDelete.push(p)
-    }
-    if (toDelete.length > 0) {
-        console.log(`  Deleting ${toDelete.length} garbage entries...`)
-        for (const p of toDelete) {
-            await supabase.from('pavilions').delete().eq('id', p.id)
-            console.log(`  🗑️  #${p.id} "${p.nome}"`)
-        }
-    }
-
-    // Deduplicate: same cleaned name, keep the one with recinto_id or most data
-    const seen = new Map()
-    const dupes = []
-    for (const p of allPavs.filter(p => cleanPavilionName(p.nome))) {
-        const key = cleanPavilionName(p.nome).toLowerCase()
-        if (seen.has(key)) {
-            const existing = seen.get(key)
-            // Keep the one with recinto_id, or the first one
-            if (!existing.recinto_id && p.recinto_id) {
-                dupes.push(existing.id) // delete the old one
-                seen.set(key, p)
-            } else {
-                dupes.push(p.id) // delete this duplicate
-            }
-        } else {
-            seen.set(key, p)
-        }
-    }
-    if (dupes.length > 0) {
-        console.log(`  Deduplicating ${dupes.length} duplicates...`)
-        for (const id of dupes) {
-            await supabase.from('pavilions').delete().eq('id', id)
-            console.log(`  🗑️  #${id} (duplicate)`)
-        }
-    }
-    console.log('  Done.')
+    console.log('\n✅ No new pavilions.')
 }
