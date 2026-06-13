@@ -26,7 +26,6 @@ type AdminAction =
     | 'updateGame'
     | 'listCompetitionsMeta'
     | 'upsertCompetitionMeta'
-    | 'trackPageView'
     | 'getPageViews'
 
 interface AdminRequest {
@@ -531,8 +530,6 @@ export default async function handler(request: Request) {
                 return await handleListCompetitionsMeta()
             case 'upsertCompetitionMeta':
                 return await handleUpsertCompetitionMeta(payload)
-            case 'trackPageView':
-                return await handleTrackPageView()
             case 'getPageViews':
                 return await handleGetPageViews(payload)
             default:
