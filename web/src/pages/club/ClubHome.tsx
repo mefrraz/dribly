@@ -195,16 +195,27 @@ function ClubHome() {
                         <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
                             <Calendar size={20} />
                         </div>
-                        <h3 className="text-zinc-900 dark:text-white font-bold text-lg leading-tight">Resultados &amp; Agenda</h3>
+                        <h3 className="text-zinc-900 dark:text-white font-bold text-lg leading-tight">Resultados<br />&amp; Agenda</h3>
                     </div>
                 </Link>
                 <Link to={`/clube/${club.slug}/team`} className="relative overflow-hidden rounded-2xl bg-[var(--club-color)] border border-[var(--club-color)] p-5 h-32 group shadow-sm shadow-[var(--club-color)]/10 transition-all active:scale-[0.98] hover:shadow-md">
-                    <Trophy size={48} className="absolute bottom-0 right-0 text-white/10 transform translate-x-2 translate-y-2 group-hover:scale-110 transition-transform" />
+                    {/* Real trophy SVG as background decoration */}
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"
+                        className="absolute top-0 right-0 text-white/15 transform -rotate-12 translate-x-1 -translate-y-2 group-hover:scale-110 transition-transform">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" strokeLinecap="round"/>
+                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" strokeLinecap="round"/>
+                        <path d="M4 22h16" strokeLinecap="round"/>
+                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" strokeLinecap="round"/>
+                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" strokeLinecap="round"/>
+                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                        <path d="M12 2v7" strokeLinecap="round"/>
+                        <path d="M9 2v2M15 2v2" strokeLinecap="round"/>
+                    </svg>
                     <div className="relative z-10 h-full flex flex-col justify-between">
                         <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
                             <Trophy size={20} />
                         </div>
-                        <h3 className="text-white font-bold text-lg leading-tight">Equipas &amp; Escalões</h3>
+                        <h3 className="text-white font-bold text-lg leading-tight">Equipas<br />&amp; Escalões</h3>
                     </div>
                 </Link>
             </div>
