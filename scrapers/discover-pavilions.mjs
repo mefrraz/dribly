@@ -10,6 +10,11 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import dotenv from 'dotenv'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+const __dirname = dirname(fileURLToPath(import.meta.url))
+dotenv.config({ path: join(__dirname, '.env') })
 
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SUPABASE_KEY = process.env.SUPABASE_KEY
@@ -39,10 +44,10 @@ for (const table of GAME_TABLES) {
             if (!nome || nome.length < 3) continue
             const key = nome.toLowerCase()
             if (!discovered.has(key)) {
-                discovered.set(key, { nome, recinto_id: (row as any).recinto_id || null })
-            } else if (!discovered.get(key)!.recinto_id && (row as any).recinto_id) {
+                discovered.set(key, { nome, recinto_id: row.recinto_id || null })
+            } else if (!discovered.get(key).recinto_id && row.recinto_id) {
                 // Upgrade: found a recinto_id for this name
-                discovered.get(key)!.recinto_id = (row as any).recinto_id
+                discovered.get(key).recinto_id = row.recinto_id
             }
         }
         if (data.length < PAGE) break
@@ -55,7 +60,7 @@ console.log(`  Found ${discovered.size} unique game locations`)
 
 const { data: existing } = await supabase.from('pavilions').select('id, nome, recinto_id, fpb_url')
 const existingNames = new Set((existing || []).map(p => p.nome.toLowerCase().trim()))
-const existingRecintos = new Set((existing || []).filter(p => p.recinto_id).map(p => p.recinto_id!))
+const existingRecintos = new Set((existing || []).filter(p => p.recinto_id).map(p => p.recinto_id))
 console.log(`  ${existingNames.size} pavilions already in database`)
 
 // ── Backfill fpb_url for pavilions that have recinto_id but no URL ──
