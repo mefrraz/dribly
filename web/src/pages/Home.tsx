@@ -297,7 +297,7 @@ export default function Home() {
                     if (toRefresh.length < COMPETITIONS.length) {
                         const freshGames = [...cache.games.filter(g => !toRefresh.some(c => c.name === g.competicao))]
                         for (const comp of toRefresh) {
-                            for (const page of ['calendario', 'resultados']) {
+                            for (const page of ['resultados', 'calendario']) {
                                 try {
                                     const res = await fetch(`/api/fpb?page=${page}&competicao=${comp.id}`)
                                     const html = await res.text()
@@ -318,7 +318,7 @@ export default function Home() {
             // 2. Full fetch (first load or cache expired)
             const allGames: Match[] = []
             await Promise.all(COMPETITIONS.map(async (comp) => {
-                for (const page of ['calendario', 'resultados']) {
+                for (const page of ['resultados', 'calendario']) {
                     try {
                         const res = await fetch(`/api/fpb?page=${page}&competicao=${comp.id}`)
                         const html = await res.text()
@@ -357,7 +357,8 @@ export default function Home() {
             const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
             const clubGames: Match[] = []
             for (const club of followedClubs.slice(0, 8)) {
-                for (const page of ['calendario', 'resultados']) {
+                // Fetch resultados first so dedup keeps scores over time-only calendar entries
+                for (const page of ['resultados', 'calendario']) {
                     try {
                         const res = await fetch(`/api/fpb?page=${page}&clube=${club.id}&epoca=2025/2026`)
                         const html = await res.text()
