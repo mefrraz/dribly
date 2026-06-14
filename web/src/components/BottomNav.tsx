@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { MapPin, Building2, Heart, BarChart2, Trophy, Grid3X3, Settings2, User } from 'lucide-react'
+import { MapPin, Building2, Heart, BarChart2, Trophy, Grid3X3, Settings2, User, Shield } from 'lucide-react'
 import { useAuth } from '../lib/AuthContext'
 
 function BottomNav() {
@@ -24,6 +24,7 @@ function BottomNav() {
         { to: '/clubes', icon: Building2, label: 'Clubes' },
         { to: '/classificacoes', icon: BarChart2, label: 'Classificações' },
         { to: '/definicoes', icon: Settings2, label: 'Definições' },
+        { to: '/privacidade', icon: Shield, label: 'Privacidade' },
     ]
 
     return (

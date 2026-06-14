@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import { Sun, Moon, Instagram, Github, Info, Settings2, BarChart2, Home as HomeIcon, Search, LogIn, Heart, Trophy, Building2, MapPin, Shield, TrendingUp, Sparkles } from 'lucide-react'
+import { Sun, Moon, Instagram, Github, Info, BarChart2, Home as HomeIcon, Search, LogIn, Heart, Trophy, Building2, MapPin, Shield, TrendingUp, Sparkles } from 'lucide-react'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastContainer } from './components/Toast'
 import PWAInstallBanner from './components/PWAInstallBanner'
@@ -167,9 +167,6 @@ function Layout() {
 
                             <Link to="/inicio" className={`sm:hidden flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-dribly-purple/10 text-dribly-purple hover:bg-dribly-purple/20 transition-colors`}>
                                 <Sparkles size={13} /> Novo
-                            </Link>
-                            <Link to="/definicoes" className={`sm:hidden ${navIcon} ${isActive('/definicoes') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Definições">
-                                <Settings2 size={18} />
                             </Link>
                             <Link to="/sobre" className={`${navIcon} ${isActive('/sobre') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Sobre">
                                 <Info size={17} />
