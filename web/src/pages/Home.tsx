@@ -276,18 +276,22 @@ export default function Home() {
     // ── Jogos perto de mim ──
     const geo = useGeolocation()
     const [nearbyGames, setNearbyGames] = useState<{ game: Match; pavilion: Pavilion; distance: number }[]>([])
-    const computingNearby = useRef(false)
+    const pavsRef = useRef<Pavilion[] | null>(null)
+    const gamesHashRef = useRef('')
     useEffect(() => {
         if (!geo.lat || !geo.lng) return
-        if (games.length === 0 && followedGames.length === 0) return // wait for data
-        if (computingNearby.current) return // already computing
-        computingNearby.current = true
+        const allGames = [...games, ...followedGames].filter(g => g.local)
+        const todayStr = new Date().toISOString().split('T')[0]
+        const recent = allGames.filter(g => g.data >= todayStr)
+        if (recent.length === 0) { setNearbyGames([]); return }
+        // Only recompute if games content changed (avoids re-fetch on every render)
+        const hash = recent.map(g => g.slug || g.id).sort().join(',')
+        if (hash === gamesHashRef.current) return
+        gamesHashRef.current = hash
         const compute = async () => {
             try {
-                const pavs = await fetchPavilions()
-                const allGames = [...games, ...followedGames].filter(g => g.local)
-                const todayStr = new Date().toISOString().split('T')[0]
-                const recent = allGames.filter(g => g.data >= todayStr)
+                if (!pavsRef.current) pavsRef.current = await fetchPavilions()
+                const pavs = pavsRef.current
                 const matches: { game: Match; pavilion: Pavilion; distance: number }[] = []
                 for (const g of recent) {
                     const locNorm = normalizeLocation(g.local!.split('|')[0])
@@ -296,17 +300,15 @@ export default function Home() {
                         if (locNorm.includes(pavNorm) || pavNorm.includes(locNorm) || 
                             (g.local!.toLowerCase().includes(p.cidade?.toLowerCase() || '') && locNorm.split(/\s+/).some(w => pavNorm.includes(w)))) {
                             const dist = haversineKm(geo.lat!, geo.lng!, p.lat, p.lng)
-                            if (dist <= 50) {
-                                matches.push({ game: g, pavilion: p, distance: dist })
-                            }
+                            if (dist <= 50) matches.push({ game: g, pavilion: p, distance: dist })
                             break
                         }
                     }
                 }
                 matches.sort((a, b) => a.distance - b.distance)
-                setNearbyGames(matches.slice(0, 5))
+                setNearbyGames(matches)
             } catch { /* ignore */ }
-            computingNearby.current = false
+            gamesHashRef.current = ''
         }
         compute()
     }, [geo.lat, geo.lng, games, followedGames])
@@ -656,8 +658,9 @@ export default function Home() {
                                     <span className="text-[10px] font-bold text-zinc-400 shrink-0">{maxDistance} km</span>
                                 </div>
                                 {/* Mini map with distance circle + pavilion pins */}
-                                <div className="h-44 w-full">
+                                <div className="h-48 w-full">
                                     <MapContainer
+                                        key={darkMode ? 'dark' : 'light'}
                                         center={[geo.lat!, geo.lng!]}
                                         zoom={11}
                                         zoomControl={false}
