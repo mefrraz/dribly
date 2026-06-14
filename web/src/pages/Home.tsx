@@ -611,18 +611,29 @@ export default function Home() {
             </div>
 
             {/* ── Jogos perto de mim ── */}
-            {!geo.loading && !geo.error && nearbyGames.length > 0 && (
+            {!geo.error && !loading && (
                 <div className="px-4 mt-5">
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
                         <div className="px-4 py-3.5 flex items-center gap-2.5 border-b border-zinc-100 dark:border-white/5">
                             <MapPin size={16} className="text-dribly-purple shrink-0" />
                             <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Jogos perto de ti</h3>
                         </div>
-                        <div className="divide-y divide-zinc-100 dark:divide-white/5">
-                            {nearbyGames.map(({ game }) => (
-                                <ConfrontoRow key={game.slug || game.id} match={game} clubs={clubs} isFollowed={false} />
-                            ))}
-                        </div>
+                        {geo.loading ? (
+                            <div className="px-4 py-6 text-center">
+                                <LoadingSpinner />
+                                <p className="text-xs text-zinc-400 mt-2">A obter localização...</p>
+                            </div>
+                        ) : nearbyGames.length === 0 ? (
+                            <div className="px-4 py-6 text-center">
+                                <p className="text-xs text-zinc-400">Nenhum jogo próximo encontrado.</p>
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-zinc-100 dark:divide-white/5">
+                                {nearbyGames.map(({ game }) => (
+                                    <ConfrontoRow key={game.slug || game.id} match={game} clubs={clubs} isFollowed={false} />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

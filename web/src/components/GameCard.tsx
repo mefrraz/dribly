@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { MapPin, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Match } from './types'
 import { isClubWin } from '../lib/matchUtils'
-import { normalizeTeamDisplay, clubLogoUrl } from '../lib/fpbUtils'
+import { normalizeTeamDisplay, clubLogoUrl, semiAbrev } from '../lib/fpbUtils'
 import type { Club } from '../lib/useClub'
 
 interface GameCardProps {
@@ -22,10 +22,19 @@ const GameCardInner = ({ match, mode, clubName, clubSlug, clubs = [] }: GameCard
   const slug = match.slug || `${match.data}-${match.equipa_casa.toLowerCase().replace(/\s+/g, '-')}-${match.equipa_fora.toLowerCase().replace(/\s+/g, '-')}`
   const won = clubName ? isClubWin(match, clubName) : null
   const isLive = match.status === 'A DECORRER'
-  const linkSlug = clubSlug ? `/jogo/${slug}?clube=${clubSlug}` : `/jogo/${slug}`
+  const idParam = match.id && /^\d+$/.test(match.id) ? `&internalID=${match.id}` : ''
+  const linkSlug = clubSlug ? `/jogo/${slug}?clube=${clubSlug}${idParam}` : idParam ? `/jogo/${slug}?internalID=${match.id}` : `/jogo/${slug}`
   const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
   const displayFora = normalizeTeamDisplay(match.equipa_fora, clubs)
-  const findClub = (name: string) => clubs.find(c => c.name.toUpperCase() === name.trim().toUpperCase() || c.search_name?.toUpperCase() === name.trim().toUpperCase())
+  const findClub = (name: string) => {
+      const n = name.trim().toUpperCase()
+      return clubs.find(c => {
+          const cn = c.name.toUpperCase()
+          const sn = (c.search_name || '').toUpperCase()
+          const sa = semiAbrev(c.name).toUpperCase()
+          return n === cn || n === sn || n === sa || cn.includes(n) || n.includes(cn) || sa.includes(n)
+      })
+  }
   // Primary: our Supabase bucket. Fallback: FPB scrape.
   const logoCasa = clubLogoUrl(findClub(match.equipa_casa)) || match.logotipo_casa
   const logoFora = clubLogoUrl(findClub(match.equipa_fora)) || match.logotipo_fora
