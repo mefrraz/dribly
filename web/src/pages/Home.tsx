@@ -186,6 +186,7 @@ export default function Home() {
     const [loadingFollowed, setLoadingFollowed] = useState(false)
     const [openSections, setOpenSections] = useState<Set<string>>(new Set())
     const [searchOpen, setSearchOpen] = useState(false)
+    const [showDatePicker, setShowDatePicker] = useState(false)
     const [compLogos, setCompLogos] = useState<Map<number, string | null>>(new Map())
 
     useEffect(() => { loadClubs() }, [loadClubs])
@@ -394,11 +395,18 @@ export default function Home() {
 
             {/* ── Date selector bar ── */}
             <div className="px-4 mb-5">
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-full p-1 flex overflow-x-auto scrollbar-none">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-full p-1 flex items-center overflow-x-auto scrollbar-none">
                     {pills.map(p => (
                         <button key={p.date} onClick={() => setSelectedDate(p.date)} className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all ${selectedDate === p.date ? 'bg-dribly-purple text-white shadow-sm' : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5'}`}>{p.label}</button>
                     ))}
+                    <button onClick={() => setShowDatePicker(!showDatePicker)} className="shrink-0 px-3 py-2 rounded-full text-xs font-bold text-zinc-400 hover:text-dribly-purple hover:bg-zinc-100 dark:hover:bg-white/5 transition-all" title="Escolher data">📅</button>
                 </div>
+                {showDatePicker && (
+                    <div className="mt-2 flex justify-center">
+                        <input type="date" value={selectedDate} onChange={e => { setSelectedDate(e.target.value); setShowDatePicker(false) }}
+                            className="px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl text-sm text-zinc-900 dark:text-white outline-none focus:ring-2 focus:ring-dribly-purple/30" />
+                    </div>
+                )}
             </div>
 
             {liveCount > 0 && (
