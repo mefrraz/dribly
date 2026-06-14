@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import { Sun, Moon, Instagram, Github, Info, Settings2, BarChart2, Home, Search, LogIn, Heart, Trophy, Building2, MapPin, Shield, TrendingUp } from 'lucide-react'
+import { Sun, Moon, Instagram, Github, Info, Settings2, BarChart2, Home as HomeIcon, Search, LogIn, Heart, Trophy, Building2, MapPin, Shield, TrendingUp, Sparkles } from 'lucide-react'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastContainer } from './components/Toast'
 import PWAInstallBanner from './components/PWAInstallBanner'
@@ -128,7 +128,7 @@ function Layout() {
                             </Link>
                             <div className="hidden sm:flex items-center gap-1 ml-1">
                                 <Link to="/" className={`${navPill} ${isActive('/') ? navPillActive : navPillInactive}`}>
-                                    <Home size={14} /> Início
+                                    <HomeIcon size={14} /> Início
                                 </Link>
                                 {user && (
                                     <Link to="/seguidos" data-tour="seguidos-nav" className={`${navPill} ${isActive('/seguidos') ? navPillActive : navPillInactive}`}>
@@ -161,7 +161,13 @@ function Layout() {
                             <button onClick={() => setSearchOpen(true)} className="hidden sm:flex items-center gap-1.5 px-2 py-1.5 rounded-full text-xs font-bold transition-all text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5 hover:text-zinc-700 dark:hover:text-zinc-200">
                                 <Search size={14} />
                             </button>
+                            <Link to="/inicio" className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-dribly-purple/10 text-dribly-purple hover:bg-dribly-purple/20 transition-colors">
+                                <Sparkles size={13} /> Novo
+                            </Link>
 
+                            <Link to="/inicio" className={`sm:hidden flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-dribly-purple/10 text-dribly-purple hover:bg-dribly-purple/20 transition-colors`}>
+                                <Sparkles size={13} /> Novo
+                            </Link>
                             <Link to="/definicoes" className={`sm:hidden ${navIcon} ${isActive('/definicoes') ? 'text-dribly-purple bg-dribly-purple/10' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'}`} aria-label="Definições">
                                 <Settings2 size={18} />
                             </Link>

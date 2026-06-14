@@ -4,6 +4,7 @@ import { useState, lazy, Suspense } from 'react'
 import Layout from './Layout'
 import ClubLayout from './pages/club/ClubLayout'
 import Landing from './pages/Landing'
+import Home from './pages/Home'
 import ClubHome from './pages/club/ClubHome'
 import ClubGames from './pages/club/ClubGames'
 import Standings from './pages/Standings'
@@ -59,6 +60,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Layout />}>
                         <Route index element={<Landing />} />
+                        <Route path="inicio" element={<Home />} />
                         <Route path="clube/:slug" element={<ClubLayout />}>
                             <Route index element={<ClubHome />} />
                             <Route path="home" element={<ClubHome />} />
