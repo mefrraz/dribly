@@ -202,6 +202,7 @@ export default function Home() {
     useEffect(() => {
         setLoading(true)
         setOpenSections(new Set())
+        setFollowedGames([])
 
         const COMPETITIONS = [
             { name: 'Liga Betclic', id: 10902 },
@@ -288,38 +289,41 @@ export default function Home() {
                 } catch { setGames([]) }
             }
             setLoading(false)
-
-            // Background: fetch followed clubs' games
-            if (followedClubIds.length > 0 && clubs.length > 0) {
-                setLoadingFollowed(true)
-                const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
-                const clubGames: Match[] = []
-                for (const club of followedClubs.slice(0, 8)) {
-                    for (const page of ['calendario', 'resultados']) {
-                        try {
-                            const res = await fetch(`/api/fpb?page=${page}&clube=${club.id}&epoca=2025/2026`)
-                            const html = await res.text()
-                            if (!html || html.startsWith('{')) continue
-                            const parsed = parseFPBHtml(html, '')
-                            // Tag with competition from parsed data, filter by today
-                            clubGames.push(...parsed.filter(g => g.data === selectedDate))
-                        } catch { /* skip */ }
-                    }
-                }
-                // Dedup
-                const seen = new Set<string>()
-                const unique = clubGames.filter(g => {
-                    const k = g.slug || `${g.data}-${g.equipa_casa}-${g.equipa_fora}`
-                    if (seen.has(k)) return false; seen.add(k); return true
-                })
-                setFollowedGames(unique)
-                setLoadingFollowed(false)
-            } else {
-                setFollowedGames([])
-            }
         }
         load()
     }, [selectedDate])
+
+    // Background fetch for followed clubs (runs when follows/clubs are ready)
+    useEffect(() => {
+        if (followedClubIds.length === 0 || clubs.length === 0) {
+            setFollowedGames([])
+            return
+        }
+        setLoadingFollowed(true)
+        const fetchFollowed = async () => {
+            const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
+            const clubGames: Match[] = []
+            for (const club of followedClubs.slice(0, 8)) {
+                for (const page of ['calendario', 'resultados']) {
+                    try {
+                        const res = await fetch(`/api/fpb?page=${page}&clube=${club.id}&epoca=2025/2026`)
+                        const html = await res.text()
+                        if (!html || html.startsWith('{')) continue
+                        const parsed = parseFPBHtml(html, '')
+                        clubGames.push(...parsed.filter(g => g.data === selectedDate))
+                    } catch { /* skip */ }
+                }
+            }
+            const seen = new Set<string>()
+            const unique = clubGames.filter(g => {
+                const k = g.slug || `${g.data}-${g.equipa_casa}-${g.equipa_fora}`
+                if (seen.has(k)) return false; seen.add(k); return true
+            })
+            setFollowedGames(unique)
+            setLoadingFollowed(false)
+        }
+        fetchFollowed()
+    }, [followedClubIds, clubs, selectedDate])
 
     // Filter: hide past-day games without scores (stale data)
     const todayStr = toYYYYMMDD(new Date())
