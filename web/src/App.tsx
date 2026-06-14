@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
-import { useState, lazy, Suspense } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import Layout from './Layout'
 import ClubLayout from './pages/club/ClubLayout'
 import Landing from './pages/Landing'
@@ -47,6 +47,17 @@ const PavilionPage = lazy(() => import('./pages/PavilionPage'))
 
 const PageFallback = () => <LoadingSpinner />
 
+// Smart landing: /inicio on mobile, original landing on desktop
+function SmartLanding() {
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+    useEffect(() => {
+        const handler = () => setIsMobile(window.innerWidth < 768)
+        window.addEventListener('resize', handler)
+        return () => window.removeEventListener('resize', handler)
+    }, [])
+    return isMobile ? <Home /> : <Landing />
+}
+
 function App() {
     const [splashDone, setSplashDone] = useState(() => sessionStorage.getItem('dribly_splash_shown') === '1')
 
@@ -59,7 +70,7 @@ function App() {
                 <Suspense fallback={<PageFallback />}>
                 <Routes>
                     <Route path="/" element={<Layout />}>
-                        <Route index element={<Landing />} />
+                        <Route index element={<SmartLanding />} />
                         <Route path="inicio" element={<Home />} />
                         <Route path="clube/:slug" element={<ClubLayout />}>
                             <Route index element={<ClubHome />} />
