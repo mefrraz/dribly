@@ -5,7 +5,7 @@
  * Accordions: "Seguidos" (♥ clubs/ligas) primeiro, depois competições
  */
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, Trophy, ChevronDown } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -293,12 +293,15 @@ export default function Home() {
         load()
     }, [selectedDate])
 
-    // Background fetch for followed clubs (runs when follows/clubs are ready)
+    // Background fetch for followed clubs (runs once per date+follows combo)
+    const lastFollowedFetch = useRef('')
     useEffect(() => {
-        if (followedClubIds.length === 0 || clubs.length === 0) {
-            setFollowedGames([])
+        const key = `${selectedDate}-${followedClubIds.join(',')}`
+        if (followedClubIds.length === 0 || clubs.length === 0 || key === lastFollowedFetch.current) {
+            if (followedClubIds.length === 0) setFollowedGames([])
             return
         }
+        lastFollowedFetch.current = key
         setLoadingFollowed(true)
         const fetchFollowed = async () => {
             const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
@@ -323,7 +326,7 @@ export default function Home() {
             setLoadingFollowed(false)
         }
         fetchFollowed()
-    }, [followedClubIds, clubs, selectedDate])
+    }, [followedClubIds, clubs.length, selectedDate])
 
     // Filter: hide past-day games without scores (stale data)
     const todayStr = toYYYYMMDD(new Date())
