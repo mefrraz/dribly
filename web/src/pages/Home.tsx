@@ -423,18 +423,6 @@ export default function Home() {
                 </div>
             )}
 
-            {/* Stats bar */}
-            {!loading && !isEmpty && (
-                <div className="px-4 mb-5">
-                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl py-3 flex items-center justify-center gap-8">
-                        <div className="text-center"><span className="text-lg font-black text-zinc-900 dark:text-white">{games.length}</span><p className="text-[10px] text-zinc-500 uppercase tracking-wide mt-0.5">Jogos</p></div>
-                        <div className="w-px h-8 bg-zinc-200 dark:bg-white/10" />
-                        <div className="text-center"><span className="text-lg font-black text-zinc-900 dark:text-white">{new Set(games.map(g => g.competicao)).size}</span><p className="text-[10px] text-zinc-500 uppercase tracking-wide mt-0.5">Competições</p></div>
-                        {games.some(g => g.status === 'FINALIZADO' || g.resultado_casa !== null) && (<><div className="w-px h-8 bg-zinc-200 dark:bg-white/10" /><div className="text-center"><span className="text-lg font-black text-green-600 dark:text-green-400">{games.filter(g => g.status === 'FINALIZADO' || g.resultado_casa !== null).length}</span><p className="text-[10px] text-zinc-500 uppercase tracking-wide mt-0.5">Resultados</p></div></>)}
-                    </div>
-                </div>
-            )}
-
             <div className="px-4">
                 {loading ? <div className="flex justify-center py-12"><LoadingSpinner /></div>
                     : isEmpty ? <div className="text-center py-12"><Trophy size={28} className="text-zinc-300 dark:text-zinc-600 mx-auto mb-3" /><p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Nenhum jogo neste dia.</p></div>
@@ -472,30 +460,6 @@ export default function Home() {
                         </div>
                     </>}
             </div>
-
-            {/* Footer */}
-            {!loading && !isEmpty && (
-                <div className="px-4 mt-8 mb-8">
-                    <div className="grid grid-cols-2 gap-3">
-                        <Link to="/classificacoes" className="flex items-center gap-3 p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl hover:border-dribly-purple/30 transition-colors group">
-                            <Trophy size={18} className="text-dribly-purple shrink-0" />
-                            <div className="min-w-0"><p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Classificações</p><p className="text-[10px] text-zinc-400">Tabelas de todas as ligas</p></div>
-                        </Link>
-                        <Link to="/mapa" className="flex items-center gap-3 p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl hover:border-dribly-purple/30 transition-colors group">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            <div className="min-w-0"><p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Mapa</p><p className="text-[10px] text-zinc-400">Pavilhões em Portugal</p></div>
-                        </Link>
-                        <Link to="/ranking" className="flex items-center gap-3 p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl hover:border-dribly-purple/30 transition-colors group">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-                            <div className="min-w-0"><p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Ranking</p><p className="text-[10px] text-zinc-400">Top clubes por ELO</p></div>
-                        </Link>
-                        <Link to="/clubes" className="flex items-center gap-3 p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl hover:border-dribly-purple/30 transition-colors group">
-                            <Search size={18} className="text-dribly-purple shrink-0" />
-                            <div className="min-w-0"><p className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Clubes</p><p className="text-[10px] text-zinc-400">Todos os clubes da FPB</p></div>
-                        </Link>
-                    </div>
-                </div>
-            )}
 
             {searchOpen && <SearchOverlay clubs={clubs} onClose={() => setSearchOpen(false)} />}
         </div>
