@@ -8,6 +8,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Search, Trophy, ChevronDown, MapPin } from 'lucide-react'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import L from 'leaflet'
 import { supabase } from '../lib/supabase'
 import { useFollows } from '../hooks/useFollows'
 import { type Club, useClub, displayName } from '../lib/ClubContext'
@@ -262,6 +264,14 @@ export default function Home() {
     const [searchOpen, setSearchOpen] = useState(false)
     const [showDatePicker, setShowDatePicker] = useState(false)
     const [compLogos, setCompLogos] = useState<Map<number, string | null>>(new Map())
+
+    // ── Dark mode ──
+    const [darkMode, setDarkMode] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
+    useEffect(() => {
+        const obs = new MutationObserver(() => setDarkMode(document.documentElement.classList.contains('dark')))
+        obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+        return () => obs.disconnect()
+    }, [])
 
     // ── Jogos perto de mim ──
     const geo = useGeolocation()
@@ -633,11 +643,41 @@ export default function Home() {
                                 <p className="text-xs text-zinc-400">Nenhum jogo próximo encontrado.</p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-zinc-100 dark:divide-white/5">
-                                {nearbyGames.map(({ game }) => (
-                                    <ConfrontoRow key={game.slug || game.id} match={game} clubs={clubs} isFollowed={false} />
-                                ))}
-                            </div>
+                            <>
+                                {/* Mini map with pavilion pins */}
+                                <div className="h-40 w-full">
+                                    <MapContainer
+                                        center={[nearbyGames[0].pavilion.lat, nearbyGames[0].pavilion.lng]}
+                                        zoom={13}
+                                        zoomControl={false}
+                                        dragging={false}
+                                        scrollWheelZoom={false}
+                                        doubleClickZoom={false}
+                                        touchZoom={false}
+                                        attributionControl={false}
+                                        className="w-full h-full pointer-events-none"
+                                    >
+                                        <TileLayer url={darkMode
+                                            ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                                            : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'
+                                        } />
+                                        {nearbyGames.map(({ pavilion }) => (
+                                            <Marker key={pavilion.id}
+                                                position={[pavilion.lat, pavilion.lng]}
+                                                icon={L.divIcon({
+                                                    html: `<div style="width:12px;height:12px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 4px rgba(124,58,237,0.6)"></div>`,
+                                                    className: '', iconSize: [12, 12], iconAnchor: [6, 6]
+                                                })}
+                                            />
+                                        ))}
+                                    </MapContainer>
+                                </div>
+                                <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
+                                    {nearbyGames.map(({ game }) => (
+                                        <ConfrontoRow key={game.slug || game.id} match={game} clubs={clubs} isFollowed={false} />
+                                    ))}
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>
