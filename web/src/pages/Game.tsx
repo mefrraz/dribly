@@ -96,15 +96,26 @@ function Game() {
                                 setTopPerfCasa(detail.topPerfCasa)
                                 setTopPerfFora(detail.topPerfFora)
                                 setTopPerfStats(detail.topPerfStats)
-                                // Update match with fresh FPB data (scores might have changed since scrape)
-                                setMatch(prev => prev ? {
-                                    ...prev,
-                                    resultado_casa: detail.resultado_casa ?? prev.resultado_casa,
-                                    resultado_fora: detail.resultado_fora ?? prev.resultado_fora,
-                                    status: (detail.status || prev.status) as Match['status'],
-                                    local: (detail.pavilhao && prev.local && prev.local.includes('|'))
-                                        ? detail.pavilhao : prev.local,
-                                } : prev)
+                                // Update match state with fresh FPB data
+                                const updated = {
+                                    ...m,
+                                    resultado_casa: detail.resultado_casa ?? m.resultado_casa,
+                                    resultado_fora: detail.resultado_fora ?? m.resultado_fora,
+                                    status: (detail.status || m.status) as Match['status'],
+                                    local: (detail.pavilhao && m.local && m.local.includes('|'))
+                                        ? detail.pavilhao : m.local,
+                                }
+                                setMatch(updated)
+                                // Persist fresh data to Supabase so Home page benefits
+                                if (detail.resultado_casa !== null || detail.resultado_fora !== null) {
+                                    const season = m.data ? m.data.slice(0, 4) : '2025'
+                                    const nextSeason = String(parseInt(season) + 1)
+                                    const tableName = `games_${season}_${nextSeason}`
+                                    supabase.from(tableName).upsert({
+                                        ...updated,
+                                        updated_at: new Date().toISOString(),
+                                    }, { onConflict: 'slug' }).then(() => {}, () => {})
+                                }
                             }
                         }).catch(() => {}).finally(() => setDetailLoading(false))
                     }
