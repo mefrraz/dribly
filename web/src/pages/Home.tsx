@@ -633,22 +633,20 @@ export default function Home() {
                             <MapPin size={16} className="text-dribly-purple shrink-0" />
                             <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Jogos perto de ti</h3>
                         </div>
-                        {geo.loading ? (
-                            <div className="px-4 py-6 text-center">
-                                <LoadingSpinner />
-                                <p className="text-xs text-zinc-400 mt-2">A obter localização...</p>
-                            </div>
-                        ) : nearbyGames.length === 0 ? (
+                        {nearbyGames.length === 0 ? (
                             <div className="px-4 py-6 text-center">
                                 <p className="text-xs text-zinc-400">Nenhum jogo próximo encontrado.</p>
                             </div>
                         ) : (
                             <>
-                                {/* Mini map with pavilion pins */}
+                                {/* Mini map — auto-fits all pavilion pins */}
                                 <div className="h-40 w-full">
                                     <MapContainer
-                                        center={[nearbyGames[0].pavilion.lat, nearbyGames[0].pavilion.lng]}
-                                        zoom={13}
+                                        bounds={(() => {
+                                            const lats = nearbyGames.map(g => g.pavilion.lat)
+                                            const lngs = nearbyGames.map(g => g.pavilion.lng)
+                                            return [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]] as [[number, number], [number, number]]
+                                        })()}
                                         zoomControl={false}
                                         dragging={false}
                                         scrollWheelZoom={false}
