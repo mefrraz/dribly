@@ -101,6 +101,9 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
                     comp = raw
                 }
             }
+            // Extract location from HTML (for "Jogos perto de mim")
+            const localMatch = gh.match(/<div class="location-wrapper[^"]*">[\s\S]*?<b>([^<]+)<\/b>/i)
+            const local = localMatch ? localMatch[1].trim().replace(/\s+/g, ' ') : null
             const isFinished = scores.length >= 2
             games.push({
                 id, slug: `${dateStr}-${slugify(teams[0])}-${slugify(teams[1])}`,
@@ -110,7 +113,7 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
                 resultado_fora: isFinished ? scores[1] : null,
                 competicao: comp, escalao: esc,
                 status: isFinished ? 'FINALIZADO' : 'AGENDADO',
-                local: null,
+                local,
                 logotipo_casa: null, logotipo_fora: null, // logos come from clubLogoUrl() bucket
             })
         }
