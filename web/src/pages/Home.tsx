@@ -195,11 +195,11 @@ function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Ma
             <span className="flex-1" />
             {/* Escalão label for Seguidos — right next to hora */}
             {showCompetition && match.escalao ? (
-                <span className="text-[9px] text-zinc-400 shrink-0 mr-1.5 max-w-[80px] truncate">{match.escalao}</span>
+                <span className="text-[10px] text-zinc-400 shrink-0 mr-1.5 max-w-[90px] truncate">{match.escalao}</span>
             ) : null}
-            {isLive ? <span className="text-[10px] font-bold text-red-500 animate-pulse shrink-0 uppercase">LIVE</span>
-                : isFinished ? <span className="text-[10px] text-zinc-400 shrink-0 font-medium uppercase">FIN</span>
-                : <span className="text-[10px] text-zinc-400 shrink-0 font-medium tabular-nums">{hora || '--:--'}</span>}
+            {isLive ? <span className="text-[11px] font-bold text-red-500 animate-pulse shrink-0 uppercase">LIVE</span>
+                : isFinished ? <span className="text-[11px] text-zinc-400 shrink-0 font-medium uppercase">FIN</span>
+                : <span className="text-[11px] text-zinc-400 shrink-0 font-medium tabular-nums">{hora || '--:--'}</span>}
         </Link>
     )
 }

@@ -86,6 +86,61 @@ function Game() {
             for (const { data, error } of results) {
                 if (!error && data) {
                     const m = data as Match
+
+                    // If game is from today and scheduled time + 1h has passed,
+                    // fetch FPB first to avoid flash of stale Supabase data
+                    const today = new Date().toISOString().split('T')[0]
+                    const isToday = m.data === today
+                    const horaClean = (m.hora || '').replace(/[^0-9]/g, '')
+                    const gameShouldBeOver = isToday && horaClean.length >= 4 && (() => {
+                        const h = parseInt(horaClean.slice(0, 2))
+                        const min = parseInt(horaClean.slice(2, 4))
+                        const end = new Date(today + 'T' + String(h).padStart(2, '0') + ':' + String(min).padStart(2, '0') + ':00')
+                        end.setHours(end.getHours() + 1)
+                        return new Date() > end
+                    })()
+
+                    if (gameShouldBeOver && m.id) {
+                        // Await FPB before showing anything — no flash
+                        setDetailLoading(true)
+                        try {
+                            const detail = await fetchGameDetail(String(m.id))
+                            if (detail) {
+                                setDetailLeaders(detail.gameLeaders)
+                                setParciais(detail.parciais)
+                                setTopPerfCasa(detail.topPerfCasa)
+                                setTopPerfFora(detail.topPerfFora)
+                                setTopPerfStats(detail.topPerfStats)
+                                const updated = {
+                                    ...m,
+                                    resultado_casa: detail.resultado_casa ?? m.resultado_casa,
+                                    resultado_fora: detail.resultado_fora ?? m.resultado_fora,
+                                    status: (detail.status || m.status) as Match['status'],
+                                    local: (detail.pavilhao && m.local && m.local.includes('|'))
+                                        ? detail.pavilhao : m.local,
+                                }
+                                setMatch(updated)
+                                if (detail.resultado_casa !== null || detail.resultado_fora !== null) {
+                                    const season = m.data ? m.data.slice(0, 4) : '2025'
+                                    const nextSeason = String(parseInt(season) + 1)
+                                    const tableName = `games_${season}_${nextSeason}`
+                                    supabase.from(tableName).upsert({
+                                        ...updated,
+                                        updated_at: new Date().toISOString(),
+                                    }, { onConflict: 'slug' }).then(() => {}, () => {})
+                                }
+                            } else {
+                                setMatch(m)
+                            }
+                        } catch {
+                            setMatch(m)
+                        }
+                        setDetailLoading(false)
+                        setLoading(false)
+                        return
+                    }
+
+                    // Game is in the future or old — show Supabase immediately, refresh FPB in background
                     setMatch(m)
                     setLoading(false)
                     if (m.id) {
@@ -97,7 +152,6 @@ function Game() {
                                 setTopPerfCasa(detail.topPerfCasa)
                                 setTopPerfFora(detail.topPerfFora)
                                 setTopPerfStats(detail.topPerfStats)
-                                // Update match state with fresh FPB data
                                 const updated = {
                                     ...m,
                                     resultado_casa: detail.resultado_casa ?? m.resultado_casa,
@@ -107,7 +161,6 @@ function Game() {
                                         ? detail.pavilhao : m.local,
                                 }
                                 setMatch(updated)
-                                // Persist fresh data to Supabase so Home page benefits
                                 if (detail.resultado_casa !== null || detail.resultado_fora !== null) {
                                     const season = m.data ? m.data.slice(0, 4) : '2025'
                                     const nextSeason = String(parseInt(season) + 1)
