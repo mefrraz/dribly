@@ -164,10 +164,13 @@ export default function Home() {
         const load = async () => {
             // Use existing /api/fpb proxy to fetch competition pages
             const comps = [
-                { name: 'Liga Betclic Masculina', id: 10902 },
+                { name: 'Liga Betclic', id: 10902 },
                 { name: 'Proliga', id: 10903 },
                 { name: '1ª Divisão', id: 10904 },
                 { name: '2ª Divisão', id: 10905 },
+                { name: 'Liga Betclic Fem', id: 10906 },
+                { name: '1ª Divisão Fem', id: 10907 },
+                { name: '2ª Divisão Fem', id: 10908 },
             ]
             const allGames: Match[] = []
 
@@ -221,7 +224,7 @@ export default function Home() {
     const sections = useMemo(() => {
         const s: { key: string; label: string; games: Match[] }[] = []
 
-        const compOrder = ['Liga Betclic Masculina', 'Proliga', '1ª Divisão', '2ª Divisão']
+        const compOrder = ['Liga Betclic', 'Proliga', '1ª Divisão', '2ª Divisão', 'Liga Betclic Fem', '1ª Divisão Fem', '2ª Divisão Fem']
         for (const comp of compOrder) {
             const compGames = displayGames.filter(g => g.competicao === comp)
             if (compGames.length > 0) s.push({ key: comp, label: comp, games: compGames })
