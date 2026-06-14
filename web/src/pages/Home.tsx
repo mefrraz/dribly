@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Search, Trophy, ChevronDown } from 'lucide-react'
+import { Search, Trophy, ChevronDown, MapPin } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useFollows } from '../hooks/useFollows'
 import { type Club, useClub, displayName } from '../lib/ClubContext'
@@ -15,6 +15,8 @@ import { normalizeTeamDisplay, clubLogoUrl, semiAbrev } from '../lib/fpbUtils'
 import type { Match } from '../components/types'
 import { GameCard } from '../components/GameCard'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { useGeolocation, haversineKm, normalizeLocation } from '../lib/geolocation'
+import { fetchPavilions, type Pavilion } from '../lib/mapData'
 
 // ── League pills ──
 
@@ -257,6 +259,39 @@ export default function Home() {
     const [searchOpen, setSearchOpen] = useState(false)
     const [showDatePicker, setShowDatePicker] = useState(false)
     const [compLogos, setCompLogos] = useState<Map<number, string | null>>(new Map())
+
+    // ── Jogos perto de mim ──
+    const geo = useGeolocation()
+    const [nearbyGames, setNearbyGames] = useState<{ game: Match; pavilion: Pavilion; distance: number }[]>([])
+    useEffect(() => {
+        if (!geo.lat || !geo.lng) { setNearbyGames([]); return }
+        const compute = async () => {
+            try {
+                const pavs = await fetchPavilions()
+                const allGames = [...games, ...followedGames].filter(g => g.local)
+                const todayStr = new Date().toISOString().split('T')[0]
+                const recent = allGames.filter(g => g.data >= todayStr)
+                const matches: { game: Match; pavilion: Pavilion; distance: number }[] = []
+                for (const g of recent) {
+                    const locNorm = normalizeLocation(g.local!.split('|')[0])
+                    for (const p of pavs) {
+                        const pavNorm = normalizeLocation(p.nome)
+                        if (locNorm.includes(pavNorm) || pavNorm.includes(locNorm) || 
+                            (g.local!.toLowerCase().includes(p.cidade?.toLowerCase() || '') && locNorm.split(/\s+/).some(w => pavNorm.includes(w)))) {
+                            const dist = haversineKm(geo.lat!, geo.lng!, p.lat, p.lng)
+                            if (dist <= 50) { // within 50km
+                                matches.push({ game: g, pavilion: p, distance: dist })
+                            }
+                            break // first match per game
+                        }
+                    }
+                }
+                matches.sort((a, b) => a.distance - b.distance)
+                setNearbyGames(matches.slice(0, 5))
+            } catch { /* ignore */ }
+        }
+        compute()
+    }, [geo.lat, geo.lng, games.length, followedGames.length])
 
     useEffect(() => { loadClubs() }, [loadClubs])
     useEffect(() => {
@@ -539,6 +574,23 @@ export default function Home() {
                         </div>
                     </>}
             </div>
+
+            {/* ── Jogos perto de mim (mobile only) ── */}
+            {!geo.loading && !geo.error && nearbyGames.length > 0 && (
+                <div className="px-4 mt-5 sm:hidden">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
+                        <div className="px-4 py-3.5 flex items-center gap-2.5 border-b border-zinc-100 dark:border-white/5">
+                            <MapPin size={16} className="text-dribly-purple shrink-0" />
+                            <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Jogos perto de ti</h3>
+                        </div>
+                        <div className="divide-y divide-zinc-100 dark:divide-white/5">
+                            {nearbyGames.map(({ game }) => (
+                                <ConfrontoRow key={game.slug || game.id} match={game} clubs={clubs} isFollowed={false} />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {searchOpen && <SearchOverlay clubs={clubs} onClose={() => setSearchOpen(false)} />}
         </div>
