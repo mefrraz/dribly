@@ -125,6 +125,7 @@ function parseGames(html: string, competicao: string): GameData[] {
 }
 
 export default async function handler(req: Request): Promise<Response> {
+    try {
     const url = new URL(req.url)
     const dataParam = url.searchParams.get('data')
     if (!dataParam) return Response.json({ error: 'Missing ?data=' }, { status: 400 })
@@ -133,23 +134,19 @@ export default async function handler(req: Request): Promise<Response> {
 
     // Fetch all 4 competitions in parallel
     // Fetch both calendar (upcoming) and results (finished) for each competition
-    const results = await Promise.allSettled(
-        COMPS.flatMap(async (comp) => {
-            const [calHtml, resHtml] = await Promise.all([
-                fetchFPBPage(`calendario/${comp.fpbId}`).catch(() => ''),
-                fetchFPBPage(`resultados/${comp.fpbId}`).catch(() => ''),
-            ])
-            return [
-                ...parseGames(calHtml, comp.name),
-                ...parseGames(resHtml, comp.name),
-            ]
-        })
-    )
-
-    for (const r of results) {
-        if (r.status === 'fulfilled') {
-            allGames.push(...r.value)
+    const compPromises = COMPS.map(async (comp) => {
+        const compGames: GameData[] = []
+        for (const page of ['calendario', 'resultados']) {
+            try {
+                const html = await fetchFPBPage(`${page}/${comp.fpbId}`)
+                compGames.push(...parseGames(html, comp.name))
+            } catch { /* skip */ }
         }
+        return compGames
+    })
+    const settled = await Promise.allSettled(compPromises)
+    for (const r of settled) {
+        if (r.status === 'fulfilled') allGames.push(...r.value)
     }
 
     // Filter by date
@@ -176,4 +173,7 @@ export default async function handler(req: Request): Promise<Response> {
         total: filtered.length,
         competicoes: COMPS.map(c => c.name),
     })
+    } catch (err) {
+        return Response.json({ error: 'Internal error', details: String(err) }, { status: 500 })
+    }
 }
