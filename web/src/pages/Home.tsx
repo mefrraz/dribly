@@ -86,8 +86,6 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
                     }
                 }
             }
-            // FPB logos: both /uploads/clubes/logotipo/ and /old_uploads/CLU/ patterns
-            const logos = [...gh.matchAll(/<img[^>]*src="([^"]*(?:\/uploads\/clubes\/logotipo\/|\/old_uploads\/CLU\/)[^"]*)"[^>]*>/gi)].map(l => l[1])
             // Extract competition from inline HTML (club pages have per-game competition)
             const compMatch = gh.match(/<div class="competition"[^>]*>\s*<span>\s*([^<]+?)\s*<\/span>/i)
             let comp = competicao, esc = ''
@@ -111,7 +109,7 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
                 competicao: comp, escalao: esc,
                 status: isFinished ? 'FINALIZADO' : 'AGENDADO',
                 local: null,
-                logotipo_casa: logos[0] || null, logotipo_fora: logos[1] || null,
+                logotipo_casa: null, logotipo_fora: null, // logos come from clubLogoUrl() bucket
             })
         }
     }
@@ -167,19 +165,32 @@ function leagueRank(comp: string): number {
 
 function findClubByTeam(teamName: string, clubs: Club[]): Club | undefined {
     const n = teamName.trim().toUpperCase()
-    // Exact match (including semi-abbreviated form: "SC Farense" ↔ "Sporting Clube Farense")
+    // 1. Exact match (including semi-abbreviated form: "SC Farense" ↔ "Sporting Clube Farense")
     for (const c of clubs) {
         const cn = c.name.toUpperCase()
         const sn = (c.search_name || '').toUpperCase()
         const sa = semiAbrev(c.name).toUpperCase()
         if (n === cn || n === sn || n === sa) return c
     }
-    // Substring both ways (handles partial abbreviations)
+    // 2. Substring both ways (handles partial abbreviations)
     for (const c of clubs) {
         const cn = c.name.toUpperCase()
         const sn = (c.search_name || '').toUpperCase()
         const sa = semiAbrev(c.name).toUpperCase()
         if (cn.includes(n) || n.includes(cn) || sn.includes(n) || n.includes(sn) || sa.includes(n) || n.includes(sa)) return c
+    }
+    // 3. Word-level: match if ≥50% of significant words match (handles "SC FARENSE" → "Sporting Clube Farense")
+    const teamWords = n.split(/\s+/).filter(w => w.length > 1)
+    if (teamWords.length >= 1) {
+        for (const c of clubs) {
+            const allWords = new Set([
+                ...c.name.toUpperCase().split(/\s+/),
+                ...(c.search_name || '').toUpperCase().split(/\s+/),
+                ...semiAbrev(c.name).toUpperCase().split(/\s+/),
+            ])
+            const matches = teamWords.filter(w => allWords.has(w)).length
+            if (matches >= teamWords.length * 0.5 && matches >= 1) return c
+        }
     }
     return undefined
 }
