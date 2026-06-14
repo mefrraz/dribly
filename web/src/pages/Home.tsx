@@ -649,25 +649,28 @@ export default function Home() {
                         ) : (
                             <>
                                 {/* Distance slider */}
-                                <div className="px-4 pt-3 pb-1 flex items-center gap-3">
-                                    <span className="text-[10px] font-bold text-zinc-400 shrink-0">1 km</span>
-                                    <input type="range" min={1} max={50} value={maxDistance}
-                                        onChange={e => setMaxDistance(parseInt(e.target.value))}
-                                        className="flex-1 h-1 accent-dribly-purple"
-                                    />
-                                    <span className="text-[10px] font-bold text-zinc-400 shrink-0">{maxDistance} km</span>
+                                <div className="px-4 pt-3 pb-1 flex items-center gap-2.5">
+                                    <span className="text-[10px] font-bold text-dribly-purple shrink-0 w-8 text-right">1</span>
+                                    <div className="flex-1 relative flex items-center">
+                                        <input type="range" min={1} max={50} value={maxDistance}
+                                            onChange={e => setMaxDistance(parseInt(e.target.value))}
+                                            className="w-full h-2 rounded-full appearance-none bg-zinc-200 dark:bg-zinc-700 accent-dribly-purple cursor-pointer"
+                                            style={{ accentColor: '#7C3AED' }}
+                                        />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-dribly-purple shrink-0 w-10">{maxDistance} km</span>
                                 </div>
-                                {/* Mini map with distance circle + pavilion pins */}
+                                {/* Mini map — static, circle grows with slider */}
                                 <div className="h-48 w-full">
                                     <MapContainer
                                         key={darkMode ? 'dark' : 'light'}
                                         center={[geo.lat!, geo.lng!]}
-                                        zoom={11}
+                                        zoom={Math.round(13.5 - Math.log2(maxDistance / 1.5))}
                                         zoomControl={false}
-                                        dragging={true}
+                                        dragging={false}
                                         scrollWheelZoom={false}
                                         doubleClickZoom={false}
-                                        touchZoom={true}
+                                        touchZoom={false}
                                         attributionControl={false}
                                         className="w-full h-full z-0"
                                     >
@@ -675,7 +678,6 @@ export default function Home() {
                                             ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
                                             : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'
                                         } />
-                                        {/* Purple radius circle centered on user */}
                                         <Circle center={[geo.lat!, geo.lng!]} radius={maxDistance * 1000}
                                             pathOptions={{ color: '#7C3AED', fillColor: '#7C3AED', fillOpacity: 0.08, weight: 1.5 }}
                                         />
@@ -683,15 +685,19 @@ export default function Home() {
                                             <Marker key={pavilion.id}
                                                 position={[pavilion.lat, pavilion.lng]}
                                                 icon={L.divIcon({
-                                                    html: `<div style="width:14px;height:14px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(124,58,237,0.8)"></div>`,
+                                                    html: `<div style="width:14px;height:14px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(124,58,237,0.8);cursor:pointer"></div>`,
                                                     className: '', iconSize: [14, 14], iconAnchor: [7, 7]
                                                 })}
+                                                eventHandlers={{
+                                                    click: () => navigate(`/pavilhao/${pavilion.recinto_id || pavilion.id}`),
+                                                }}
                                             >
                                                 <Tooltip direction="top" offset={[0, -10]} opacity={0.95}
                                                     className="text-[11px] font-bold text-zinc-800 bg-white dark:bg-zinc-800 dark:text-white border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 shadow-lg">
                                                     <div className="text-center">
                                                         <p className="text-[11px] font-bold">{pavilion.nome}</p>
                                                         {pavilion.cidade && <p className="text-[9px] text-zinc-400">{pavilion.cidade}</p>}
+                                                        <p className="text-[8px] text-dribly-purple mt-0.5">ver pavilhão →</p>
                                                     </div>
                                                 </Tooltip>
                                             </Marker>
