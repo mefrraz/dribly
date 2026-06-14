@@ -168,21 +168,47 @@ export default function Home() {
             ]
             const allGames: Match[] = []
 
+            // Fetch competition pages
             for (const comp of comps) {
                 for (const page of ['calendario', 'resultados']) {
                     try {
                         const res = await fetch(`/api/fpb?page=${page}&competicao=${comp.id}`)
                         const html = await res.text()
-                        if (!html || html.startsWith('{')) continue // skip JSON errors
+                        if (!html || html.startsWith('{')) continue
                         const parsed = parseFPBHtml(html, comp.name)
                         allGames.push(...parsed)
                     } catch { /* skip */ }
                 }
             }
 
+            // Fetch followed clubs' games (if any)
+            if (followedClubIds.length > 0) {
+                const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
+                for (const club of followedClubs.slice(0, 4)) {
+                    for (const page of ['calendario', 'resultados']) {
+                        try {
+                            const res = await fetch(`/api/fpb?page=${page}&clube=${club.id}&epoca=2025/2026`)
+                            const html = await res.text()
+                            if (!html || html.startsWith('{')) continue
+                            // Parse club page — uses slightly different structure
+                            const parsed = parseFPBHtml(html, '')
+                            // Tag each game with the club name for dedup
+                            allGames.push(...parsed)
+                        } catch { /* skip */ }
+                    }
+                }
+            }
+
             if (allGames.length > 0) {
-                // Filter by date
-                const filtered = allGames.filter(g => g.data === selectedDate)
+                // Filter strictly by selected date AND deduplicate
+                const seen = new Set<string>()
+                const filtered = allGames.filter(g => {
+                    if (g.data !== selectedDate) return false
+                    const key = g.slug || `${g.data}-${g.equipa_casa}-${g.equipa_fora}`
+                    if (seen.has(key)) return false
+                    seen.add(key)
+                    return true
+                })
                 filtered.sort((a, b) => (a.hora || '99:99').localeCompare(b.hora || '99:99'))
                 setGames(filtered)
             } else {
@@ -210,27 +236,34 @@ export default function Home() {
         return fcg
     }, [games, followedNames])
 
-    // Build accordion sections
+    // Build accordion sections: followed clubs by escalão (♥), then competitions
     const sections = useMemo(() => {
         const s: { key: string; label: string; games: Match[]; heart?: boolean }[] = []
 
-        // 1. "Seguidos" — followed club games in top leagues (with heart)
+        // 1. Followed clubs — one accordion per competition/escalão
         if (followedClubGames.length > 0) {
-            s.push({ key: 'seguidos', label: 'Seguidos', games: followedClubGames, heart: true })
+            const byComp = new Map<string, Match[]>()
+            for (const g of followedClubGames) {
+                const comp = g.competicao || 'Outros'
+                const arr = byComp.get(comp) || []
+                arr.push(g)
+                byComp.set(comp, arr)
+            }
+            for (const [comp, gs] of byComp) {
+                s.push({ key: `seguidos-${comp}`, label: comp, games: gs, heart: true })
+            }
         }
 
-        // 2. Competition accordions (only non-followed ones)
+        // 2. Competition accordions (exclude games already in "Seguidos")
         const compOrder = ['Liga Betclic Masculina', 'Proliga', '1ª Divisão', '2ª Divisão']
         for (const comp of compOrder) {
             const compGames = games.filter(g => g.competicao === comp && !followedClubGames.includes(g))
             if (compGames.length > 0) s.push({ key: comp, label: comp, games: compGames })
         }
 
-        // 3. Remaining games grouped
+        // 3. Remaining
         const remaining = games.filter((g: Match) => !s.some(sec => sec.games.includes(g)))
-        if (remaining.length > 0) {
-            s.push({ key: 'outros', label: 'Outros', games: remaining })
-        }
+        if (remaining.length > 0) s.push({ key: 'outros', label: 'Outros', games: remaining })
 
         return s
     }, [games, followedClubGames])
