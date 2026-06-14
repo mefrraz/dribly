@@ -80,7 +80,7 @@ export function useFollows() {
             } else {
                 const { data, error } = await supabase
                     .from('user_follows')
-                    .upsert({ user_id: user.id, entity_type: entityType, entity_id: entityId }, { onConflict: 'user_id, entity_type, entity_id' })
+                    .upsert({ user_id: user.id, entity_type: entityType, entity_id: entityId }, { onConflict: 'user_id,entity_type,entity_id' })
                     .select()
                     .single()
                 if (error) throw error
