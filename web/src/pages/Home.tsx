@@ -1,18 +1,17 @@
 /**
- * Home — App-first (v12 final)
+ * Home — v12 final
  *
  * Layout:
- *   Purple blur → search + league pills (landing page replica)
- *   Competition filter pills
- *   Date selector pills
- *   Featured game card (GameCard component)
- *   Game rows (Confrontos style from Game.tsx)
- *   Followed clubs highlighted, ordered by time
+ *   Purple blur (stronger) behind league pills (WITH logos) + search bar
+ *   Date selector bar
+ *   Featured card: followed clubs game (head-to-head priority)
+ *   Accordion sections per competition (closed by default)
+ *   Confrontos rows inside each section
  */
 
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, Trophy, ChevronRight } from 'lucide-react'
+import { Search, Trophy, ChevronDown } from 'lucide-react'
 import { useFollows } from '../hooks/useFollows'
 import { supabase } from '../lib/supabase'
 import { type Club, useClub, displayName } from '../lib/ClubContext'
@@ -21,27 +20,19 @@ import type { Match } from '../components/types'
 import { GameCard } from '../components/GameCard'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 
-// ── Competition filter ──
+// ── Competition sections ──
 
-const COMP_FILTERS = [
-    { label: 'Liga Betclic', competition: 'Liga Betclic' },
-    { label: 'Proliga', competition: 'Proliga' },
-    { label: '1ª Divisão', competition: '1ª Divisão' },
-    { label: '2ª Divisão', competition: '2ª Divisão' },
-    { label: 'Todas', competition: '' },
+const COMPETITIONS = [
+    { key: 'Liga Betclic', label: 'Liga Betclic', id: 10902 },
+    { key: 'Proliga', label: 'Proliga', id: 10903 },
+    { key: '1ª Divisão', label: '1ª Divisão', id: 10904 },
+    { key: '2ª Divisão', label: '2ª Divisão', id: 10905 },
 ]
 
 // ── Date helpers ──
 
-function toYYYYMMDD(d: Date): string {
-    return d.toISOString().split('T')[0]
-}
-
-function addDays(d: Date, n: number): Date {
-    const r = new Date(d)
-    r.setDate(r.getDate() + n)
-    return r
-}
+function toYYYYMMDD(d: Date): string { return d.toISOString().split('T')[0] }
+function addDays(d: Date, n: number): Date { const r = new Date(d); r.setDate(r.getDate() + n); return r }
 
 type DayPill = { label: string; date: string; isToday: boolean }
 
@@ -65,7 +56,7 @@ function buildDayPills(): DayPill[] {
     }))
 }
 
-// ── Confrontos row (replicated from Game.tsx) ──
+// ── Confrontos row ──
 
 function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[]; isFollowed: boolean }) {
     const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
@@ -78,62 +69,30 @@ function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[
     const hora = match.hora ? match.hora.replace(/[^0-9:]/g, '').slice(0, 5) : ''
 
     return (
-        <Link
-            to={linkTo}
+        <Link to={linkTo}
             className={`flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group ${
                 isFollowed ? 'bg-dribly-purple/[0.03] dark:bg-dribly-purple/[0.05]' : ''
-            }`}
-        >
-            {/* Followed indicator */}
+            }`}>
             {isFollowed && <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple shrink-0" />}
-
-            {/* Casa */}
             <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
-                {match.logotipo_casa ? (
-                    <img src={match.logotipo_casa} alt="" className="w-5 h-5 object-contain" loading="lazy" />
-                ) : (
-                    <span className="text-[9px] font-bold text-zinc-500">{displayCasa.charAt(0)}</span>
-                )}
+                {match.logotipo_casa ? <img src={match.logotipo_casa} alt="" className="w-5 h-5 object-contain" loading="lazy" />
+                    : <span className="text-[9px] font-bold text-zinc-500">{displayCasa.charAt(0)}</span>}
             </div>
-            <span className={`text-[12px] font-semibold truncate shrink-0 max-w-[100px] ${
-                isLive ? 'text-zinc-900 dark:text-white' : 'text-zinc-900 dark:text-white'
-            } group-hover:text-dribly-purple transition-colors`}>
+            <span className={`text-[12px] font-semibold truncate shrink-0 max-w-[100px] text-zinc-900 dark:text-white group-hover:text-dribly-purple transition-colors`}>
                 {displayCasa}
             </span>
-
-            {/* Score or vs */}
-            {isFinished ? (
-                <span className="text-zinc-400 font-medium text-xs tabular-nums shrink-0">
-                    {match.resultado_casa}-{match.resultado_fora}
-                </span>
-            ) : (
-                <span className="text-zinc-400 font-medium text-[10px] shrink-0">vs</span>
-            )}
-
-            {/* Fora */}
-            <span className={`text-[12px] truncate shrink-0 max-w-[100px] ${
-                isFinished ? 'text-zinc-500 dark:text-zinc-400' : 'text-zinc-500 dark:text-zinc-400'
-            }`}>
-                {displayFora}
-            </span>
+            {isFinished
+                ? <span className="text-zinc-400 font-medium text-xs tabular-nums shrink-0">{match.resultado_casa}-{match.resultado_fora}</span>
+                : <span className="text-zinc-400 font-medium text-[10px] shrink-0">vs</span>}
+            <span className="text-[12px] truncate shrink-0 max-w-[100px] text-zinc-500 dark:text-zinc-400">{displayFora}</span>
             <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
-                {match.logotipo_fora ? (
-                    <img src={match.logotipo_fora} alt="" className="w-5 h-5 object-contain" loading="lazy" />
-                ) : (
-                    <span className="text-[9px] font-bold text-zinc-500">{displayFora.charAt(0)}</span>
-                )}
+                {match.logotipo_fora ? <img src={match.logotipo_fora} alt="" className="w-5 h-5 object-contain" loading="lazy" />
+                    : <span className="text-[9px] font-bold text-zinc-500">{displayFora.charAt(0)}</span>}
             </div>
-
             <span className="flex-1" />
-
-            {/* Time or LIVE */}
-            {isLive ? (
-                <span className="text-[10px] font-bold text-red-500 animate-pulse shrink-0 uppercase">LIVE</span>
-            ) : isFinished ? (
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase shrink-0 font-medium">FIN</span>
-            ) : (
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 shrink-0 font-medium tabular-nums">{hora || '--:--'}</span>
-            )}
+            {isLive ? <span className="text-[10px] font-bold text-red-500 animate-pulse shrink-0 uppercase">LIVE</span>
+                : isFinished ? <span className="text-[10px] text-zinc-400 shrink-0 font-medium uppercase">FIN</span>
+                : <span className="text-[10px] text-zinc-400 shrink-0 font-medium tabular-nums">{hora || '--:--'}</span>}
         </Link>
     )
 }
@@ -147,76 +106,147 @@ export default function Home() {
 
     const [pills] = useState<DayPill[]>(() => buildDayPills())
     const [selectedDate, setSelectedDate] = useState<string>(() => toYYYYMMDD(new Date()))
-    const [compFilter, setCompFilter] = useState<string>(COMP_FILTERS[0].competition)
-    const [games, setGames] = useState<Match[]>([])
+    const [allGames, setAllGames] = useState<Match[]>([])
     const [loading, setLoading] = useState(true)
-    const [showAll, setShowAll] = useState(false)
+    const [openSections, setOpenSections] = useState<Set<string>>(new Set())
     const [searchOpen, setSearchOpen] = useState(false)
 
     useEffect(() => { loadClubs() }, [loadClubs])
 
-    // Fetch games for selected date
+    // Fetch ALL games for selected date (no filter — we split by competition client-side)
     useEffect(() => {
         setLoading(true)
-        setShowAll(false)
+        setOpenSections(new Set())
         const season = '2025/2026'
         const tableName = `games_${season.replace('/', '_')}`
 
-        let query = supabase.from(tableName).select('*').eq('data', selectedDate)
-
-        if (compFilter) {
-            query = query.eq('competicao', compFilter)
-        }
-
         const fetchGames = async () => {
             try {
-                const { data } = await query.order('hora', { ascending: true })
-                setGames((data as Match[]) || [])
-            } catch { setGames([]) }
+                const { data } = await supabase
+                    .from(tableName)
+                    .select('*')
+                    .eq('data', selectedDate)
+                    .order('hora', { ascending: true })
+                setAllGames((data as Match[]) || [])
+            } catch { setAllGames([]) }
             setLoading(false)
         }
         fetchGames()
-    }, [selectedDate, compFilter])
+    }, [selectedDate])
 
-    // Sort: followed first, then by time
-    const sortedGames = useMemo(() => {
-        const followedNames = new Set(
-            clubs.filter(c => followedClubIds.includes(c.id)).map(c => c.name)
+    // Followed names set
+    const followedNames = useMemo(() =>
+        new Set(clubs.filter(c => followedClubIds.includes(c.id)).map(c => c.name)),
+        [clubs, followedClubIds])
+
+    // Group games by competition
+    const gamesByComp = useMemo(() => {
+        const map = new Map<string, Match[]>()
+        for (const g of allGames) {
+            const comp = g.competicao || 'Outros'
+            const arr = map.get(comp) || []
+            arr.push(g)
+            map.set(comp, arr)
+        }
+        return map
+    }, [allGames])
+
+    // Sort games within each group: followed first, then by time
+    const sortedByComp = useMemo(() => {
+        const result = new Map<string, Match[]>()
+        for (const [comp, games] of gamesByComp) {
+            const followed: Match[] = []
+            const rest: Match[] = []
+            for (const g of games) {
+                if (followedNames.has(g.equipa_casa) || followedNames.has(g.equipa_fora)) {
+                    followed.push(g)
+                } else { rest.push(g) }
+            }
+            result.set(comp, [...followed, ...rest])
+        }
+        return result
+    }, [gamesByComp, followedNames])
+
+    // Featured game: followed clubs head-to-head priority
+    const featuredGame = useMemo(() => {
+        if (followedNames.size < 2) {
+            // Find first game with a followed club
+            return allGames.find(g =>
+                followedNames.has(g.equipa_casa) || followedNames.has(g.equipa_fora)
+            ) || allGames[0] || null
+        }
+        // Look for head-to-head between followed clubs
+        const h2h = allGames.find(g =>
+            followedNames.has(g.equipa_casa) && followedNames.has(g.equipa_fora)
         )
-        const followed: Match[] = []
-        const rest: Match[] = []
-        for (const g of games) {
-            if (followedNames.has(g.equipa_casa) || followedNames.has(g.equipa_fora)) {
-                followed.push(g)
-            } else {
-                rest.push(g)
+        if (h2h) return h2h
+        return allGames.find(g =>
+            followedNames.has(g.equipa_casa) || followedNames.has(g.equipa_fora)
+        ) || allGames[0] || null
+    }, [allGames, followedNames])
+
+    const toggleSection = (key: string) => {
+        setOpenSections(prev => {
+            const next = new Set(prev)
+            if (next.has(key)) next.delete(key)
+            else next.add(key)
+            return next
+        })
+    }
+
+    // Build sections: known competitions in order, then "Outros"
+    const sections = useMemo(() => {
+        const result: { key: string; label: string; id?: number }[] = []
+        const seen = new Set<string>()
+
+        for (const { key, label, id } of COMPETITIONS) {
+            if (sortedByComp.has(key)) {
+                result.push({ key, label, id })
+                seen.add(key)
             }
         }
-        return [...followed, ...rest]
-    }, [games, clubs, followedClubIds])
 
-    const featured = sortedGames[0] || null
-    const restGames = sortedGames.slice(1)
-    const visible = showAll ? restGames : restGames.slice(0, 6)
-    const hasMore = restGames.length > 6 && !showAll
-    const liveCount = games.filter(g => g.status === 'A DECORRER').length
-    const isEmpty = !loading && games.length === 0
+        // Add remaining competitions as "Outros"
+        const others: string[] = []
+        for (const comp of sortedByComp.keys()) {
+            if (!seen.has(comp)) others.push(comp)
+        }
+        if (others.length > 0) {
+            result.push({ key: 'outros', label: 'Outros' })
+        }
 
-    // Followed check
-    const followedNames = new Set(
-        clubs.filter(c => followedClubIds.includes(c.id)).map(c => c.name)
-    )
+        return { sections: result, others }
+    }, [sortedByComp])
+
+    const isEmpty = !loading && allGames.length === 0
+    const liveCount = allGames.filter(g => g.status === 'A DECORRER').length
 
     return (
         <div className="max-w-2xl mx-auto pb-24">
-            {/* ── Purple blur section ── */}
+            {/* ── Purple blur section (stronger) ── */}
             <div className="relative overflow-hidden">
-                {/* Blur circle */}
-                <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full bg-dribly-purple/15 dark:bg-dribly-purple/10 blur-[80px] pointer-events-none" />
+                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-dribly-purple/20 dark:bg-dribly-purple/15 blur-[100px] pointer-events-none" />
+                <div className="absolute -top-8 left-1/4 w-40 h-40 rounded-full bg-dribly-purple-light/15 dark:bg-dribly-purple-light/10 blur-[60px] pointer-events-none" />
 
-                <div className="relative z-10 max-w-2xl mx-auto px-4 pt-2 pb-4">
+                <div className="relative z-10 max-w-2xl mx-auto px-4 pt-2 pb-5">
+                    {/* League pills WITH logos */}
+                    <div className="flex justify-center gap-2 flex-wrap mb-4">
+                        {COMPETITIONS.map(({ label, id }) => (
+                            <button
+                                key={id}
+                                onClick={() => navigate('/competicao/' + id)}
+                                className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all shrink-0"
+                            >
+                                <div className="w-6 h-6 rounded-full bg-dribly-purple/10 dark:bg-dribly-purple/20 flex items-center justify-center shrink-0 overflow-hidden">
+                                    <Trophy size={12} className="text-dribly-purple" />
+                                </div>
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+
                     {/* Search bar */}
-                    <div className="max-w-lg mx-auto mb-3">
+                    <div className="max-w-lg mx-auto">
                         <button
                             onClick={() => setSearchOpen(true)}
                             className="w-full flex items-center gap-3 pl-5 pr-4 py-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl text-left text-sm text-zinc-400 hover:border-dribly-purple/30 transition-colors shadow-lg shadow-zinc-200/50 dark:shadow-black/20"
@@ -225,65 +255,27 @@ export default function Home() {
                             Pesquisar clubes e competições...
                         </button>
                     </div>
+                </div>
+            </div>
 
-                    {/* League pills */}
-                    <div className="flex justify-center gap-2 flex-wrap">
-                        {[
-                            { name: 'Liga Betclic', id: 10902 },
-                            { name: 'Proliga', id: 10903 },
-                            { name: '1ª Divisão', id: 10904 },
-                            { name: '2ª Divisão', id: 10905 },
-                        ].map(({ name, id }, i) => (
+            {/* ── Date selector BAR ── */}
+            <div className="px-4 mb-5">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
+                    <div className="flex overflow-x-auto scrollbar-none">
+                        {pills.map(p => (
                             <button
-                                key={id}
-                                onClick={() => navigate('/competicao/' + id)}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all shrink-0 ${i >= 3 ? 'hidden sm:flex' : ''}`}
+                                key={p.date}
+                                onClick={() => setSelectedDate(p.date)}
+                                className={`shrink-0 px-5 py-3 text-xs font-bold transition-all border-r border-zinc-100 dark:border-white/5 last:border-0 ${
+                                    selectedDate === p.date
+                                        ? 'bg-dribly-purple text-white'
+                                        : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5'
+                                }`}
                             >
-                                <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0">
-                                    <Trophy size={10} className="text-dribly-purple" />
-                                </span>
-                                {name}
+                                {p.label}
                             </button>
                         ))}
                     </div>
-                </div>
-            </div>
-
-            {/* ── Competition filter pills ── */}
-            <div className="px-4 mb-4">
-                <div className="flex gap-1.5 overflow-x-auto scrollbar-none pb-1">
-                    {COMP_FILTERS.map(f => (
-                        <button
-                            key={f.label}
-                            onClick={() => setCompFilter(f.competition)}
-                            className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                                compFilter === f.competition
-                                    ? 'bg-dribly-purple text-white shadow-sm shadow-dribly-purple/20'
-                                    : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400 hover:border-dribly-purple/30'
-                            }`}
-                        >
-                            {f.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* ── Date selector ── */}
-            <div className="px-4 mb-5">
-                <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
-                    {pills.map(p => (
-                        <button
-                            key={p.date}
-                            onClick={() => setSelectedDate(p.date)}
-                            className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                                selectedDate === p.date
-                                    ? 'bg-dribly-purple text-white shadow-sm shadow-dribly-purple/20'
-                                    : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:border-dribly-purple/30'
-                            }`}
-                        >
-                            {p.label}
-                        </button>
-                    ))}
                 </div>
             </div>
 
@@ -308,47 +300,94 @@ export default function Home() {
                     </div>
                 ) : (
                     <>
-                        {/* Featured card — uses existing GameCard */}
-                        {featured && (
-                            <div className="mb-4">
-                                <GameCard match={featured} mode="agenda" clubs={clubs} />
+                        {/* Featured card */}
+                        {featuredGame && (
+                            <div className="mb-5">
+                                <GameCard match={featuredGame} mode="agenda" clubs={clubs} />
                             </div>
                         )}
 
-                        {/* Game rows — Confrontos style */}
-                        {visible.length > 0 && (
-                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
-                                <div className="p-3.5 border-b border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02]">
-                                    <h3 className="text-xs font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />
-                                        {compFilter ? compFilter : 'Todos os jogos'}
-                                    </h3>
-                                </div>
-                                <div className="divide-y divide-zinc-100 dark:divide-white/5">
-                                    {visible.map((g, i) => (
-                                        <ConfrontoRow
-                                            key={g.slug || i}
-                                            match={g}
-                                            clubs={clubs}
-                                            isFollowed={
-                                                followedNames.has(g.equipa_casa) ||
-                                                followedNames.has(g.equipa_fora)
-                                            }
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        {/* Competition accordion sections */}
+                        <div className="space-y-2">
+                            {sections.sections.map(({ key, label }) => {
+                                const games = sortedByComp.get(key) || []
+                                if (games.length === 0) return null
+                                const isOpen = openSections.has(key)
 
-                        {hasMore && (
-                            <button
-                                onClick={() => setShowAll(true)}
-                                className="w-full mt-2 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-bold hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-1.5"
-                            >
-                                Ver mais {restGames.length - 6} jogos
-                                <ChevronRight size={12} />
-                            </button>
-                        )}
+                                return (
+                                    <div key={key} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
+                                        {/* Header */}
+                                        <button
+                                            onClick={() => toggleSection(key)}
+                                            className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors"
+                                        >
+                                            <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />
+                                                {label}
+                                                <span className="text-[11px] font-medium text-zinc-400">({games.length})</span>
+                                            </h3>
+                                            <ChevronDown size={16} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+
+                                        {/* Games */}
+                                        {isOpen && (
+                                            <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
+                                                {games.map((g, i) => (
+                                                    <ConfrontoRow
+                                                        key={g.slug || i}
+                                                        match={g}
+                                                        clubs={clubs}
+                                                        isFollowed={
+                                                            followedNames.has(g.equipa_casa) ||
+                                                            followedNames.has(g.equipa_fora)
+                                                        }
+                                                    />
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )
+                            })}
+
+                            {/* "Outros" section — remaining competitions */}
+                            {sections.others.length > 0 && (() => {
+                                const othersKey = 'outros'
+                                const isOpen = openSections.has(othersKey)
+                                const allOtherGames = sections.others.flatMap(comp => sortedByComp.get(comp) || [])
+                                if (allOtherGames.length === 0) return null
+
+                                return (
+                                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
+                                        <button
+                                            onClick={() => toggleSection(othersKey)}
+                                            className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors"
+                                        >
+                                            <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                                                Outros
+                                                <span className="text-[11px] font-medium text-zinc-400">({allOtherGames.length})</span>
+                                            </h3>
+                                            <ChevronDown size={16} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {isOpen && (
+                                            <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
+                                                {allOtherGames.map((g, i) => (
+                                                    <ConfrontoRow
+                                                        key={g.slug || i}
+                                                        match={g}
+                                                        clubs={clubs}
+                                                        isFollowed={
+                                                            followedNames.has(g.equipa_casa) ||
+                                                            followedNames.has(g.equipa_fora)
+                                                        }
+                                                    />
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )
+                            })()}
+                        </div>
                     </>
                 )}
             </div>
@@ -368,10 +407,7 @@ function SearchOverlay({ clubs, onClose }: { clubs: Club[]; onClose: () => void 
         const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
         const qn = norm(q)
         return clubs.filter(c => {
-            const n = norm(displayName(c))
-            const f = norm(c.name)
-            const s = norm(c.search_name || '')
-            return n.includes(qn) || f.includes(qn) || s.includes(qn)
+            return norm(displayName(c)).includes(qn) || norm(c.name).includes(qn) || norm(c.search_name || '').includes(qn)
         }).slice(0, 6)
     }, [q, clubs])
 
@@ -387,9 +423,7 @@ function SearchOverlay({ clubs, onClose }: { clubs: Club[]; onClose: () => void 
                     </div>
                     <button onClick={onClose} className="text-sm font-medium text-zinc-500">Cancelar</button>
                 </div>
-                {q.trim() && results.length === 0 && (
-                    <p className="text-sm text-zinc-400 text-center py-8">Nenhum clube encontrado.</p>
-                )}
+                {q.trim() && results.length === 0 && <p className="text-sm text-zinc-400 text-center py-8">Nenhum clube encontrado.</p>}
                 <div className="space-y-1">
                     {results.map(club => (
                         <Link key={club.id} to={`/clube/${club.slug}/home`} onClick={onClose}
