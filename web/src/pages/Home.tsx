@@ -8,7 +8,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Search, Trophy, ChevronDown, MapPin } from 'lucide-react'
-import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabase'
 import { useFollows } from '../hooks/useFollows'
@@ -648,7 +648,7 @@ export default function Home() {
                                     <MapContainer
                                         key={darkMode ? 'dark' : 'light'}
                                         center={[geo.lat!, geo.lng!]}
-                                        zoom={12}
+                                        zoom={11}
                                         zoomControl={false}
                                         dragging={false}
                                         scrollWheelZoom={false}
@@ -661,6 +661,13 @@ export default function Home() {
                                             ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
                                             : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'
                                         } />
+                                        {/* User location */}
+                                        <Marker position={[geo.lat!, geo.lng!]}
+                                            icon={L.divIcon({
+                                                html: `<div style="width:12px;height:12px;background:#3B82F6;border:3px solid white;border-radius:50%;box-shadow:0 0 8px rgba(59,130,246,0.9)"></div>`,
+                                                className: '', iconSize: [12, 12], iconAnchor: [6, 6]
+                                            })}
+                                        />
                                         {nearbyGames.map(({ pavilion }) => (
                                             <Marker key={pavilion.id}
                                                 position={[pavilion.lat, pavilion.lng]}
@@ -668,17 +675,17 @@ export default function Home() {
                                                     html: `<div style="width:14px;height:14px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(124,58,237,0.8);cursor:pointer"></div>`,
                                                     className: '', iconSize: [14, 14], iconAnchor: [7, 7]
                                                 })}
-                                                eventHandlers={{
-                                                    click: () => navigate(`/pavilhao/${pavilion.recinto_id || pavilion.id}`),
-                                                }}
                                             >
-                                                <Tooltip direction="top" offset={[0, -10]} opacity={0.95}>
-                                                    <div className="text-center">
-                                                        <p className="text-[11px] font-bold">{pavilion.nome}</p>
+                                                <Popup closeButton={false} className="pavilion-popup">
+                                                    <div className="text-center -m-2 p-2 min-w-[120px]">
+                                                        <p className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200">{pavilion.nome}</p>
                                                         {pavilion.cidade && <p className="text-[9px] text-zinc-400">{pavilion.cidade}</p>}
-                                                        <p className="text-[8px] text-dribly-purple mt-0.5">ver pavilhão →</p>
+                                                        <button onClick={() => navigate(`/pavilhao/${pavilion.recinto_id || pavilion.id}`)}
+                                                            className="text-[10px] font-bold text-dribly-purple mt-1 hover:underline">
+                                                            ver pavilhão →
+                                                        </button>
                                                     </div>
-                                                </Tooltip>
+                                                </Popup>
                                             </Marker>
                                         ))}
                                     </MapContainer>
