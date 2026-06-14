@@ -9,6 +9,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, Trophy, ChevronDown } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { useFollows } from '../hooks/useFollows'
 import { type Club, useClub, displayName } from '../lib/ClubContext'
 import { normalizeTeamDisplay } from '../lib/fpbUtils'
 import type { Match } from '../components/types'
@@ -134,7 +135,7 @@ function leagueRank(comp: string): number {
 
 // ── Confrontos row ──
 
-function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[]; isFollowed: boolean }) {
+function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Match; clubs: Club[]; isFollowed: boolean; showCompetition?: boolean }) {
     const dc = normalizeTeamDisplay(match.equipa_casa, clubs)
     const df = normalizeTeamDisplay(match.equipa_fora, clubs)
     const isLive = match.status === 'A DECORRER'
@@ -158,6 +159,10 @@ function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[
             <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
                 {match.logotipo_fora ? <img src={match.logotipo_fora} alt="" className="w-5 h-5 object-contain" loading="lazy" /> : <span className="text-[9px] font-bold text-zinc-500">{df.charAt(0)}</span>}
             </div>
+            {/* Competition label for Seguidos */}
+            {showCompetition && match.competicao ? (
+                <span className="text-[9px] text-zinc-400 shrink-0 mr-2 max-w-[80px] truncate">{match.competicao}</span>
+            ) : null}
             <span className="flex-1" />
             {isLive ? <span className="text-[10px] font-bold text-red-500 animate-pulse shrink-0 uppercase">LIVE</span>
                 : isFinished ? <span className="text-[10px] text-zinc-400 shrink-0 font-medium uppercase">FIN</span>
@@ -169,13 +174,16 @@ function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[
 // ── Main ──
 
 export default function Home() {
+    const { followedClubIds } = useFollows()
     const { clubs, loadClubs } = useClub()
     const navigate = useNavigate()
 
     const [pills] = useState(() => buildDayPills())
     const [selectedDate, setSelectedDate] = useState(() => toYYYYMMDD(new Date()))
     const [games, setGames] = useState<Match[]>([])
+    const [followedGames, setFollowedGames] = useState<Match[]>([])
     const [loading, setLoading] = useState(true)
+    const [loadingFollowed, setLoadingFollowed] = useState(false)
     const [openSections, setOpenSections] = useState<Set<string>>(new Set())
     const [searchOpen, setSearchOpen] = useState(false)
     const [compLogos, setCompLogos] = useState<Map<number, string | null>>(new Map())
@@ -279,6 +287,35 @@ export default function Home() {
                 } catch { setGames([]) }
             }
             setLoading(false)
+
+            // Background: fetch followed clubs' games (only for today)
+            if (selectedDate === toYYYYMMDD(new Date()) && followedClubIds.length > 0 && clubs.length > 0) {
+                setLoadingFollowed(true)
+                const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
+                const clubGames: Match[] = []
+                for (const club of followedClubs.slice(0, 8)) {
+                    for (const page of ['calendario', 'resultados']) {
+                        try {
+                            const res = await fetch(`/api/fpb?page=${page}&clube=${club.id}&epoca=2025/2026`)
+                            const html = await res.text()
+                            if (!html || html.startsWith('{')) continue
+                            const parsed = parseFPBHtml(html, '')
+                            // Tag with competition from parsed data, filter by today
+                            clubGames.push(...parsed.filter(g => g.data === selectedDate))
+                        } catch { /* skip */ }
+                    }
+                }
+                // Dedup
+                const seen = new Set<string>()
+                const unique = clubGames.filter(g => {
+                    const k = g.slug || `${g.data}-${g.equipa_casa}-${g.equipa_fora}`
+                    if (seen.has(k)) return false; seen.add(k); return true
+                })
+                setFollowedGames(unique)
+                setLoadingFollowed(false)
+            } else {
+                setFollowedGames([])
+            }
         }
         load()
     }, [selectedDate])
@@ -292,20 +329,30 @@ export default function Home() {
         })
     }, [games, todayStr])
 
-    // Build accordion sections (NO hearts on accordions — only rows have indicators)
+    // Build accordion sections — Seguidos first, then leagues
     const sections = useMemo(() => {
-        const s: { key: string; label: string; games: Match[] }[] = []
+        const s: { key: string; label: string; games: Match[]; loading?: boolean }[] = []
+
+        // "Seguidos" — always visible if user follows anyone (today only)
+        if (followedClubIds.length > 0 && selectedDate === toYYYYMMDD(new Date())) {
+            s.push({
+                key: 'seguidos',
+                label: 'Seguidos',
+                games: followedGames,
+                loading: loadingFollowed,
+            })
+        }
 
         const compOrder = ['Liga Betclic', 'Proliga', '1ª Divisão', '2ª Divisão', 'Liga Betclic Fem', '1ª Divisão Fem', '2ª Divisão Fem']
         for (const comp of compOrder) {
-            const compGames = displayGames.filter(g => g.competicao === comp)
+            const compGames = displayGames.filter(g => g.competicao === comp && !followedGames.includes(g))
             if (compGames.length > 0) s.push({ key: comp, label: comp, games: compGames })
         }
         const remaining = displayGames.filter((g: Match) => !s.some(sec => sec.games.includes(g)))
         if (remaining.length > 0) s.push({ key: 'outros', label: 'Outros', games: remaining })
 
         return s
-    }, [displayGames])
+    }, [displayGames, followedGames, loadingFollowed, followedClubIds, selectedDate])
 
     const featuredGame = useMemo(() => {
         let best: Match | null = null, bestRank = 999
@@ -366,7 +413,7 @@ export default function Home() {
                     : <>
                         {featuredGame && <div className="mb-4"><GameCard match={featuredGame} mode="agenda" clubs={clubs} /></div>}
                         <div className="space-y-2">
-                            {sections.map(({ key, label, games: secGames }) => {
+                            {sections.map(({ key, label, games: secGames, loading: secLoading }) => {
                                 const isOpen = openSections.has(key)
                                 return (
                                     <div key={key} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
@@ -374,16 +421,22 @@ export default function Home() {
                                             <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />
                                                 {label}
-                                                <span className="text-[11px] font-medium text-zinc-400">({secGames.length})</span>
                                             </h3>
                                             <ChevronDown size={16} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                                         </button>
                                         {isOpen && (
-                                            <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
-                                                {secGames.map((g, i) => (
-                                                    <ConfrontoRow key={g.slug || i} match={g} clubs={clubs} isFollowed={false} />
-                                                ))}
-                                            </div>
+                                            secLoading ? (
+                                                <div className="px-4 py-6 text-center border-t border-zinc-100 dark:border-white/5">
+                                                    <LoadingSpinner />
+                                                    <p className="text-xs text-zinc-400 mt-2">A pesquisar jogos...</p>
+                                                </div>
+                                            ) : (
+                                                <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
+                                                    {secGames.map((g, i) => (
+                                                        <ConfrontoRow key={g.slug || i} match={g} clubs={clubs} isFollowed={false} showCompetition={key === 'seguidos'} />
+                                                    ))}
+                                                </div>
+                                            )
                                         )}
                                     </div>
                                 )
