@@ -186,11 +186,15 @@ function findClubByTeam(teamName: string, clubs: Club[]): Club | undefined {
 function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Match; clubs: Club[]; isFollowed: boolean; showCompetition?: boolean }) {
     const dc = normalizeTeamDisplay(match.equipa_casa, clubs)
     const df = normalizeTeamDisplay(match.equipa_fora, clubs)
+    const clubCasa = findClubByTeam(match.equipa_casa, clubs)
+    const clubFora = findClubByTeam(match.equipa_fora, clubs)
+    const logoCasa = match.logotipo_casa || clubCasa?.logo_url || null
+    const logoFora = match.logotipo_fora || clubFora?.logo_url || null
     const isLive = match.status === 'A DECORRER'
     const hasScores = match.resultado_casa !== null && match.resultado_fora !== null
     const isFinished = match.status === 'FINALIZADO' || hasScores
     const slug = match.slug || `${match.data}-${match.equipa_casa.toLowerCase().replace(/\s+/g, '-')}-${match.equipa_fora.toLowerCase().replace(/\s+/g, '-')}`
-    const club = findClubByTeam(match.equipa_casa, clubs) || findClubByTeam(match.equipa_fora, clubs)
+    const club = clubCasa || clubFora
     const idParam = match.id && /^\d+$/.test(match.id) ? `&internalID=${match.id}` : ''
     const linkTo = club ? `/jogo/${slug}?clube=${club.slug}${idParam}` : idParam ? `/jogo/${slug}?internalID=${match.id}` : `/jogo/${slug}`
     const hora = formatHora(match.hora)
@@ -199,14 +203,14 @@ function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Ma
         <Link to={linkTo} className={`flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group ${isFollowed ? 'bg-dribly-purple/[0.03] dark:bg-dribly-purple/[0.05]' : ''}`}>
             {isFollowed && <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple shrink-0" />}
             <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
-                {match.logotipo_casa ? <img src={match.logotipo_casa} alt="" className="w-5 h-5 object-contain" loading="lazy" /> : <span className="text-[9px] font-bold text-zinc-500">{dc.charAt(0)}</span>}
+                {logoCasa ? <img src={logoCasa} alt="" className="w-5 h-5 object-contain" loading="lazy" /> : <span className="text-[9px] font-bold text-zinc-500">{dc.charAt(0)}</span>}
             </div>
             <span className="text-[12px] font-semibold truncate shrink-0 max-w-[100px] text-zinc-900 dark:text-white group-hover:text-dribly-purple transition-colors">{dc}</span>
             {isFinished ? <span className="text-zinc-900 dark:text-white font-bold text-xs tabular-nums shrink-0">{match.resultado_casa}-{match.resultado_fora}</span>
                 : <span className="text-zinc-400 font-medium text-[10px] shrink-0">vs</span>}
             <span className="text-[12px] truncate shrink-0 max-w-[100px] text-zinc-500 dark:text-zinc-400">{df}</span>
             <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
-                {match.logotipo_fora ? <img src={match.logotipo_fora} alt="" className="w-5 h-5 object-contain" loading="lazy" /> : <span className="text-[9px] font-bold text-zinc-500">{df.charAt(0)}</span>}
+                {logoFora ? <img src={logoFora} alt="" className="w-5 h-5 object-contain" loading="lazy" /> : <span className="text-[9px] font-bold text-zinc-500">{df.charAt(0)}</span>}
             </div>
             <span className="flex-1" />
             {/* Escalão label for Seguidos — right next to hora */}
@@ -400,6 +404,14 @@ export default function Home() {
         })
     }, [games, todayStr])
 
+    const featuredGame = useMemo(() => {
+        // Use league games; fallback to followed games if no league games today
+        const pool = games.length > 0 ? games : followedGames
+        let best: Match | null = null, bestRank = 999
+        for (const g of pool) { const r = leagueRank(g.competicao || ''); if (r < bestRank) { bestRank = r; best = g } }
+        return best
+    }, [games, followedGames])
+
     // Build accordion sections — Seguidos first, then leagues
     const sections = useMemo(() => {
         const s: { key: string; label: string; games: Match[]; loading?: boolean }[] = []
@@ -416,20 +428,18 @@ export default function Home() {
 
         const compOrder = ['Liga Betclic', 'Proliga', '1ª Divisão', '2ª Divisão', 'Liga Betclic Fem', '1ª Divisão Fem', '2ª Divisão Fem']
         for (const comp of compOrder) {
-            const compGames = displayGames.filter(g => g.competicao === comp && !followedGames.includes(g))
+            const compGames = displayGames.filter(g =>
+                g.competicao === comp &&
+                !followedGames.includes(g) &&
+                g.slug !== featuredGame?.slug
+            )
             if (compGames.length > 0) s.push({ key: comp, label: comp, games: compGames })
         }
         const remaining = displayGames.filter((g: Match) => !s.some(sec => sec.games.includes(g)))
         if (remaining.length > 0) s.push({ key: 'outros', label: 'Outros', games: remaining })
 
         return s
-    }, [displayGames, followedGames, loadingFollowed, followedClubIds, selectedDate])
-
-    const featuredGame = useMemo(() => {
-        let best: Match | null = null, bestRank = 999
-        for (const g of games) { const r = leagueRank(g.competicao || ''); if (r < bestRank) { bestRank = r; best = g } }
-        return best
-    }, [games])
+    }, [displayGames, followedGames, loadingFollowed, followedClubIds, selectedDate, featuredGame])
 
     const toggleSection = (key: string) => setOpenSections(prev => { const n = new Set(prev); if (n.has(key)) n.delete(key); else n.add(key); return n })
     const isEmpty = !loading && games.length === 0
