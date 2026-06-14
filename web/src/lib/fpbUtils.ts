@@ -107,3 +107,14 @@ export function normalizeTeamDisplay(teamName: string, clubs: { name: string; se
     // No match — return original
     return teamName
 }
+
+const SUPABASE_URL = 'https://qdzmwgahencinoucvoop.supabase.co'
+
+/**
+ * Build the Supabase bucket logo URL for a club slug.
+ * Bucket "club-logos" contains {slug}.png for all 295 clubs.
+ */
+export function clubLogoUrl(club: { slug: string; logo_url?: string | null } | null | undefined): string | null {
+    if (!club?.slug) return club?.logo_url ?? null
+    return `${SUPABASE_URL}/storage/v1/object/public/club-logos/${club.slug}.png`
+}

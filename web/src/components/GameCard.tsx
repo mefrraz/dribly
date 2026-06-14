@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { MapPin, ChevronRight, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Match } from './types'
 import { isClubWin } from '../lib/matchUtils'
-import { normalizeTeamDisplay } from '../lib/fpbUtils'
+import { normalizeTeamDisplay, clubLogoUrl } from '../lib/fpbUtils'
 import type { Club } from '../lib/useClub'
 
 interface GameCardProps {
@@ -25,6 +25,9 @@ const GameCardInner = ({ match, mode, clubName, clubSlug, clubs = [] }: GameCard
   const linkSlug = clubSlug ? `/jogo/${slug}?clube=${clubSlug}` : `/jogo/${slug}`
   const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
   const displayFora = normalizeTeamDisplay(match.equipa_fora, clubs)
+  const findClub = (name: string) => clubs.find(c => c.name.toUpperCase() === name.trim().toUpperCase() || c.search_name?.toUpperCase() === name.trim().toUpperCase())
+  const logoCasa = match.logotipo_casa || clubLogoUrl(findClub(match.equipa_casa))
+  const logoFora = match.logotipo_fora || clubLogoUrl(findClub(match.equipa_fora))
 
   const badge = mode === 'agenda'
     ? null
@@ -77,8 +80,8 @@ const GameCardInner = ({ match, mode, clubName, clubSlug, clubs = [] }: GameCard
 
       {/* Teams */}
       <div className="p-4 flex flex-col gap-3">
-        <TeamRow name={displayCasa} logo={match.logotipo_casa} score={mode === 'results' ? match.resultado_casa : null} dimmed={match.resultado_casa !== null && match.resultado_fora !== null && match.resultado_casa < match.resultado_fora} />
-        <TeamRow name={displayFora} logo={match.logotipo_fora} score={mode === 'results' ? match.resultado_fora : null} dimmed={match.resultado_casa !== null && match.resultado_fora !== null && match.resultado_fora < match.resultado_casa} />
+        <TeamRow name={displayCasa} logo={logoCasa} score={mode === 'results' ? match.resultado_casa : null} dimmed={match.resultado_casa !== null && match.resultado_fora !== null && match.resultado_casa < match.resultado_fora} />
+        <TeamRow name={displayFora} logo={logoFora} score={mode === 'results' ? match.resultado_fora : null} dimmed={match.resultado_casa !== null && match.resultado_fora !== null && match.resultado_fora < match.resultado_casa} />
       </div>
 
       {/* Bottom bar */}

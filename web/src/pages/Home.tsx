@@ -11,7 +11,7 @@ import { Search, Trophy, ChevronDown } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useFollows } from '../hooks/useFollows'
 import { type Club, useClub, displayName } from '../lib/ClubContext'
-import { normalizeTeamDisplay } from '../lib/fpbUtils'
+import { normalizeTeamDisplay, clubLogoUrl } from '../lib/fpbUtils'
 import type { Match } from '../components/types'
 import { GameCard } from '../components/GameCard'
 import { LoadingSpinner } from '../components/LoadingSpinner'
@@ -188,9 +188,8 @@ function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Ma
     const df = normalizeTeamDisplay(match.equipa_fora, clubs)
     const clubCasa = findClubByTeam(match.equipa_casa, clubs)
     const clubFora = findClubByTeam(match.equipa_fora, clubs)
-    const bucketLogo = (slug: string) => slug ? `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/club-logos/${slug}.png` : null
-    const logoCasa = match.logotipo_casa || (clubCasa ? clubCasa.logo_url || bucketLogo(clubCasa.slug) : null)
-    const logoFora = match.logotipo_fora || (clubFora ? clubFora.logo_url || bucketLogo(clubFora.slug) : null)
+    const logoCasa = match.logotipo_casa || clubLogoUrl(clubCasa)
+    const logoFora = match.logotipo_fora || clubLogoUrl(clubFora)
     const isLive = match.status === 'A DECORRER'
     const hasScores = match.resultado_casa !== null && match.resultado_fora !== null
     const isFinished = match.status === 'FINALIZADO' || hasScores
