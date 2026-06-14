@@ -8,10 +8,10 @@
 export const config = { runtime: 'nodejs' }
 
 const COMPS = [
-    { name: 'Liga Betclic Masculina', fpbPage: 'calendario', fpbId: 10902 },
-    { name: 'Proliga', fpbPage: 'calendario', fpbId: 10903 },
-    { name: '1ª Divisão', fpbPage: 'calendario', fpbId: 10904 },
-    { name: '2ª Divisão', fpbPage: 'calendario', fpbId: 10905 },
+    { name: 'Liga Betclic Masculina', fpbId: 10902 },
+    { name: 'Proliga', fpbId: 10903 },
+    { name: '1ª Divisão', fpbId: 10904 },
+    { name: '2ª Divisão', fpbId: 10905 },
 ]
 
 interface GameData {
@@ -44,89 +44,77 @@ async function fetchFPBPage(path: string): Promise<string> {
 }
 
 function parseGames(html: string, competicao: string): GameData[] {
+    if (!html) return []
     const games: GameData[] = []
 
-    // Match day wrappers with games
-    const dayRegex = /<h3 class="date">([^<]+)<\/h3>([\s\S]*?)(?=<h3 class="date">|$)/g
-    let dayMatch
+    // FPB date format: "14 JUN 2026"
+    const monthMap: Record<string, string> = {
+        'JAN': '01', 'FEV': '02', 'MAR': '03', 'ABR': '04', 'MAI': '05', 'JUN': '06',
+        'JUL': '07', 'AGO': '08', 'SET': '09', 'OUT': '10', 'NOV': '11', 'DEZ': '12',
+    }
 
-    while ((dayMatch = dayRegex.exec(html)) !== null) {
-        const dateRaw = dayMatch[1].trim()
-        const dayContent = dayMatch[2]
+    // Split by day-wrapper
+    const dayBlocks = html.split(/<div class="day-wrapper[^"]*">/)
+    for (let i = 1; i < dayBlocks.length; i++) {
+        const block = dayBlocks[i]
 
-        // Parse date: "Sábado, 14 Junho 2026" → "2026-06-14"
-        const months: Record<string, string> = {
-            'janeiro': '01', 'fevereiro': '02', 'março': '03', 'abril': '04',
-            'maio': '05', 'junho': '06', 'julho': '07', 'agosto': '08',
-            'setembro': '09', 'outubro': '10', 'novembro': '11', 'dezembro': '12',
-        }
-        const parts = dateRaw.split(' ')
-        const day = parts[1]
-        const monthName = (parts[2] || '').toLowerCase()
-        const year = parts[3] || ''
-        const month = months[monthName] || '01'
-        const dateStr = `${year}-${month}-${String(day).padStart(2, '0')}`
+        // Extract date
+        const dateMatch = block.match(/<h3 class="date">\s*(\d{1,2})\s*([A-Z]{3})\s*(\d{4})\s*<\/h3>/i)
+        if (!dateMatch) continue
+        const day = dateMatch[1].padStart(2, '0')
+        const month = monthMap[dateMatch[2].toUpperCase()] || '01'
+        const year = dateMatch[3]
+        const dateStr = `${year}-${month}-${day}`
 
-        // Match game links
-        const gameRegex = /<a[^>]*href="\/ficha-de-jogo\/\?internalID=(\d+)"[^>]*>([\s\S]*?)<\/a>/g
+        // Extract games
+        const gameRegex = /<a[^>]*href="\/ficha-de-jogo\/?\?internalID=(\d+)"[^>]*class="game-wrapper-a[^"]*">([\s\S]*?)<\/a>/gi
         let gameMatch
-
-        while ((gameMatch = gameRegex.exec(dayContent)) !== null) {
+        while ((gameMatch = gameRegex.exec(block)) !== null) {
             const id = gameMatch[1]
             const gameHtml = gameMatch[2]
 
-            // Teams
-            const teamRegex = /<span class="fullName[^"]*">([^<]+)<\/span>/g
+            // Teams (fullName spans)
+            const teamRegex = /<span class="fullName[^"]*">([^<]+)<\/span>/gi
             const teams: string[] = []
-            let teamMatch
-            while ((teamMatch = teamRegex.exec(gameHtml)) !== null) {
-                teams.push(teamMatch[1].trim())
+            let tm
+            while ((tm = teamRegex.exec(gameHtml)) !== null) {
+                teams.push(tm[1].trim())
             }
-
             if (teams.length < 2) continue
 
-            // Scores
-            const scoreRegex = /<h3 class="results_text[^"]*">\s*(\d+)\s*<\/h3>/g
+            // Scores (results page)
+            const scoreRegex = /<h3 class="results_text[^"]*">\s*(\d+)\s*<\/h3>/gi
             const scores: number[] = []
-            let scoreMatch
-            while ((scoreMatch = scoreRegex.exec(gameHtml)) !== null) {
-                scores.push(parseInt(scoreMatch[1]))
+            let sm
+            while ((sm = scoreRegex.exec(gameHtml)) !== null) {
+                scores.push(parseInt(sm[1]))
             }
 
-            // Hour
-            const horaMatch = gameHtml.match(/<span class="hour[^"]*">([^<]+)<\/span>/)
-            const hora = horaMatch ? horaMatch[1].trim() : ''
-
-            // Status
-            const isFinished = scores.length >= 2
-            const isLive = /a decorrer/i.test(gameHtml)
-            const status = isLive ? 'A DECORRER' : isFinished ? 'FINALIZADO' : 'AGENDADO'
+            // Hour (calendar page): <div class="hour"><h3>17H15</h3></div>
+            const horaMatch = gameHtml.match(/<div class="hour[^"]*">\s*<h3>\s*(\d{1,2})[Hh](\d{2})\s*<\/h3>/i)
+            const hora = horaMatch ? `${horaMatch[1].padStart(2, '0')}:${horaMatch[2]}` : ''
 
             // Logos
             const logoRegex = /<img[^>]*src="([^"]*\/CLU[^"]*)"[^>]*>/gi
             const logos: string[] = []
-            let logoMatch
-            while ((logoMatch = logoRegex.exec(gameHtml)) !== null) {
-                logos.push(logoMatch[1])
+            let lm
+            while ((lm = logoRegex.exec(gameHtml)) !== null) {
+                logos.push(lm[1])
             }
 
+            const isFinished = scores.length >= 2
+            const status = isFinished ? 'FINALIZADO' : 'AGENDADO'
             const casa = teams[0]
             const fora = teams[1]
             const slug = `${dateStr}-${slugify(casa)}-${slugify(fora)}`
 
             games.push({
-                id,
-                slug,
-                data: dateStr,
-                hora,
-                equipa_casa: casa,
-                equipa_fora: fora,
+                id, slug, data: dateStr, hora,
+                equipa_casa: casa, equipa_fora: fora,
                 resultado_casa: isFinished ? scores[0] : null,
                 resultado_fora: isFinished ? scores[1] : null,
-                competicao,
-                escalao: '',
-                status,
-                local: null,
+                competicao, escalao: '',
+                status, local: null,
                 logotipo_casa: logos[0] || null,
                 logotipo_fora: logos[1] || null,
             })
@@ -144,10 +132,17 @@ export default async function handler(req: Request): Promise<Response> {
     const allGames: GameData[] = []
 
     // Fetch all 4 competitions in parallel
+    // Fetch both calendar (upcoming) and results (finished) for each competition
     const results = await Promise.allSettled(
-        COMPS.map(async (comp) => {
-            const html = await fetchFPBPage(`${comp.fpbPage}/competition_${comp.fpbId}`)
-            return parseGames(html, comp.name)
+        COMPS.flatMap(async (comp) => {
+            const [calHtml, resHtml] = await Promise.all([
+                fetchFPBPage(`calendario/${comp.fpbId}`).catch(() => ''),
+                fetchFPBPage(`resultados/${comp.fpbId}`).catch(() => ''),
+            ])
+            return [
+                ...parseGames(calHtml, comp.name),
+                ...parseGames(resHtml, comp.name),
+            ]
         })
     )
 
