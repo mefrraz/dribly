@@ -462,17 +462,30 @@ export default function Home() {
         return best
     }, [games, followedGames])
 
-    // Build accordion sections — Seguidos first, then leagues
+    // Build accordion sections — Seguidos (por escalão) first, then leagues
     const sections = useMemo(() => {
-        const s: { key: string; label: string; games: Match[]; loading?: boolean }[] = []
+        const s: { key: string; label: string; games: Match[]; isFollowed?: boolean; count?: number }[] = []
 
-        // "Seguidos" — só aparece depois do primeiro fetch (evita flash spinner)
+        // "Seguidos" — um accordion por escalão, aparece depois do fetch
         if (followedClubIds.length > 0 && hasLoadedFollowed) {
-            s.push({
-                key: 'seguidos',
-                label: 'Seguidos',
-                games: followedGames,
+            const byEscalao = new Map<string, Match[]>()
+            for (const g of followedGames) {
+                const esc = g.escalao || 'Outros'
+                if (!byEscalao.has(esc)) byEscalao.set(esc, [])
+                byEscalao.get(esc)!.push(g)
+            }
+            // Sort: seniors first, then by age, then alphabetical
+            const order = Array.from(byEscalao.keys()).sort((a, b) => {
+                const aNum = parseInt((a.match(/sub\s*(\d+)/i) || [])[1] || '99')
+                const bNum = parseInt((b.match(/sub\s*(\d+)/i) || [])[1] || '99')
+                if (aNum !== bNum) return aNum - bNum
+                return a.localeCompare(b)
             })
+            for (const esc of order) {
+                const games = byEscalao.get(esc)!
+                games.sort((a, b) => (a.hora || '99:99').localeCompare(b.hora || '99:99'))
+                s.push({ key: `seguidos-${esc}`, label: esc, games, isFollowed: true, count: games.length })
+            }
         }
 
         const compOrder = ['Liga Betclic', 'Proliga', '1ª Divisão', '2ª Divisão', 'Liga Betclic Fem', '1ª Divisão Fem', '2ª Divisão Fem']
@@ -550,23 +563,42 @@ export default function Home() {
                     : <>
                         {featuredGame && <div className="mb-4"><GameCard match={featuredGame} mode="agenda" clubs={clubs} /></div>}
                         <div className="space-y-2">
-                            {sections.map(({ key, label, games: secGames }) => {
+                            {sections.map(({ key, label, games: secGames, isFollowed, count }) => {
                                 const isOpen = openSections.has(key)
                                 return (
-                                    <div key={key} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
+                                    <div key={key} className={`bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden ${isFollowed ? 'border-dribly-purple/20 dark:border-dribly-purple/10' : ''}`}>
                                         <button onClick={() => toggleSection(key)} className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors">
-                                            <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />
-                                                {label}
-                                            </h3>
-                                            <ChevronDown size={16} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                            <div className="flex items-center gap-2 min-w-0">
+                                                {isFollowed ? (
+                                                    <svg className="w-4 h-4 text-dribly-purple shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                                    </svg>
+                                                ) : (
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple shrink-0" />
+                                                )}
+                                                <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate">{label}</h3>
+                                            </div>
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                {count !== undefined && (
+                                                    <span className="text-[10px] font-bold text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full tabular-nums">
+                                                        {count}
+                                                    </span>
+                                                )}
+                                                <ChevronDown size={16} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                            </div>
                                         </button>
                                         {isOpen && (
-                                            <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
-                                                {secGames.map((g, i) => (
-                                                    <ConfrontoRow key={g.slug || i} match={g} clubs={clubs} isFollowed={false} showCompetition={key === 'seguidos'} />
-                                                ))}
-                                            </div>
+                                            secGames.length === 0 ? (
+                                                <div className="px-4 py-6 text-center border-t border-zinc-100 dark:border-white/5">
+                                                    <p className="text-xs text-zinc-400">Nenhum jogo neste escalão.</p>
+                                                </div>
+                                            ) : (
+                                                <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
+                                                    {secGames.map((g, i) => (
+                                                        <ConfrontoRow key={g.slug || i} match={g} clubs={clubs} isFollowed={!!isFollowed} showCompetition={!!isFollowed} />
+                                                    ))}
+                                                </div>
+                                            )
                                         )}
                                     </div>
                                 )
@@ -575,9 +607,9 @@ export default function Home() {
                     </>}
             </div>
 
-            {/* ── Jogos perto de mim (mobile only) ── */}
+            {/* ── Jogos perto de mim ── */}
             {!geo.loading && !geo.error && nearbyGames.length > 0 && (
-                <div className="px-4 mt-5 sm:hidden">
+                <div className="px-4 mt-5">
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
                         <div className="px-4 py-3.5 flex items-center gap-2.5 border-b border-zinc-100 dark:border-white/5">
                             <MapPin size={16} className="text-dribly-purple shrink-0" />
