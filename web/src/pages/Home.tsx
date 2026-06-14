@@ -208,9 +208,18 @@ export default function Home() {
         load()
     }, [selectedDate])
 
-    const followedNames = useMemo(() => new Set(clubs.filter(c => followedClubIds.includes(c.id)).map(c => c.name)), [clubs, followedClubIds])
+    // Build name matching for followed clubs (handles FPB name vs DB name differences)
+    const followedClubsData = useMemo(() => clubs.filter(c => followedClubIds.includes(c.id)), [clubs, followedClubIds])
 
-    // Separate: followed club games, followed league games, other
+    function isTeamFollowed(equipaCasa: string, equipaFora: string): boolean {
+        return followedClubsData.some(c => {
+            const names = [c.name, c.short_name, displayName(c)].filter(Boolean) as string[]
+            return names.some(n =>
+                equipaCasa.includes(n) || equipaFora.includes(n) ||
+                n.includes(equipaCasa) || n.includes(equipaFora))
+        })
+    }
+
     // Filter: hide past-day games without scores (stale data)
     const todayStr = toYYYYMMDD(new Date())
     const displayGames = useMemo(() => {
@@ -316,7 +325,7 @@ export default function Home() {
                                         {isOpen && (
                                             <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
                                                 {secGames.map((g, i) => (
-                                                    <ConfrontoRow key={g.slug || i} match={g} clubs={clubs} isFollowed={followedNames.has(g.equipa_casa) || followedNames.has(g.equipa_fora)} />
+                                                    <ConfrontoRow key={g.slug || i} match={g} clubs={clubs} isFollowed={isTeamFollowed(g.equipa_casa, g.equipa_fora)} />
                                                 ))}
                                             </div>
                                         )}
