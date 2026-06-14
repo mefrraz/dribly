@@ -122,10 +122,28 @@ export default function Home() {
         setLoading(true)
         setOpenSections(new Set(['seguidos']))
         const load = async () => {
+            // Try FPB endpoint first, fall back to Supabase after 5s
+            const controller = new AbortController()
+            const timeout = setTimeout(() => controller.abort(), 5000)
             try {
-                const res = await fetch(`/api/jogos-do-dia?data=${selectedDate}`)
+                const res = await fetch(`/api/jogos-do-dia?data=${selectedDate}`, { signal: controller.signal })
                 const data = await res.json()
-                setGames(data.jogos || [])
+                if (data.jogos?.length > 0) {
+                    setGames(data.jogos)
+                    setLoading(false)
+                    return
+                }
+            } catch { /* timeout or error — fall back to Supabase */ }
+            clearTimeout(timeout)
+
+            // Fallback: Supabase
+            try {
+                const { data } = await supabase
+                    .from('games_2025_2026')
+                    .select('*')
+                    .eq('data', selectedDate)
+                    .order('hora', { ascending: true })
+                setGames((data as Match[]) || [])
             } catch { setGames([]) }
             setLoading(false)
         }
