@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, Trophy, ChevronDown, Heart } from 'lucide-react'
+import { Search, Trophy, ChevronDown } from 'lucide-react'
 import { useFollows } from '../hooks/useFollows'
 import { supabase } from '../lib/supabase'
 import { type Club, useClub, displayName } from '../lib/ClubContext'
@@ -147,6 +147,7 @@ export default function Home() {
     const [loading, setLoading] = useState(true)
     const [openSections, setOpenSections] = useState<Set<string>>(new Set())
     const [searchOpen, setSearchOpen] = useState(false)
+    const [showDatePicker, setShowDatePicker] = useState(false)
     const [compLogos, setCompLogos] = useState<Map<number, string | null>>(new Map())
 
     useEffect(() => { loadClubs() }, [loadClubs])
@@ -210,16 +211,6 @@ export default function Home() {
     const followedNames = useMemo(() => new Set(clubs.filter(c => followedClubIds.includes(c.id)).map(c => c.name)), [clubs, followedClubIds])
 
     // Separate: followed club games, followed league games, other
-    const followedClubGames = useMemo(() => {
-        const fcg: Match[] = []
-        for (const g of games) {
-            if (followedNames.has(g.equipa_casa) || followedNames.has(g.equipa_fora)) {
-                fcg.push(g)
-            }
-        }
-        return fcg
-    }, [games, followedNames])
-
     // Filter: hide past-day games without scores (stale data)
     const todayStr = toYYYYMMDD(new Date())
     const displayGames = useMemo(() => {
@@ -229,44 +220,20 @@ export default function Home() {
         })
     }, [games, todayStr])
 
-    // Followed games also filtered
-    const displayFollowedGames = useMemo(() => {
-        return followedClubGames.filter(g => {
-            if (g.data < todayStr && g.resultado_casa === null && g.resultado_fora === null) return false
-            return true
-        })
-    }, [followedClubGames, todayStr])
-
-    // Build accordion sections
+    // Build accordion sections (NO hearts on accordions — only rows have indicators)
     const sections = useMemo(() => {
-        const s: { key: string; label: string; games: Match[]; heart?: boolean }[] = []
+        const s: { key: string; label: string; games: Match[] }[] = []
 
-        // 1. Followed club games — grouped by competition name (heart)
-        if (displayFollowedGames.length > 0) {
-            const byComp = new Map<string, Match[]>()
-            for (const g of displayFollowedGames) {
-                const comp = g.competicao || 'Outros'
-                if (!byComp.has(comp)) byComp.set(comp, [])
-                byComp.get(comp)!.push(g)
-            }
-            for (const [comp, compGames] of byComp) {
-                s.push({ key: `seg-${comp}`, label: comp, games: compGames, heart: true })
-            }
-        }
-
-        // 2. Competition accordions (no hearts, exclude followed games)
         const compOrder = ['Liga Betclic Masculina', 'Proliga']
         for (const comp of compOrder) {
-            const compGames = displayGames.filter(g => g.competicao === comp && !displayFollowedGames.includes(g))
+            const compGames = displayGames.filter(g => g.competicao === comp)
             if (compGames.length > 0) s.push({ key: comp, label: comp, games: compGames })
         }
-
-        // 3. Remaining
         const remaining = displayGames.filter((g: Match) => !s.some(sec => sec.games.includes(g)))
         if (remaining.length > 0) s.push({ key: 'outros', label: 'Outros', games: remaining })
 
         return s
-    }, [displayGames, displayFollowedGames])
+    }, [displayGames])
 
     const featuredGame = useMemo(() => {
         let best: Match | null = null, bestRank = 999
@@ -308,11 +275,18 @@ export default function Home() {
 
             {/* ── Date selector bar ── */}
             <div className="px-4 mb-5">
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-full p-1 flex overflow-x-auto scrollbar-none">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-full p-1 flex items-center overflow-x-auto scrollbar-none">
                     {pills.map(p => (
                         <button key={p.date} onClick={() => setSelectedDate(p.date)} className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all ${selectedDate === p.date ? 'bg-dribly-purple text-white shadow-sm' : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5'}`}>{p.label}</button>
                     ))}
+                    <button onClick={() => setShowDatePicker(!showDatePicker)} className="shrink-0 px-3 py-2 rounded-full text-xs font-bold text-zinc-400 hover:text-dribly-purple hover:bg-zinc-100 dark:hover:bg-white/5 transition-all" title="Escolher data">📅</button>
                 </div>
+                {showDatePicker && (
+                    <div className="mt-2 flex justify-center">
+                        <input type="date" value={selectedDate} onChange={e => { setSelectedDate(e.target.value); setShowDatePicker(false) }}
+                            className="px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl text-sm text-zinc-900 dark:text-white outline-none focus:ring-2 focus:ring-dribly-purple/30" />
+                    </div>
+                )}
             </div>
 
             {liveCount > 0 && (
@@ -327,13 +301,13 @@ export default function Home() {
                     : <>
                         {featuredGame && <div className="mb-4"><GameCard match={featuredGame} mode="agenda" clubs={clubs} /></div>}
                         <div className="space-y-2">
-                            {sections.map(({ key, label, games: secGames, heart }) => {
-                                const isOpen = openSections.has(key) || heart ? openSections.has(key) : false
+                            {sections.map(({ key, label, games: secGames }) => {
+                                const isOpen = openSections.has(key)
                                 return (
                                     <div key={key} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
                                         <button onClick={() => toggleSection(key)} className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors">
                                             <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
-                                                {heart ? <Heart size={14} className="text-red-500 fill-red-500" /> : <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />}
+                                                <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />
                                                 {label}
                                                 <span className="text-[11px] font-medium text-zinc-400">({secGames.length})</span>
                                             </h3>
