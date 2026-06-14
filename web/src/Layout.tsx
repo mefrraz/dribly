@@ -118,11 +118,8 @@ function Layout() {
                         <div className="relative flex items-center h-full w-full">
                         {/* LEFT: Logo + desktop nav pills */}
                         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                            <Link to="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0 mr-1">
-                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center overflow-hidden">
-                                    <img src="/logo.svg" alt="Dribly" className="w-full h-full object-contain" />
-                                </div>
-                                <span className="flex items-baseline font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100">
+                            <Link to="/" className="flex items-center shrink-0 mr-1">
+                                <span className="flex items-baseline font-black text-base sm:text-xl text-zinc-900 dark:text-zinc-100 tracking-tight">
                                     Dribly<span className="text-dribly-purple">.</span>
                                 </span>
                             </Link>
