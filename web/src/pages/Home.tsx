@@ -8,7 +8,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Search, Trophy, ChevronDown, MapPin } from 'lucide-react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabase'
 import { useFollows } from '../hooks/useFollows'
@@ -672,21 +672,11 @@ export default function Home() {
                                             <Marker key={pavilion.id}
                                                 position={[pavilion.lat, pavilion.lng]}
                                                 icon={L.divIcon({
-                                                    html: `<div style="width:14px;height:14px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(124,58,237,0.8);cursor:pointer"></div>`,
+                                                    html: `<div style="width:14px;height:14px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(124,58,237,0.8);cursor:pointer" title="${pavilion.nome.replace(/"/g, '&quot;')}"></div>`,
                                                     className: '', iconSize: [14, 14], iconAnchor: [7, 7]
                                                 })}
-                                            >
-                                                <Popup closeButton={false} className="pavilion-popup">
-                                                    <div className="text-center -m-2 p-2 min-w-[120px]">
-                                                        <p className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200">{pavilion.nome}</p>
-                                                        {pavilion.cidade && <p className="text-[9px] text-zinc-400">{pavilion.cidade}</p>}
-                                                        <button onClick={() => navigate(`/pavilhao/${pavilion.recinto_id || pavilion.id}`)}
-                                                            className="text-[10px] font-bold text-dribly-purple mt-1 hover:underline">
-                                                            ver pavilhão →
-                                                        </button>
-                                                    </div>
-                                                </Popup>
-                                            </Marker>
+                                                eventHandlers={{ click: () => navigate(`/pavilhao/${pavilion.recinto_id || pavilion.id}`) }}
+                                            />
                                         ))}
                                     </MapContainer>
                                 </div>
