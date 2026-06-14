@@ -190,8 +190,24 @@ export default function Home() {
     const [loading, setLoading] = useState(true)
     const [openSections, setOpenSections] = useState<Set<string>>(new Set(['liga-betclic']))
     const [searchOpen, setSearchOpen] = useState(false)
+    const [compLogos, setCompLogos] = useState<Map<number, string | null>>(new Map())
 
     useEffect(() => { loadClubs() }, [loadClubs])
+
+    // Load competition logos for league pills
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const { data } = await supabase.from('competitions_meta').select('id, logo_url')
+                if (data) {
+                    const map = new Map<number, string | null>()
+                    ;(data as { id: number; logo_url: string | null }[]).forEach(r => map.set(r.id, r.logo_url))
+                    setCompLogos(map)
+                }
+            } catch { /* ignore */ }
+        }
+        load()
+    }, [])
 
     useEffect(() => {
         setLoading(true)
@@ -276,19 +292,26 @@ export default function Home() {
 
     return (
         <div className="max-w-2xl mx-auto pb-24">
-            {/* ── Purple blur ── */}
-            <div className="relative overflow-hidden">
-                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-dribly-purple/20 dark:bg-dribly-purple/15 blur-[100px] pointer-events-none" />
-                <div className="absolute -top-8 left-1/4 w-40 h-40 rounded-full bg-dribly-purple-light/15 dark:bg-dribly-purple-light/10 blur-[60px] pointer-events-none" />
+            {/* ── Purple blur (reaches behind navbar) ── */}
+            <div className="relative overflow-hidden -mt-16 pt-16">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-dribly-purple/20 dark:bg-dribly-purple/15 blur-[120px] pointer-events-none" />
+                <div className="absolute top-4 left-1/4 w-48 h-48 rounded-full bg-dribly-purple-light/15 dark:bg-dribly-purple-light/10 blur-[70px] pointer-events-none" />
                 <div className="relative z-10 max-w-2xl mx-auto px-4 pt-2 pb-5">
-                    {/* League pills */}
+                    {/* League pills with logos (landing page replica) */}
                     <div className="flex justify-center gap-2 mb-4 flex-wrap">
-                        {FEATURED_LEAGUES.map(({ name, id }) => (
-                            <button key={id} onClick={() => navigate('/competicao/' + id)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all shrink-0">
-                                {name}
-                            </button>
-                        ))}
+                        {FEATURED_LEAGUES.map(({ name, id }) => {
+                            const logo = compLogos.get(id)
+                            return (
+                                <button key={id} onClick={() => navigate('/competicao/' + id)}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all shrink-0">
+                                    <span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
+                                        {logo ? <img src={logo} alt="" className="w-3.5 h-3.5 object-contain" decoding="async" />
+                                            : <Trophy size={10} className="text-dribly-purple" />}
+                                    </span>
+                                    {name}
+                                </button>
+                            )
+                        })}
                     </div>
                     {/* Search bar */}
                     <div className="max-w-lg mx-auto">
