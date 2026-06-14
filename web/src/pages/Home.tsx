@@ -30,16 +30,14 @@ function addDays(d: Date, n: number): Date { const r = new Date(d); r.setDate(r.
 
 function buildDayPills() {
     const hoje = new Date()
-    const dias = []
-    // Show 4 days back, today, 3 days forward
-    for (let i = -4; i <= 3; i++) {
+    const dias = [
+        { label: 'Ontem', date: addDays(hoje, -1) },
+        { label: 'Hoje', date: hoje },
+        { label: 'Amanhã', date: addDays(hoje, 1) },
+    ]
+    for (let i = 2; i <= 4; i++) {
         const d = addDays(hoje, i)
-        let label: string
-        if (i === 0) label = 'Hoje'
-        else if (i === -1) label = 'Ontem'
-        else if (i === 1) label = 'Amanhã'
-        else label = d.toLocaleDateString('pt-PT', { weekday: 'short' }) + ' ' + d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'numeric' })
-        dias.push({ label, date: d })
+        dias.push({ label: d.toLocaleDateString('pt-PT', { weekday: 'short' }) + ' ' + d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'numeric' }), date: d })
     }
     return dias.map(d => ({ label: d.label, date: toYYYYMMDD(d.date), isToday: d.date.toDateString() === hoje.toDateString() }))
 }
@@ -87,6 +85,41 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
         }
     }
     return games
+}
+
+// ── Cache helpers ──
+
+interface CacheEntry {
+    games: Match[]
+    compTimes: Record<string, string>
+    ts: number
+}
+
+function dedupAndFilter(games: Match[], date: string): Match[] {
+    const seen = new Set<string>()
+    const filtered = games.filter(g => {
+        if (g.data !== date) return false
+        const key = g.slug || `${g.data}-${g.equipa_casa}-${g.equipa_fora}`
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+    })
+    filtered.sort((a, b) => (a.hora || '99:99').localeCompare(b.hora || '99:99'))
+    return filtered
+}
+
+function saveCache(key: string, games: Match[], competitions: { name: string }[]) {
+    const compTimes: Record<string, string> = {}
+    for (const comp of competitions) {
+        const compGames = games.filter(g => g.competicao === comp.name)
+        if (compGames.length > 0) {
+            // Find the latest game time for this competition
+            const latest = compGames.reduce((max, g) => (g.hora || '') > (max.hora || '') ? g : max, compGames[0])
+            compTimes[comp.name] = formatHora(latest.hora) || '23:59'
+        }
+    }
+    const cache: CacheEntry = { games, compTimes, ts: Date.now() }
+    try { localStorage.setItem(key, JSON.stringify(cache)) } catch { /* quota exceeded */ }
 }
 
 // ── League ranking for featured card ──
@@ -145,7 +178,6 @@ export default function Home() {
     const [loading, setLoading] = useState(true)
     const [openSections, setOpenSections] = useState<Set<string>>(new Set())
     const [searchOpen, setSearchOpen] = useState(false)
-    const [showDatePicker, setShowDatePicker] = useState(false)
     const [compLogos, setCompLogos] = useState<Map<number, string | null>>(new Map())
 
     useEffect(() => { loadClubs() }, [loadClubs])
@@ -157,49 +189,89 @@ export default function Home() {
         }; loadLogos()
     }, [])
 
-    // Fetch games from FPB via /api/jogos-do-dia
+    // Smart cache: fetch 7 leagues, cache 2h after last game ends
     useEffect(() => {
         setLoading(true)
-        setOpenSections(new Set(['seguidos']))
-        const load = async () => {
-            // Use existing /api/fpb proxy to fetch competition pages
-            const comps = [
-                { name: 'Liga Betclic', id: 10902 },
-                { name: 'Proliga', id: 10903 },
-                { name: '1ª Divisão', id: 10904 },
-                { name: '2ª Divisão', id: 10905 },
-                { name: 'Liga Betclic Fem', id: 10906 },
-                { name: '1ª Divisão Fem', id: 10907 },
-                { name: '2ª Divisão Fem', id: 10908 },
-            ]
-            const allGames: Match[] = []
+        setOpenSections(new Set())
 
-            // Fetch all 4 competition pages — covers ~90% of games
-            for (const comp of comps) {
+        const COMPETITIONS = [
+            { name: 'Liga Betclic', id: 10902 },
+            { name: 'Proliga', id: 10903 },
+            { name: '1ª Divisão', id: 10904 },
+            { name: '2ª Divisão', id: 10905 },
+            { name: 'Liga Betclic Fem', id: 10906 },
+            { name: '1ª Divisão Fem', id: 10907 },
+            { name: '2ª Divisão Fem', id: 10908 },
+        ]
+
+        const CACHE_KEY = `dribly_games_${selectedDate}`
+        const now = Date.now()
+
+        const load = async () => {
+            // 1. Check cache
+            const cached = localStorage.getItem(CACHE_KEY)
+            if (cached) {
+                try {
+                    const cache: { games: Match[]; compTimes: Record<string, string>; ts: number } = JSON.parse(cached)
+                    // Check if any competition's last game ended more than 2h ago
+                    let needsRefresh = false
+                    const toRefresh: typeof COMPETITIONS = []
+                    for (const comp of COMPETITIONS) {
+                        const lastTime = cache.compTimes[comp.name]
+                        if (lastTime) {
+                            const [h, m] = lastTime.split(':').map(Number)
+                            const gameEnd = new Date(selectedDate + 'T' + String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':00')
+                            gameEnd.setHours(gameEnd.getHours() + 2) // game duration ~2h
+                            if (now > gameEnd.getTime()) {
+                                needsRefresh = true
+                                toRefresh.push(comp)
+                            }
+                        }
+                    }
+                    if (!needsRefresh) {
+                        setGames(cache.games)
+                        setLoading(false)
+                        return
+                    }
+                    // Partial refresh: only refetch competitions whose games just ended
+                    if (toRefresh.length < COMPETITIONS.length) {
+                        const freshGames = [...cache.games.filter(g => !toRefresh.some(c => c.name === g.competicao))]
+                        for (const comp of toRefresh) {
+                            for (const page of ['calendario', 'resultados']) {
+                                try {
+                                    const res = await fetch(`/api/fpb?page=${page}&competicao=${comp.id}`)
+                                    const html = await res.text()
+                                    if (!html || html.startsWith('{')) continue
+                                    freshGames.push(...parseFPBHtml(html, comp.name))
+                                } catch { /* skip */ }
+                            }
+                        }
+                        const filtered = dedupAndFilter(freshGames, selectedDate)
+                        saveCache(CACHE_KEY, filtered, COMPETITIONS)
+                        setGames(filtered)
+                        setLoading(false)
+                        return
+                    }
+                } catch { /* corrupt cache — full fetch */ }
+            }
+
+            // 2. Full fetch (first load or cache expired)
+            const allGames: Match[] = []
+            await Promise.all(COMPETITIONS.map(async (comp) => {
                 for (const page of ['calendario', 'resultados']) {
                     try {
                         const res = await fetch(`/api/fpb?page=${page}&competicao=${comp.id}`)
                         const html = await res.text()
                         if (!html || html.startsWith('{')) continue
-                        const parsed = parseFPBHtml(html, comp.name)
-                        allGames.push(...parsed)
+                        allGames.push(...parseFPBHtml(html, comp.name))
                     } catch { /* skip */ }
                 }
-            }
+            }))
 
-            if (allGames.length > 0) {
-                // Filter strictly by selected date AND deduplicate
-                const seen = new Set<string>()
-                const filtered = allGames.filter(g => {
-                    if (g.data !== selectedDate) return false
-                    const key = g.slug || `${g.data}-${g.equipa_casa}-${g.equipa_fora}`
-                    if (seen.has(key)) return false
-                    seen.add(key)
-                    return true
-                })
-                filtered.sort((a, b) => (a.hora || '99:99').localeCompare(b.hora || '99:99'))
-                setGames(filtered)
-            } else {
+            const filtered = dedupAndFilter(allGames, selectedDate)
+            saveCache(CACHE_KEY, filtered, COMPETITIONS)
+            setGames(filtered.length > 0 ? filtered : [])
+            if (filtered.length === 0) {
                 // Fallback Supabase
                 try {
                     const { data } = await supabase.from('games_2025_2026').select('*').eq('data', selectedDate).order('hora', { ascending: true })
@@ -275,18 +347,11 @@ export default function Home() {
 
             {/* ── Date selector bar ── */}
             <div className="px-4 mb-5">
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-full p-1 flex items-center overflow-x-auto scrollbar-none">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-full p-1 flex overflow-x-auto scrollbar-none">
                     {pills.map(p => (
                         <button key={p.date} onClick={() => setSelectedDate(p.date)} className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all ${selectedDate === p.date ? 'bg-dribly-purple text-white shadow-sm' : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5'}`}>{p.label}</button>
                     ))}
-                    <button onClick={() => setShowDatePicker(!showDatePicker)} className="shrink-0 px-3 py-2 rounded-full text-xs font-bold text-zinc-400 hover:text-dribly-purple hover:bg-zinc-100 dark:hover:bg-white/5 transition-all" title="Escolher data">📅</button>
                 </div>
-                {showDatePicker && (
-                    <div className="mt-2 flex justify-center">
-                        <input type="date" value={selectedDate} onChange={e => { setSelectedDate(e.target.value); setShowDatePicker(false) }}
-                            className="px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-xl text-sm text-zinc-900 dark:text-white outline-none focus:ring-2 focus:ring-dribly-purple/30" />
-                    </div>
-                )}
             </div>
 
             {liveCount > 0 && (
