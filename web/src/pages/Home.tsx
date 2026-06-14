@@ -8,7 +8,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, Trophy, ChevronDown } from 'lucide-react'
-import { useFollows } from '../hooks/useFollows'
 import { supabase } from '../lib/supabase'
 import { type Club, useClub, displayName } from '../lib/ClubContext'
 import { normalizeTeamDisplay } from '../lib/fpbUtils'
@@ -137,7 +136,6 @@ function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[
 // ── Main ──
 
 export default function Home() {
-    const { followedClubIds } = useFollows()
     const { clubs, loadClubs } = useClub()
     const navigate = useNavigate()
 
@@ -168,10 +166,12 @@ export default function Home() {
             const comps = [
                 { name: 'Liga Betclic Masculina', id: 10902 },
                 { name: 'Proliga', id: 10903 },
+                { name: '1ª Divisão', id: 10904 },
+                { name: '2ª Divisão', id: 10905 },
             ]
             const allGames: Match[] = []
 
-            // 1. Fetch competition pages (fast, covers main leagues)
+            // Fetch all 4 competition pages — covers ~90% of games
             for (const comp of comps) {
                 for (const page of ['calendario', 'resultados']) {
                     try {
@@ -181,35 +181,6 @@ export default function Home() {
                         const parsed = parseFPBHtml(html, comp.name)
                         allGames.push(...parsed)
                     } catch { /* skip */ }
-                }
-            }
-
-            // 2. For followed clubs: check Supabase first, then FPB if missing games
-            if (followedClubIds.length > 0 && clubs.length > 0) {
-                const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
-                const followedNames = followedClubs.map(c => c.name)
-
-                // Check if Supabase already has games for these clubs on this date
-                const { data: sbGames } = await supabase
-                    .from('games_2025_2026')
-                    .select('*')
-                    .eq('data', selectedDate)
-                    .or(followedNames.map(n => `equipa_casa.eq.${n},equipa_fora.eq.${n}`).join(','))
-                const sbCount = (sbGames || []).length
-
-                // If Supabase has few or no games for followed clubs, fetch from FPB
-                if (sbCount < followedClubs.length) {
-                    for (const club of followedClubs.slice(0, 4)) {
-                        for (const page of ['calendario', 'resultados']) {
-                            try {
-                                const res = await fetch(`/api/fpb?page=${page}&clube=${club.id}&epoca=2025/2026`)
-                                const html = await res.text()
-                                if (!html || html.startsWith('{')) continue
-                                const parsed = parseFPBHtml(html, '') // competition detected from page
-                                allGames.push(...parsed)
-                            } catch { /* skip */ }
-                        }
-                    }
                 }
             }
 
@@ -237,18 +208,6 @@ export default function Home() {
         load()
     }, [selectedDate])
 
-    // Build name matching for followed clubs (handles FPB name vs DB name differences)
-    const followedClubsData = useMemo(() => clubs.filter(c => followedClubIds.includes(c.id)), [clubs, followedClubIds])
-
-    function isTeamFollowed(equipaCasa: string, equipaFora: string): boolean {
-        return followedClubsData.some(c => {
-            const names = [c.name, c.short_name, displayName(c)].filter(Boolean) as string[]
-            return names.some(n =>
-                equipaCasa.includes(n) || equipaFora.includes(n) ||
-                n.includes(equipaCasa) || n.includes(equipaFora))
-        })
-    }
-
     // Filter: hide past-day games without scores (stale data)
     const todayStr = toYYYYMMDD(new Date())
     const displayGames = useMemo(() => {
@@ -262,7 +221,7 @@ export default function Home() {
     const sections = useMemo(() => {
         const s: { key: string; label: string; games: Match[] }[] = []
 
-        const compOrder = ['Liga Betclic Masculina', 'Proliga']
+        const compOrder = ['Liga Betclic Masculina', 'Proliga', '1ª Divisão', '2ª Divisão']
         for (const comp of compOrder) {
             const compGames = displayGames.filter(g => g.competicao === comp)
             if (compGames.length > 0) s.push({ key: comp, label: comp, games: compGames })
@@ -354,7 +313,7 @@ export default function Home() {
                                         {isOpen && (
                                             <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
                                                 {secGames.map((g, i) => (
-                                                    <ConfrontoRow key={g.slug || i} match={g} clubs={clubs} isFollowed={isTeamFollowed(g.equipa_casa, g.equipa_fora)} />
+                                                    <ConfrontoRow key={g.slug || i} match={g} clubs={clubs} isFollowed={false} />
                                                 ))}
                                             </div>
                                         )}
