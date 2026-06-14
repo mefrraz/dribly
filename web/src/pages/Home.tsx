@@ -138,7 +138,8 @@ function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[
     const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
     const displayFora = normalizeTeamDisplay(match.equipa_fora, clubs)
     const isLive = match.status === 'A DECORRER'
-    const isFinished = match.status === 'FINALIZADO'
+    const hasScores = match.resultado_casa !== null && match.resultado_fora !== null
+    const isFinished = match.status === 'FINALIZADO' || hasScores
     const slug = match.slug || `${match.data}-${match.equipa_casa.toLowerCase().replace(/\s+/g, '-')}-${match.equipa_fora.toLowerCase().replace(/\s+/g, '-')}`
     const club = clubs.find(c => c.name === match.equipa_casa || c.name === match.equipa_fora)
     const linkTo = club ? `/jogo/${slug}?clube=${club.slug}` : `/jogo/${slug}`
@@ -367,7 +368,7 @@ export default function Home() {
                                         {isOpen && (
                                             isEmpty ? (
                                                 <div className="px-4 py-6 text-center border-t border-zinc-100 dark:border-white/5">
-                                                    <p className="text-xs text-zinc-400">Nenhum jogo neste escalão para o dia selecionado.</p>
+                                                    <p className="text-xs text-zinc-400">Nenhum jogo nesta competição para o dia selecionado.</p>
                                                 </div>
                                             ) : (
                                                 <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
