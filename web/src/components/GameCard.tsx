@@ -26,8 +26,9 @@ const GameCardInner = ({ match, mode, clubName, clubSlug, clubs = [] }: GameCard
   const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
   const displayFora = normalizeTeamDisplay(match.equipa_fora, clubs)
   const findClub = (name: string) => clubs.find(c => c.name.toUpperCase() === name.trim().toUpperCase() || c.search_name?.toUpperCase() === name.trim().toUpperCase())
-  const logoCasa = match.logotipo_casa || clubLogoUrl(findClub(match.equipa_casa))
-  const logoFora = match.logotipo_fora || clubLogoUrl(findClub(match.equipa_fora))
+  // Primary: our Supabase bucket. Fallback: FPB scrape.
+  const logoCasa = clubLogoUrl(findClub(match.equipa_casa)) || match.logotipo_casa
+  const logoFora = clubLogoUrl(findClub(match.equipa_fora)) || match.logotipo_fora
 
   const badge = mode === 'agenda'
     ? null

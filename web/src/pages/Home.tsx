@@ -11,7 +11,7 @@ import { Search, Trophy, ChevronDown } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useFollows } from '../hooks/useFollows'
 import { type Club, useClub, displayName } from '../lib/ClubContext'
-import { normalizeTeamDisplay, clubLogoUrl } from '../lib/fpbUtils'
+import { normalizeTeamDisplay, clubLogoUrl, semiAbrev } from '../lib/fpbUtils'
 import type { Match } from '../components/types'
 import { GameCard } from '../components/GameCard'
 import { LoadingSpinner } from '../components/LoadingSpinner'
@@ -167,17 +167,19 @@ function leagueRank(comp: string): number {
 
 function findClubByTeam(teamName: string, clubs: Club[]): Club | undefined {
     const n = teamName.trim().toUpperCase()
-    // Exact match
+    // Exact match (including semi-abbreviated form: "SC Farense" ↔ "Sporting Clube Farense")
     for (const c of clubs) {
         const cn = c.name.toUpperCase()
         const sn = (c.search_name || '').toUpperCase()
-        if (n === cn || n === sn) return c
+        const sa = semiAbrev(c.name).toUpperCase()
+        if (n === cn || n === sn || n === sa) return c
     }
-    // Substring both ways
+    // Substring both ways (handles partial abbreviations)
     for (const c of clubs) {
         const cn = c.name.toUpperCase()
         const sn = (c.search_name || '').toUpperCase()
-        if (cn.includes(n) || n.includes(cn) || sn.includes(n) || n.includes(sn)) return c
+        const sa = semiAbrev(c.name).toUpperCase()
+        if (cn.includes(n) || n.includes(cn) || sn.includes(n) || n.includes(sn) || sa.includes(n) || n.includes(sa)) return c
     }
     return undefined
 }
@@ -189,8 +191,9 @@ function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Ma
     const df = normalizeTeamDisplay(match.equipa_fora, clubs)
     const clubCasa = findClubByTeam(match.equipa_casa, clubs)
     const clubFora = findClubByTeam(match.equipa_fora, clubs)
-    const logoCasa = match.logotipo_casa || clubLogoUrl(clubCasa)
-    const logoFora = match.logotipo_fora || clubLogoUrl(clubFora)
+    // Primary: our Supabase bucket (reliable, always correct). Fallback: FPB scrape.
+    const logoCasa = clubLogoUrl(clubCasa) || match.logotipo_casa
+    const logoFora = clubLogoUrl(clubFora) || match.logotipo_fora
     const isLive = match.status === 'A DECORRER'
     const hasScores = match.resultado_casa !== null && match.resultado_fora !== null
     const isFinished = match.status === 'FINALIZADO' || hasScores
