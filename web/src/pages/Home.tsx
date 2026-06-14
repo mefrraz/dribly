@@ -70,7 +70,7 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
             const scores = [...gh.matchAll(/<h3 class="results_text[^"]*">\s*(\d+)\s*<\/h3>/gi)].map(s => parseInt(s[1]))
             const horaMatch = gh.match(/<div class="hour[^"]*">\s*<h3>\s*(\d{1,2})[Hh](\d{2})\s*<\/h3>/i)
             const hora = horaMatch ? `${horaMatch[1].padStart(2, '0')}:${horaMatch[2]}` : ''
-            const logos = [...gh.matchAll(/<img[^>]*src="([^"]*\/CLU[^"]*)"[^>]*>/gi)].map(l => l[1])
+            const logos = [...gh.matchAll(/<img[^>]*src="([^"]*\/uploads\/clubes\/logotipo\/[^"]*)"[^>]*>/gi)].map(l => l[1])
             // Extract competition from inline HTML (club pages have per-game competition)
             const compMatch = gh.match(/<div class="competition"[^>]*>\s*<span>\s*([^<]+?)\s*<\/span>/i)
             let comp = competicao, esc = ''
@@ -192,11 +192,11 @@ function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Ma
             <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
                 {match.logotipo_fora ? <img src={match.logotipo_fora} alt="" className="w-5 h-5 object-contain" loading="lazy" /> : <span className="text-[9px] font-bold text-zinc-500">{df.charAt(0)}</span>}
             </div>
-            {/* Competition label for Seguidos */}
-            {showCompetition && match.competicao ? (
-                <span className="text-[9px] text-zinc-400 shrink-0 mr-2 max-w-[80px] truncate">{match.competicao}</span>
-            ) : null}
             <span className="flex-1" />
+            {/* Escalão label for Seguidos — right next to hora */}
+            {showCompetition && match.escalao ? (
+                <span className="text-[9px] text-zinc-400 shrink-0 mr-1.5 max-w-[80px] truncate">{match.escalao}</span>
+            ) : null}
             {isLive ? <span className="text-[10px] font-bold text-red-500 animate-pulse shrink-0 uppercase">LIVE</span>
                 : isFinished ? <span className="text-[10px] text-zinc-400 shrink-0 font-medium uppercase">FIN</span>
                 : <span className="text-[10px] text-zinc-400 shrink-0 font-medium tabular-nums">{hora || '--:--'}</span>}
@@ -356,6 +356,7 @@ export default function Home() {
                 const k = g.slug || `${g.data}-${g.equipa_casa}-${g.equipa_fora}`
                 if (seen.has(k)) return false; seen.add(k); return true
             })
+            unique.sort((a, b) => (a.hora || '99:99').localeCompare(b.hora || '99:99'))
             setFollowedGames(unique)
             setLoadingFollowed(false)
         }
