@@ -260,18 +260,10 @@ export default function Home() {
     const isEmpty = !loading && allGames.length === 0
     const liveCount = allGames.filter(g => g.status === 'A DECORRER').length
 
-    // Build ordered category list
+    // Build ordered category list — only show categories with games
     const orderedCategories = useMemo(() => {
         const entries = [...gamesByCategory.entries()]
-            .filter(([, games]) => games.length > 0 || CATEGORIES.some(c => c.key === gamesByCategory.get('')?.[0]?.competicao))
-        // Always include all defined categories even if empty
-        const allKeys = new Set(entries.map(([k]) => k))
-        for (const cat of CATEGORIES) {
-            if (!allKeys.has(cat.key)) {
-                entries.push([cat.key, []])
-            }
-        }
-        // Sort by category order
+            .filter(([, games]) => games.length > 0)
         entries.sort((a, b) => catOrder(a[0]) - catOrder(b[0]))
         return entries
     }, [gamesByCategory])
@@ -346,38 +338,33 @@ export default function Home() {
 
                         <div className="space-y-2">
                             {orderedCategories.map(([key, games]) => {
+                                // Exclude featured game from accordion
+                                const filtered = featuredGame
+                                    ? games.filter(g => g.slug !== featuredGame.slug)
+                                    : games
+                                if (filtered.length === 0) return null
+
                                 const isOpen = openSections.has(key)
                                 const label = catLabel(key)
-                                const isEmpty = games.length === 0
-                                // Skip "outros" if empty
-                                if (key === 'outros' && isEmpty) return null
 
                                 return (
-                                    <div key={key} className={`bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden ${isEmpty ? 'opacity-70' : ''}`}>
+                                    <div key={key} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
                                         <button onClick={() => toggleSection(key)}
                                             className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors">
                                             <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
-                                                <span className={`w-1.5 h-1.5 rounded-full ${isEmpty ? 'bg-zinc-300' : 'bg-dribly-purple'}`} />
+                                                <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />
                                                 {label}
-                                                {isEmpty
-                                                    ? <span className="text-[11px] font-normal text-zinc-400">— 0 jogos</span>
-                                                    : <span className="text-[11px] font-medium text-zinc-400">({games.length})</span>}
+                                                <span className="text-[11px] font-medium text-zinc-400">({filtered.length})</span>
                                             </h3>
                                             <ChevronDown size={16} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                                         </button>
                                         {isOpen && (
-                                            isEmpty ? (
-                                                <div className="px-4 py-6 text-center border-t border-zinc-100 dark:border-white/5">
-                                                    <p className="text-xs text-zinc-400">Nenhum jogo nesta competição para o dia selecionado.</p>
-                                                </div>
-                                            ) : (
-                                                <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
-                                                    {games.map((g, i) => (
-                                                        <ConfrontoRow key={g.slug || i} match={g} clubs={clubs}
-                                                            isFollowed={followedNames.has(g.equipa_casa) || followedNames.has(g.equipa_fora)} />
-                                                    ))}
-                                                </div>
-                                            )
+                                            <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
+                                                {filtered.map((g, i) => (
+                                                    <ConfrontoRow key={g.slug || i} match={g} clubs={clubs}
+                                                        isFollowed={followedNames.has(g.equipa_casa) || followedNames.has(g.equipa_fora)} />
+                                                ))}
+                                            </div>
                                         )}
                                     </div>
                                 )
