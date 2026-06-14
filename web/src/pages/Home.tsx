@@ -171,7 +171,7 @@ export default function Home() {
             ]
             const allGames: Match[] = []
 
-            // Fetch competition pages only — clean, fast, reliable
+            // 1. Fetch competition pages (fast, covers main leagues)
             for (const comp of comps) {
                 for (const page of ['calendario', 'resultados']) {
                     try {
@@ -181,6 +181,35 @@ export default function Home() {
                         const parsed = parseFPBHtml(html, comp.name)
                         allGames.push(...parsed)
                     } catch { /* skip */ }
+                }
+            }
+
+            // 2. For followed clubs: check Supabase first, then FPB if missing games
+            if (followedClubIds.length > 0 && clubs.length > 0) {
+                const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
+                const followedNames = followedClubs.map(c => c.name)
+
+                // Check if Supabase already has games for these clubs on this date
+                const { data: sbGames } = await supabase
+                    .from('games_2025_2026')
+                    .select('*')
+                    .eq('data', selectedDate)
+                    .or(followedNames.map(n => `equipa_casa.eq.${n},equipa_fora.eq.${n}`).join(','))
+                const sbCount = (sbGames || []).length
+
+                // If Supabase has few or no games for followed clubs, fetch from FPB
+                if (sbCount < followedClubs.length) {
+                    for (const club of followedClubs.slice(0, 4)) {
+                        for (const page of ['calendario', 'resultados']) {
+                            try {
+                                const res = await fetch(`/api/fpb?page=${page}&clube=${club.id}&epoca=2025/2026`)
+                                const html = await res.text()
+                                if (!html || html.startsWith('{')) continue
+                                const parsed = parseFPBHtml(html, '') // competition detected from page
+                                allGames.push(...parsed)
+                            } catch { /* skip */ }
+                        }
+                    }
                 }
             }
 
