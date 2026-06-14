@@ -31,14 +31,16 @@ function addDays(d: Date, n: number): Date { const r = new Date(d); r.setDate(r.
 
 function buildDayPills() {
     const hoje = new Date()
-    const dias = [
-        { label: 'Ontem', date: addDays(hoje, -1) },
-        { label: 'Hoje', date: hoje },
-        { label: 'Amanhã', date: addDays(hoje, 1) },
-    ]
-    for (let i = 2; i <= 4; i++) {
+    const dias = []
+    // Show 4 days back, today, 3 days forward
+    for (let i = -4; i <= 3; i++) {
         const d = addDays(hoje, i)
-        dias.push({ label: d.toLocaleDateString('pt-PT', { weekday: 'short' }) + ' ' + d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'numeric' }), date: d })
+        let label: string
+        if (i === 0) label = 'Hoje'
+        else if (i === -1) label = 'Ontem'
+        else if (i === 1) label = 'Amanhã'
+        else label = d.toLocaleDateString('pt-PT', { weekday: 'short' }) + ' ' + d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'numeric' })
+        dias.push({ label, date: d })
     }
     return dias.map(d => ({ label: d.label, date: toYYYYMMDD(d.date), isToday: d.date.toDateString() === hoje.toDateString() }))
 }
@@ -143,7 +145,7 @@ export default function Home() {
     const [selectedDate, setSelectedDate] = useState(() => toYYYYMMDD(new Date()))
     const [games, setGames] = useState<Match[]>([])
     const [loading, setLoading] = useState(true)
-    const [openSections, setOpenSections] = useState<Set<string>>(new Set(['seguidos']))
+    const [openSections, setOpenSections] = useState<Set<string>>(new Set())
     const [searchOpen, setSearchOpen] = useState(false)
     const [compLogos, setCompLogos] = useState<Map<number, string | null>>(new Map())
 
@@ -218,28 +220,53 @@ export default function Home() {
         return fcg
     }, [games, followedNames])
 
+    // Filter: hide past-day games without scores (stale data)
+    const todayStr = toYYYYMMDD(new Date())
+    const displayGames = useMemo(() => {
+        return games.filter(g => {
+            if (g.data < todayStr && g.resultado_casa === null && g.resultado_fora === null) return false
+            return true
+        })
+    }, [games, todayStr])
+
+    // Followed games also filtered
+    const displayFollowedGames = useMemo(() => {
+        return followedClubGames.filter(g => {
+            if (g.data < todayStr && g.resultado_casa === null && g.resultado_fora === null) return false
+            return true
+        })
+    }, [followedClubGames, todayStr])
+
     // Build accordion sections
     const sections = useMemo(() => {
         const s: { key: string; label: string; games: Match[]; heart?: boolean }[] = []
 
-        // 1. "Seguidos" — followed club games, ONE accordion, with heart
-        if (followedClubGames.length > 0) {
-            s.push({ key: 'seguidos', label: 'Seguidos', games: followedClubGames, heart: true })
+        // 1. Followed club games — grouped by competition name (heart)
+        if (displayFollowedGames.length > 0) {
+            const byComp = new Map<string, Match[]>()
+            for (const g of displayFollowedGames) {
+                const comp = g.competicao || 'Outros'
+                if (!byComp.has(comp)) byComp.set(comp, [])
+                byComp.get(comp)!.push(g)
+            }
+            for (const [comp, compGames] of byComp) {
+                s.push({ key: `seg-${comp}`, label: comp, games: compGames, heart: true })
+            }
         }
 
-        // 2. Competition accordions (NEVER hearts, exclude followed games)
+        // 2. Competition accordions (no hearts, exclude followed games)
         const compOrder = ['Liga Betclic Masculina', 'Proliga']
         for (const comp of compOrder) {
-            const compGames = games.filter(g => g.competicao === comp && !followedClubGames.includes(g))
+            const compGames = displayGames.filter(g => g.competicao === comp && !displayFollowedGames.includes(g))
             if (compGames.length > 0) s.push({ key: comp, label: comp, games: compGames })
         }
 
         // 3. Remaining
-        const remaining = games.filter((g: Match) => !s.some(sec => sec.games.includes(g)))
+        const remaining = displayGames.filter((g: Match) => !s.some(sec => sec.games.includes(g)))
         if (remaining.length > 0) s.push({ key: 'outros', label: 'Outros', games: remaining })
 
         return s
-    }, [games, followedClubGames])
+    }, [displayGames, displayFollowedGames])
 
     const featuredGame = useMemo(() => {
         let best: Match | null = null, bestRank = 999
