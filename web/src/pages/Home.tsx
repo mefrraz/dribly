@@ -67,9 +67,25 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
             const id = m[1], gh = m[2]
             const teams = [...gh.matchAll(/<span class="fullName[^"]*">([^<]+)<\/span>/gi)].map(t => t[1].trim())
             if (teams.length < 2) continue
-            const scores = [...gh.matchAll(/<h3 class="results_text[^"]*">\s*(\d+)\s*<\/h3>/gi)].map(s => parseInt(s[1]))
+            // Scores: handle multiline h3 tags (results page has newlines before class=)
+            const scores = [...gh.matchAll(/<h3[^>]*class="results_text[^"]*"[^>]*>\s*(\d+)\s*<\/h3>/gi)].map(s => parseInt(s[1]))
             const horaMatch = gh.match(/<div class="hour[^"]*">\s*<h3>\s*(\d{1,2})[Hh](\d{2})\s*<\/h3>/i)
-            const hora = horaMatch ? `${horaMatch[1].padStart(2, '0')}:${horaMatch[2]}` : ''
+            let hora = horaMatch ? `${horaMatch[1].padStart(2, '0')}:${horaMatch[2]}` : ''
+            // Fallback: results page may show score in hour position ("78-65")
+            if (!horaMatch && scores.length < 2) {
+                const altHora = gh.match(/<div class="hour[^"]*">\s*<h3>\s*([^<]+)\s*<\/h3>/i)
+                if (altHora) {
+                    const txt = altHora[1].trim()
+                    if (txt.includes('-') && !txt.includes('H')) {
+                        const parts = txt.split('-')
+                        const s1 = parseInt(parts[0]), s2 = parseInt(parts[1])
+                        if (!isNaN(s1) && !isNaN(s2)) { scores.push(s1, s2) }
+                    } else {
+                        hora = txt.replace(/[^0-9]/g, '').slice(0, 4)
+                        if (hora.length === 4) hora = hora.slice(0, 2) + ':' + hora.slice(2)
+                    }
+                }
+            }
             const logos = [...gh.matchAll(/<img[^>]*src="([^"]*\/uploads\/clubes\/logotipo\/[^"]*)"[^>]*>/gi)].map(l => l[1])
             // Extract competition from inline HTML (club pages have per-game competition)
             const compMatch = gh.match(/<div class="competition"[^>]*>\s*<span>\s*([^<]+?)\s*<\/span>/i)
