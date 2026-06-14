@@ -8,7 +8,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Search, Trophy, ChevronDown, MapPin } from 'lucide-react'
-import { MapContainer, TileLayer, Marker, Tooltip, Circle } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Tooltip, Circle, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabase'
 import { useFollows } from '../hooks/useFollows'
@@ -202,6 +202,9 @@ function findClubByTeam(teamName: string, clubs: Club[]): Club | undefined {
     return undefined
 }
 
+/** Updates Leaflet map zoom when distance changes (Leaflet ignores zoom prop after mount) */
+function MapZoom({ zoom }: { zoom: number }) { const map = useMap(); map.setZoom(zoom); return null }
+
 // ── Confrontos row ──
 
 function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Match; clubs: Club[]; isFollowed: boolean; showCompetition?: boolean }) {
@@ -276,6 +279,7 @@ export default function Home() {
     // ── Jogos perto de mim ──
     const geo = useGeolocation()
     const [nearbyGames, setNearbyGames] = useState<{ game: Match; pavilion: Pavilion; distance: number }[]>([])
+    const [nearbyComputed, setNearbyComputed] = useState(false)
     const pavsRef = useRef<Pavilion[] | null>(null)
     const gamesHashRef = useRef('')
     useEffect(() => {
@@ -283,7 +287,7 @@ export default function Home() {
         const allGames = [...games, ...followedGames].filter(g => g.local)
         const todayStr = new Date().toISOString().split('T')[0]
         const recent = allGames.filter(g => g.data >= todayStr)
-        if (recent.length === 0) { setNearbyGames([]); return }
+        if (recent.length === 0) { setNearbyGames([]); setNearbyComputed(true); return }
         // Only recompute if games content changed (avoids re-fetch on every render)
         const hash = recent.map(g => g.slug || g.id).sort().join(',')
         if (hash === gamesHashRef.current) return
@@ -307,6 +311,7 @@ export default function Home() {
                 }
                 matches.sort((a, b) => a.distance - b.distance)
                 setNearbyGames(matches)
+                setNearbyComputed(true)
             } catch { /* ignore */ }
             gamesHashRef.current = ''
         }
@@ -642,75 +647,76 @@ export default function Home() {
                             <MapPin size={16} className="text-dribly-purple shrink-0" />
                             <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Jogos perto de ti</h3>
                         </div>
-                        {nearbyGames.length === 0 ? (
-                            <div className="px-4 py-6 text-center">
-                                <p className="text-xs text-zinc-400">Nenhum jogo próximo encontrado.</p>
+                        {/* Distance slider */}
+                            <div className="px-4 pt-3 flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-zinc-400">1 km</span>
+                                <input type="range" min={1} max={50} value={maxDistance}
+                                    onChange={e => setMaxDistance(parseInt(e.target.value))}
+                                    className="flex-1 h-1.5 rounded-full appearance-none bg-zinc-200 dark:bg-zinc-600 cursor-pointer"
+                                    style={{ accentColor: '#7C3AED' }}
+                                />
+                                <span className="text-[10px] font-bold text-dribly-purple w-12 text-right">{maxDistance} km</span>
                             </div>
-                        ) : (
-                            <>
-                                {/* Distance slider */}
-                                <div className="px-4 pt-3 pb-1 flex items-center gap-2.5">
-                                    <span className="text-[10px] font-bold text-dribly-purple shrink-0 w-8 text-right">1</span>
-                                    <div className="flex-1 relative flex items-center">
-                                        <input type="range" min={1} max={50} value={maxDistance}
-                                            onChange={e => setMaxDistance(parseInt(e.target.value))}
-                                            className="w-full h-2 rounded-full appearance-none bg-zinc-200 dark:bg-zinc-700 accent-dribly-purple cursor-pointer"
-                                            style={{ accentColor: '#7C3AED' }}
-                                        />
-                                    </div>
-                                    <span className="text-[10px] font-bold text-dribly-purple shrink-0 w-10">{maxDistance} km</span>
+                            {/* Map — always visible with circle, pins appear when computed */}
+                            <div className="h-48 w-full mt-1">
+                                <MapContainer
+                                    key={darkMode ? 'dark' : 'light'}
+                                    center={[geo.lat!, geo.lng!]}
+                                    zoom={11}
+                                    zoomControl={false}
+                                    dragging={false}
+                                    scrollWheelZoom={false}
+                                    doubleClickZoom={false}
+                                    touchZoom={false}
+                                    attributionControl={false}
+                                    className="w-full h-full z-0"
+                                >
+                                    <MapZoom zoom={Math.round(13.5 - Math.log2(maxDistance / 1.5))} />
+                                    <TileLayer url={darkMode
+                                        ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                                        : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'
+                                    } />
+                                    <Circle center={[geo.lat!, geo.lng!]} radius={maxDistance * 1000}
+                                        pathOptions={{ color: '#7C3AED', fillColor: '#7C3AED', fillOpacity: 0.08, weight: 1.5 }}
+                                    />
+                                    {filteredNearby.map(({ pavilion }) => (
+                                        <Marker key={pavilion.id}
+                                            position={[pavilion.lat, pavilion.lng]}
+                                            icon={L.divIcon({
+                                                html: `<div style="width:14px;height:14px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(124,58,237,0.8);cursor:pointer"></div>`,
+                                                className: '', iconSize: [14, 14], iconAnchor: [7, 7]
+                                            })}
+                                            eventHandlers={{
+                                                click: () => navigate(`/pavilhao/${pavilion.recinto_id || pavilion.id}`),
+                                            }}
+                                        >
+                                            <Tooltip direction="top" offset={[0, -10]} opacity={0.95}>
+                                                <div className="text-center">
+                                                    <p className="text-[11px] font-bold">{pavilion.nome}</p>
+                                                    {pavilion.cidade && <p className="text-[9px] text-zinc-400">{pavilion.cidade}</p>}
+                                                    <p className="text-[8px] text-dribly-purple mt-0.5">ver pavilhão →</p>
+                                                </div>
+                                            </Tooltip>
+                                        </Marker>
+                                    ))}
+                                </MapContainer>
+                            </div>
+                            {/* Game list — loading or results */}
+                            {!nearbyComputed ? (
+                                <div className="px-4 py-4 text-center border-t border-zinc-100 dark:border-white/5">
+                                    <p className="text-xs text-zinc-400">A procurar jogos próximos...</p>
                                 </div>
-                                {/* Mini map — static, circle grows with slider */}
-                                <div className="h-48 w-full">
-                                    <MapContainer
-                                        key={darkMode ? 'dark' : 'light'}
-                                        center={[geo.lat!, geo.lng!]}
-                                        zoom={Math.round(13.5 - Math.log2(maxDistance / 1.5))}
-                                        zoomControl={false}
-                                        dragging={false}
-                                        scrollWheelZoom={false}
-                                        doubleClickZoom={false}
-                                        touchZoom={false}
-                                        attributionControl={false}
-                                        className="w-full h-full z-0"
-                                    >
-                                        <TileLayer url={darkMode
-                                            ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-                                            : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'
-                                        } />
-                                        <Circle center={[geo.lat!, geo.lng!]} radius={maxDistance * 1000}
-                                            pathOptions={{ color: '#7C3AED', fillColor: '#7C3AED', fillOpacity: 0.08, weight: 1.5 }}
-                                        />
-                                        {filteredNearby.map(({ pavilion }) => (
-                                            <Marker key={pavilion.id}
-                                                position={[pavilion.lat, pavilion.lng]}
-                                                icon={L.divIcon({
-                                                    html: `<div style="width:14px;height:14px;background:#7C3AED;border:2px solid white;border-radius:50%;box-shadow:0 0 6px rgba(124,58,237,0.8);cursor:pointer"></div>`,
-                                                    className: '', iconSize: [14, 14], iconAnchor: [7, 7]
-                                                })}
-                                                eventHandlers={{
-                                                    click: () => navigate(`/pavilhao/${pavilion.recinto_id || pavilion.id}`),
-                                                }}
-                                            >
-                                                <Tooltip direction="top" offset={[0, -10]} opacity={0.95}
-                                                    className="text-[11px] font-bold text-zinc-800 bg-white dark:bg-zinc-800 dark:text-white border-zinc-200 dark:border-zinc-700 rounded-lg px-2 py-1 shadow-lg">
-                                                    <div className="text-center">
-                                                        <p className="text-[11px] font-bold">{pavilion.nome}</p>
-                                                        {pavilion.cidade && <p className="text-[9px] text-zinc-400">{pavilion.cidade}</p>}
-                                                        <p className="text-[8px] text-dribly-purple mt-0.5">ver pavilhão →</p>
-                                                    </div>
-                                                </Tooltip>
-                                            </Marker>
-                                        ))}
-                                    </MapContainer>
+                            ) : filteredNearby.length === 0 ? (
+                                <div className="px-4 py-4 text-center border-t border-zinc-100 dark:border-white/5">
+                                    <p className="text-xs text-zinc-400">Nenhum jogo neste raio.</p>
                                 </div>
+                            ) : (
                                 <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
                                     {filteredNearby.map(({ game }) => (
                                         <ConfrontoRow key={game.slug || game.id} match={game} clubs={clubs} isFollowed={false} />
                                     ))}
                                 </div>
-                            </>
-                        )}
+                            )}
                     </div>
                 </div>
             )}
