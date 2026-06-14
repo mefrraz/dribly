@@ -289,8 +289,8 @@ export default function Home() {
             }
             setLoading(false)
 
-            // Background: fetch followed clubs' games (only for today)
-            if (selectedDate === toYYYYMMDD(new Date()) && followedClubIds.length > 0 && clubs.length > 0) {
+            // Background: fetch followed clubs' games
+            if (followedClubIds.length > 0 && clubs.length > 0) {
                 setLoadingFollowed(true)
                 const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
                 const clubGames: Match[] = []
@@ -334,8 +334,8 @@ export default function Home() {
     const sections = useMemo(() => {
         const s: { key: string; label: string; games: Match[]; loading?: boolean }[] = []
 
-        // "Seguidos" — always visible if user follows anyone (today only)
-        if (followedClubIds.length > 0 && selectedDate === toYYYYMMDD(new Date())) {
+        // "Seguidos" — always visible if user follows anyone
+        if (followedClubIds.length > 0) {
             s.push({
                 key: 'seguidos',
                 label: 'Seguidos',
