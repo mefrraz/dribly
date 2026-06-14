@@ -88,6 +88,48 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
     return games
 }
 
+// Parser for club calendar pages — extracts competition name from each game row
+function parseFPBClubHtml(html: string): Match[] {
+    if (!html || html.length < 100) return []
+    const games: Match[] = []
+    const monthMap: Record<string, string> = { 'JAN': '01', 'FEV': '02', 'MAR': '03', 'ABR': '04', 'MAI': '05', 'JUN': '06', 'JUL': '07', 'AGO': '08', 'SET': '09', 'OUT': '10', 'NOV': '11', 'DEZ': '12' }
+    const dayBlocks = html.split(/<div class="day-wrapper[^"]*">/)
+    for (let i = 1; i < dayBlocks.length; i++) {
+        const block = dayBlocks[i]
+        const dateMatch = block.match(/<h3 class="date">\s*(\d{1,2})\s*([A-Z]{3})\s*(\d{4})\s*<\/h3>/i)
+        if (!dateMatch) continue
+        const dateStr = `${dateMatch[3]}-${monthMap[dateMatch[2].toUpperCase()] || '01'}-${dateMatch[1].padStart(2, '0')}`
+        const gameRegex = /<a[^>]*href="\/ficha-de-jogo\/?\?internalID=(\d+)"[^>]*class="game-wrapper-a[^"]*">([\s\S]*?)<\/a>/gi
+        let m
+        while ((m = gameRegex.exec(block)) !== null) {
+            const id = m[1], gh = m[2]
+            const teams = [...gh.matchAll(/<span class="fullName[^"]*">([^<]+)<\/span>/gi)].map(t => t[1].trim())
+            if (teams.length < 2) continue
+            const scores = [...gh.matchAll(/<h3 class="results_text[^"]*">\s*(\d+)\s*<\/h3>/gi)].map(s => parseInt(s[1]))
+            const horaMatch = gh.match(/<div class="hour[^"]*">\s*<h3>\s*(\d{1,2})[Hh](\d{2})\s*<\/h3>/i)
+            const hora = horaMatch ? `${horaMatch[1].padStart(2, '0')}:${horaMatch[2]}` : ''
+            const logos = [...gh.matchAll(/<img[^>]*src="([^"]*\/CLU[^"]*)"[^>]*>/gi)].map(l => l[1])
+            // Try to extract competition from game HTML (club page shows competition name)
+            const compMatch = gh.match(/<span class="competicao[^"]*">([^<]+)<\/span>/i)
+                || gh.match(/competicao[:\s]*([^<]+)/i)
+            const competicao = compMatch ? compMatch[1].trim() : 'Outros'
+            const isFinished = scores.length >= 2
+            games.push({
+                id, slug: `${dateStr}-${slugify(teams[0])}-${slugify(teams[1])}`,
+                data: dateStr, hora,
+                equipa_casa: teams[0], equipa_fora: teams[1],
+                resultado_casa: isFinished ? scores[0] : null,
+                resultado_fora: isFinished ? scores[1] : null,
+                competicao, escalao: '',
+                status: isFinished ? 'FINALIZADO' : 'AGENDADO',
+                local: null,
+                logotipo_casa: logos[0] || null, logotipo_fora: logos[1] || null,
+            })
+        }
+    }
+    return games
+}
+
 // ── League ranking for featured card ──
 function leagueRank(comp: string): number {
     const c = comp.toLowerCase()
@@ -168,7 +210,7 @@ export default function Home() {
             ]
             const allGames: Match[] = []
 
-            // Fetch competition pages (covers ~80% of all games)
+            // Fetch competition pages
             for (const comp of comps) {
                 for (const page of ['calendario', 'resultados']) {
                     try {
@@ -178,6 +220,23 @@ export default function Home() {
                         const parsed = parseFPBHtml(html, comp.name)
                         allGames.push(...parsed)
                     } catch { /* skip */ }
+                }
+            }
+
+            // Fetch followed clubs' games — extract real competition from HTML
+            if (followedClubIds.length > 0) {
+                const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
+                for (const club of followedClubs.slice(0, 8)) {
+                    for (const page of ['calendario', 'resultados']) {
+                        try {
+                            const res = await fetch(`/api/fpb?page=${page}&clube=${club.id}&epoca=2025/2026`)
+                            const html = await res.text()
+                            if (!html || html.startsWith('{')) continue
+                            // Parse club page — detect competition from game HTML
+                            const parsed = parseFPBClubHtml(html)
+                            allGames.push(...parsed)
+                        } catch { /* skip */ }
+                    }
                 }
             }
 
