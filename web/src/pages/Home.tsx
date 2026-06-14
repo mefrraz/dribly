@@ -86,7 +86,8 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
                     }
                 }
             }
-            const logos = [...gh.matchAll(/<img[^>]*src="([^"]*\/uploads\/clubes\/logotipo\/[^"]*)"[^>]*>/gi)].map(l => l[1])
+            // FPB logos: both /uploads/clubes/logotipo/ and /old_uploads/CLU/ patterns
+            const logos = [...gh.matchAll(/<img[^>]*src="([^"]*(?:\/uploads\/clubes\/logotipo\/|\/old_uploads\/CLU\/)[^"]*)"[^>]*>/gi)].map(l => l[1])
             // Extract competition from inline HTML (club pages have per-game competition)
             const compMatch = gh.match(/<div class="competition"[^>]*>\s*<span>\s*([^<]+?)\s*<\/span>/i)
             let comp = competicao, esc = ''
