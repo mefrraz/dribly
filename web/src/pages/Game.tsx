@@ -10,7 +10,7 @@ import { SkeletonHero } from '../components/Skeleton'
 import { Match } from '../components/types'
 import { useClub, type Club } from '../lib/ClubContext'
 import { fetchPavilions, type Pavilion } from '../lib/mapData'
-import { semiAbrev, normalizeTeamDisplay } from '../lib/fpbUtils'
+import { semiAbrev, normalizeTeamDisplay, clubLogoUrl } from '../lib/fpbUtils'
 import { logger } from '../lib/logger'
 import { TeamBlock } from '../components/TeamBlock'
 import { GameDueloCard } from '../components/GameDueloCard'
@@ -431,6 +431,10 @@ function Game() {
 
     const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
     const displayFora = normalizeTeamDisplay(match.equipa_fora, clubs)
+    const clubCasa = clubs.find(c => c.name.toUpperCase() === match.equipa_casa.trim().toUpperCase() || c.search_name?.toUpperCase() === match.equipa_casa.trim().toUpperCase())
+    const clubFora = clubs.find(c => c.name.toUpperCase() === match.equipa_fora.trim().toUpperCase() || c.search_name?.toUpperCase() === match.equipa_fora.trim().toUpperCase())
+    const logoCasa = clubLogoUrl(clubCasa) || match.logotipo_casa
+    const logoFora = clubLogoUrl(clubFora) || match.logotipo_fora
     const dn = (name: string) => normalizeTeamDisplay(name, clubs)
     // Clean location: if it contains "|", it has competition data mixed in — strip it
     const cleanLocal = match.local
@@ -485,7 +489,7 @@ function Game() {
                     </div>
 
                     <div className="flex items-center justify-between gap-4">
-                        <TeamBlock name={displayCasa} logo={match.logotipo_casa} clubSlug={findClubSlug(match.equipa_casa, clubs)} />
+                        <TeamBlock name={displayCasa} logo={logoCasa} clubSlug={findClubSlug(match.equipa_casa, clubs)} />
                         <div className="flex flex-col items-center gap-1 shrink-0">
                             {isFinished || isLive ? (
                                 <>
@@ -526,7 +530,7 @@ function Game() {
                                 </div>
                             )}
                         </div>
-                        <TeamBlock name={displayFora} logo={match.logotipo_fora} clubSlug={findClubSlug(match.equipa_fora, clubs)} />
+                        <TeamBlock name={displayFora} logo={logoFora} clubSlug={findClubSlug(match.equipa_fora, clubs)} />
                     </div>
 
                     {/* Detail loading indicator */}
