@@ -10,8 +10,6 @@ export const config = { runtime: 'nodejs' }
 const COMPS = [
     { name: 'Liga Betclic Masculina', fpbId: 10902 },
     { name: 'Proliga', fpbId: 10903 },
-    { name: '1ª Divisão', fpbId: 10904 },
-    { name: '2ª Divisão', fpbId: 10905 },
 ]
 
 interface GameData {
@@ -36,11 +34,18 @@ function slugify(s: string): string {
 }
 
 async function fetchFPBPage(path: string): Promise<string> {
-    const res = await fetch(`https://www.fpb.pt/${path}/`, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Dribly/1.0)' },
-    })
-    if (!res.ok) throw new Error(`FPB ${res.status}`)
-    return await res.text()
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 8000)
+    try {
+        const res = await fetch(`https://www.fpb.pt/${path}/`, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+            signal: controller.signal,
+        })
+        if (!res.ok) throw new Error(`FPB ${res.status}`)
+        return await res.text()
+    } finally {
+        clearTimeout(timeout)
+    }
 }
 
 function parseGames(html: string, competicao: string): GameData[] {
@@ -135,14 +140,14 @@ export default async function handler(req: Request): Promise<Response> {
     // Fetch all 4 competitions in parallel
     // Fetch both calendar (upcoming) and results (finished) for each competition
     const compPromises = COMPS.map(async (comp) => {
-        const compGames: GameData[] = []
+        const games: GameData[] = []
         for (const page of ['calendario', 'resultados']) {
             try {
                 const html = await fetchFPBPage(`${page}/${comp.fpbId}`)
-                compGames.push(...parseGames(html, comp.name))
+                games.push(...parseGames(html, comp.name))
             } catch { /* skip */ }
         }
-        return compGames
+        return games
     })
     const settled = await Promise.allSettled(compPromises)
     for (const r of settled) {
