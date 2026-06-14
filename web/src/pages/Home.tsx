@@ -252,7 +252,7 @@ export default function Home() {
     const [games, setGames] = useState<Match[]>([])
     const [followedGames, setFollowedGames] = useState<Match[]>([])
     const [loading, setLoading] = useState(true)
-    const [loadingFollowed, setLoadingFollowed] = useState(false)
+    const [hasLoadedFollowed, setHasLoadedFollowed] = useState(false)
     const [openSections, setOpenSections] = useState<Set<string>>(new Set())
     const [searchOpen, setSearchOpen] = useState(false)
     const [showDatePicker, setShowDatePicker] = useState(false)
@@ -371,7 +371,7 @@ export default function Home() {
             return
         }
         lastFollowedFetch.current = key
-        setLoadingFollowed(true)
+        setHasLoadedFollowed(false)
         const fetchFollowed = async () => {
             const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
             // Merge resultados + calendario: keep scores from resultados, hora from calendario
@@ -405,7 +405,7 @@ export default function Home() {
             const unique = Array.from(clubGamesMap.values())
             unique.sort((a, b) => (a.hora || '99:99').localeCompare(b.hora || '99:99'))
             setFollowedGames(unique)
-            setLoadingFollowed(false)
+            setHasLoadedFollowed(true)
         }
         fetchFollowed()
     }, [followedClubIds, clubs.length, selectedDate])
@@ -431,13 +431,12 @@ export default function Home() {
     const sections = useMemo(() => {
         const s: { key: string; label: string; games: Match[]; loading?: boolean }[] = []
 
-        // "Seguidos" — always visible if user follows anyone
-        if (followedClubIds.length > 0) {
+        // "Seguidos" — só aparece depois do primeiro fetch (evita flash spinner)
+        if (followedClubIds.length > 0 && hasLoadedFollowed) {
             s.push({
                 key: 'seguidos',
                 label: 'Seguidos',
                 games: followedGames,
-                loading: loadingFollowed,
             })
         }
 
@@ -454,7 +453,7 @@ export default function Home() {
         if (remaining.length > 0) s.push({ key: 'outros', label: 'Outros', games: remaining })
 
         return s
-    }, [displayGames, followedGames, loadingFollowed, followedClubIds, selectedDate, featuredGame])
+    }, [displayGames, followedGames, followedClubIds, selectedDate, featuredGame, hasLoadedFollowed])
 
     const toggleSection = (key: string) => setOpenSections(prev => { const n = new Set(prev); if (n.has(key)) n.delete(key); else n.add(key); return n })
     const isEmpty = !loading && games.length === 0
@@ -516,7 +515,7 @@ export default function Home() {
                     : <>
                         {featuredGame && <div className="mb-4"><GameCard match={featuredGame} mode="agenda" clubs={clubs} /></div>}
                         <div className="space-y-2">
-                            {sections.map(({ key, label, games: secGames, loading: secLoading }) => {
+                            {sections.map(({ key, label, games: secGames }) => {
                                 const isOpen = openSections.has(key)
                                 return (
                                     <div key={key} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
@@ -528,18 +527,11 @@ export default function Home() {
                                             <ChevronDown size={16} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                                         </button>
                                         {isOpen && (
-                                            secLoading ? (
-                                                <div className="px-4 py-6 text-center border-t border-zinc-100 dark:border-white/5">
-                                                    <LoadingSpinner />
-                                                    <p className="text-xs text-zinc-400 mt-2">A pesquisar jogos...</p>
-                                                </div>
-                                            ) : (
-                                                <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
-                                                    {secGames.map((g, i) => (
-                                                        <ConfrontoRow key={g.slug || i} match={g} clubs={clubs} isFollowed={false} showCompetition={key === 'seguidos'} />
-                                                    ))}
-                                                </div>
-                                            )
+                                            <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
+                                                {secGames.map((g, i) => (
+                                                    <ConfrontoRow key={g.slug || i} match={g} clubs={clubs} isFollowed={false} showCompetition={key === 'seguidos'} />
+                                                ))}
+                                            </div>
                                         )}
                                     </div>
                                 )
