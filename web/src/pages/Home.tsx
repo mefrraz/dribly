@@ -8,7 +8,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Search, Trophy, ChevronDown, MapPin } from 'lucide-react'
-import { MapContainer, TileLayer, Marker, Tooltip, Circle } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabase'
 import { useFollows } from '../hooks/useFollows'
@@ -648,7 +648,7 @@ export default function Home() {
                                     <MapContainer
                                         key={darkMode ? 'dark' : 'light'}
                                         center={[geo.lat!, geo.lng!]}
-                                        zoom={13}
+                                        zoom={12}
                                         zoomControl={false}
                                         dragging={false}
                                         scrollWheelZoom={false}
@@ -661,9 +661,6 @@ export default function Home() {
                                             ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
                                             : 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'
                                         } />
-                                        <Circle center={[geo.lat!, geo.lng!]} radius={5000}
-                                            pathOptions={{ color: '#7C3AED', fillColor: '#7C3AED', fillOpacity: 0.08, weight: 1.5 }}
-                                        />
                                         {nearbyGames.map(({ pavilion }) => (
                                             <Marker key={pavilion.id}
                                                 position={[pavilion.lat, pavilion.lng]}
