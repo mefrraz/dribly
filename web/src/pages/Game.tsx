@@ -96,10 +96,15 @@ function Game() {
                                 setTopPerfCasa(detail.topPerfCasa)
                                 setTopPerfFora(detail.topPerfFora)
                                 setTopPerfStats(detail.topPerfStats)
-                                // Fix bad location from Supabase with clean pavilhao from detail
-                                if (detail.pavilhao && m.local && m.local.includes('|')) {
-                                    setMatch(prev => prev ? { ...prev, local: detail.pavilhao } : prev)
-                                }
+                                // Update match with fresh FPB data (scores might have changed since scrape)
+                                setMatch(prev => prev ? {
+                                    ...prev,
+                                    resultado_casa: detail.resultado_casa ?? prev.resultado_casa,
+                                    resultado_fora: detail.resultado_fora ?? prev.resultado_fora,
+                                    status: (detail.status || prev.status) as Match['status'],
+                                    local: (detail.pavilhao && prev.local && prev.local.includes('|'))
+                                        ? detail.pavilhao : prev.local,
+                                } : prev)
                             }
                         }).catch(() => {}).finally(() => setDetailLoading(false))
                     }
