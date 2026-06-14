@@ -71,6 +71,19 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
             const horaMatch = gh.match(/<div class="hour[^"]*">\s*<h3>\s*(\d{1,2})[Hh](\d{2})\s*<\/h3>/i)
             const hora = horaMatch ? `${horaMatch[1].padStart(2, '0')}:${horaMatch[2]}` : ''
             const logos = [...gh.matchAll(/<img[^>]*src="([^"]*\/CLU[^"]*)"[^>]*>/gi)].map(l => l[1])
+            // Extract competition from inline HTML (club pages have per-game competition)
+            const compMatch = gh.match(/<div class="competition"[^>]*>\s*<span>\s*([^<]+?)\s*<\/span>/i)
+            let comp = competicao, esc = ''
+            if (compMatch) {
+                const raw = compMatch[1].trim()
+                if (raw.includes('|')) {
+                    const parts = raw.split('|')
+                    esc = parts[0]?.trim() || ''
+                    comp = parts[1]?.trim() || raw
+                } else if (raw) {
+                    comp = raw
+                }
+            }
             const isFinished = scores.length >= 2
             games.push({
                 id, slug: `${dateStr}-${slugify(teams[0])}-${slugify(teams[1])}`,
@@ -78,7 +91,7 @@ function parseFPBHtml(html: string, competicao: string): Match[] {
                 equipa_casa: teams[0], equipa_fora: teams[1],
                 resultado_casa: isFinished ? scores[0] : null,
                 resultado_fora: isFinished ? scores[1] : null,
-                competicao, escalao: '',
+                competicao: comp, escalao: esc,
                 status: isFinished ? 'FINALIZADO' : 'AGENDADO',
                 local: null,
                 logotipo_casa: logos[0] || null, logotipo_fora: logos[1] || null,
@@ -133,6 +146,25 @@ function leagueRank(comp: string): number {
     return 99
 }
 
+// ── Club lookup helper ──
+
+function findClubByTeam(teamName: string, clubs: Club[]): Club | undefined {
+    const n = teamName.trim().toUpperCase()
+    // Exact match
+    for (const c of clubs) {
+        const cn = c.name.toUpperCase()
+        const sn = (c.search_name || '').toUpperCase()
+        if (n === cn || n === sn) return c
+    }
+    // Substring both ways
+    for (const c of clubs) {
+        const cn = c.name.toUpperCase()
+        const sn = (c.search_name || '').toUpperCase()
+        if (cn.includes(n) || n.includes(cn) || sn.includes(n) || n.includes(sn)) return c
+    }
+    return undefined
+}
+
 // ── Confrontos row ──
 
 function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Match; clubs: Club[]; isFollowed: boolean; showCompetition?: boolean }) {
@@ -142,8 +174,9 @@ function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Ma
     const hasScores = match.resultado_casa !== null && match.resultado_fora !== null
     const isFinished = match.status === 'FINALIZADO' || hasScores
     const slug = match.slug || `${match.data}-${match.equipa_casa.toLowerCase().replace(/\s+/g, '-')}-${match.equipa_fora.toLowerCase().replace(/\s+/g, '-')}`
-    const club = clubs.find(c => c.name === match.equipa_casa || c.name === match.equipa_fora)
-    const linkTo = club ? `/jogo/${slug}?clube=${club.slug}` : `/jogo/${slug}`
+    const club = findClubByTeam(match.equipa_casa, clubs) || findClubByTeam(match.equipa_fora, clubs)
+    const idParam = match.id && /^\d+$/.test(match.id) ? `&internalID=${match.id}` : ''
+    const linkTo = club ? `/jogo/${slug}?clube=${club.slug}${idParam}` : idParam ? `/jogo/${slug}?internalID=${match.id}` : `/jogo/${slug}`
     const hora = formatHora(match.hora)
 
     return (

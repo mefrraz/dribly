@@ -40,6 +40,7 @@ function Game() {
     const { slug } = useParams()
     const [searchParams] = useSearchParams()
     const clubSlug = searchParams.get('clube') || ''
+    const internalID = searchParams.get('internalID') || ''
     const { getClubBySlug, clubs } = useClub()
 
     const [match, setMatch] = useState<Match | null>(null)
@@ -121,6 +122,25 @@ function Game() {
                     }
                     return
                 }
+            }
+
+            // If internalID provided in URL, try direct FPB game detail fetch
+            if (internalID) {
+                try {
+                    setDetailLoading(true)
+                    const detail = await fetchGameDetail(internalID)
+                    if (detail) {
+                        setMatch(detailToMatch(detail))
+                        setDetailLeaders(detail.gameLeaders)
+                        setParciais(detail.parciais)
+                        setTopPerfCasa(detail.topPerfCasa)
+                        setTopPerfFora(detail.topPerfFora)
+                        setTopPerfStats(detail.topPerfStats)
+                    }
+                    setDetailLoading(false)
+                } catch { /* ignore */ }
+                setLoading(false)
+                return
             }
 
             if (!clubSlug && /^\d+$/.test(slug)) {
