@@ -143,7 +143,13 @@ function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[
     const slug = match.slug || `${match.data}-${match.equipa_casa.toLowerCase().replace(/\s+/g, '-')}-${match.equipa_fora.toLowerCase().replace(/\s+/g, '-')}`
     const club = clubs.find(c => c.name === match.equipa_casa || c.name === match.equipa_fora)
     const linkTo = club ? `/jogo/${slug}?clube=${club.slug}` : `/jogo/${slug}`
-    const hora = match.hora ? match.hora.replace(/[^0-9:]/g, '').slice(0, 5) : ''
+    // Parse hora: handle "15:00:00", "15h00", "15:00", etc.
+    const hora = (() => {
+        if (!match.hora) return ''
+        const nums = match.hora.replace(/[^0-9]/g, '')
+        if (nums.length >= 4) return nums.slice(0, 2) + ':' + nums.slice(2, 4)
+        return match.hora.replace(/[^0-9:]/g, '').slice(0, 5)
+    })()
 
     return (
         <Link to={linkTo}
@@ -156,7 +162,7 @@ function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[
             </div>
             <span className="text-[12px] font-semibold truncate shrink-0 max-w-[100px] text-zinc-900 dark:text-white group-hover:text-dribly-purple transition-colors">{displayCasa}</span>
             {isFinished
-                ? <span className="text-zinc-400 font-medium text-xs tabular-nums shrink-0">{match.resultado_casa}-{match.resultado_fora}</span>
+                ? <span className="text-zinc-900 dark:text-white font-bold text-xs tabular-nums shrink-0">{match.resultado_casa}-{match.resultado_fora}</span>
                 : <span className="text-zinc-400 font-medium text-[10px] shrink-0">vs</span>}
             <span className="text-[12px] truncate shrink-0 max-w-[100px] text-zinc-500 dark:text-zinc-400">{displayFora}</span>
             <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700/50">
