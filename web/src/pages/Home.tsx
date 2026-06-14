@@ -2,11 +2,11 @@
  * Home — v12 final
  *
  * Layout:
- *   Purple blur (stronger) behind league pills (WITH logos) + search bar
- *   Date selector bar
- *   Featured card: followed clubs game (head-to-head priority)
- *   Accordion sections per competition (closed by default)
- *   Confrontos rows inside each section
+ *   Purple blur → league pills (EXACT landing page replica: 3 pills, no icons)
+ *   Search bar
+ *   Date selector bar (no dividers, selected = rounded-full cylinder)
+ *   Featured card: followed clubs H2H priority
+ *   Accordion sections grouped by category (not raw competition names)
  */
 
 import { useState, useEffect, useMemo } from 'react'
@@ -20,13 +20,49 @@ import type { Match } from '../components/types'
 import { GameCard } from '../components/GameCard'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 
-// ── Competition sections ──
+// ── League pills (EXACT landing page) ──
 
-const COMPETITIONS = [
-    { key: 'Liga Betclic', label: 'Liga Betclic', id: 10902 },
-    { key: 'Proliga', label: 'Proliga', id: 10903 },
-    { key: '1ª Divisão', label: '1ª Divisão', id: 10904 },
-    { key: '2ª Divisão', label: '2ª Divisão', id: 10905 },
+const FEATURED_LEAGUES = [
+    { name: 'Liga Betclic', id: 10902 },
+    { name: 'Proliga', id: 10903 },
+    { name: '1ª Divisão', id: 10904 },
+]
+
+// ── Category grouping for accordions ──
+
+const CATEGORIES: { key: string; label: string; match: (comp: string) => boolean }[] = [
+    {
+        key: 'liga-betclic', label: 'Liga Betclic',
+        match: (c) => c.toLowerCase().includes('betclic'),
+    },
+    {
+        key: 'proliga', label: 'Proliga',
+        match: (c) => c.toLowerCase().includes('proliga'),
+    },
+    {
+        key: '1divisao', label: '1ª Divisão',
+        match: (c) => c.toLowerCase().includes('1ª') || c.toLowerCase().includes('1 divisão') || c.toLowerCase().includes('i divisão'),
+    },
+    {
+        key: '2divisao', label: '2ª Divisão',
+        match: (c) => c.toLowerCase().includes('2ª') || c.toLowerCase().includes('ii divisão'),
+    },
+    {
+        key: 'sub18', label: 'Sub-18',
+        match: (c) => /\b(sub[-\s]?18|s18|junior)/i.test(c),
+    },
+    {
+        key: 'sub16', label: 'Sub-16',
+        match: (c) => /\b(sub[-\s]?16|s16|cadete)/i.test(c),
+    },
+    {
+        key: 'sub14', label: 'Sub-14',
+        match: (c) => /\b(sub[-\s]?14|s14|iniciad)/i.test(c),
+    },
+    {
+        key: 'sen-fem', label: 'Seniores Femininos',
+        match: (c) => /\b(fem|feminin)/i.test(c) && !/\b(sub[-\s]?(14|16|18)|s14|s16|s18)/i.test(c),
+    },
 ]
 
 // ── Date helpers ──
@@ -56,9 +92,21 @@ function buildDayPills(): DayPill[] {
     }))
 }
 
+function categoryFor(comp: string): string {
+    for (const cat of CATEGORIES) {
+        if (cat.match(comp)) return cat.key
+    }
+    return 'outros'
+}
+
+function categoryLabel(key: string): string {
+    const found = CATEGORIES.find(c => c.key === key)
+    return found ? found.label : 'Outros'
+}
+
 // ── Confrontos row ──
 
-function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[]; isFollowed: boolean }) {
+function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[]; isFollowed: boolean; compLabel?: string }) {
     const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
     const displayFora = normalizeTeamDisplay(match.equipa_fora, clubs)
     const isLive = match.status === 'A DECORRER'
@@ -78,7 +126,7 @@ function ConfrontoRow({ match, clubs, isFollowed }: { match: Match; clubs: Club[
                 {match.logotipo_casa ? <img src={match.logotipo_casa} alt="" className="w-5 h-5 object-contain" loading="lazy" />
                     : <span className="text-[9px] font-bold text-zinc-500">{displayCasa.charAt(0)}</span>}
             </div>
-            <span className={`text-[12px] font-semibold truncate shrink-0 max-w-[100px] text-zinc-900 dark:text-white group-hover:text-dribly-purple transition-colors`}>
+            <span className="text-[12px] font-semibold truncate shrink-0 max-w-[100px] text-zinc-900 dark:text-white group-hover:text-dribly-purple transition-colors">
                 {displayCasa}
             </span>
             {isFinished
@@ -113,20 +161,13 @@ export default function Home() {
 
     useEffect(() => { loadClubs() }, [loadClubs])
 
-    // Fetch ALL games for selected date (no filter — we split by competition client-side)
     useEffect(() => {
         setLoading(true)
         setOpenSections(new Set())
-        const season = '2025/2026'
-        const tableName = `games_${season.replace('/', '_')}`
-
+        const tableName = `games_2025_2026`
         const fetchGames = async () => {
             try {
-                const { data } = await supabase
-                    .from(tableName)
-                    .select('*')
-                    .eq('data', selectedDate)
-                    .order('hora', { ascending: true })
+                const { data } = await supabase.from(tableName).select('*').eq('data', selectedDate).order('hora', { ascending: true })
                 setAllGames((data as Match[]) || [])
             } catch { setAllGames([]) }
             setLoading(false)
@@ -134,27 +175,27 @@ export default function Home() {
         fetchGames()
     }, [selectedDate])
 
-    // Followed names set
     const followedNames = useMemo(() =>
         new Set(clubs.filter(c => followedClubIds.includes(c.id)).map(c => c.name)),
         [clubs, followedClubIds])
 
-    // Group games by competition
-    const gamesByComp = useMemo(() => {
+    // Group games by category
+    const gamesByCategory = useMemo(() => {
+        // Initialize all categories (empty arrays)
         const map = new Map<string, Match[]>()
-        for (const g of allGames) {
-            const comp = g.competicao || 'Outros'
-            const arr = map.get(comp) || []
-            arr.push(g)
-            map.set(comp, arr)
-        }
-        return map
-    }, [allGames])
+        for (const cat of CATEGORIES) map.set(cat.key, [])
+        map.set('outros', [])
 
-    // Sort games within each group: followed first, then by time
-    const sortedByComp = useMemo(() => {
-        const result = new Map<string, Match[]>()
-        for (const [comp, games] of gamesByComp) {
+        for (const g of allGames) {
+            const comp = g.competicao || ''
+            const cat = categoryFor(comp)
+            const arr = map.get(cat) || []
+            arr.push(g)
+            if (!map.has(cat)) map.set(cat, arr)
+        }
+
+        // Sort within each category: followed first, then by time
+        for (const [key, games] of map) {
             const followed: Match[] = []
             const rest: Match[] = []
             for (const g of games) {
@@ -162,24 +203,18 @@ export default function Home() {
                     followed.push(g)
                 } else { rest.push(g) }
             }
-            result.set(comp, [...followed, ...rest])
+            map.set(key, [...followed, ...rest])
         }
-        return result
-    }, [gamesByComp, followedNames])
 
-    // Featured game: followed clubs head-to-head priority
+        return map
+    }, [allGames, followedNames])
+
     const featuredGame = useMemo(() => {
-        if (followedNames.size < 2) {
-            // Find first game with a followed club
-            return allGames.find(g =>
-                followedNames.has(g.equipa_casa) || followedNames.has(g.equipa_fora)
-            ) || allGames[0] || null
+        if (followedNames.size >= 2) {
+            const h2h = allGames.find(g =>
+                followedNames.has(g.equipa_casa) && followedNames.has(g.equipa_fora))
+            if (h2h) return h2h
         }
-        // Look for head-to-head between followed clubs
-        const h2h = allGames.find(g =>
-            followedNames.has(g.equipa_casa) && followedNames.has(g.equipa_fora)
-        )
-        if (h2h) return h2h
         return allGames.find(g =>
             followedNames.has(g.equipa_casa) || followedNames.has(g.equipa_fora)
         ) || allGames[0] || null
@@ -194,53 +229,26 @@ export default function Home() {
         })
     }
 
-    // Build sections: known competitions in order, then "Outros"
-    const sections = useMemo(() => {
-        const result: { key: string; label: string; id?: number }[] = []
-        const seen = new Set<string>()
-
-        for (const { key, label, id } of COMPETITIONS) {
-            if (sortedByComp.has(key)) {
-                result.push({ key, label, id })
-                seen.add(key)
-            }
-        }
-
-        // Add remaining competitions as "Outros"
-        const others: string[] = []
-        for (const comp of sortedByComp.keys()) {
-            if (!seen.has(comp)) others.push(comp)
-        }
-        if (others.length > 0) {
-            result.push({ key: 'outros', label: 'Outros' })
-        }
-
-        return { sections: result, others }
-    }, [sortedByComp])
-
     const isEmpty = !loading && allGames.length === 0
     const liveCount = allGames.filter(g => g.status === 'A DECORRER').length
 
     return (
         <div className="max-w-2xl mx-auto pb-24">
-            {/* ── Purple blur section (stronger) ── */}
+            {/* ── Purple blur section ── */}
             <div className="relative overflow-hidden">
                 <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-dribly-purple/20 dark:bg-dribly-purple/15 blur-[100px] pointer-events-none" />
                 <div className="absolute -top-8 left-1/4 w-40 h-40 rounded-full bg-dribly-purple-light/15 dark:bg-dribly-purple-light/10 blur-[60px] pointer-events-none" />
 
                 <div className="relative z-10 max-w-2xl mx-auto px-4 pt-2 pb-5">
-                    {/* League pills WITH logos */}
-                    <div className="flex justify-center gap-2 flex-wrap mb-4">
-                        {COMPETITIONS.map(({ label, id }) => (
+                    {/* League pills — EXACT landing page replica: 3 pills, NO icons */}
+                    <div className="flex justify-center gap-2 mb-4 flex-wrap">
+                        {FEATURED_LEAGUES.map(({ name, id }) => (
                             <button
                                 key={id}
                                 onClick={() => navigate('/competicao/' + id)}
-                                className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all shrink-0"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 hover:border-dribly-purple/30 hover:text-dribly-purple hover:shadow-sm transition-all shrink-0"
                             >
-                                <div className="w-6 h-6 rounded-full bg-dribly-purple/10 dark:bg-dribly-purple/20 flex items-center justify-center shrink-0 overflow-hidden">
-                                    <Trophy size={12} className="text-dribly-purple" />
-                                </div>
-                                {label}
+                                {name}
                             </button>
                         ))}
                     </div>
@@ -258,24 +266,22 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* ── Date selector BAR ── */}
+            {/* ── Date selector BAR (no dividers, selected = rounded-full cylinder) ── */}
             <div className="px-4 mb-5">
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
-                    <div className="flex overflow-x-auto scrollbar-none">
-                        {pills.map(p => (
-                            <button
-                                key={p.date}
-                                onClick={() => setSelectedDate(p.date)}
-                                className={`shrink-0 px-5 py-3 text-xs font-bold transition-all border-r border-zinc-100 dark:border-white/5 last:border-0 ${
-                                    selectedDate === p.date
-                                        ? 'bg-dribly-purple text-white'
-                                        : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5'
-                                }`}
-                            >
-                                {p.label}
-                            </button>
-                        ))}
-                    </div>
+                <div className="flex gap-2 overflow-x-auto scrollbar-none">
+                    {pills.map(p => (
+                        <button
+                            key={p.date}
+                            onClick={() => setSelectedDate(p.date)}
+                            className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                                selectedDate === p.date
+                                    ? 'bg-dribly-purple text-white shadow-sm shadow-dribly-purple/20'
+                                    : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:border-dribly-purple/30'
+                            }`}
+                        >
+                            {p.label}
+                        </button>
+                    ))}
                 </div>
             </div>
 
@@ -307,92 +313,49 @@ export default function Home() {
                             </div>
                         )}
 
-                        {/* Competition accordion sections */}
+                        {/* Category accordions */}
                         <div className="space-y-2">
-                            {sections.sections.map(({ key, label }) => {
-                                const games = sortedByComp.get(key) || []
-                                if (games.length === 0) return null
-                                const isOpen = openSections.has(key)
-
-                                return (
-                                    <div key={key} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
-                                        {/* Header */}
-                                        <button
-                                            onClick={() => toggleSection(key)}
-                                            className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors"
-                                        >
-                                            <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />
-                                                {label}
-                                                <span className="text-[11px] font-medium text-zinc-400">({games.length})</span>
-                                            </h3>
-                                            <ChevronDown size={16} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-                                        </button>
-
-                                        {/* Games */}
-                                        {isOpen && (
-                                            <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
-                                                {games.map((g, i) => (
-                                                    <ConfrontoRow
-                                                        key={g.slug || i}
-                                                        match={g}
-                                                        clubs={clubs}
-                                                        isFollowed={
-                                                            followedNames.has(g.equipa_casa) ||
-                                                            followedNames.has(g.equipa_fora)
-                                                        }
-                                                    />
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                )
-                            })}
-
-                            {/* "Outros" section — remaining competitions */}
-                            {sections.others.length > 0 && (() => {
-                                const othersKey = 'outros'
-                                const isOpen = openSections.has(othersKey)
-                                const allOtherGames = sections.others.flatMap(comp => sortedByComp.get(comp) || [])
-                                if (allOtherGames.length === 0) return null
-
-                                return (
-                                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
-                                        <button
-                                            onClick={() => toggleSection(othersKey)}
-                                            className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors"
-                                        >
-                                            <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-                                                Outros
-                                                <span className="text-[11px] font-medium text-zinc-400">({allOtherGames.length})</span>
-                                            </h3>
-                                            <ChevronDown size={16} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-                                        </button>
-                                        {isOpen && (
-                                            <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
-                                                {allOtherGames.map((g, i) => (
-                                                    <ConfrontoRow
-                                                        key={g.slug || i}
-                                                        match={g}
-                                                        clubs={clubs}
-                                                        isFollowed={
-                                                            followedNames.has(g.equipa_casa) ||
-                                                            followedNames.has(g.equipa_fora)
-                                                        }
-                                                    />
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                )
-                            })()}
+                            {[...gamesByCategory.entries()]
+                                .filter(([, games]) => games.length > 0)
+                                .map(([key, games]) => {
+                                    const isOpen = openSections.has(key)
+                                    const label = categoryLabel(key)
+                                    return (
+                                        <div key={key} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden">
+                                            <button
+                                                onClick={() => toggleSection(key)}
+                                                className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 dark:hover:bg-white/[0.02] transition-colors"
+                                            >
+                                                <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-dribly-purple" />
+                                                    {label}
+                                                    <span className="text-[11px] font-medium text-zinc-400">({games.length})</span>
+                                                </h3>
+                                                <ChevronDown size={16} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                            </button>
+                                            {isOpen && (
+                                                <div className="divide-y divide-zinc-100 dark:divide-white/5 border-t border-zinc-100 dark:border-white/5">
+                                                    {games.map((g, i) => (
+                                                        <ConfrontoRow
+                                                            key={g.slug || i}
+                                                            match={g}
+                                                            clubs={clubs}
+                                                            isFollowed={
+                                                                followedNames.has(g.equipa_casa) ||
+                                                                followedNames.has(g.equipa_fora)
+                                                            }
+                                                        />
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
                         </div>
                     </>
                 )}
             </div>
 
-            {/* ── Search overlay ── */}
             {searchOpen && <SearchOverlay clubs={clubs} onClose={() => setSearchOpen(false)} />}
         </div>
     )
