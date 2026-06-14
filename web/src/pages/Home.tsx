@@ -19,6 +19,7 @@ import { normalizeTeamDisplay } from '../lib/fpbUtils'
 import type { Match } from '../components/types'
 import { GameCard } from '../components/GameCard'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { fetchGameDetail } from '../lib/fpbCompetitionsApi'
 
 // ── League pills ──
 
@@ -219,7 +220,50 @@ export default function Home() {
                     .select('*')
                     .eq('data', selectedDate)
                     .order('hora', { ascending: true })
-                setAllGames((data as Match[]) || [])
+                const games = (data as Match[]) || []
+                setAllGames(games)
+
+                // ── Auto-refresh: update scores for today's games without results ──
+                const today = toYYYYMMDD(new Date())
+                if (selectedDate === today || selectedDate < today) {
+                    const needUpdate = games.filter(g =>
+                        g.id && (g.resultado_casa === null || g.resultado_fora === null)
+                    )
+                    if (needUpdate.length > 0) {
+                        console.log(`[Home] ${needUpdate.length} jogos sem resultado — a atualizar...`)
+                        // eslint-disable-next-line no-console
+                        console.time('[Home] FPB refresh')
+                        let updated = 0
+                        for (const g of needUpdate.slice(0, 8)) {
+                            try {
+                                const detail = await fetchGameDetail(String(g.id))
+                                if (detail && (detail.resultado_casa !== null || detail.resultado_fora !== null)) {
+                                    await supabase.from('games_2025_2026').upsert({
+                                        ...g,
+                                        resultado_casa: detail.resultado_casa ?? g.resultado_casa,
+                                        resultado_fora: detail.resultado_fora ?? g.resultado_fora,
+                                        status: detail.status || g.status,
+                                        updated_at: new Date().toISOString(),
+                                    }, { onConflict: 'slug' })
+                                    updated++
+                                }
+                            } catch { /* skip failed fetches */ }
+                        }
+                        // eslint-disable-next-line no-console
+                        console.timeEnd('[Home] FPB refresh')
+                        console.log(`[Home] ${updated}/${Math.min(needUpdate.length, 8)} jogos atualizados`)
+
+                        // Reload from Supabase to get updated data
+                        if (updated > 0) {
+                            const { data: fresh } = await supabase
+                                .from('games_2025_2026')
+                                .select('*')
+                                .eq('data', selectedDate)
+                                .order('hora', { ascending: true })
+                            setAllGames((fresh as Match[]) || [])
+                        }
+                    }
+                }
             } catch { setAllGames([]) }
             setLoading(false)
         }
