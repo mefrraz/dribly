@@ -22,6 +22,8 @@ const GameCardInner = ({ match, mode, clubName, clubSlug, clubs = [] }: GameCard
   const slug = match.slug || `${match.data}-${match.equipa_casa.toLowerCase().replace(/\s+/g, '-')}-${match.equipa_fora.toLowerCase().replace(/\s+/g, '-')}`
   const won = clubName ? isClubWin(match, clubName) : null
   const isLive = match.status === 'A DECORRER'
+  const hasScores = match.resultado_casa !== null && match.resultado_fora !== null
+  const effectiveMode = hasScores ? 'results' : mode
   const idParam = match.id && /^\d+$/.test(match.id) ? `&internalID=${match.id}` : ''
   const linkSlug = clubSlug ? `/jogo/${slug}?clube=${clubSlug}${idParam}` : idParam ? `/jogo/${slug}?internalID=${match.id}` : `/jogo/${slug}`
   const displayCasa = normalizeTeamDisplay(match.equipa_casa, clubs)
@@ -39,7 +41,7 @@ const GameCardInner = ({ match, mode, clubName, clubSlug, clubs = [] }: GameCard
   const logoCasa = clubLogoUrl(findClub(match.equipa_casa)) || match.logotipo_casa
   const logoFora = clubLogoUrl(findClub(match.equipa_fora)) || match.logotipo_fora
 
-  const badge = mode === 'agenda'
+  const badge = effectiveMode === 'agenda'
     ? null
     : clubName
       ? won === true
@@ -58,7 +60,7 @@ const GameCardInner = ({ match, mode, clubName, clubSlug, clubs = [] }: GameCard
       {/* Top bar */}
       <div className="flex justify-between items-center px-4 py-2.5 border-b border-zinc-100 dark:border-white/5">
         <div className="flex items-center gap-2 min-w-0">
-          {mode === 'agenda' ? (
+          {effectiveMode === 'agenda' ? (
             <div className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 tracking-wider">
               {new Date(match.data).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })}
               {hasHora(match.hora) && ` · ${match.hora!.slice(0, 5)}`}
@@ -90,8 +92,8 @@ const GameCardInner = ({ match, mode, clubName, clubSlug, clubs = [] }: GameCard
 
       {/* Teams */}
       <div className="p-4 flex flex-col gap-3">
-        <TeamRow name={displayCasa} logo={logoCasa} score={mode === 'results' ? match.resultado_casa : null} dimmed={match.resultado_casa !== null && match.resultado_fora !== null && match.resultado_casa < match.resultado_fora} />
-        <TeamRow name={displayFora} logo={logoFora} score={mode === 'results' ? match.resultado_fora : null} dimmed={match.resultado_casa !== null && match.resultado_fora !== null && match.resultado_fora < match.resultado_casa} />
+        <TeamRow name={displayCasa} logo={logoCasa} score={effectiveMode === 'results' ? match.resultado_casa : null} dimmed={hasScores && match.resultado_casa! < match.resultado_fora!} />
+        <TeamRow name={displayFora} logo={logoFora} score={effectiveMode === 'results' ? match.resultado_fora : null} dimmed={hasScores && match.resultado_fora! < match.resultado_casa!} />
       </div>
 
       {/* Bottom bar */}

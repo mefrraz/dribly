@@ -266,8 +266,12 @@ export default function Home() {
     // ── Jogos perto de mim ──
     const geo = useGeolocation()
     const [nearbyGames, setNearbyGames] = useState<{ game: Match; pavilion: Pavilion; distance: number }[]>([])
+    const computingNearby = useRef(false)
     useEffect(() => {
-        if (!geo.lat || !geo.lng) { setNearbyGames([]); return }
+        if (!geo.lat || !geo.lng) return
+        if (games.length === 0 && followedGames.length === 0) return // wait for data
+        if (computingNearby.current) return // already computing
+        computingNearby.current = true
         const compute = async () => {
             try {
                 const pavs = await fetchPavilions()
@@ -282,19 +286,20 @@ export default function Home() {
                         if (locNorm.includes(pavNorm) || pavNorm.includes(locNorm) || 
                             (g.local!.toLowerCase().includes(p.cidade?.toLowerCase() || '') && locNorm.split(/\s+/).some(w => pavNorm.includes(w)))) {
                             const dist = haversineKm(geo.lat!, geo.lng!, p.lat, p.lng)
-                            if (dist <= 50) { // within 50km
+                            if (dist <= 50) {
                                 matches.push({ game: g, pavilion: p, distance: dist })
                             }
-                            break // first match per game
+                            break
                         }
                     }
                 }
                 matches.sort((a, b) => a.distance - b.distance)
                 setNearbyGames(matches.slice(0, 5))
             } catch { /* ignore */ }
+            computingNearby.current = false
         }
         compute()
-    }, [geo.lat, geo.lng, games.length, followedGames.length])
+    }, [geo.lat, geo.lng, games, followedGames])
 
     useEffect(() => { loadClubs() }, [loadClubs])
     useEffect(() => {
