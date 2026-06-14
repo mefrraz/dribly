@@ -355,24 +355,35 @@ export default function Home() {
         setLoadingFollowed(true)
         const fetchFollowed = async () => {
             const followedClubs = clubs.filter(c => followedClubIds.includes(c.id))
-            const clubGames: Match[] = []
+            // Merge resultados + calendario: keep scores from resultados, hora from calendario
+            const clubGamesMap = new Map<string, Match>()
             for (const club of followedClubs.slice(0, 8)) {
-                // Fetch resultados first so dedup keeps scores over time-only calendar entries
+                // Fetch resultados first so scores take priority in the merge
                 for (const page of ['resultados', 'calendario']) {
                     try {
                         const res = await fetch(`/api/fpb?page=${page}&clube=${club.id}&epoca=2025/2026`)
                         const html = await res.text()
                         if (!html || html.startsWith('{')) continue
                         const parsed = parseFPBHtml(html, '')
-                        clubGames.push(...parsed.filter(g => g.data === selectedDate))
+                        for (const g of parsed.filter(g => g.data === selectedDate)) {
+                            const key = g.slug || `${g.data}-${g.equipa_casa}-${g.equipa_fora}`
+                            const existing = clubGamesMap.get(key)
+                            if (existing) {
+                                clubGamesMap.set(key, {
+                                    ...g,
+                                    hora: g.hora || existing.hora,
+                                    resultado_casa: g.resultado_casa ?? existing.resultado_casa,
+                                    resultado_fora: g.resultado_fora ?? existing.resultado_fora,
+                                    status: (g.resultado_casa !== null && g.resultado_fora !== null) ? 'FINALIZADO' : existing.status,
+                                })
+                            } else {
+                                clubGamesMap.set(key, g)
+                            }
+                        }
                     } catch { /* skip */ }
                 }
             }
-            const seen = new Set<string>()
-            const unique = clubGames.filter(g => {
-                const k = g.slug || `${g.data}-${g.equipa_casa}-${g.equipa_fora}`
-                if (seen.has(k)) return false; seen.add(k); return true
-            })
+            const unique = Array.from(clubGamesMap.values())
             unique.sort((a, b) => (a.hora || '99:99').localeCompare(b.hora || '99:99'))
             setFollowedGames(unique)
             setLoadingFollowed(false)
