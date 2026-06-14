@@ -188,8 +188,9 @@ function ConfrontoRow({ match, clubs, isFollowed, showCompetition }: { match: Ma
     const df = normalizeTeamDisplay(match.equipa_fora, clubs)
     const clubCasa = findClubByTeam(match.equipa_casa, clubs)
     const clubFora = findClubByTeam(match.equipa_fora, clubs)
-    const logoCasa = match.logotipo_casa || clubCasa?.logo_url || null
-    const logoFora = match.logotipo_fora || clubFora?.logo_url || null
+    const bucketLogo = (slug: string) => slug ? `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/club-logos/${slug}.png` : null
+    const logoCasa = match.logotipo_casa || (clubCasa ? clubCasa.logo_url || bucketLogo(clubCasa.slug) : null)
+    const logoFora = match.logotipo_fora || (clubFora ? clubFora.logo_url || bucketLogo(clubFora.slug) : null)
     const isLive = match.status === 'A DECORRER'
     const hasScores = match.resultado_casa !== null && match.resultado_fora !== null
     const isFinished = match.status === 'FINALIZADO' || hasScores
@@ -435,7 +436,7 @@ export default function Home() {
             )
             if (compGames.length > 0) s.push({ key: comp, label: comp, games: compGames })
         }
-        const remaining = displayGames.filter((g: Match) => !s.some(sec => sec.games.includes(g)))
+        const remaining = displayGames.filter((g: Match) => !s.some(sec => sec.games.includes(g)) && g.slug !== featuredGame?.slug)
         if (remaining.length > 0) s.push({ key: 'outros', label: 'Outros', games: remaining })
 
         return s
