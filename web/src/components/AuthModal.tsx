@@ -373,6 +373,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                             <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                                             <input
                                                 type="text"
+                                                inputMode="numeric"
                                                 value={resetCode}
                                                 onChange={e => setResetCode(e.target.value)}
                                                 placeholder="Código de 6 dígitos"
@@ -437,6 +438,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                     <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                                     <input
                                         type="text"
+                                        inputMode="numeric"
                                         value={signUpVerificationCode}
                                         onChange={e => setSignUpVerificationCode(e.target.value)}
                                         placeholder="Código de 6 dígitos"
@@ -494,6 +496,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
                                     <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                                     <input
                                         type="text"
+                                        inputMode="numeric"
                                         value={secondFactorCode}
                                         onChange={e => setSecondFactorCode(e.target.value)}
                                         placeholder="Código de 6 dígitos"
