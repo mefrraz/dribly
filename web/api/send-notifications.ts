@@ -190,80 +190,103 @@ export default async function handler(req: Request): Promise<Response> {
             subsByUser.set(s.user_id, arr)
         }
 
-        // ── 5. Send notifications for club games ──
-        // For each upcoming game, find users who follow the home club
-        // (club_id lookup via clubs table matching equipa_casa name)
-        for (const game of upcomingGames) {
-            const clubFollowers = followClubUsers(follows as Follow[], game.equipa_casa)
-            for (const userId of clubFollowers) {
-                const subs = subsByUser.get(userId)
-                if (!subs) continue
-                for (const sub of subs) {
-                    try {
-                        await webpush.sendNotification(
-                            {
-                                endpoint: sub.endpoint,
-                                keys: { p256dh: sub.p256dh, auth: sub.auth },
-                            },
-                            JSON.stringify({
-                                title: '🏀 Jogo a começar',
-                                body: `${game.equipa_casa} vs ${game.equipa_fora} — ${formatTime(game.hora)}`,
-                                icon: '/logo.png',
-                                badge: '/logo.png',
-                                url: `https://dribly.pt/jogo/${game.slug}`,
-                                tag: `game-${game.slug}`,
-                            })
-                        )
-                        results.clubGames++
-                    } catch (err) {
-                        // Remove dead subscriptions
-                        if ((err as { statusCode?: number }).statusCode === 410) {
-                            await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
-                        }
-                        results.errors++
+        // ── 5. Load notification templates from DB ──
+        const { data: templateRows } = await supabase.from('notification_templates').select('id, title, body')
+        const templates: Record<string, { title: string; body: string }> = {
+            game_starting: { title: '🏀 {equipa_casa} vs {equipa_fora}', body: 'Começa às {hora} — {competicao}' },
+            game_win: { title: '✅ Vitória!', body: '{equipa_casa} {resultado_casa} - {resultado_fora} {equipa_fora}' },
+            game_loss: { title: '❌ Derrota', body: '{equipa_casa} {resultado_casa} - {resultado_fora} {equipa_fora}' },
+            game_draw: { title: '🤝 Empate', body: '{equipa_casa} {resultado_casa} - {resultado_fora} {equipa_fora}' },
+            game_result: { title: '📊 Resultado', body: '{equipa_casa} {resultado_casa} - {resultado_fora} {equipa_fora}' },
+        }
+        if (templateRows) for (const t of templateRows as { id: string; title: string; body: string }[]) {
+            if (templates[t.id]) templates[t.id] = { title: t.title, body: t.body }
+        }
+
+        const fillTemplate = (tmpl: string, vars: Record<string, string>) => {
+            let result = tmpl
+            for (const [k, v] of Object.entries(vars)) {
+                result = result.replace(new RegExp(k.replace(/[{}]/g, '\\$&'), 'g'), v)
+            }
+            return result
+        }
+
+        const notifySubscribers = async (subs: PushSub[], payload: object, tag: string) => {
+            for (const sub of subs) {
+                try {
+                    await webpush.sendNotification(
+                        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+                        JSON.stringify({ ...payload, icon: '/logo.png', badge: '/logo.png', tag })
+                    )
+                } catch (err) {
+                    if ((err as { statusCode?: number }).statusCode === 410) {
+                        await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
                     }
+                    results.errors++
                 }
             }
         }
 
-        // ── 6. Send notifications for finished games ──
-        for (const game of finishedGames) {
-            const homeScore = game.resultado_casa ?? '?'
-            const awayScore = game.resultado_fora ?? '?'
+        // ── 6. Send notifications for upcoming games ──
+        for (const game of upcomingGames) {
+            const vars = { '{equipa_casa}': game.equipa_casa, '{equipa_fora}': game.equipa_fora,
+                '{competicao}': game.competicao, '{hora}': formatTime(game.hora), '{escalao}': game.competicao,
+                '{resultado_casa}': '', '{resultado_fora}': '' }
+            const t = templates.game_starting
+            const payload = { title: fillTemplate(t.title, vars), body: fillTemplate(t.body, vars), url: `https://dribly.pt/jogo/${game.slug}` }
 
-            // Notify followers of BOTH teams
-            const homeFollowers = followClubUsers(follows as Follow[], game.equipa_casa)
-            const awayFollowers = followClubUsers(follows as Follow[], game.equipa_fora)
-            const allFollowers = [...new Set([...homeFollowers, ...awayFollowers])]
-
-            for (const userId of allFollowers) {
-                const subs = subsByUser.get(userId)
-                if (!subs) continue
-                for (const sub of subs) {
-                    try {
-                        await webpush.sendNotification(
-                            {
-                                endpoint: sub.endpoint,
-                                keys: { p256dh: sub.p256dh, auth: sub.auth },
-                            },
-                            JSON.stringify({
-                                title: '📊 Resultado final',
-                                body: `${game.equipa_casa} ${homeScore} - ${awayScore} ${game.equipa_fora}`,
-                                icon: '/logo.png',
-                                badge: '/logo.png',
-                                url: `https://dribly.pt/jogo/${game.slug}`,
-                                tag: `result-${game.slug}`,
-                            })
-                        )
-                        results.results++
-                    } catch (err) {
-                        if ((err as { statusCode?: number }).statusCode === 410) {
-                            await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
-                        }
-                        results.errors++
-                    }
+            const warned = new Set<string>()
+            for (const team of [game.equipa_casa, game.equipa_fora]) {
+                const followers = followClubUsers(follows as Follow[], team)
+                for (const uid of followers) {
+                    if (warned.has(uid)) continue
+                    warned.add(uid)
+                    const subs = subsByUser.get(uid)
+                    if (subs) await notifySubscribers(subs, payload, `game-${game.slug}`)
                 }
             }
+            results.clubGames += warned.size
+        }
+
+        // ── 7. Send notifications for finished games ──
+        for (const game of finishedGames) {
+            const homeScore = String(game.resultado_casa ?? '?')
+            const awayScore = String(game.resultado_fora ?? '?')
+            const vars = { '{equipa_casa}': game.equipa_casa, '{equipa_fora}': game.equipa_fora,
+                '{resultado_casa}': homeScore, '{resultado_fora}': awayScore,
+                '{competicao}': game.competicao, '{hora}': formatTime(game.hora), '{escalao}': game.competicao }
+
+            const homeFollowers = new Set(followClubUsers(follows as Follow[], game.equipa_casa))
+            const awayFollowers = new Set(followClubUsers(follows as Follow[], game.equipa_fora))
+            const bothFollowers = new Set([...homeFollowers].filter(u => awayFollowers.has(u)))
+
+            // Helper: send to set of users with specific template
+            const sendToUsers = async (users: Set<string>, templateKey: string) => {
+                const t = templates[templateKey]
+                const payload = { title: fillTemplate(t.title, vars), body: fillTemplate(t.body, vars), url: `https://dribly.pt/jogo/${game.slug}` }
+                for (const uid of users) {
+                    const subs = subsByUser.get(uid)
+                    if (subs) await notifySubscribers(subs, payload, `result-${game.slug}`)
+                }
+            }
+
+            // If user follows both: neutral "resultado"
+            if (bothFollowers.size > 0) await sendToUsers(bothFollowers, 'game_result')
+            // Home-only followers
+            const homeOnly = new Set([...homeFollowers].filter(u => !bothFollowers.has(u)))
+            if (homeOnly.size > 0) {
+                const homeWon = parseInt(homeScore) > parseInt(awayScore)
+                const isDraw = homeScore === awayScore
+                await sendToUsers(homeOnly, isDraw ? 'game_draw' : homeWon ? 'game_win' : 'game_loss')
+            }
+            // Away-only followers
+            const awayOnly = new Set([...awayFollowers].filter(u => !bothFollowers.has(u)))
+            if (awayOnly.size > 0) {
+                const awayWon = parseInt(awayScore) > parseInt(homeScore)
+                const isDraw = homeScore === awayScore
+                await sendToUsers(awayOnly, isDraw ? 'game_draw' : awayWon ? 'game_win' : 'game_loss')
+            }
+            results.results += homeFollowers.size + awayFollowers.size - bothFollowers.size
         }
 
         return Response.json({ message: 'Notifications sent', ...results })

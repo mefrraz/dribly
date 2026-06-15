@@ -112,7 +112,7 @@ function App() {
                             <Route path="competicoes" element={<CompetitionsAdmin />} />
                             <Route path="scrape" element={<ScrapeAdmin />} />
                             <Route path="calendario" element={<CalendarAdmin />} />
-                            <Route path="notifications" element={<NotificationsAdmin />} />
+                            <Route path="notificacoes" element={<NotificationsAdmin />} />
                         </Route>
                     </Route>
                 </Routes>
