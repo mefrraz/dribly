@@ -16,9 +16,9 @@ interface Competition {
 }
 
 const RECOMMENDED_CLUBS = [
-    'fc-porto', 'sl-benfica', 'sporting-cp', 'ud-oliveirense',
-    'sc-lusitania', 'vitoria-sc', 'galitos-barreiro', 'cd-povoa',
-    'sangalhos-dc', 'ovar-basquete',
+    'futebol-clube-do-porto', 'sport-lisboa-e-benfica', 'sporting-clube-de-portugal', 'uni-o-desportiva-oliveirense',
+    'sport-club-lusit-nia', 'vit-ria-sport-clube', 'clube-dos-galitos', 'clube-desportivo-da-p-voa',
+    'sangalhos-desporto-clube', 'a-d-o-basquetebol-da-associa-o-desportiva-ovarense',
 ]
 
 const COMP_SUGGESTIONS = [
@@ -49,8 +49,19 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
 
     const [clubQuery, setClubQuery] = useState('')
     const [compQuery, setCompQuery] = useState('')
+    const [compLogos, setCompLogos] = useState<Map<number, string>>(new Map())
 
     useEffect(() => { loadClubs() }, [loadClubs])
+
+    useEffect(() => {
+        supabase.from('competitions_meta').select('id, logo_url').then(({ data }) => {
+            if (data) {
+                const m = new Map<number, string>()
+                ;(data as { id: number; logo_url: string | null }[]).forEach(r => { if (r.logo_url) m.set(r.id, r.logo_url) })
+                setCompLogos(m)
+            }
+        })
+    }, [])
 
     useEffect(() => {
         supabase
@@ -252,8 +263,12 @@ export function PostOnboardingSuggestions({ onComplete }: Props) {
                                             isF ? 'bg-dribly-purple/5 dark:bg-dribly-purple/10 border-dribly-purple/30 text-dribly-purple' : 'bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-400 hover:border-dribly-purple/20'
                                         }`}
                                     >
+                                        {compLogos.get(comp.competition_id) ? (
+                                        <img src={compLogos.get(comp.competition_id)} alt="" className="w-5 h-5 object-contain shrink-0" />
+                                    ) : (
                                         <Trophy size={14} className={isF ? 'text-dribly-purple' : 'text-zinc-300'} />
-                                        <span className="flex-1 text-left truncate">{comp.competition_name}</span>
+                                    )}
+                                    <span className="flex-1 text-left truncate">{comp.competition_name}</span>
                                         {isF ? <Heart size={13} className="text-dribly-purple fill-dribly-purple shrink-0" /> : <Heart size={13} className="text-zinc-300 shrink-0" />}
                                     </button>
                                 )
