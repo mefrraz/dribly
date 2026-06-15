@@ -69,6 +69,19 @@
   <body class="bg-zinc-50 text-zinc-900 font-sans antialiased">
     <div id="root"></div>
     <div id="clerk-captcha"></div>
+    <!-- Capacitor debug: log all clicks on links -->
+    <script>
+      document.addEventListener('click', function(e) {
+        var a = e.target.closest('a')
+        if (a && a.href) {
+          var div = document.createElement('div')
+          div.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#7C3AED;color:#fff;padding:12px;font-size:12px;z-index:99999;text-align:center'
+          div.textContent = '🔗 ' + a.href
+          document.body.appendChild(div)
+          setTimeout(function(){ div.remove() }, 2000)
+        }
+      })
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

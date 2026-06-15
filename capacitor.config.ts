@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
     server: {
         url: 'https://dribly.pt',
         cleartext: false,
-
+        allowNavigation: ['*'],
     },
 
     plugins: {
@@ -26,7 +26,7 @@ const config: CapacitorConfig = {
     android: {
         allowMixedContent: false,
         captureInput: true,
-        webContentsDebuggingEnabled: false,
+        webContentsDebuggingEnabled: true,
     },
 }
 
