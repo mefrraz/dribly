@@ -9,6 +9,7 @@ const config: CapacitorConfig = {
     server: {
         url: 'https://dribly.pt',
         cleartext: false,
+
     },
 
     plugins: {
