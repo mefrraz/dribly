@@ -66,12 +66,8 @@ export function usePushNotifications() {
         return () => clearInterval(interval)
     }, [])
 
-    // ── Subscribe to push notifications ──
+    // ── Subscribe to push notifications (works with or without account) ──
     const subscribe = useCallback(async (): Promise<boolean> => {
-        if (!user) {
-            logger.warn('Cannot subscribe: user not logged in')
-            return false
-        }
         if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
             logger.warn('Push notifications not supported')
             return false
@@ -117,19 +113,19 @@ export function usePushNotifications() {
                 })
             }
 
-            // 5. Save to Supabase
+            // 5. Save to Supabase (user_id nullable — works for anonymous too)
             const subJson = pushSub.toJSON()
             const { error } = await supabase
                 .from('push_subscriptions')
                 .upsert(
                     {
-                        user_id: user.id,
+                        user_id: user?.id || null,
                         endpoint: subJson.endpoint!,
                         p256dh: subJson.keys!.p256dh,
                         auth: subJson.keys!.auth,
                         updated_at: new Date().toISOString(),
                     },
-                    { onConflict: 'user_id, endpoint' }
+                    { onConflict: 'endpoint' }
                 )
             if (error) throw error
 
@@ -145,8 +141,6 @@ export function usePushNotifications() {
 
     // ── Unsubscribe from push notifications ──
     const unsubscribe = useCallback(async (subscriptionId?: number): Promise<boolean> => {
-        if (!user) return false
-
         try {
             // 1. Remove from PushManager
             if ('serviceWorker' in navigator) {
@@ -157,17 +151,9 @@ export function usePushNotifications() {
 
             // 2. Remove from Supabase
             if (subscriptionId) {
-                await supabase
-                    .from('push_subscriptions')
-                    .delete()
-                    .eq('id', subscriptionId)
-                    .eq('user_id', user.id)
-            } else {
-                // Delete all subscriptions for this user
-                await supabase
-                    .from('push_subscriptions')
-                    .delete()
-                    .eq('user_id', user.id)
+                await supabase.from('push_subscriptions').delete().eq('id', subscriptionId)
+            } else if (user) {
+                await supabase.from('push_subscriptions').delete().eq('user_id', user.id)
             }
 
             await loadSubscriptions()

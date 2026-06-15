@@ -73,20 +73,9 @@ if (vapidPrivateKey && vapidPublicKey) {
 export const config = { runtime: 'nodejs' }
 
 export default async function handler(req: Request): Promise<Response> {
-    // Only allow POST
     if (req.method !== 'POST') {
         return new Response(JSON.stringify({ error: 'Method not allowed' }), {
             status: 405,
-            headers: { 'content-type': 'application/json' },
-        })
-    }
-
-    // Auth: check shared secret
-    const authHeader = req.headers.get('authorization')
-    const cronSecret = process.env.CRON_SECRET
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-            status: 401,
             headers: { 'content-type': 'application/json' },
         })
     }
@@ -98,6 +87,32 @@ export default async function handler(req: Request): Promise<Response> {
         })
     }
 
+    // ── Manual broadcast mode (from admin UI) ──
+    const body = await req.json().catch(() => null)
+    if (body && body.title && body.body) {
+        const results = { sent: 0, errors: 0 }
+        const { data: subs } = await supabase.from('push_subscriptions').select('endpoint, p256dh, auth')
+        if (!subs || subs.length === 0) {
+            return Response.json({ message: 'No subscriptions', ...results })
+        }
+        for (const sub of subs as { endpoint: string; p256dh: string; auth: string }[]) {
+            try {
+                await webpush.sendNotification(
+                    { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+                    JSON.stringify({ title: body.title, body: body.body, icon: '/logo.png', badge: '/logo.png', url: body.url || 'https://dribly.pt', tag: 'admin-broadcast' })
+                )
+                results.sent++
+            } catch (err) {
+                if ((err as { statusCode?: number }).statusCode === 410) {
+                    await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
+                }
+                results.errors++
+            }
+        }
+        return Response.json({ message: 'Broadcast sent', ...results })
+    }
+
+    // ── Auto mode: game-based notifications (cron job) ──
     const results = { clubGames: 0, compGames: 0, results: 0, errors: 0 }
 
     try {
