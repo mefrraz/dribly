@@ -95,11 +95,13 @@ export default async function handler(req: Request): Promise<Response> {
         if (!subs || subs.length === 0) {
             return Response.json({ message: 'No subscriptions', ...results })
         }
-        for (const sub of subs as { endpoint: string; p256dh: string; auth: string }[]) {
+        // Send in parallel (much faster than sequential)
+        const payload = JSON.stringify({ title: body.title, body: body.body, icon: '/logo.png', badge: '/logo.png', url: body.url || 'https://dribly.pt', tag: 'admin-broadcast' })
+        const promises = (subs as { endpoint: string; p256dh: string; auth: string }[]).map(async (sub) => {
             try {
                 await webpush.sendNotification(
                     { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-                    JSON.stringify({ title: body.title, body: body.body, icon: '/logo.png', badge: '/logo.png', url: body.url || 'https://dribly.pt', tag: 'admin-broadcast' })
+                    payload
                 )
                 results.sent++
             } catch (err) {
@@ -108,7 +110,8 @@ export default async function handler(req: Request): Promise<Response> {
                 }
                 results.errors++
             }
-        }
+        })
+        await Promise.allSettled(promises)
         return Response.json({ message: 'Broadcast sent', ...results })
     }
 
