@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { useState, useEffect, lazy, Suspense } from 'react'
 import Layout from './Layout'
@@ -66,7 +66,7 @@ function App() {
 
     return (
         <HelmetProvider>
-        <BrowserRouter>
+        <HashRouter>
             <AuthProvider>
             <ClubProvider>
                 {!splashDone && <SplashScreen onDone={() => { sessionStorage.setItem('dribly_splash_shown', '1'); setSplashDone(true) }} />}
@@ -121,7 +121,7 @@ function App() {
                 </Suspense>
             </ClubProvider>
             </AuthProvider>
-        </BrowserRouter>
+        </HashRouter>
         </HelmetProvider>
     )
 }
