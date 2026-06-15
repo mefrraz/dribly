@@ -469,8 +469,20 @@ export default function Home() {
     // Filter: hide past-day games without scores (stale data)
     const todayStr = toYYYYMMDD(new Date())
     const displayGames = useMemo(() => {
+        const now = new Date()
         return games.filter(g => {
+            // Past days without scores → hide
             if (g.data < todayStr && g.resultado_casa === null && g.resultado_fora === null) return false
+            // Today's games that started >12h ago without scores → stale, hide
+            if (g.data === todayStr && g.resultado_casa === null && g.resultado_fora === null && g.hora) {
+                const clean = g.hora.replace(/[^0-9]/g, '')
+                if (clean.length >= 4) {
+                    const h = parseInt(clean.slice(0, 2))
+                    const m = parseInt(clean.slice(2, 4))
+                    const gameTime = new Date(todayStr + 'T' + String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':00')
+                    if ((now.getTime() - gameTime.getTime()) > 12 * 3600 * 1000) return false
+                }
+            }
             return true
         })
     }, [games, todayStr])

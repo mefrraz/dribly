@@ -62,6 +62,20 @@ function SmartLanding() {
 function App() {
     const [splashDone, setSplashDone] = useState(() => sessionStorage.getItem('dribly_splash_shown') === '1')
 
+    // Android back button: go back in history instead of closing app
+    useEffect(() => {
+        const handleBack = async () => {
+            try {
+                const { App: CapApp } = await import('@capacitor/app')
+                CapApp.addListener('backButton', ({ canGoBack }) => {
+                    if (canGoBack) window.history.back()
+                    else CapApp.exitApp()
+                })
+            } catch { /* not in Capacitor */ }
+        }
+        handleBack()
+    }, [])
+
     return (
         <HelmetProvider>
         <BrowserRouter>

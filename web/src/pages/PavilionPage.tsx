@@ -31,13 +31,13 @@ function formatDate(dateStr: string) {
 }
 
 /** Group matches by date, sorted */
-function groupByDate(matches: Match[]): [string, Match[]][] {
+function groupByDate(matches: Match[], desc = false): [string, Match[]][] {
     const groups: Record<string, Match[]> = {}
     for (const m of matches) {
         if (!groups[m.data]) groups[m.data] = []
         groups[m.data].push(m)
     }
-    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b))
+    return Object.entries(groups).sort(([a], [b]) => desc ? b.localeCompare(a) : a.localeCompare(b))
 }
 
 /** Translate day names from PT to short form (week starts Sunday) */
@@ -148,7 +148,7 @@ export default function PavilionPage() {
     [games])
 
     const upcomingByDate = useMemo(() => groupByDate(upcoming), [upcoming])
-    const resultsByDate = useMemo(() => groupByDate(results), [results])
+    const resultsByDate = useMemo(() => groupByDate(results, true), [results])
 
     // Best image: prefer high-res from image_urls[0] for hero, fallback to image_url/foto_url
     const imageSrc = pavilion?.image_urls?.[0] || pavilion?.foto_url || pavilion?.image_url
