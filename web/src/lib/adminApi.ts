@@ -61,6 +61,7 @@ export interface AdminPostTemplate {
     type: string
     background_url: string
     fields: Record<string, unknown>
+    is_default: boolean
     created_at: string
     updated_at: string
 }

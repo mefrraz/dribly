@@ -489,9 +489,22 @@ async function handleUpsertPostTemplate(payload?: Record<string, unknown>) {
         type: template.type,
         background_url: template.background_url,
         fields: template.fields || {},
+        is_default: template.is_default ?? false,
     }
 
     const id = template.id as number | undefined
+
+    // If setting as default, clear other defaults of same type first
+    if (body.is_default) {
+        await supabaseRest(
+            `post_templates?type=eq.${template.type}&id=neq.${id || 0}`,
+            {
+                method: 'PATCH',
+                body: JSON.stringify({ is_default: false }),
+            },
+        ).catch(() => {})
+    }
+
     let res: Response
     if (id) {
         body.updated_at = new Date().toISOString()

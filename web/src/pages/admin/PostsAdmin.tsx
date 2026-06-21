@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Plus, Upload, Trash2, Download, Eye, X, Image, Save, Move, Search } from 'lucide-react'
+import { Plus, Upload, Trash2, Download, Eye, X, Image, Save, Move, Search, Trophy } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAdminApi, type AdminPostTemplate, type AdminGame } from '../../lib/adminApi'
 
@@ -77,6 +77,25 @@ const FIELD_DEFAULTS: Record<string, Partial<FieldDef>> = {
     logo_fora: { label: 'Logo Fora', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28 },
 }
 
+// ── Color palette ──────────────────────────────────────
+
+const PALETTE_SWATCHES = [
+    '#7C3AED', '#FFFFFF', '#9CA3AF', '#D9F99D', '#EF4444',
+    '#09070F', '#1B162E', '#000000', '#F59E0B', '#06B6D4',
+]
+
+function loadRecentColors(): string[] {
+    try {
+        const raw = localStorage.getItem('dribly_recent_colors')
+        return raw ? JSON.parse(raw) : []
+    } catch { return [] }
+}
+function saveRecentColor(color: string) {
+    const recent = loadRecentColors().filter(c => c !== color)
+    recent.unshift(color)
+    localStorage.setItem('dribly_recent_colors', JSON.stringify(recent.slice(0, 6)))
+}
+
 // ── Component ───────────────────────────────────────────
 
 export default function PostsAdmin() {
@@ -87,12 +106,14 @@ export default function PostsAdmin() {
     const [message, setMessage] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [selectedType, setSelectedType] = useState<PostType>('resultado_hero')
+    const [recentColors, setRecentColors] = useState<string[]>(() => loadRecentColors())
 
     // Editor state
     const [editingTemplate, setEditingTemplate] = useState<AdminPostTemplate | null>(null)
     const [fields, setFields] = useState<FieldDef[]>([])
     const [dragging, setDragging] = useState<string | null>(null)
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+    const [resizing, setResizing] = useState<{ id: string; corner: string; startX: number; startY: number; startW: number; startH: number; startLeft: number; startTop: number } | null>(null)
     const [selectedField, setSelectedField] = useState<string | null>(null)
     const [uploading, setUploading] = useState(false)
     const editorRef = useRef<HTMLDivElement>(null)
@@ -124,6 +145,14 @@ export default function PostsAdmin() {
     }
 
     useEffect(() => { loadTemplates() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Auto-select default template when switching to generate tab
+    useEffect(() => {
+        if (tab === 'generate' && templates.length > 0 && !selectedTemplate) {
+            const def = templates.find(t => t.is_default)
+            if (def) setSelectedTemplate(def)
+        }
+    }, [tab, templates]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── Upload new template ─────────────────────────────
 
@@ -279,6 +308,42 @@ export default function PostsAdmin() {
     }
 
     const endDrag = () => setDragging(null)
+
+    // ── Resize handling ──────────────────────────────────
+
+    const startResize = (id: string, corner: string, e: React.MouseEvent) => {
+        const field = fields.find(f => f.id === id)
+        if (!field || !editorRef.current) return
+        setResizing({
+            id, corner,
+            startX: e.clientX,
+            startY: e.clientY,
+            startW: field.w,
+            startH: field.h,
+            startLeft: field.x,
+            startTop: field.y,
+        })
+    }
+
+    const onResize = (e: React.MouseEvent) => {
+        if (!resizing || !editorRef.current) return
+        const rect = editorRef.current.getBoundingClientRect()
+        const dx = ((e.clientX - resizing.startX) / rect.width) * 100
+        const dy = ((e.clientY - resizing.startY) / rect.height) * 100
+        const { corner, startW, startH, startLeft, startTop } = resizing
+
+        let newX = startLeft, newY = startTop, newW = startW, newH = startH
+        const minPct = 3
+
+        if (corner.includes('e')) newW = Math.max(minPct, startW + dx)
+        if (corner.includes('w')) { newW = Math.max(minPct, startW - dx); newX = startLeft + (startW - newW) }
+        if (corner.includes('s')) newH = Math.max(minPct, startH + dy)
+        if (corner.includes('n')) { newH = Math.max(minPct, startH - dy); newY = startTop + (startH - newH) }
+
+        updateField(resizing.id, { x: Math.max(0, newX), y: Math.max(0, newY), w: newW, h: newH })
+    }
+
+    const endResize = () => setResizing(null)
 
     // ── Save template ───────────────────────────────────
 
@@ -633,7 +698,7 @@ export default function PostsAdmin() {
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {templates.map(t => (
-                                <div key={t.id} className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden hover:border-dribly-purple transition-colors">
+                                <div key={t.id} className={`bg-white dark:bg-zinc-950 border rounded-xl overflow-hidden hover:border-dribly-purple transition-colors ${t.is_default ? 'border-dribly-purple ring-1 ring-dribly-purple' : 'border-zinc-200 dark:border-zinc-800'}`}>
                                     <div className="aspect-square bg-zinc-100 dark:bg-zinc-900 relative">
                                         <img
                                             src={t.background_url}
@@ -644,6 +709,9 @@ export default function PostsAdmin() {
                                         <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold bg-black/60 text-white uppercase">
                                             {t.type.replace(/_/g, ' ')}
                                         </span>
+                                        {t.is_default && (
+                                            <span className="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold bg-dribly-purple text-white">PADRÃO</span>
+                                        )}
                                     </div>
                                     <div className="p-3 flex items-center justify-between">
                                         <div>
@@ -651,6 +719,16 @@ export default function PostsAdmin() {
                                             <p className="text-[10px] text-zinc-400">{Object.keys(t.fields as object).length} campos</p>
                                         </div>
                                         <div className="flex gap-1">
+                                            <button
+                                                onClick={async () => {
+                                                    await api.upsertPostTemplate({ id: t.id, is_default: !t.is_default } as AdminPostTemplate)
+                                                    loadTemplates()
+                                                }}
+                                                className={`p-1.5 rounded-lg transition-colors ${t.is_default ? 'bg-dribly-purple/10 text-dribly-purple' : 'hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-500 hover:text-dribly-purple'}`}
+                                                title={t.is_default ? 'Remover padrão' : 'Definir como padrão'}
+                                            >
+                                                <Trophy size={14} />
+                                            </button>
                                             <button
                                                 onClick={() => openEditor(t)}
                                                 className="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-500 hover:text-dribly-purple transition-colors"
@@ -701,9 +779,9 @@ export default function PostsAdmin() {
                             <div
                                 ref={editorRef}
                                 className="relative w-full aspect-square bg-zinc-900 rounded-xl overflow-hidden cursor-crosshair select-none"
-                                onMouseMove={onDrag}
-                                onMouseUp={endDrag}
-                                onMouseLeave={endDrag}
+                                onMouseMove={(e) => { onDrag(e); onResize(e) }}
+                                onMouseUp={() => { endDrag(); endResize() }}
+                                onMouseLeave={() => { endDrag(); endResize() }}
                             >
                                 <img
                                     src={editingTemplate.background_url}
@@ -714,11 +792,11 @@ export default function PostsAdmin() {
                                 {fields.map(f => (
                                     <div
                                         key={f.id}
-                                        className={`absolute border-2 rounded cursor-move transition-colors overflow-hidden ${
+                                        className={`absolute border-2 rounded cursor-move transition-colors overflow-visible group ${
                                             selectedField === f.id
-                                                ? 'border-dribly-purple bg-dribly-purple/20'
+                                                ? 'border-dribly-purple bg-dribly-purple/20 z-10'
                                                 : dragging === f.id
-                                                    ? 'border-dribly-purple bg-dribly-purple/10'
+                                                    ? 'border-dribly-purple bg-dribly-purple/10 z-10'
                                                     : 'border-white/30 bg-white/5 hover:border-white/60'
                                         }`}
                                         style={{
@@ -730,9 +808,21 @@ export default function PostsAdmin() {
                                         onMouseDown={(e) => startDrag(f.id, e)}
                                         onClick={(e) => { e.stopPropagation(); setSelectedField(f.id) }}
                                     >
+                                        {/* X delete button */}
+                                        <button
+                                            className="absolute -top-2.5 -right-2.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20"
+                                            onClick={(e) => { e.stopPropagation(); removeField(f.id) }}
+                                            title="Remover campo"
+                                        >
+                                            <X size={10} />
+                                        </button>
+
+                                        {/* Label */}
                                         <div className="absolute -top-5 left-0 right-0 text-[9px] font-bold text-white bg-black/60 rounded px-1 py-0.5 truncate text-center">
                                             {f.label}
                                         </div>
+
+                                        {/* Content preview */}
                                         {f.kind === 'logo' ? (
                                             <div className="flex items-center justify-center h-full">
                                                 <Image size={f.w > 20 ? 20 : 14} className="text-white/40" />
@@ -754,6 +844,55 @@ export default function PostsAdmin() {
                                             >
                                                 {SAMPLE_DATA[f.id] || f.label}
                                             </div>
+                                        )}
+
+                                        {/* Resize handles — only on selected field */}
+                                        {selectedField === f.id && (
+                                            <>
+                                                {/* 4 corners */}
+                                                {['nw', 'ne', 'sw', 'se'].map(corner => {
+                                                    const isLeft = corner.includes('w')
+                                                    const isTop = corner.includes('n')
+                                                    return (
+                                                        <div
+                                                            key={corner}
+                                                            className="absolute w-3 h-3 bg-white border-2 border-dribly-purple rounded-sm z-20"
+                                                            style={{
+                                                                [isLeft ? 'left' : 'right']: -5,
+                                                                [isTop ? 'top' : 'bottom']: -5,
+                                                                cursor: `${corner}-resize`,
+                                                            }}
+                                                            onMouseDown={(e) => {
+                                                                e.stopPropagation()
+                                                                e.preventDefault()
+                                                                startResize(f.id, corner, e)
+                                                            }}
+                                                        />
+                                                    )
+                                                })}
+                                                {/* 4 mid-edge handles */}
+                                                {['n', 's', 'e', 'w'].map(edge => {
+                                                    const isVert = edge === 'n' || edge === 's'
+                                                    return (
+                                                        <div
+                                                            key={edge}
+                                                            className="absolute w-3 h-3 bg-white border-2 border-dribly-purple rounded-sm z-20"
+                                                            style={{
+                                                                [isVert ? 'top' : 'left']: isVert ? -5 : '50%',
+                                                                [isVert ? 'bottom' : 'right']: isVert ? undefined : -5,
+                                                                [isVert ? 'left' : 'top']: isVert ? '50%' : -5,
+                                                                transform: isVert ? 'translateX(-50%)' : 'translateY(-50%)',
+                                                                cursor: `${edge}-resize`,
+                                                            }}
+                                                            onMouseDown={(e) => {
+                                                                e.stopPropagation()
+                                                                e.preventDefault()
+                                                                startResize(f.id, edge, e)
+                                                            }}
+                                                        />
+                                                    )
+                                                })}
+                                            </>
                                         )}
                                     </div>
                                 ))}
@@ -825,12 +964,12 @@ export default function PostsAdmin() {
                                     {f.kind === 'text' && (
                                         <>
                                             <div>
-                                                <label className="text-[10px] font-bold text-zinc-500 uppercase">Tamanho</label>
+                                                <label className="text-[10px] font-bold text-zinc-500 uppercase">Tamanho {f.fontSize}px</label>
                                                 <input
-                                                    type="number"
-                                                    value={f.fontSize}
+                                                    type="range"
+                                                    min="8" max="200" value={f.fontSize}
                                                     onChange={(e) => updateField(f.id, { fontSize: Number(e.target.value) })}
-                                                    className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent"
+                                                    className="w-full mt-0.5 accent-dribly-purple"
                                                 />
                                             </div>
                                             <div>
@@ -839,15 +978,59 @@ export default function PostsAdmin() {
                                                     <input
                                                         type="color"
                                                         value={f.color}
-                                                        onChange={(e) => updateField(f.id, { color: e.target.value })}
+                                                        onChange={(e) => {
+                                                            updateField(f.id, { color: e.target.value })
+                                                            saveRecentColor(e.target.value)
+                                                            setRecentColors(loadRecentColors())
+                                                        }}
                                                         className="w-8 h-8 rounded cursor-pointer border-0 p-0"
                                                     />
                                                     <input
                                                         value={f.color}
-                                                        onChange={(e) => updateField(f.id, { color: e.target.value })}
+                                                        onChange={(e) => {
+                                                            updateField(f.id, { color: e.target.value })
+                                                            saveRecentColor(e.target.value)
+                                                            setRecentColors(loadRecentColors())
+                                                        }}
                                                         className="flex-1 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent font-mono"
                                                     />
                                                 </div>
+                                                {/* Palette swatches */}
+                                                <div className="flex flex-wrap gap-1 mt-1.5">
+                                                    {PALETTE_SWATCHES.map(c => (
+                                                        <button
+                                                            key={c}
+                                                            className="w-5 h-5 rounded border border-zinc-300 dark:border-zinc-600 cursor-pointer transition-transform hover:scale-110"
+                                                            style={{ backgroundColor: c }}
+                                                            onClick={() => {
+                                                                updateField(f.id, { color: c })
+                                                                saveRecentColor(c)
+                                                                setRecentColors(loadRecentColors())
+                                                            }}
+                                                            title={c}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                {/* Recent colors */}
+                                                {recentColors.length > 0 && (
+                                                    <div className="mt-1">
+                                                        <p className="text-[9px] text-zinc-400 uppercase mb-0.5">Recentes</p>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {recentColors.map(c => (
+                                                                <button
+                                                                    key={c}
+                                                                    className="w-5 h-5 rounded-full border border-zinc-300 dark:border-zinc-600 cursor-pointer transition-transform hover:scale-110"
+                                                                    style={{ backgroundColor: c }}
+                                                                    onClick={() => {
+                                                                        updateField(f.id, { color: c })
+                                                                        setRecentColors(loadRecentColors())
+                                                                    }}
+                                                                    title={c}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <label className="flex items-center gap-1.5 text-xs cursor-pointer">
