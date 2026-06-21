@@ -64,20 +64,23 @@ export default function PostsAdmin() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
+    const apiRef = useRef(api)
+    apiRef.current = api
+
     // ── Load templates ──────────────────────────────────
 
-    const loadTemplates = useCallback(async () => {
+    const loadTemplates = async () => {
         setLoading(true)
         try {
-            const { templates: tpls } = await api.listPostTemplates()
+            const { templates: tpls } = await apiRef.current.listPostTemplates()
             setTemplates(tpls)
         } catch (e) {
             setMessage('Erro: ' + (e as Error).message)
         }
         setLoading(false)
-    }, [api])
+    }
 
-    useEffect(() => { loadTemplates() }, [loadTemplates])
+    useEffect(() => { loadTemplates() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── Upload new template ─────────────────────────────
 
