@@ -16,7 +16,7 @@ interface FieldDef {
     color: string
     italic: boolean
     outline: boolean
-    kind: 'text' | 'logo'
+    kind: 'text' | 'imagem'
     content: string
     fontFamily: string
     fontWeight: number  // 400, 700, 900
@@ -53,6 +53,10 @@ const ALL_VARIABLES: { key: string; label: string; example: string }[] = [
     { key: 'escalao', label: 'Escalão', example: 'SUB14A' },
     { key: 'competicao', label: 'Competição', example: 'LIGA BETCLIC' },
     { key: 'status', label: 'Status', example: 'FINALIZADO' },
+    { key: 'logotipo_casa', label: 'Logo Casa (URL)', example: 'https://...' },
+    { key: 'logotipo_fora', label: 'Logo Fora (URL)', example: 'https://...' },
+    { key: 'logotipo_competicao', label: 'Logo Competição (URL)', example: 'https://...' },
+    { key: 'imagem_url', label: 'Imagem (URL personalizada)', example: 'https://...' },
 ]
 
 // ── Font options ───────────────────────────────────────
@@ -83,20 +87,21 @@ const DEFAULT_CONTENT: Record<string, string> = {
 }
 
 const FIELD_DEFAULTS: Record<string, Partial<FieldDef>> = {
-    equipa_casa: { label: 'Equipa Casa', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8, content: '{equipa_casa}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
-    equipa_fora: { label: 'Equipa Fora', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8, content: '{equipa_fora}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
-    resultado_casa: { label: 'Placar Casa', fontSize: 120, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 15, h: 14, content: '{resultado_casa}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'center' },
-    resultado_fora: { label: 'Placar Fora', fontSize: 120, color: '#7C3AED', italic: true, outline: true, kind: 'text', w: 15, h: 14, content: '{resultado_fora}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'center' },
-    data: { label: 'Data', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5, content: '{data}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
-    dia_semana: { label: 'Dia Semana', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{dia_semana}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
-    dia_mes: { label: 'Dia + Mês', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{dia_mes}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
-    hora: { label: 'Hora', fontSize: 80, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 20, h: 12, content: '{hora}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'center' },
-    local: { label: 'Local', fontSize: 22, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5, content: '{local}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
-    escalao: { label: 'Escalão', fontSize: 32, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 20, h: 6, content: '{escalao}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
-    competicao: { label: 'Competição', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{competicao}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
-    logo_casa: { label: 'Logo Casa', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28, content: '', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
-    logo_fora: { label: 'Logo Fora', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28, content: '', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
-    logo_competicao: { label: 'Logo Competição', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 20, h: 20, content: '', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    equipa_casa: { label: '{equipa_casa}', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8, content: '{equipa_casa}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
+    equipa_fora: { label: '{equipa_fora}', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8, content: '{equipa_fora}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
+    resultado_casa: { label: '{resultado_casa}', fontSize: 120, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 15, h: 14, content: '{resultado_casa}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'center' },
+    resultado_fora: { label: '{resultado_fora}', fontSize: 120, color: '#7C3AED', italic: true, outline: true, kind: 'text', w: 15, h: 14, content: '{resultado_fora}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'center' },
+    data: { label: '{data}', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5, content: '{data}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    dia_semana: { label: '{dia_semana}', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{dia_semana}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
+    dia_mes: { label: '{dia_mes}', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{dia_mes}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
+    hora: { label: '{hora}', fontSize: 80, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 20, h: 12, content: '{hora}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'center' },
+    local: { label: '{local}', fontSize: 22, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5, content: '{local}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    escalao: { label: '{escalao}', fontSize: 32, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 20, h: 6, content: '{escalao}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
+    competicao: { label: '{competicao}', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{competicao}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    logo_casa: { label: '{logotipo_casa}', fontSize: 0, color: '', italic: false, outline: false, kind: 'imagem', w: 28, h: 28, content: '{logotipo_casa}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    logo_fora: { label: '{logotipo_fora}', fontSize: 0, color: '', italic: false, outline: false, kind: 'imagem', w: 28, h: 28, content: '{logotipo_fora}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    logo_competicao: { label: '{logotipo_competicao}', fontSize: 0, color: '', italic: false, outline: false, kind: 'imagem', w: 20, h: 20, content: '{logotipo_competicao}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    imagem_url: { label: '{imagem_url}', fontSize: 0, color: '', italic: false, outline: false, kind: 'imagem', w: 20, h: 20, content: '{imagem_url}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
 }
 
 // ── Color palette ──────────────────────────────────────
@@ -255,7 +260,7 @@ export default function PostsAdmin() {
             color: (f.color as string) || '#FFFFFF',
             italic: (f.italic as boolean) || false,
             outline: (f.outline as boolean) || false,
-            kind: (f.kind as FieldDef['kind']) || 'text',
+            kind: ((f.kind as string) === 'logo' ? 'imagem' : (f.kind as string)) as FieldDef['kind'] || 'text',
             content: (f.content as string) || (DEFAULT_CONTENT[id] || ''),
             fontFamily: (f.fontFamily as string) || 'Montserrat',
             fontWeight: (f.fontWeight as number) || 900,
@@ -289,6 +294,7 @@ export default function PostsAdmin() {
         logotipo_casa: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/club-logos/fc-gaia.png',
         logotipo_fora: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/club-logos/fc-porto.png',
         logotipo_competicao: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/competition-logos/liga-betclic.png',
+        imagem_url: '',
         status: 'FINALIZADO',
     })
 
@@ -307,6 +313,7 @@ export default function PostsAdmin() {
             logotipo_casa: fakeGame.logotipo_casa || '',
             logotipo_fora: fakeGame.logotipo_fora || '',
             logotipo_competicao: fakeGame.logotipo_competicao || '',
+            imagem_url: fakeGame.imagem_url || '',
         }
         if (fakeGame.data) {
             const d = new Date(fakeGame.data + 'T00:00:00')
@@ -582,43 +589,79 @@ export default function PostsAdmin() {
             return logoCache[url]
         }
 
-        const logoCasa = await loadLogo(game.logotipo_casa)
-        const logoFora = await loadLogo(game.logotipo_fora)
-        const logoCompeticao = await loadLogo(game.logotipo_competicao)
+        // Build variable map for this game
+        const vars: Record<string, string> = {
+            equipa_casa: game.equipa_casa || '',
+            equipa_fora: game.equipa_fora || '',
+            resultado_casa: game.resultado_casa != null ? String(game.resultado_casa) : '',
+            resultado_fora: game.resultado_fora != null ? String(game.resultado_fora) : '',
+            data: game.data || '',
+            local: game.local || '',
+            escalao: game.escalao || '',
+            competicao: game.competicao || '',
+            status: game.status || '',
+            logotipo_casa: game.logotipo_casa || '',
+            logotipo_fora: game.logotipo_fora || '',
+            logotipo_competicao: game.logotipo_competicao || '',
+            imagem_url: game.imagem_url || '',
+        }
+        if (game.data) {
+            const dateObj = new Date(game.data + 'T00:00:00')
+            vars.dia_semana = dateObj.toLocaleDateString('pt-PT', { weekday: 'long' }).toUpperCase()
+            const mes = dateObj.toLocaleDateString('pt-PT', { month: 'short' }).toUpperCase().replace('.', '')
+            vars.dia_mes = `${dateObj.getDate()} ${mes}`
+        } else {
+            vars.dia_semana = ''
+            vars.dia_mes = ''
+        }
+        vars.hora = (game.hora || '').replace(':', 'H')
 
         // Draw each field
-        for (const [id, f] of Object.entries(fieldsObj)) {
+        for (const [_id, f] of Object.entries(fieldsObj)) {
             const fx = ((f.x as number) / 100) * 1080
             const fy = ((f.y as number) / 100) * 1080
             const fw = ((f.w as number) / 100) * 1080
             const fh = ((f.h as number) / 100) * 1080
             const kind = (f.kind as string) || 'text'
 
-            if (kind === 'logo') {
-                const logo = id === 'logo_casa' ? logoCasa : id === 'logo_fora' ? logoFora : id === 'logo_competicao' ? logoCompeticao : null
-                if (logo) {
-                    // Scale logo to fit the bounding box while maintaining aspect ratio
-                    const scale = Math.min(fw / logo.naturalWidth, fh / logo.naturalHeight)
-                    const lw = logo.naturalWidth * scale
-                    const lh = logo.naturalHeight * scale
-                    const lx = fx + (fw - lw) / 2
-                    const ly = fy + (fh - lh) / 2
-                    ctx.save()
-                    // Rounded rect clip for logos
-                    ctx.beginPath()
-                    const r = 16
-                    ctx.moveTo(lx + r, ly)
-                    ctx.lineTo(lx + lw - r, ly)
-                    ctx.arcTo(lx + lw, ly, lx + lw, ly + r, r)
-                    ctx.lineTo(lx + lw, ly + lh - r)
-                    ctx.arcTo(lx + lw, ly + lh, lx + lw - r, ly + lh, r)
-                    ctx.lineTo(lx + r, ly + lh)
-                    ctx.arcTo(lx, ly + lh, lx, ly + lh - r, r)
-                    ctx.lineTo(lx, ly + r)
-                    ctx.arcTo(lx, ly, lx + r, ly, r)
-                    ctx.clip()
-                    ctx.drawImage(logo, lx, ly, lw, lh)
-                    ctx.restore()
+            if (kind === 'imagem' || kind === 'logo') {
+                // Resolve content to get the URL
+                const urlRaw = (f.content as string) || ''
+                let imageUrl = ''
+                if (urlRaw.match(/^\{.+\}$/)) {
+                    // Single variable — extract key
+                    const varKey = urlRaw.replace(/[{}]/g, '')
+                    imageUrl = (vars[varKey] as string) || urlRaw
+                } else {
+                    // Literal URL or multi-variable template — resolve
+                    imageUrl = urlRaw.replace(/\{(\w+)\}/g, (_, key: string) => vars[key] ?? `{${key}}`)
+                }
+                if (imageUrl && !imageUrl.startsWith('http')) imageUrl = ''
+
+                if (imageUrl) {
+                    const img = await loadLogo(imageUrl)
+                    if (img) {
+                        const scale = Math.min(fw / img.naturalWidth, fh / img.naturalHeight)
+                        const lw = img.naturalWidth * scale
+                        const lh = img.naturalHeight * scale
+                        const lx = fx + (fw - lw) / 2
+                        const ly = fy + (fh - lh) / 2
+                        ctx.save()
+                        ctx.beginPath()
+                        const r = 16
+                        ctx.moveTo(lx + r, ly)
+                        ctx.lineTo(lx + lw - r, ly)
+                        ctx.arcTo(lx + lw, ly, lx + lw, ly + r, r)
+                        ctx.lineTo(lx + lw, ly + lh - r)
+                        ctx.arcTo(lx + lw, ly + lh, lx + lw - r, ly + lh, r)
+                        ctx.lineTo(lx + r, ly + lh)
+                        ctx.arcTo(lx, ly + lh, lx, ly + lh - r, r)
+                        ctx.lineTo(lx, ly + r)
+                        ctx.arcTo(lx, ly, lx + r, ly, r)
+                        ctx.clip()
+                        ctx.drawImage(img, lx, ly, lw, lh)
+                        ctx.restore()
+                    }
                 }
                 continue
             }
@@ -626,36 +669,6 @@ export default function PostsAdmin() {
             // Text field — resolve content template
             let value = (f.content as string) || ''
             if (!value) continue
-
-            // Build variable map for this game
-            const vars: Record<string, string> = {
-                equipa_casa: game.equipa_casa || '',
-                equipa_fora: game.equipa_fora || '',
-                resultado_casa: game.resultado_casa != null ? String(game.resultado_casa) : '',
-                resultado_fora: game.resultado_fora != null ? String(game.resultado_fora) : '',
-                data: game.data || '',
-                local: game.local || '',
-                escalao: game.escalao || '',
-                competicao: game.competicao || '',
-                status: game.status || '',
-                logotipo_casa: game.logotipo_casa || '',
-                logotipo_fora: game.logotipo_fora || '',
-                logotipo_competicao: game.logotipo_competicao || '',
-            }
-
-            // Computed date fields
-            if (game.data) {
-                const dateObj = new Date(game.data + 'T00:00:00')
-                vars.dia_semana = dateObj.toLocaleDateString('pt-PT', { weekday: 'long' }).toUpperCase()
-                const mes = dateObj.toLocaleDateString('pt-PT', { month: 'short' }).toUpperCase().replace('.', '')
-                vars.dia_mes = `${dateObj.getDate()} ${mes}`
-            } else {
-                vars.dia_semana = ''
-                vars.dia_mes = ''
-            }
-
-            // Format hora
-            vars.hora = (game.hora || '').replace(':', 'H')
 
             // Replace {variables} in content
             value = value.replace(/\{(\w+)\}/g, (_, key: string) => vars[key] ?? `{${key}}`)
@@ -930,7 +943,7 @@ export default function PostsAdmin() {
                                             </button>
                                         ))}
                                         <div className="border-t border-zinc-200 dark:border-zinc-700 my-1" />
-                                        <p className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase">Logos</p>
+                                        <p className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase">Imagens</p>
                                         <button
                                             onClick={() => addField('logo_casa')}
                                             className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-100 dark:hover:bg-white/5 flex items-center justify-between"
@@ -950,6 +963,13 @@ export default function PostsAdmin() {
                                             className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-100 dark:hover:bg-white/5 flex items-center justify-between"
                                         >
                                             <span>Logo Competição</span>
+                                            <Image size={12} className="text-zinc-400" />
+                                        </button>
+                                        <button
+                                            onClick={() => addField('imagem_url')}
+                                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-100 dark:hover:bg-white/5 flex items-center justify-between"
+                                        >
+                                            <span>Imagem (URL personalizada)</span>
                                             <Image size={12} className="text-zinc-400" />
                                         </button>
                                         <div className="border-t border-zinc-200 dark:border-zinc-700 my-1" />
@@ -1091,21 +1111,22 @@ export default function PostsAdmin() {
                                             <X size={10} />
                                         </button>
 
-                                        {/* Label */}
+                                        {/* Label — resolve variables */}
                                         <div className="absolute -top-5 left-0 right-0 text-[9px] font-bold text-white bg-black/60 rounded px-1 py-0.5 truncate text-center">
-                                            {f.label}
+                                            {resolvePreview(f.label) || f.label}
                                         </div>
 
                                         {/* Content preview */}
-                                        {f.kind === 'logo' ? (
+                                        {(f.kind as string) === 'imagem' || (f.kind as string) === 'logo' ? (
                                             <div className="flex items-center justify-center h-full p-1">
                                                 {(() => {
-                                                    const logoUrl = f.id === 'logo_casa' ? fakeGame.logotipo_casa : f.id === 'logo_fora' ? fakeGame.logotipo_fora : f.id === 'logo_competicao' ? fakeGame.logotipo_competicao : null
-                                                    return logoUrl ? (
-                                                        <img src={logoUrl} alt="" className="max-w-full max-h-full object-contain opacity-80" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                                                    ) : (
-                                                        <Image size={f.w > 20 ? 20 : 14} className="text-white/40" />
-                                                    )
+                                                    // Resolve the content to get an image URL
+                                                    const content = f.content || ''
+                                                    const resolved = resolvePreview(content)
+                                                    if (resolved && resolved.startsWith('http')) {
+                                                        return <img src={resolved} alt="" className="max-w-full max-h-full object-contain opacity-80" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                                                    }
+                                                    return <Image size={f.w > 20 ? 20 : 14} className="text-white/40" />
                                                 })()}
                                             </div>
                                         ) : (
@@ -1349,18 +1370,56 @@ export default function PostsAdmin() {
                                         </>
                                     )}
 
-                                    {f.kind === 'logo' && (
+                                    {f.kind === 'imagem' && (
                                         <>
-                                            <p className="text-[10px] text-zinc-400">O logo é carregado automaticamente do jogo (logotipo_casa, logotipo_fora ou logotipo_competicao).</p>
-                                            <p className="text-[9px] text-zinc-500">URL atual no preview: {f.id === 'logo_casa' ? fakeGame.logotipo_casa : f.id === 'logo_fora' ? fakeGame.logotipo_fora : f.id === 'logo_competicao' ? fakeGame.logotipo_competicao : '—'}</p>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-zinc-500 uppercase">URL da Imagem</label>
+                                                <textarea
+                                                    id={`content-${f.id}`}
+                                                    value={f.content || ''}
+                                                    onChange={(e) => updateField(f.id, { content: e.target.value })}
+                                                    className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent font-mono resize-none h-8"
+                                                    placeholder="{logotipo_casa}"
+                                                />
+                                                <p className="text-[9px] text-zinc-400 mt-0.5">
+                                                    Usa {'{logotipo_casa}'}, {'{imagem_url}'}, ou um URL direto
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold text-zinc-500 uppercase mb-1">Variáveis de Imagem</p>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {['logotipo_casa', 'logotipo_fora', 'logotipo_competicao', 'imagem_url'].map(vKey => (
+                                                        <button
+                                                            key={vKey}
+                                                            onClick={() => {
+                                                                const input = document.getElementById(`content-${f.id}`) as HTMLTextAreaElement
+                                                                if (input) {
+                                                                    const start = input.selectionStart
+                                                                    const end = input.selectionEnd
+                                                                    const text = input.value
+                                                                    const insert = `{${vKey}}`
+                                                                    const newText = text.substring(0, start) + insert + text.substring(end)
+                                                                    updateField(f.id, { content: newText })
+                                                                    setTimeout(() => { input.focus(); input.setSelectionRange(start + insert.length, start + insert.length) }, 0)
+                                                                } else {
+                                                                    updateField(f.id, { content: `{${vKey}}` })
+                                                                }
+                                                            }}
+                                                            className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-100 dark:bg-white/10 hover:bg-dribly-purple/20 transition-colors"
+                                                        >
+                                                            {`{${vKey}}`}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </>
                                     )}
 
                                     <div>
                                         <label className="text-[10px] font-bold text-zinc-500 uppercase">Tipo</label>
-                                        <select value={f.kind} onChange={(e) => isMulti ? updateAllSelected({ kind: e.target.value as 'text' | 'logo' }) : updateField(f.id, { kind: e.target.value as 'text' | 'logo' })} className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent">
+                                        <select value={f.kind} onChange={(e) => isMulti ? updateAllSelected({ kind: e.target.value as 'text' | 'imagem' }) : updateField(f.id, { kind: e.target.value as 'text' | 'imagem' })} className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent">
                                             <option value="text">Texto</option>
-                                            <option value="logo">Logo</option>
+                                            <option value="imagem">Imagem</option>
                                         </select>
                                     </div>
                                 </div>
@@ -1393,6 +1452,7 @@ export default function PostsAdmin() {
                                     { key: 'logotipo_casa', label: 'Logo Casa (URL)' },
                                     { key: 'logotipo_fora', label: 'Logo Fora (URL)' },
                                     { key: 'logotipo_competicao', label: 'Logo Competição (URL)' },
+                                    { key: 'imagem_url', label: 'Imagem (URL personalizada)' },
                                 ].map(({ key, label }) => (
                                     <div key={key} className="flex flex-col gap-0.5">
                                         <label className="text-[9px] text-zinc-400 uppercase font-bold">{label}</label>

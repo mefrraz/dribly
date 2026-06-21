@@ -53,6 +53,7 @@ export interface AdminGame {
     logotipo_casa: string | null
     logotipo_fora: string | null
     logotipo_competicao: string | null
+    imagem_url: string | null
     status: string
 }
 
