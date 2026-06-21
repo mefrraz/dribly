@@ -27,6 +27,9 @@ type AdminAction =
     | 'listCompetitionsMeta'
     | 'upsertCompetitionMeta'
     | 'getPageViews'
+    | 'listPostTemplates'
+    | 'upsertPostTemplate'
+    | 'deletePostTemplate'
 
 interface AdminRequest {
     action: AdminAction
@@ -463,6 +466,89 @@ async function handleGetPageViews(payload?: Record<string, unknown>) {
     }
 }
 
+// ── Post Templates ────────────────────────────────────
+
+async function handleListPostTemplates() {
+    const res = await supabaseRest(
+        'post_templates?order=created_at.desc',
+        { method: 'GET' },
+    )
+    if (!res.ok) return json({ error: 'Failed to fetch templates' }, 502)
+    const templates = (await res.json()) as Array<Record<string, unknown>>
+    return json({ templates })
+}
+
+async function handleUpsertPostTemplate(payload?: Record<string, unknown>) {
+    const template = payload?.template as Record<string, unknown> | undefined
+    if (!template?.name || !template?.type || !template?.background_url) {
+        return json({ error: 'name, type and background_url are required' }, 400)
+    }
+
+    const body: Record<string, unknown> = {
+        name: template.name,
+        type: template.type,
+        background_url: template.background_url,
+        fields: template.fields || {},
+    }
+
+    const id = template.id as number | undefined
+    let res: Response
+    if (id) {
+        body.updated_at = new Date().toISOString()
+        res = await supabaseRest(`post_templates?id=eq.${id}`, {
+            method: 'PATCH',
+            body: JSON.stringify(body),
+        })
+    } else {
+        res = await supabaseRest('post_templates', {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: { Prefer: 'return=representation' },
+        })
+    }
+
+    if (!res.ok) {
+        const err = await res.text()
+        return json({ error: `Upsert failed: ${err}` }, 502)
+    }
+
+    const rows = (await res.json()) as Array<Record<string, unknown>>
+    return json({ ok: true, template: rows[0] })
+}
+
+async function handleDeletePostTemplate(payload?: Record<string, unknown>) {
+    const id = payload?.id as number | undefined
+    if (!id) return json({ error: 'id is required' }, 400)
+
+    // Delete the background from storage if it's a dribly URL
+    const getRes = await supabaseRest(`post_templates?id=eq.${id}`, { method: 'GET' })
+    if (getRes.ok) {
+        const rows = (await getRes.json()) as Array<{ background_url: string }>
+        const bgUrl = rows[0]?.background_url || ''
+        const storageMatch = bgUrl.match(/\/storage\/v1\/object\/public\/post_templates\/(.+)/)
+        if (storageMatch) {
+            const filePath = decodeURIComponent(storageMatch[1])
+            await fetch(
+                `${process.env.SUPABASE_URL}/storage/v1/object/post_templates/${filePath}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+                    },
+                },
+            ).catch(() => {})
+        }
+    }
+
+    const res = await supabaseRest(`post_templates?id=eq.${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+        const err = await res.text()
+        return json({ error: `Delete failed: ${err}` }, 502)
+    }
+
+    return json({ ok: true })
+}
+
 // ── Router ─────────────────────────────────────────────
 
 export default async function handler(request: Request) {
@@ -532,6 +618,12 @@ export default async function handler(request: Request) {
                 return await handleUpsertCompetitionMeta(payload)
             case 'getPageViews':
                 return await handleGetPageViews(payload)
+            case 'listPostTemplates':
+                return await handleListPostTemplates()
+            case 'upsertPostTemplate':
+                return await handleUpsertPostTemplate(payload)
+            case 'deletePostTemplate':
+                return await handleDeletePostTemplate(payload)
             default:
                 return json({ error: `Unknown action: ${action}` }, 400)
         }

@@ -36,6 +36,7 @@ import CompetitionsAdmin from './pages/admin/CompetitionsAdmin'
 import ScrapeAdmin from './pages/admin/ScrapeAdmin'
 import CalendarAdmin from './pages/admin/CalendarAdmin'
 import NotificationsAdmin from './pages/admin/NotificationsAdmin'
+import PostsAdmin from './pages/admin/PostsAdmin'
 import { ClubProvider } from './lib/ClubContext'
 import { AuthProvider } from './lib/AuthContext'
 import SplashScreen from './components/SplashScreen'
@@ -115,6 +116,7 @@ function App() {
                             <Route path="scrape" element={<ScrapeAdmin />} />
                             <Route path="calendario" element={<CalendarAdmin />} />
                             <Route path="notificacoes" element={<NotificationsAdmin />} />
+                            <Route path="posts" element={<PostsAdmin />} />
                         </Route>
                     </Route>
                 </Routes>

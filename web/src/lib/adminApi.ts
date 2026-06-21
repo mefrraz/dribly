@@ -50,7 +50,19 @@ export interface AdminGame {
     escalao: string | null
     competicao: string | null
     local: string | null
+    logotipo_casa: string | null
+    logotipo_fora: string | null
     status: string
+}
+
+export interface AdminPostTemplate {
+    id: number
+    name: string
+    type: string
+    background_url: string
+    fields: Record<string, unknown>
+    created_at: string
+    updated_at: string
 }
 
 export interface AdminStats {
@@ -168,6 +180,27 @@ export function useAdminApi() {
             callAdmin<{ views: Array<{ date: string; count: number }> }>(
                 'getPageViews',
                 { days },
+                getAdminToken,
+            ),
+
+        listPostTemplates: () =>
+            callAdmin<{ templates: AdminPostTemplate[] }>(
+                'listPostTemplates',
+                undefined,
+                getAdminToken,
+            ),
+
+        upsertPostTemplate: (template: Partial<AdminPostTemplate>) =>
+            callAdmin<{ ok: boolean; template: AdminPostTemplate }>(
+                'upsertPostTemplate',
+                { template },
+                getAdminToken,
+            ),
+
+        deletePostTemplate: (id: number) =>
+            callAdmin<{ ok: boolean }>(
+                'deletePostTemplate',
+                { id },
                 getAdminToken,
             ),
     }
