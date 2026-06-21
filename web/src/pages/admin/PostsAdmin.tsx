@@ -141,6 +141,7 @@ export default function PostsAdmin() {
     const [dragging, setDragging] = useState<string | null>(null)
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
     const [resizing, setResizing] = useState<{ id: string; corner: string; startX: number; startY: number; startW: number; startH: number; startLeft: number; startTop: number } | null>(null)
+    const [shiftHeld, setShiftHeld] = useState(false)
     const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set())
     const [uploading, setUploading] = useState(false)
     const editorRef = useRef<HTMLDivElement>(null)
@@ -157,6 +158,15 @@ export default function PostsAdmin() {
 
     const apiRef = useRef(api)
     apiRef.current = api
+
+    // Shift key tracking for proportional resize
+    useEffect(() => {
+        const down = (e: KeyboardEvent) => { if (e.key === 'Shift') setShiftHeld(true) }
+        const up = (e: KeyboardEvent) => { if (e.key === 'Shift') setShiftHeld(false) }
+        window.addEventListener('keydown', down)
+        window.addEventListener('keyup', up)
+        return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up) }
+    }, [])
 
     // ── Load templates ──────────────────────────────────
 
@@ -291,8 +301,8 @@ export default function PostsAdmin() {
         escalao: 'SUB14A',
         competicao: 'LIGA BETCLIC',
         local: 'PAVILHÃO MUNICIPAL',
-        logotipo_casa: 'https://via.placeholder.com/200x200/7C3AED/FFFFFF?text=FC+GAIA',
-        logotipo_fora: 'https://via.placeholder.com/200x200/1B162E/FFFFFF?text=FC+PORTO',
+        logotipo_casa: 'https://sav2.fpb.pt/old_uploads/CLU/CLU_119_LOGO.png',
+        logotipo_fora: 'https://sav2.fpb.pt/old_uploads/CLU/CLU_120_LOGO.png',
         logotipo_competicao: 'https://via.placeholder.com/200x200/5B21B6/FFFFFF?text=BETCLIC',
         imagem_url: '',
         status: 'FINALIZADO',
@@ -483,6 +493,18 @@ export default function PostsAdmin() {
         if (corner.includes('w')) { newW = Math.max(minPct, startW - dx); newX = startLeft + (startW - newW) }
         if (corner.includes('s')) newH = Math.max(minPct, startH + dy)
         if (corner.includes('n')) { newH = Math.max(minPct, startH - dy); newY = startTop + (startH - newH) }
+
+        // Shift = lock aspect ratio (square)
+        if (shiftHeld) {
+            const ratio = startW / startH
+            if (corner.includes('e') || corner.includes('w')) {
+                newH = newW / ratio
+                if (corner.includes('n')) newY = startTop + startH - newH
+            } else {
+                newW = newH * ratio
+                if (corner.includes('w')) newX = startLeft + startW - newW
+            }
+        }
 
         updateField(resizing.id, { x: Math.max(0, newX), y: Math.max(0, newY), w: newW, h: newH })
     }
