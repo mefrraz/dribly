@@ -291,9 +291,9 @@ export default function PostsAdmin() {
         escalao: 'SUB14A',
         competicao: 'LIGA BETCLIC',
         local: 'PAVILHÃO MUNICIPAL',
-        logotipo_casa: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/club-logos/fc-gaia.png',
-        logotipo_fora: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/club-logos/fc-porto.png',
-        logotipo_competicao: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/competition-logos/liga-betclic.png',
+        logotipo_casa: 'https://via.placeholder.com/200x200/7C3AED/FFFFFF?text=FC+GAIA',
+        logotipo_fora: 'https://via.placeholder.com/200x200/1B162E/FFFFFF?text=FC+PORTO',
+        logotipo_competicao: 'https://via.placeholder.com/200x200/5B21B6/FFFFFF?text=BETCLIC',
         imagem_url: '',
         status: 'FINALIZADO',
     })
@@ -1124,7 +1124,7 @@ export default function PostsAdmin() {
                                                     const content = f.content || ''
                                                     const resolved = resolvePreview(content)
                                                     if (resolved && resolved.startsWith('http')) {
-                                                        return <img src={resolved} alt="" className="max-w-full max-h-full object-contain opacity-80" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                                                        return <img src={resolved} alt="" className="max-w-full max-h-full object-contain opacity-80" onError={(e) => { const t = e.target as HTMLImageElement; t.style.display = 'none'; const p = t.parentElement; if (p) p.innerHTML = '<span class=\"text-[10px] text-red-400\">Erro 404</span>' }} />
                                                     }
                                                     return <Image size={f.w > 20 ? 20 : 14} className="text-white/40" />
                                                 })()}
