@@ -909,7 +909,7 @@ export default function PostsAdmin() {
                                 </button>
                                 {showAddMenu && (
                                     <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-xl z-30 py-1 max-h-64 overflow-y-auto">
-                                        <p className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase">Campos de Jogo</p>
+                                        <p className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase">Campos de Texto</p>
                                         {ALL_VARIABLES.map(v => (
                                             <button
                                                 key={v.key}
@@ -920,6 +920,22 @@ export default function PostsAdmin() {
                                                 <span className="text-[10px] text-zinc-400 font-mono">{`{${v.key}}`}</span>
                                             </button>
                                         ))}
+                                        <div className="border-t border-zinc-200 dark:border-zinc-700 my-1" />
+                                        <p className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase">Logos</p>
+                                        <button
+                                            onClick={() => addField('logo_casa')}
+                                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-100 dark:hover:bg-white/5 flex items-center justify-between"
+                                        >
+                                            <span>Logo Casa</span>
+                                            <Image size={12} className="text-zinc-400" />
+                                        </button>
+                                        <button
+                                            onClick={() => addField('logo_fora')}
+                                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-100 dark:hover:bg-white/5 flex items-center justify-between"
+                                        >
+                                            <span>Logo Fora</span>
+                                            <Image size={12} className="text-zinc-400" />
+                                        </button>
                                         <div className="border-t border-zinc-200 dark:border-zinc-700 my-1" />
                                         <button
                                             onClick={() => addField()}
