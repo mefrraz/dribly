@@ -21,12 +21,54 @@ interface FieldDef {
 
 type Tab = 'templates' | 'editor' | 'generate'
 
+type PostType = 'resultado_hero' | 'agenda_hero' | 'resultados_lista' | 'agenda_lista' | 'gameday' | 'capa_resultados' | 'capa_agenda' | 'custom'
+
+const POST_TYPE_LABELS: Record<PostType, string> = {
+    resultado_hero: 'Resultado — Jogo Único',
+    agenda_hero: 'Agenda — Jogo Único',
+    resultados_lista: 'Resultados — Lista',
+    agenda_lista: 'Agenda — Lista',
+    gameday: 'GameDay',
+    capa_resultados: 'Capa Resultados',
+    capa_agenda: 'Capa Agenda',
+    custom: 'Personalizado',
+}
+
+// Which fields each post type gets by default
+const TYPE_FIELDS: Record<PostType, string[]> = {
+    resultado_hero: ['equipa_casa', 'equipa_fora', 'resultado_casa', 'resultado_fora', 'data', 'escalao', 'logo_casa', 'logo_fora'],
+    agenda_hero: ['equipa_casa', 'equipa_fora', 'dia_semana', 'dia_mes', 'hora', 'local', 'escalao', 'logo_casa', 'logo_fora'],
+    resultados_lista: ['equipa_casa', 'equipa_fora', 'resultado_casa', 'resultado_fora', 'dia_semana', 'dia_mes', 'escalao'],
+    agenda_lista: ['equipa_casa', 'equipa_fora', 'dia_semana', 'dia_mes', 'hora', 'escalao'],
+    gameday: ['equipa_casa', 'equipa_fora', 'dia_semana', 'dia_mes', 'hora', 'local', 'escalao', 'logo_casa', 'logo_fora'],
+    capa_resultados: ['data'],
+    capa_agenda: ['data'],
+    custom: ['equipa_casa', 'equipa_fora', 'resultado_casa', 'resultado_fora', 'data', 'hora', 'local', 'escalao', 'competicao', 'logo_casa', 'logo_fora'],
+}
+
+// Fake data shown in the editor overlay
+const SAMPLE_DATA: Record<string, string> = {
+    equipa_casa: 'FC GAIA',
+    equipa_fora: 'FC PORTO',
+    resultado_casa: '37',
+    resultado_fora: '91',
+    data: '19 OUT 2025',
+    dia_semana: 'DOMINGO',
+    dia_mes: '19 OUT',
+    hora: '16H30',
+    local: 'PAVILHAO MUNICIPAL',
+    escalao: 'SUB14A',
+    competicao: 'LIGA BETCLIC',
+}
+
 const FIELD_DEFAULTS: Record<string, Partial<FieldDef>> = {
     equipa_casa: { label: 'Equipa Casa', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8 },
     equipa_fora: { label: 'Equipa Fora', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8 },
     resultado_casa: { label: 'Placar Casa', fontSize: 120, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 15, h: 14 },
     resultado_fora: { label: 'Placar Fora', fontSize: 120, color: '#7C3AED', italic: true, outline: true, kind: 'text', w: 15, h: 14 },
     data: { label: 'Data', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5 },
+    dia_semana: { label: 'Dia Semana', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5 },
+    dia_mes: { label: 'Dia + Mês', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5 },
     hora: { label: 'Hora', fontSize: 80, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 20, h: 12 },
     local: { label: 'Local', fontSize: 22, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5 },
     escalao: { label: 'Escalão', fontSize: 32, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 20, h: 6 },
@@ -44,6 +86,7 @@ export default function PostsAdmin() {
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const [selectedType, setSelectedType] = useState<PostType>('resultado_hero')
 
     // Editor state
     const [editingTemplate, setEditingTemplate] = useState<AdminPostTemplate | null>(null)
@@ -105,25 +148,14 @@ export default function PostsAdmin() {
 
             const bgUrl = urlData.publicUrl
 
-            // Determine type from filename or default
-            const type = file.name.toLowerCase().includes('gameday') ? 'gameday' :
-                         file.name.toLowerCase().includes('agenda') ? 'agenda_hero' :
-                         file.name.toLowerCase().includes('resultado') ? 'resultado_hero' :
-                         'custom'
-
+            const type = selectedType
             const name = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ')
 
             // Create default fields based on type
+            const fieldIds = TYPE_FIELDS[type] || TYPE_FIELDS.custom
             const defaultFields: Record<string, FieldDef> = {}
-            const fieldIds = type === 'gameday' ?
-                ['equipa_casa', 'equipa_fora', 'data', 'hora', 'local', 'escalao', 'logo_casa', 'logo_fora'] :
-                type === 'agenda_hero' ?
-                ['equipa_casa', 'equipa_fora', 'hora', 'data', 'local', 'escalao', 'logo_casa', 'logo_fora'] :
-                ['equipa_casa', 'equipa_fora', 'resultado_casa', 'resultado_fora', 'data', 'escalao', 'logo_casa', 'logo_fora']
-
             fieldIds.forEach((fid, i) => {
                 const def = FIELD_DEFAULTS[fid] || {}
-                // Stagger positions so they don't all overlap
                 const row = Math.floor(i / 2)
                 const col = i % 2
                 defaultFields[fid] = {
@@ -391,7 +423,25 @@ export default function PostsAdmin() {
                 case 'resultado_casa': value = game.resultado_casa != null ? String(game.resultado_casa) : ''; break
                 case 'resultado_fora': value = game.resultado_fora != null ? String(game.resultado_fora) : ''; break
                 case 'data': value = game.data || ''; break
-                case 'hora': value = game.hora || ''; break
+                case 'dia_semana': {
+                    const d = game.data ? new Date(game.data + 'T00:00:00') : null
+                    value = d ? d.toLocaleDateString('pt-PT', { weekday: 'long' }).toUpperCase() : ''
+                    break
+                }
+                case 'dia_mes': {
+                    const d2 = game.data ? new Date(game.data + 'T00:00:00') : null
+                    if (d2) {
+                        const dia = d2.getDate()
+                        const mes = d2.toLocaleDateString('pt-PT', { month: 'short' }).toUpperCase().replace('.', '')
+                        value = `${dia} ${mes}`
+                    }
+                    break
+                }
+                case 'hora': {
+                    const raw = game.hora || ''
+                    value = raw.replace(':', 'H')
+                    break
+                }
                 case 'local': value = game.local || ''; break
                 case 'escalao': value = game.escalao || ''; break
                 case 'competicao': value = game.competicao || ''; break
@@ -545,6 +595,15 @@ export default function PostsAdmin() {
             {tab === 'templates' && (
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
+                        <select
+                            value={selectedType}
+                            onChange={(e) => setSelectedType(e.target.value as PostType)}
+                            className="px-3 py-2.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 bg-transparent text-zinc-900 dark:text-white font-medium"
+                        >
+                            {(Object.entries(POST_TYPE_LABELS) as [PostType, string][]).map(([value, label]) => (
+                                <option key={value} value={value}>{label}</option>
+                            ))}
+                        </select>
                         <input
                             ref={fileInputRef}
                             type="file"
@@ -560,7 +619,7 @@ export default function PostsAdmin() {
                             {uploading ? <span className="animate-spin">⟳</span> : <Upload size={16} />}
                             Novo Template (PNG)
                         </button>
-                        <span className="text-xs text-zinc-400">Faz upload do teu PNG com o design de fundo</span>
+                        <span className="text-xs text-zinc-400">Escolhe o tipo e faz upload do PNG</span>
                     </div>
 
                     {loading ? (
@@ -655,7 +714,7 @@ export default function PostsAdmin() {
                                 {fields.map(f => (
                                     <div
                                         key={f.id}
-                                        className={`absolute border-2 rounded cursor-move transition-colors ${
+                                        className={`absolute border-2 rounded cursor-move transition-colors overflow-hidden ${
                                             selectedField === f.id
                                                 ? 'border-dribly-purple bg-dribly-purple/20'
                                                 : dragging === f.id
@@ -674,9 +733,26 @@ export default function PostsAdmin() {
                                         <div className="absolute -top-5 left-0 right-0 text-[9px] font-bold text-white bg-black/60 rounded px-1 py-0.5 truncate text-center">
                                             {f.label}
                                         </div>
-                                        {f.kind === 'logo' && (
+                                        {f.kind === 'logo' ? (
                                             <div className="flex items-center justify-center h-full">
-                                                <Image size={16} className="text-white/40" />
+                                                <Image size={f.w > 20 ? 20 : 14} className="text-white/40" />
+                                            </div>
+                                        ) : (
+                                            <div
+                                                className="flex items-center justify-center h-full px-1"
+                                                style={{
+                                                    fontSize: Math.min(f.fontSize * 0.35, 18),
+                                                    color: f.color,
+                                                    fontStyle: f.italic ? 'italic' : 'normal',
+                                                    fontWeight: f.outline ? 400 : 800,
+                                                    WebkitTextStroke: f.outline ? `1px ${f.color}` : undefined,
+                                                    opacity: 0.85,
+                                                    textAlign: 'center' as const,
+                                                    lineHeight: 1.1,
+                                                    wordBreak: 'break-word' as const,
+                                                }}
+                                            >
+                                                {SAMPLE_DATA[f.id] || f.label}
                                             </div>
                                         )}
                                     </div>
