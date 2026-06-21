@@ -96,6 +96,7 @@ const FIELD_DEFAULTS: Record<string, Partial<FieldDef>> = {
     competicao: { label: 'Competição', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{competicao}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
     logo_casa: { label: 'Logo Casa', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28, content: '', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
     logo_fora: { label: 'Logo Fora', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28, content: '', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    logo_competicao: { label: 'Logo Competição', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 20, h: 20, content: '', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
 }
 
 // ── Color palette ──────────────────────────────────────
@@ -287,6 +288,7 @@ export default function PostsAdmin() {
         local: 'PAVILHÃO MUNICIPAL',
         logotipo_casa: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/club-logos/fc-gaia.png',
         logotipo_fora: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/club-logos/fc-porto.png',
+        logotipo_competicao: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/competition-logos/liga-betclic.png',
         status: 'FINALIZADO',
     })
 
@@ -302,6 +304,9 @@ export default function PostsAdmin() {
             escalao: fakeGame.escalao || '',
             competicao: fakeGame.competicao || '',
             status: fakeGame.status || '',
+            logotipo_casa: fakeGame.logotipo_casa || '',
+            logotipo_fora: fakeGame.logotipo_fora || '',
+            logotipo_competicao: fakeGame.logotipo_competicao || '',
         }
         if (fakeGame.data) {
             const d = new Date(fakeGame.data + 'T00:00:00')
@@ -579,6 +584,7 @@ export default function PostsAdmin() {
 
         const logoCasa = await loadLogo(game.logotipo_casa)
         const logoFora = await loadLogo(game.logotipo_fora)
+        const logoCompeticao = await loadLogo(game.logotipo_competicao)
 
         // Draw each field
         for (const [id, f] of Object.entries(fieldsObj)) {
@@ -589,7 +595,7 @@ export default function PostsAdmin() {
             const kind = (f.kind as string) || 'text'
 
             if (kind === 'logo') {
-                const logo = id === 'logo_casa' ? logoCasa : id === 'logo_fora' ? logoFora : null
+                const logo = id === 'logo_casa' ? logoCasa : id === 'logo_fora' ? logoFora : id === 'logo_competicao' ? logoCompeticao : null
                 if (logo) {
                     // Scale logo to fit the bounding box while maintaining aspect ratio
                     const scale = Math.min(fw / logo.naturalWidth, fh / logo.naturalHeight)
@@ -632,6 +638,9 @@ export default function PostsAdmin() {
                 escalao: game.escalao || '',
                 competicao: game.competicao || '',
                 status: game.status || '',
+                logotipo_casa: game.logotipo_casa || '',
+                logotipo_fora: game.logotipo_fora || '',
+                logotipo_competicao: game.logotipo_competicao || '',
             }
 
             // Computed date fields
@@ -936,6 +945,13 @@ export default function PostsAdmin() {
                                             <span>Logo Fora</span>
                                             <Image size={12} className="text-zinc-400" />
                                         </button>
+                                        <button
+                                            onClick={() => addField('logo_competicao')}
+                                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-100 dark:hover:bg-white/5 flex items-center justify-between"
+                                        >
+                                            <span>Logo Competição</span>
+                                            <Image size={12} className="text-zinc-400" />
+                                        </button>
                                         <div className="border-t border-zinc-200 dark:border-zinc-700 my-1" />
                                         <button
                                             onClick={() => addField()}
@@ -1084,7 +1100,7 @@ export default function PostsAdmin() {
                                         {f.kind === 'logo' ? (
                                             <div className="flex items-center justify-center h-full p-1">
                                                 {(() => {
-                                                    const logoUrl = f.id === 'logo_casa' ? fakeGame.logotipo_casa : f.id === 'logo_fora' ? fakeGame.logotipo_fora : null
+                                                    const logoUrl = f.id === 'logo_casa' ? fakeGame.logotipo_casa : f.id === 'logo_fora' ? fakeGame.logotipo_fora : f.id === 'logo_competicao' ? fakeGame.logotipo_competicao : null
                                                     return logoUrl ? (
                                                         <img src={logoUrl} alt="" className="max-w-full max-h-full object-contain opacity-80" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                                                     ) : (
@@ -1334,7 +1350,10 @@ export default function PostsAdmin() {
                                     )}
 
                                     {f.kind === 'logo' && (
-                                        <p className="text-[10px] text-zinc-400">O logo do clube será automaticamente recortado e ajustado a esta área.</p>
+                                        <>
+                                            <p className="text-[10px] text-zinc-400">O logo é carregado automaticamente do jogo (logotipo_casa, logotipo_fora ou logotipo_competicao).</p>
+                                            <p className="text-[9px] text-zinc-500">URL atual no preview: {f.id === 'logo_casa' ? fakeGame.logotipo_casa : f.id === 'logo_fora' ? fakeGame.logotipo_fora : f.id === 'logo_competicao' ? fakeGame.logotipo_competicao : '—'}</p>
+                                        </>
                                     )}
 
                                     <div>
@@ -1373,6 +1392,7 @@ export default function PostsAdmin() {
                                     { key: 'status', label: 'Status' },
                                     { key: 'logotipo_casa', label: 'Logo Casa (URL)' },
                                     { key: 'logotipo_fora', label: 'Logo Fora (URL)' },
+                                    { key: 'logotipo_competicao', label: 'Logo Competição (URL)' },
                                 ].map(({ key, label }) => (
                                     <div key={key} className="flex flex-col gap-0.5">
                                         <label className="text-[9px] text-zinc-400 uppercase font-bold">{label}</label>
