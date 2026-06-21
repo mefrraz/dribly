@@ -17,6 +17,7 @@ interface FieldDef {
     italic: boolean
     outline: boolean
     kind: 'text' | 'logo'
+    content: string  // template with {variables}
 }
 
 type Tab = 'templates' | 'editor' | 'generate'
@@ -61,20 +62,52 @@ const SAMPLE_DATA: Record<string, string> = {
     competicao: 'LIGA BETCLIC',
 }
 
+// ── Available variables for content templates ─────────
+
+const ALL_VARIABLES: { key: string; label: string; example: string }[] = [
+    { key: 'equipa_casa', label: 'Equipa Casa', example: 'FC GAIA' },
+    { key: 'equipa_fora', label: 'Equipa Fora', example: 'FC PORTO' },
+    { key: 'resultado_casa', label: 'Resultado Casa', example: '37' },
+    { key: 'resultado_fora', label: 'Resultado Fora', example: '91' },
+    { key: 'data', label: 'Data (ISO)', example: '2025-01-19' },
+    { key: 'dia_semana', label: 'Dia da Semana', example: 'DOMINGO' },
+    { key: 'dia_mes', label: 'Dia + Mês', example: '19 JAN' },
+    { key: 'hora', label: 'Hora (XHYY)', example: '16H30' },
+    { key: 'local', label: 'Local', example: 'PAVILHÃO MUNICIPAL' },
+    { key: 'escalao', label: 'Escalão', example: 'SUB14A' },
+    { key: 'competicao', label: 'Competição', example: 'LIGA BETCLIC' },
+    { key: 'status', label: 'Status', example: 'FINALIZADO' },
+]
+
+// Standard content template for each predefined field
+const DEFAULT_CONTENT: Record<string, string> = {
+    equipa_casa: '{equipa_casa}',
+    equipa_fora: '{equipa_fora}',
+    resultado_casa: '{resultado_casa}',
+    resultado_fora: '{resultado_fora}',
+    data: '{data}',
+    dia_semana: '{dia_semana}',
+    dia_mes: '{dia_mes}',
+    hora: '{hora}',
+    local: '{local}',
+    escalao: '{escalao}',
+    competicao: '{competicao}',
+}
+
 const FIELD_DEFAULTS: Record<string, Partial<FieldDef>> = {
-    equipa_casa: { label: 'Equipa Casa', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8 },
-    equipa_fora: { label: 'Equipa Fora', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8 },
-    resultado_casa: { label: 'Placar Casa', fontSize: 120, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 15, h: 14 },
-    resultado_fora: { label: 'Placar Fora', fontSize: 120, color: '#7C3AED', italic: true, outline: true, kind: 'text', w: 15, h: 14 },
-    data: { label: 'Data', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5 },
-    dia_semana: { label: 'Dia Semana', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5 },
-    dia_mes: { label: 'Dia + Mês', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5 },
-    hora: { label: 'Hora', fontSize: 80, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 20, h: 12 },
-    local: { label: 'Local', fontSize: 22, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5 },
-    escalao: { label: 'Escalão', fontSize: 32, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 20, h: 6 },
-    competicao: { label: 'Competição', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 25, h: 5 },
-    logo_casa: { label: 'Logo Casa', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28 },
-    logo_fora: { label: 'Logo Fora', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28 },
+    equipa_casa: { label: 'Equipa Casa', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8, content: '{equipa_casa}' },
+    equipa_fora: { label: 'Equipa Fora', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8, content: '{equipa_fora}' },
+    resultado_casa: { label: 'Placar Casa', fontSize: 120, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 15, h: 14, content: '{resultado_casa}' },
+    resultado_fora: { label: 'Placar Fora', fontSize: 120, color: '#7C3AED', italic: true, outline: true, kind: 'text', w: 15, h: 14, content: '{resultado_fora}' },
+    data: { label: 'Data', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5, content: '{data}' },
+    dia_semana: { label: 'Dia Semana', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{dia_semana}' },
+    dia_mes: { label: 'Dia + Mês', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{dia_mes}' },
+    hora: { label: 'Hora', fontSize: 80, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 20, h: 12, content: '{hora}' },
+    local: { label: 'Local', fontSize: 22, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5, content: '{local}' },
+    escalao: { label: 'Escalão', fontSize: 32, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 20, h: 6, content: '{escalao}' },
+    competicao: { label: 'Competição', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{competicao}' },
+    logo_casa: { label: 'Logo Casa', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28, content: '' },
+    logo_fora: { label: 'Logo Fora', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28, content: '' },
 }
 
 // ── Color palette ──────────────────────────────────────
@@ -199,6 +232,7 @@ export default function PostsAdmin() {
                     italic: def.italic || false,
                     outline: def.outline || false,
                     kind: def.kind || 'text',
+                    content: def.content || DEFAULT_CONTENT[fid] || '',
                 }
             })
 
@@ -253,22 +287,49 @@ export default function PostsAdmin() {
             italic: (f.italic as boolean) || false,
             outline: (f.outline as boolean) || false,
             kind: (f.kind as FieldDef['kind']) || 'text',
+            content: (f.content as string) || (DEFAULT_CONTENT[id] || ''),
         }))
         setFields(parsed)
         setSelectedField(null)
         setTab('editor')
     }
 
-    const addField = () => {
-        const newId = `field_${Date.now()}`
+    const [showAddMenu, setShowAddMenu] = useState(false)
+    const addMenuRef = useRef<HTMLDivElement>(null)
+
+    // Close add menu on outside click
+    useEffect(() => {
+        if (!showAddMenu) return
+        const handler = (e: MouseEvent) => {
+            if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) {
+                setShowAddMenu(false)
+            }
+        }
+        document.addEventListener('mousedown', handler)
+        return () => document.removeEventListener('mousedown', handler)
+    }, [showAddMenu])
+
+    const addField = (fid?: string) => {
+        setShowAddMenu(false)
+        const id = fid || `field_${Date.now()}`
+        const existing = fields.find(f => f.id === id)
+        if (existing) {
+            // If it's a predefined field that already exists, just select it
+            setSelectedField(id)
+            return
+        }
+        const def = FIELD_DEFAULTS[id] || {}
+        const content = fid ? (def.content || DEFAULT_CONTENT[id] || '') : '{competicao}'
+        const label = fid ? (def.label || id) : 'Novo Campo'
         setFields(prev => [...prev, {
-            id: newId,
-            label: 'Novo Campo',
-            x: 50, y: 50, w: 20, h: 6,
-            fontSize: 30, color: '#FFFFFF',
-            italic: false, outline: false, kind: 'text',
+            id,
+            label,
+            x: 50, y: 50, w: def.w || 25, h: def.h || 6,
+            fontSize: def.fontSize || 30, color: def.color || '#FFFFFF',
+            italic: def.italic || false, outline: def.outline || false,
+            kind: def.kind || 'text', content,
         }])
-        setSelectedField(newId)
+        setSelectedField(id)
     }
 
     const removeField = (id: string) => {
@@ -358,6 +419,7 @@ export default function PostsAdmin() {
                     label: f.label, x: f.x, y: f.y, w: f.w, h: f.h,
                     fontSize: f.fontSize, color: f.color,
                     italic: f.italic, outline: f.outline, kind: f.kind,
+                    content: f.content,
                 }
             })
             await api.upsertPostTemplate({
@@ -480,38 +542,39 @@ export default function PostsAdmin() {
                 continue
             }
 
-            // Text field — resolve value
-            let value = ''
-            switch (id) {
-                case 'equipa_casa': value = game.equipa_casa; break
-                case 'equipa_fora': value = game.equipa_fora; break
-                case 'resultado_casa': value = game.resultado_casa != null ? String(game.resultado_casa) : ''; break
-                case 'resultado_fora': value = game.resultado_fora != null ? String(game.resultado_fora) : ''; break
-                case 'data': value = game.data || ''; break
-                case 'dia_semana': {
-                    const d = game.data ? new Date(game.data + 'T00:00:00') : null
-                    value = d ? d.toLocaleDateString('pt-PT', { weekday: 'long' }).toUpperCase() : ''
-                    break
-                }
-                case 'dia_mes': {
-                    const d2 = game.data ? new Date(game.data + 'T00:00:00') : null
-                    if (d2) {
-                        const dia = d2.getDate()
-                        const mes = d2.toLocaleDateString('pt-PT', { month: 'short' }).toUpperCase().replace('.', '')
-                        value = `${dia} ${mes}`
-                    }
-                    break
-                }
-                case 'hora': {
-                    const raw = game.hora || ''
-                    value = raw.replace(':', 'H')
-                    break
-                }
-                case 'local': value = game.local || ''; break
-                case 'escalao': value = game.escalao || ''; break
-                case 'competicao': value = game.competicao || ''; break
-                default: value = ''; break
+            // Text field — resolve content template
+            let value = (f.content as string) || ''
+            if (!value) continue
+
+            // Build variable map for this game
+            const vars: Record<string, string> = {
+                equipa_casa: game.equipa_casa || '',
+                equipa_fora: game.equipa_fora || '',
+                resultado_casa: game.resultado_casa != null ? String(game.resultado_casa) : '',
+                resultado_fora: game.resultado_fora != null ? String(game.resultado_fora) : '',
+                data: game.data || '',
+                local: game.local || '',
+                escalao: game.escalao || '',
+                competicao: game.competicao || '',
+                status: game.status || '',
             }
+
+            // Computed date fields
+            if (game.data) {
+                const dateObj = new Date(game.data + 'T00:00:00')
+                vars.dia_semana = dateObj.toLocaleDateString('pt-PT', { weekday: 'long' }).toUpperCase()
+                const mes = dateObj.toLocaleDateString('pt-PT', { month: 'short' }).toUpperCase().replace('.', '')
+                vars.dia_mes = `${dateObj.getDate()} ${mes}`
+            } else {
+                vars.dia_semana = ''
+                vars.dia_mes = ''
+            }
+
+            // Format hora
+            vars.hora = (game.hora || '').replace(':', 'H')
+
+            // Replace {variables} in content
+            value = value.replace(/\{(\w+)\}/g, (_, key: string) => vars[key] ?? `{${key}}`)
 
             if (!value) continue
 
@@ -761,9 +824,33 @@ export default function PostsAdmin() {
                             <p className="text-xs text-zinc-400">Arrasta os campos para as posições corretas. Usa o preview como referência.</p>
                         </div>
                         <div className="flex gap-2">
-                            <button onClick={addField} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors">
-                                <Plus size={12} /> Campo
-                            </button>
+                            <div className="relative" ref={addMenuRef}>
+                                <button onClick={() => setShowAddMenu(!showAddMenu)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors">
+                                    <Plus size={12} /> Campo
+                                </button>
+                                {showAddMenu && (
+                                    <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-xl z-30 py-1 max-h-64 overflow-y-auto">
+                                        <p className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase">Campos de Jogo</p>
+                                        {ALL_VARIABLES.map(v => (
+                                            <button
+                                                key={v.key}
+                                                onClick={() => addField(v.key)}
+                                                className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-100 dark:hover:bg-white/5 flex items-center justify-between"
+                                            >
+                                                <span>{v.label}</span>
+                                                <span className="text-[10px] text-zinc-400 font-mono">{`{${v.key}}`}</span>
+                                            </button>
+                                        ))}
+                                        <div className="border-t border-zinc-200 dark:border-zinc-700 my-1" />
+                                        <button
+                                            onClick={() => addField()}
+                                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-100 dark:hover:bg-white/5 text-dribly-purple font-bold"
+                                        >
+                                            + Campo Personalizado (texto livre)
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                             <button onClick={saveTemplate} disabled={uploading} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-dribly-purple text-white hover:bg-dribly-purple-dim transition-colors disabled:opacity-50">
                                 <Save size={12} /> {uploading ? 'Guardando...' : 'Guardar'}
                             </button>
@@ -829,9 +916,9 @@ export default function PostsAdmin() {
                                             </div>
                                         ) : (
                                             <div
-                                                className="flex items-center justify-center h-full px-1"
+                                                className="flex items-center justify-center h-full px-1 overflow-hidden"
                                                 style={{
-                                                    fontSize: Math.min(f.fontSize * 0.35, 18),
+                                                    fontSize: Math.min(f.fontSize * 0.35, 80),
                                                     color: f.color,
                                                     fontStyle: f.italic ? 'italic' : 'normal',
                                                     fontWeight: f.outline ? 400 : 800,
@@ -921,6 +1008,55 @@ export default function PostsAdmin() {
                                             className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent"
                                         />
                                     </div>
+
+                                    {f.kind === 'text' && (
+                                        <>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-zinc-500 uppercase">Conteúdo</label>
+                                                <textarea
+                                                    id={`content-${f.id}`}
+                                                    value={f.content || ''}
+                                                    onChange={(e) => updateField(f.id, { content: e.target.value })}
+                                                    className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent font-mono resize-none h-12"
+                                                    placeholder="Texto fixo ou {variavel}"
+                                                />
+                                                <p className="text-[9px] text-zinc-400 mt-0.5">
+                                                    Usa {'{nome}'} para variáveis. Ex: {'{equipa_casa} vs {equipa_fora}'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold text-zinc-500 uppercase mb-1">Variáveis</p>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {ALL_VARIABLES.map(v => (
+                                                        <button
+                                                            key={v.key}
+                                                            onClick={() => {
+                                                                const input = document.getElementById(`content-${f.id}`) as HTMLTextAreaElement
+                                                                if (input) {
+                                                                    const start = input.selectionStart
+                                                                    const end = input.selectionEnd
+                                                                    const text = input.value
+                                                                    const insert = `{${v.key}}`
+                                                                    const newText = text.substring(0, start) + insert + text.substring(end)
+                                                                    updateField(f.id, { content: newText })
+                                                                    setTimeout(() => {
+                                                                        input.focus()
+                                                                        input.setSelectionRange(start + insert.length, start + insert.length)
+                                                                    }, 0)
+                                                                } else {
+                                                                    updateField(f.id, { content: (f.content || '') + `{${v.key}}` })
+                                                                }
+                                                            }}
+                                                            className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-100 dark:bg-white/10 hover:bg-dribly-purple/20 transition-colors"
+                                                            title={`{${v.key}} — ${v.example}`}
+                                                        >
+                                                            {`{${v.key}}`}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
 
                                     <div className="grid grid-cols-2 gap-2">
                                         <div>
