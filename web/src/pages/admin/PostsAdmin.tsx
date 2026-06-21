@@ -296,6 +296,9 @@ export default function PostsAdmin() {
 
     const [showAddMenu, setShowAddMenu] = useState(false)
     const addMenuRef = useRef<HTMLDivElement>(null)
+    const [showGrid, setShowGrid] = useState(false)
+    const [gridDivisions, setGridDivisions] = useState(4)  // 2,4,8,16
+    const [zoom, setZoom] = useState(100)  // 25-200
 
     // Close add menu on outside click
     useEffect(() => {
@@ -360,12 +363,51 @@ export default function PostsAdmin() {
     const onDrag = (e: React.MouseEvent) => {
         if (!dragging || !editorRef.current) return
         const rect = editorRef.current.getBoundingClientRect()
-        const pctX = ((e.clientX - rect.left) / rect.width) * 100
-        const pctY = ((e.clientY - rect.top) / rect.height) * 100
-        updateField(dragging, {
-            x: Math.max(0, Math.min(100, pctX - dragOffset.x)),
-            y: Math.max(0, Math.min(100, pctY - dragOffset.y)),
-        })
+        let pctX = ((e.clientX - rect.left) / rect.width) * 100
+        let pctY = ((e.clientY - rect.top) / rect.height) * 100
+        pctX -= dragOffset.x
+        pctY -= dragOffset.y
+
+        // Snap to grid
+        if (showGrid) {
+            const gridSize = 100 / gridDivisions
+            pctX = Math.round(pctX / gridSize) * gridSize
+            pctY = Math.round(pctY / gridSize) * gridSize
+        }
+
+        // Clamp to bounds
+        const field = fields.find(f => f.id === dragging)
+        const fw = field?.w || 10
+        const fh = field?.h || 5
+        pctX = Math.max(0, Math.min(100 - fw, pctX))
+        pctY = Math.max(0, Math.min(100 - fh, pctY))
+
+        // Collision avoidance — push away from overlapping fields
+        const dragged = fields.find(f => f.id === dragging)
+        let adjustedX = pctX
+        let adjustedY = pctY
+        if (dragged) {
+            for (const other of fields) {
+                if (other.id === dragging) continue
+                // Check overlap
+                const overlapX = pctX < other.x + other.w && pctX + dragged.w > other.x
+                const overlapY = pctY < other.y + other.h && pctY + dragged.h > other.y
+                if (overlapX && overlapY) {
+                    // Push in the direction of least resistance
+                    const pushRight = (other.x + other.w) - pctX
+                    const pushLeft = (pctX + dragged.w) - other.x
+                    const pushDown = (other.y + other.h) - pctY
+                    const pushUp = (pctY + dragged.h) - other.y
+                    const minPush = Math.min(pushRight, pushLeft, pushDown, pushUp)
+                    if (minPush === pushRight && pctX + dragged.w + pushRight <= 100) adjustedX = other.x + other.w
+                    else if (minPush === pushLeft && other.x - dragged.w >= 0) adjustedX = other.x - dragged.w
+                    else if (minPush === pushDown && pctY + dragged.h + pushDown <= 100) adjustedY = other.y + other.h
+                    else if (minPush === pushUp && other.y - dragged.h >= 0) adjustedY = other.y - dragged.h
+                }
+            }
+        }
+
+        updateField(dragging, { x: adjustedX, y: adjustedY })
     }
 
     const endDrag = () => setDragging(null)
@@ -860,22 +902,85 @@ export default function PostsAdmin() {
                         </div>
                     </div>
 
+                    {/* Grid & Zoom controls */}
+                    <div className="flex items-center gap-3 text-xs">
+                        <button
+                            onClick={() => setShowGrid(!showGrid)}
+                            className={`flex items-center gap-1 px-2 py-1 rounded font-bold transition-colors ${showGrid ? 'bg-dribly-purple text-white' : 'bg-zinc-100 dark:bg-white/10 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-white/20'}`}
+                        >
+                            Grelha
+                        </button>
+                        {showGrid && (
+                            <select
+                                value={gridDivisions}
+                                onChange={(e) => setGridDivisions(Number(e.target.value))}
+                                className="px-1.5 py-1 rounded bg-zinc-100 dark:bg-white/10 text-xs font-bold"
+                            >
+                                <option value={2}>1/2</option>
+                                <option value={4}>1/4</option>
+                                <option value={8}>1/8</option>
+                                <option value={16}>1/16</option>
+                            </select>
+                        )}
+                        <div className="flex items-center gap-1 ml-auto bg-zinc-100 dark:bg-white/10 rounded px-1">
+                            <button
+                                onClick={() => setZoom(Math.max(25, zoom - 25))}
+                                className="px-1 py-0.5 font-bold hover:text-dribly-purple transition-colors"
+                                disabled={zoom <= 25}
+                            >−</button>
+                            <span className="px-1 text-[10px] font-bold min-w-[36px] text-center">{zoom}%</span>
+                            <button
+                                onClick={() => setZoom(Math.min(200, zoom + 25))}
+                                className="px-1 py-0.5 font-bold hover:text-dribly-purple transition-colors"
+                                disabled={zoom >= 200}
+                            >+</button>
+                            <button
+                                onClick={() => setZoom(100)}
+                                className="px-1 text-[9px] text-zinc-400 hover:text-white transition-colors ml-0.5"
+                                title="Reset zoom"
+                            >↺</button>
+                        </div>
+                    </div>
+
                     <div className="flex gap-4">
                         {/* Editor area */}
                         <div className="flex-1">
-                            <div
-                                ref={editorRef}
-                                className="relative w-full aspect-square bg-zinc-900 rounded-xl overflow-hidden cursor-crosshair select-none"
-                                onMouseMove={(e) => { onDrag(e); onResize(e) }}
-                                onMouseUp={() => { endDrag(); endResize() }}
-                                onMouseLeave={() => { endDrag(); endResize() }}
-                            >
-                                <img
-                                    src={editingTemplate.background_url}
-                                    alt="Background"
-                                    className="absolute inset-0 w-full h-full object-contain"
-                                    draggable={false}
-                                />
+                            <div className="overflow-auto border border-zinc-200 dark:border-zinc-700 rounded-xl bg-zinc-200 dark:bg-zinc-800 flex justify-center">
+                                <div
+                                    style={{
+                                        width: `${zoom}%`,
+                                        aspectRatio: '1 / 1',
+                                        transformOrigin: 'top left',
+                                    }}
+                                >
+                                    <div
+                                        ref={editorRef}
+                                        className="relative w-full aspect-square bg-zinc-900 cursor-crosshair select-none"
+                                        onMouseMove={(e) => { onDrag(e); onResize(e) }}
+                                        onMouseUp={() => { endDrag(); endResize() }}
+                                        onMouseLeave={() => { endDrag(); endResize() }}
+                                    >
+                                        {/* Grid overlay */}
+                                        {showGrid && (
+                                            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
+                                                {Array.from({ length: gridDivisions + 1 }).map((_, i) => (
+                                                    <div key={`h${i}`} className="absolute left-0 right-0 border-t border-white/10" style={{ top: `${(i / gridDivisions) * 100}%` }} />
+                                                ))}
+                                                {Array.from({ length: gridDivisions + 1 }).map((_, i) => (
+                                                    <div key={`v${i}`} className="absolute top-0 bottom-0 border-l border-white/10" style={{ left: `${(i / gridDivisions) * 100}%` }} />
+                                                ))}
+                                                {/* Center crosshair */}
+                                                <div className="absolute left-1/2 top-0 bottom-0 border-l border-dribly-purple/30" />
+                                                <div className="absolute top-1/2 left-0 right-0 border-t border-dribly-purple/30" />
+                                            </div>
+                                        )}
+
+                                        <img
+                                            src={editingTemplate.background_url}
+                                            alt="Background"
+                                            className="absolute inset-0 w-full h-full object-contain"
+                                            draggable={false}
+                                        />
                                 {fields.map(f => (
                                     <div
                                         key={f.id}
@@ -984,8 +1089,10 @@ export default function PostsAdmin() {
                                     </div>
                                 ))}
                             </div>
-                            <p className="text-[10px] text-zinc-400 mt-1 text-center">Arrasta os campos para posicionar. Clique num campo para o editar.</p>
-                        </div>
+                                </div> {/* zoom wrapper */}
+                            </div> {/* overflow-auto */}
+                            <p className="text-[10px] text-zinc-400 mt-1 text-center">Arrasta para mover. Puxa as pegas (cantos) para redimensionar. Usa zoom e grelha para precisão.</p>
+                        </div> {/* flex-1 */}
 
                         {/* Field properties */}
                         {selectedField && (() => {
