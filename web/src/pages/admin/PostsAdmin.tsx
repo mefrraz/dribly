@@ -8,7 +8,7 @@ import { useAdminApi, type AdminPostTemplate, type AdminGame } from '../../lib/a
 interface FieldDef {
     id: string
     label: string
-    x: number  // percentage 0-100
+    x: number
     y: number
     w: number
     h: number
@@ -17,7 +17,10 @@ interface FieldDef {
     italic: boolean
     outline: boolean
     kind: 'text' | 'logo'
-    content: string  // template with {variables}
+    content: string
+    fontFamily: string
+    fontWeight: number  // 400, 700, 900
+    textAlign: 'left' | 'center' | 'right'
 }
 
 type Tab = 'templates' | 'editor' | 'generate'
@@ -33,18 +36,6 @@ const POST_TYPE_LABELS: Record<PostType, string> = {
     capa_resultados: 'Capa Resultados',
     capa_agenda: 'Capa Agenda',
     custom: 'Personalizado',
-}
-
-// Which fields each post type gets by default
-const TYPE_FIELDS: Record<PostType, string[]> = {
-    resultado_hero: ['equipa_casa', 'equipa_fora', 'resultado_casa', 'resultado_fora', 'data', 'escalao', 'logo_casa', 'logo_fora'],
-    agenda_hero: ['equipa_casa', 'equipa_fora', 'dia_semana', 'dia_mes', 'hora', 'local', 'escalao', 'logo_casa', 'logo_fora'],
-    resultados_lista: ['equipa_casa', 'equipa_fora', 'resultado_casa', 'resultado_fora', 'dia_semana', 'dia_mes', 'escalao'],
-    agenda_lista: ['equipa_casa', 'equipa_fora', 'dia_semana', 'dia_mes', 'hora', 'escalao'],
-    gameday: ['equipa_casa', 'equipa_fora', 'dia_semana', 'dia_mes', 'hora', 'local', 'escalao', 'logo_casa', 'logo_fora'],
-    capa_resultados: ['data'],
-    capa_agenda: ['data'],
-    custom: ['equipa_casa', 'equipa_fora', 'resultado_casa', 'resultado_fora', 'data', 'hora', 'local', 'escalao', 'competicao', 'logo_casa', 'logo_fora'],
 }
 
 // Fake data shown in the editor overlay
@@ -79,6 +70,18 @@ const ALL_VARIABLES: { key: string; label: string; example: string }[] = [
     { key: 'status', label: 'Status', example: 'FINALIZADO' },
 ]
 
+// ── Font options ───────────────────────────────────────
+
+const AVAILABLE_FONTS = [
+    { name: 'Montserrat', weights: [400, 700, 900] },
+    { name: 'Outfit', weights: [400, 700, 800] },
+    { name: 'Bebas Neue', weights: [400] },
+    { name: 'Oswald', weights: [400, 700] },
+    { name: 'Impact', weights: [400] },
+]
+
+const WEIGHT_LABELS: Record<number, string> = { 400: 'Regular', 700: 'Bold', 800: 'Extra Bold', 900: 'Black' }
+
 // Standard content template for each predefined field
 const DEFAULT_CONTENT: Record<string, string> = {
     equipa_casa: '{equipa_casa}',
@@ -95,19 +98,19 @@ const DEFAULT_CONTENT: Record<string, string> = {
 }
 
 const FIELD_DEFAULTS: Record<string, Partial<FieldDef>> = {
-    equipa_casa: { label: 'Equipa Casa', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8, content: '{equipa_casa}' },
-    equipa_fora: { label: 'Equipa Fora', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8, content: '{equipa_fora}' },
-    resultado_casa: { label: 'Placar Casa', fontSize: 120, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 15, h: 14, content: '{resultado_casa}' },
-    resultado_fora: { label: 'Placar Fora', fontSize: 120, color: '#7C3AED', italic: true, outline: true, kind: 'text', w: 15, h: 14, content: '{resultado_fora}' },
-    data: { label: 'Data', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5, content: '{data}' },
-    dia_semana: { label: 'Dia Semana', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{dia_semana}' },
-    dia_mes: { label: 'Dia + Mês', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{dia_mes}' },
-    hora: { label: 'Hora', fontSize: 80, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 20, h: 12, content: '{hora}' },
-    local: { label: 'Local', fontSize: 22, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5, content: '{local}' },
-    escalao: { label: 'Escalão', fontSize: 32, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 20, h: 6, content: '{escalao}' },
-    competicao: { label: 'Competição', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{competicao}' },
-    logo_casa: { label: 'Logo Casa', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28, content: '' },
-    logo_fora: { label: 'Logo Fora', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28, content: '' },
+    equipa_casa: { label: 'Equipa Casa', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8, content: '{equipa_casa}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
+    equipa_fora: { label: 'Equipa Fora', fontSize: 40, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 35, h: 8, content: '{equipa_fora}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
+    resultado_casa: { label: 'Placar Casa', fontSize: 120, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 15, h: 14, content: '{resultado_casa}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'center' },
+    resultado_fora: { label: 'Placar Fora', fontSize: 120, color: '#7C3AED', italic: true, outline: true, kind: 'text', w: 15, h: 14, content: '{resultado_fora}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'center' },
+    data: { label: 'Data', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5, content: '{data}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    dia_semana: { label: 'Dia Semana', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{dia_semana}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
+    dia_mes: { label: 'Dia + Mês', fontSize: 28, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{dia_mes}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
+    hora: { label: 'Hora', fontSize: 80, color: '#7C3AED', italic: true, outline: false, kind: 'text', w: 20, h: 12, content: '{hora}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'center' },
+    local: { label: 'Local', fontSize: 22, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 30, h: 5, content: '{local}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    escalao: { label: 'Escalão', fontSize: 32, color: '#FFFFFF', italic: false, outline: false, kind: 'text', w: 20, h: 6, content: '{escalao}', fontFamily: 'Montserrat', fontWeight: 900, textAlign: 'left' },
+    competicao: { label: 'Competição', fontSize: 24, color: '#9CA3AF', italic: false, outline: false, kind: 'text', w: 25, h: 5, content: '{competicao}', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    logo_casa: { label: 'Logo Casa', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28, content: '', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
+    logo_fora: { label: 'Logo Fora', fontSize: 0, color: '', italic: false, outline: false, kind: 'logo', w: 28, h: 28, content: '', fontFamily: 'Montserrat', fontWeight: 400, textAlign: 'left' },
 }
 
 // ── Color palette ──────────────────────────────────────
@@ -147,7 +150,7 @@ export default function PostsAdmin() {
     const [dragging, setDragging] = useState<string | null>(null)
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
     const [resizing, setResizing] = useState<{ id: string; corner: string; startX: number; startY: number; startW: number; startH: number; startLeft: number; startTop: number } | null>(null)
-    const [selectedField, setSelectedField] = useState<string | null>(null)
+    const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set())
     const [uploading, setUploading] = useState(false)
     const editorRef = useRef<HTMLDivElement>(null)
 
@@ -213,28 +216,8 @@ export default function PostsAdmin() {
             const type = selectedType
             const name = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ')
 
-            // Create default fields based on type
-            const fieldIds = TYPE_FIELDS[type] || TYPE_FIELDS.custom
+            // Create template with NO fields — user adds them manually in the editor
             const defaultFields: Record<string, FieldDef> = {}
-            fieldIds.forEach((fid, i) => {
-                const def = FIELD_DEFAULTS[fid] || {}
-                const row = Math.floor(i / 2)
-                const col = i % 2
-                defaultFields[fid] = {
-                    id: fid,
-                    label: def.label || fid,
-                    x: col === 0 ? 10 : 55,
-                    y: 10 + row * 12,
-                    w: def.w || 30,
-                    h: def.h || 8,
-                    fontSize: def.fontSize || 30,
-                    color: def.color || '#FFFFFF',
-                    italic: def.italic || false,
-                    outline: def.outline || false,
-                    kind: def.kind || 'text',
-                    content: def.content || DEFAULT_CONTENT[fid] || '',
-                }
-            })
 
             const { template: created } = await api.upsertPostTemplate({
                 name,
@@ -288,9 +271,12 @@ export default function PostsAdmin() {
             outline: (f.outline as boolean) || false,
             kind: (f.kind as FieldDef['kind']) || 'text',
             content: (f.content as string) || (DEFAULT_CONTENT[id] || ''),
+            fontFamily: (f.fontFamily as string) || 'Montserrat',
+            fontWeight: (f.fontWeight as number) || 900,
+            textAlign: (f.textAlign as FieldDef['textAlign']) || 'left',
         }))
         setFields(parsed)
-        setSelectedField(null)
+        setSelectedFields(new Set())
         setTab('editor')
     }
 
@@ -317,8 +303,7 @@ export default function PostsAdmin() {
         const id = fid || `field_${Date.now()}`
         const existing = fields.find(f => f.id === id)
         if (existing) {
-            // If it's a predefined field that already exists, just select it
-            setSelectedField(id)
+            setSelectedFields(new Set([id]))
             return
         }
         const def = FIELD_DEFAULTS[id] || {}
@@ -331,17 +316,24 @@ export default function PostsAdmin() {
             fontSize: def.fontSize || 30, color: def.color || '#FFFFFF',
             italic: def.italic || false, outline: def.outline || false,
             kind: def.kind || 'text', content,
+            fontFamily: def.fontFamily || 'Montserrat',
+            fontWeight: def.fontWeight || 900,
+            textAlign: def.textAlign || 'left',
         }])
-        setSelectedField(id)
+        setSelectedFields(new Set([id]))
     }
 
     const removeField = (id: string) => {
         setFields(prev => prev.filter(f => f.id !== id))
-        if (selectedField === id) setSelectedField(null)
+        setSelectedFields(prev => { const n = new Set(prev); n.delete(id); return n })
     }
 
     const updateField = (id: string, updates: Partial<FieldDef>) => {
         setFields(prev => prev.map(f => f.id === id ? { ...f, ...updates } : f))
+    }
+
+    const updateAllSelected = (updates: Partial<FieldDef>) => {
+        setFields(prev => prev.map(f => selectedFields.has(f.id) ? { ...f, ...updates } : f))
     }
 
     // ── Drag handling ───────────────────────────────────
@@ -350,6 +342,14 @@ export default function PostsAdmin() {
         e.stopPropagation()
         const field = fields.find(f => f.id === id)
         if (!field || !editorRef.current) return
+        // Select on drag start if not already selected
+        if (!selectedFields.has(id)) {
+            if (e.ctrlKey || e.metaKey) {
+                setSelectedFields(prev => { const n = new Set(prev); n.add(id); return n })
+            } else {
+                setSelectedFields(new Set([id]))
+            }
+        }
         const rect = editorRef.current.getBoundingClientRect()
         const clientX = e.clientX - rect.left
         const clientY = e.clientY - rect.top
@@ -357,7 +357,6 @@ export default function PostsAdmin() {
         const pctY = (clientY / rect.height) * 100
         setDragging(id)
         setDragOffset({ x: pctX - field.x, y: pctY - field.y })
-        setSelectedField(id)
     }
 
     const onDrag = (e: React.MouseEvent) => {
@@ -462,6 +461,7 @@ export default function PostsAdmin() {
                     fontSize: f.fontSize, color: f.color,
                     italic: f.italic, outline: f.outline, kind: f.kind,
                     content: f.content,
+                    fontFamily: f.fontFamily, fontWeight: f.fontWeight, textAlign: f.textAlign,
                 }
             })
             await api.upsertPostTemplate({
@@ -624,38 +624,42 @@ export default function PostsAdmin() {
             const color = (f.color as string) || '#FFFFFF'
             const italic = f.italic as boolean
             const outline = f.outline as boolean
+            const fontFamily = (f.fontFamily as string) || 'Montserrat'
+            const fontWeight = (f.fontWeight as number) || 900
+            const textAlign = (f.textAlign as string) || 'left'
 
             ctx.save()
-            const fontStyle = `900 ${fontSize}px Montserrat, Outfit, sans-serif`
-            ctx.font = fontStyle
+            const fontStr = `${italic ? 'italic ' : ''}${fontWeight} ${fontSize}px ${fontFamily}, Outfit, sans-serif`
+            ctx.font = fontStr
             ctx.textBaseline = 'top'
-            ctx.textAlign = 'left'
+            ctx.textAlign = textAlign as CanvasTextAlign
+
+            // Calculate x based on alignment
+            let textX = fx
+            if (textAlign === 'center') textX = fx + fw / 2
+            else if (textAlign === 'right') textX = fx + fw
 
             // Measure and scale to fit
             let actualSize = fontSize
             let metrics = ctx.measureText(value)
             while (metrics.width > fw * 0.95 && actualSize > 8) {
                 actualSize--
-                ctx.font = `900 ${actualSize}px Montserrat, Outfit, sans-serif`
+                ctx.font = `${italic ? 'italic ' : ''}${fontWeight} ${actualSize}px ${fontFamily}, Outfit, sans-serif`
                 metrics = ctx.measureText(value)
-            }
-            if (italic) {
-                ctx.font = `italic 900 ${actualSize}px Montserrat, Outfit, sans-serif`
             }
 
             if (outline) {
                 ctx.strokeStyle = color
                 ctx.lineWidth = Math.max(2, actualSize / 15)
                 ctx.lineJoin = 'round'
-                ctx.strokeText(value, fx, fy)
+                ctx.strokeText(value, textX, fy)
             } else {
                 ctx.fillStyle = color
-                // Shadow for readability
                 ctx.shadowColor = 'rgba(0,0,0,0.7)'
                 ctx.shadowBlur = 4
                 ctx.shadowOffsetX = 2
                 ctx.shadowOffsetY = 2
-                ctx.fillText(value, fx, fy)
+                ctx.fillText(value, textX, fy)
             }
 
             ctx.restore()
@@ -985,7 +989,7 @@ export default function PostsAdmin() {
                                     <div
                                         key={f.id}
                                         className={`absolute border-2 rounded cursor-move transition-colors overflow-visible group ${
-                                            selectedField === f.id
+                                            selectedFields.has(f.id)
                                                 ? 'border-dribly-purple bg-dribly-purple/20 z-10'
                                                 : dragging === f.id
                                                     ? 'border-dribly-purple bg-dribly-purple/10 z-10'
@@ -998,11 +1002,24 @@ export default function PostsAdmin() {
                                             height: `${f.h}%`,
                                         }}
                                         onMouseDown={(e) => startDrag(f.id, e)}
-                                        onClick={(e) => { e.stopPropagation(); setSelectedField(f.id) }}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            if (e.ctrlKey || e.metaKey) {
+                                                // Toggle in selection
+                                                setSelectedFields(prev => {
+                                                    const n = new Set(prev)
+                                                    if (n.has(f.id)) n.delete(f.id); else n.add(f.id)
+                                                    return n
+                                                })
+                                            } else {
+                                                setSelectedFields(new Set([f.id]))
+                                            }
+                                        }}
                                     >
                                         {/* X delete button */}
                                         <button
                                             className="absolute -top-2.5 -right-2.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20"
+                                            onMouseDown={(e) => { e.stopPropagation(); e.preventDefault() }}
                                             onClick={(e) => { e.stopPropagation(); removeField(f.id) }}
                                             title="Remover campo"
                                         >
@@ -1038,8 +1055,8 @@ export default function PostsAdmin() {
                                             </div>
                                         )}
 
-                                        {/* Resize handles — only on selected field */}
-                                        {selectedField === f.id && (
+                                        {/* Resize handles — only on selected fields */}
+                                        {selectedFields.has(f.id) && (
                                             <>
                                                 {/* 4 corners */}
                                                 {['nw', 'ne', 'sw', 'se'].map(corner => {
@@ -1095,23 +1112,28 @@ export default function PostsAdmin() {
                         </div> {/* flex-1 */}
 
                         {/* Field properties */}
-                        {selectedField && (() => {
-                            const f = fields.find(ff => ff.id === selectedField)
+                        {selectedFields.size > 0 && (() => {
+                            const f = fields.find(ff => selectedFields.has(ff.id))
                             if (!f) return null
+                            const isMulti = selectedFields.size > 1
                             return (
-                                <div className="w-64 shrink-0 space-y-3 p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                                <div className="w-64 shrink-0 space-y-3 p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl max-h-[calc(100vh-200px)] overflow-y-auto">
                                     <div className="flex items-center justify-between">
-                                        <h3 className="text-sm font-bold text-zinc-900 dark:text-white">Propriedades</h3>
-                                        <button onClick={() => removeField(f.id)} className="p-1 rounded hover:bg-red-50 text-zinc-400 hover:text-red-600">
+                                        <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
+                                            {isMulti ? `${selectedFields.size} campos` : 'Propriedades'}
+                                        </h3>
+                                        <button onClick={() => { selectedFields.forEach(id => removeField(id)) }} className="p-1 rounded hover:bg-red-50 text-zinc-400 hover:text-red-600" title="Eliminar selecionados">
                                             <Trash2 size={14} />
                                         </button>
                                     </div>
+
+                                    {isMulti && <p className="text-[10px] text-zinc-400 -mt-2">A mostrar 1º campo. Alterações aplicam-se a todos.</p>}
 
                                     <div>
                                         <label className="text-[10px] font-bold text-zinc-500 uppercase">Label</label>
                                         <input
                                             value={f.label}
-                                            onChange={(e) => updateField(f.id, { label: e.target.value })}
+                                            onChange={(e) => isMulti ? updateAllSelected({ label: e.target.value }) : updateField(f.id, { label: e.target.value })}
                                             className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent"
                                         />
                                     </div>
@@ -1146,10 +1168,7 @@ export default function PostsAdmin() {
                                                                     const insert = `{${v.key}}`
                                                                     const newText = text.substring(0, start) + insert + text.substring(end)
                                                                     updateField(f.id, { content: newText })
-                                                                    setTimeout(() => {
-                                                                        input.focus()
-                                                                        input.setSelectionRange(start + insert.length, start + insert.length)
-                                                                    }, 0)
+                                                                    setTimeout(() => { input.focus(); input.setSelectionRange(start + insert.length, start + insert.length) }, 0)
                                                                 } else {
                                                                     updateField(f.id, { content: (f.content || '') + `{${v.key}}` })
                                                                 }
@@ -1168,108 +1187,75 @@ export default function PostsAdmin() {
                                     <div className="grid grid-cols-2 gap-2">
                                         <div>
                                             <label className="text-[10px] font-bold text-zinc-500 uppercase">X %</label>
-                                            <input
-                                                type="number"
-                                                value={Math.round(f.x)}
-                                                onChange={(e) => updateField(f.id, { x: Number(e.target.value) })}
-                                                className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent"
-                                            />
+                                            <input type="number" value={Math.round(f.x)} onChange={(e) => isMulti ? updateAllSelected({ x: Number(e.target.value) }) : updateField(f.id, { x: Number(e.target.value) })} className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent" />
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-bold text-zinc-500 uppercase">Y %</label>
-                                            <input
-                                                type="number"
-                                                value={Math.round(f.y)}
-                                                onChange={(e) => updateField(f.id, { y: Number(e.target.value) })}
-                                                className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent"
-                                            />
+                                            <input type="number" value={Math.round(f.y)} onChange={(e) => isMulti ? updateAllSelected({ y: Number(e.target.value) }) : updateField(f.id, { y: Number(e.target.value) })} className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent" />
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-bold text-zinc-500 uppercase">Larg %</label>
-                                            <input
-                                                type="number"
-                                                value={Math.round(f.w)}
-                                                onChange={(e) => updateField(f.id, { w: Number(e.target.value) })}
-                                                className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent"
-                                            />
+                                            <input type="number" value={Math.round(f.w)} onChange={(e) => isMulti ? updateAllSelected({ w: Number(e.target.value) }) : updateField(f.id, { w: Number(e.target.value) })} className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent" />
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-bold text-zinc-500 uppercase">Alt %</label>
-                                            <input
-                                                type="number"
-                                                value={Math.round(f.h)}
-                                                onChange={(e) => updateField(f.id, { h: Number(e.target.value) })}
-                                                className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent"
-                                            />
+                                            <input type="number" value={Math.round(f.h)} onChange={(e) => isMulti ? updateAllSelected({ h: Number(e.target.value) }) : updateField(f.id, { h: Number(e.target.value) })} className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent" />
                                         </div>
                                     </div>
 
                                     {f.kind === 'text' && (
                                         <>
                                             <div>
+                                                <label className="text-[10px] font-bold text-zinc-500 uppercase">Fonte</label>
+                                                <select value={f.fontFamily} onChange={(e) => isMulti ? updateAllSelected({ fontFamily: e.target.value }) : updateField(f.id, { fontFamily: e.target.value })} className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent">
+                                                    {AVAILABLE_FONTS.map(ff => (<option key={ff.name} value={ff.name}>{ff.name}</option>))}
+                                                </select>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <label className="text-[10px] font-bold text-zinc-500 uppercase">Peso</label>
+                                                    <select value={f.fontWeight} onChange={(e) => isMulti ? updateAllSelected({ fontWeight: Number(e.target.value) }) : updateField(f.id, { fontWeight: Number(e.target.value) })} className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent">
+                                                        {(() => {
+                                                            const fontObj = AVAILABLE_FONTS.find(ff => ff.name === f.fontFamily)
+                                                            const weights = fontObj?.weights || [400, 700, 900]
+                                                            return weights.map(w => (<option key={w} value={w}>{WEIGHT_LABELS[w] || w}</option>))
+                                                        })()}
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] font-bold text-zinc-500 uppercase">Alinhar</label>
+                                                    <select value={f.textAlign} onChange={(e) => isMulti ? updateAllSelected({ textAlign: e.target.value as 'left' | 'center' | 'right' }) : updateField(f.id, { textAlign: e.target.value as 'left' | 'center' | 'right' })} className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent">
+                                                        <option value="left">Esquerda</option>
+                                                        <option value="center">Centro</option>
+                                                        <option value="right">Direita</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
                                                 <label className="text-[10px] font-bold text-zinc-500 uppercase">Tamanho {f.fontSize}px</label>
-                                                <input
-                                                    type="range"
-                                                    min="8" max="200" value={f.fontSize}
-                                                    onChange={(e) => updateField(f.id, { fontSize: Number(e.target.value) })}
-                                                    className="w-full mt-0.5 accent-dribly-purple"
-                                                />
+                                                <input type="range" min="8" max="200" value={f.fontSize} onChange={(e) => isMulti ? updateAllSelected({ fontSize: Number(e.target.value) }) : updateField(f.id, { fontSize: Number(e.target.value) })} className="w-full mt-0.5 accent-dribly-purple" />
                                             </div>
                                             <div>
                                                 <label className="text-[10px] font-bold text-zinc-500 uppercase">Cor</label>
                                                 <div className="flex items-center gap-2 mt-0.5">
-                                                    <input
-                                                        type="color"
-                                                        value={f.color}
-                                                        onChange={(e) => {
-                                                            updateField(f.id, { color: e.target.value })
-                                                            saveRecentColor(e.target.value)
-                                                            setRecentColors(loadRecentColors())
-                                                        }}
-                                                        className="w-8 h-8 rounded cursor-pointer border-0 p-0"
-                                                    />
-                                                    <input
-                                                        value={f.color}
-                                                        onChange={(e) => {
-                                                            updateField(f.id, { color: e.target.value })
-                                                            saveRecentColor(e.target.value)
-                                                            setRecentColors(loadRecentColors())
-                                                        }}
-                                                        className="flex-1 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent font-mono"
-                                                    />
+                                                    <input type="color" value={f.color} onChange={(e) => { if (isMulti) updateAllSelected({ color: e.target.value }); else updateField(f.id, { color: e.target.value }); saveRecentColor(e.target.value); setRecentColors(loadRecentColors()) }} className="w-8 h-8 rounded cursor-pointer border-0 p-0" />
+                                                    <input value={f.color} onChange={(e) => { const c = e.target.value; isMulti ? updateAllSelected({ color: c }) : updateField(f.id, { color: c }); saveRecentColor(c); setRecentColors(loadRecentColors()) }} className="flex-1 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent font-mono" />
                                                 </div>
-                                                {/* Palette swatches */}
                                                 <div className="flex flex-wrap gap-1 mt-1.5">
                                                     {PALETTE_SWATCHES.map(c => (
-                                                        <button
-                                                            key={c}
-                                                            className="w-5 h-5 rounded border border-zinc-300 dark:border-zinc-600 cursor-pointer transition-transform hover:scale-110"
-                                                            style={{ backgroundColor: c }}
-                                                            onClick={() => {
-                                                                updateField(f.id, { color: c })
-                                                                saveRecentColor(c)
-                                                                setRecentColors(loadRecentColors())
-                                                            }}
-                                                            title={c}
-                                                        />
+                                                        <button key={c} className="w-5 h-5 rounded border border-zinc-300 dark:border-zinc-600 cursor-pointer transition-transform hover:scale-110" style={{ backgroundColor: c }}
+                                                            onClick={() => { isMulti ? updateAllSelected({ color: c }) : updateField(f.id, { color: c }); saveRecentColor(c); setRecentColors(loadRecentColors()) }}
+                                                            title={c} />
                                                     ))}
                                                 </div>
-                                                {/* Recent colors */}
                                                 {recentColors.length > 0 && (
                                                     <div className="mt-1">
                                                         <p className="text-[9px] text-zinc-400 uppercase mb-0.5">Recentes</p>
                                                         <div className="flex flex-wrap gap-1">
                                                             {recentColors.map(c => (
-                                                                <button
-                                                                    key={c}
-                                                                    className="w-5 h-5 rounded-full border border-zinc-300 dark:border-zinc-600 cursor-pointer transition-transform hover:scale-110"
-                                                                    style={{ backgroundColor: c }}
-                                                                    onClick={() => {
-                                                                        updateField(f.id, { color: c })
-                                                                        setRecentColors(loadRecentColors())
-                                                                    }}
-                                                                    title={c}
-                                                                />
+                                                                <button key={c} className="w-5 h-5 rounded-full border border-zinc-300 dark:border-zinc-600 cursor-pointer transition-transform hover:scale-110" style={{ backgroundColor: c }}
+                                                                    onClick={() => { isMulti ? updateAllSelected({ color: c }) : updateField(f.id, { color: c }); setRecentColors(loadRecentColors()) }}
+                                                                    title={c} />
                                                             ))}
                                                         </div>
                                                     </div>
@@ -1277,21 +1263,11 @@ export default function PostsAdmin() {
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <label className="flex items-center gap-1.5 text-xs cursor-pointer">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={f.italic}
-                                                        onChange={(e) => updateField(f.id, { italic: e.target.checked })}
-                                                        className="rounded"
-                                                    />
+                                                    <input type="checkbox" checked={f.italic} onChange={(e) => isMulti ? updateAllSelected({ italic: e.target.checked }) : updateField(f.id, { italic: e.target.checked })} className="rounded" />
                                                     Itálico
                                                 </label>
                                                 <label className="flex items-center gap-1.5 text-xs cursor-pointer">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={f.outline}
-                                                        onChange={(e) => updateField(f.id, { outline: e.target.checked })}
-                                                        className="rounded"
-                                                    />
+                                                    <input type="checkbox" checked={f.outline} onChange={(e) => isMulti ? updateAllSelected({ outline: e.target.checked }) : updateField(f.id, { outline: e.target.checked })} className="rounded" />
                                                     Outline
                                                 </label>
                                             </div>
@@ -1304,11 +1280,7 @@ export default function PostsAdmin() {
 
                                     <div>
                                         <label className="text-[10px] font-bold text-zinc-500 uppercase">Tipo</label>
-                                        <select
-                                            value={f.kind}
-                                            onChange={(e) => updateField(f.id, { kind: e.target.value as 'text' | 'logo' })}
-                                            className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent"
-                                        >
+                                        <select value={f.kind} onChange={(e) => isMulti ? updateAllSelected({ kind: e.target.value as 'text' | 'logo' }) : updateField(f.id, { kind: e.target.value as 'text' | 'logo' })} className="w-full mt-0.5 px-2 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-700 bg-transparent">
                                             <option value="text">Texto</option>
                                             <option value="logo">Logo</option>
                                         </select>
