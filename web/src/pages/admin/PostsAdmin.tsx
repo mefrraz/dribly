@@ -285,8 +285,8 @@ export default function PostsAdmin() {
         escalao: 'SUB14A',
         competicao: 'LIGA BETCLIC',
         local: 'PAVILHÃO MUNICIPAL',
-        logotipo_casa: null,
-        logotipo_fora: null,
+        logotipo_casa: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/club-logos/fc-gaia.png',
+        logotipo_fora: 'https://qdzmwgahencinoucvoop.supabase.co/storage/v1/object/public/club-logos/fc-porto.png',
         status: 'FINALIZADO',
     })
 
@@ -1066,13 +1066,21 @@ export default function PostsAdmin() {
 
                                         {/* Content preview */}
                                         {f.kind === 'logo' ? (
-                                            <div className="flex items-center justify-center h-full">
-                                                <Image size={f.w > 20 ? 20 : 14} className="text-white/40" />
+                                            <div className="flex items-center justify-center h-full p-1">
+                                                {(() => {
+                                                    const logoUrl = f.id === 'logo_casa' ? fakeGame.logotipo_casa : f.id === 'logo_fora' ? fakeGame.logotipo_fora : null
+                                                    return logoUrl ? (
+                                                        <img src={logoUrl} alt="" className="max-w-full max-h-full object-contain opacity-80" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                                                    ) : (
+                                                        <Image size={f.w > 20 ? 20 : 14} className="text-white/40" />
+                                                    )
+                                                })()}
                                             </div>
                                         ) : (
                                             <div
-                                                className="flex items-center justify-center h-full px-1 overflow-hidden"
+                                                className="flex items-center h-full px-1 overflow-hidden"
                                                 style={{
+                                                    justifyContent: f.textAlign === 'center' ? 'center' : f.textAlign === 'right' ? 'flex-end' : 'flex-start',
                                                     fontSize: Math.min(f.fontSize * 0.35, 80),
                                                     color: f.color,
                                                     fontStyle: f.italic ? 'italic' : 'normal',
@@ -1081,8 +1089,9 @@ export default function PostsAdmin() {
                                                     WebkitTextStroke: f.outline ? `1px ${f.color}` : undefined,
                                                     opacity: 0.85,
                                                     textAlign: f.textAlign,
-                                                    lineHeight: 1.1,
+                                                    lineHeight: 1.2,
                                                     wordBreak: 'break-word' as const,
+                                                    whiteSpace: 'pre-line' as const,
                                                 }}
                                             >
                                                 {resolvePreview(f.content || '') || f.label}
@@ -1346,6 +1355,8 @@ export default function PostsAdmin() {
                                     { key: 'competicao', label: 'Competição' },
                                     { key: 'local', label: 'Local' },
                                     { key: 'status', label: 'Status' },
+                                    { key: 'logotipo_casa', label: 'Logo Casa (URL)' },
+                                    { key: 'logotipo_fora', label: 'Logo Fora (URL)' },
                                 ].map(({ key, label }) => (
                                     <div key={key} className="flex flex-col gap-0.5">
                                         <label className="text-[9px] text-zinc-400 uppercase font-bold">{label}</label>
