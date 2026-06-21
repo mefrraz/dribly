@@ -38,21 +38,6 @@ const POST_TYPE_LABELS: Record<PostType, string> = {
     custom: 'Personalizado',
 }
 
-// Fake data shown in the editor overlay
-const SAMPLE_DATA: Record<string, string> = {
-    equipa_casa: 'FC GAIA',
-    equipa_fora: 'FC PORTO',
-    resultado_casa: '37',
-    resultado_fora: '91',
-    data: '19 OUT 2025',
-    dia_semana: 'DOMINGO',
-    dia_mes: '19 OUT',
-    hora: '16H30',
-    local: 'PAVILHAO MUNICIPAL',
-    escalao: 'SUB14A',
-    competicao: 'LIGA BETCLIC',
-}
-
 // ── Available variables for content templates ─────────
 
 const ALL_VARIABLES: { key: string; label: string; example: string }[] = [
@@ -285,6 +270,51 @@ export default function PostsAdmin() {
     const [showGrid, setShowGrid] = useState(false)
     const [gridDivisions, setGridDivisions] = useState(4)  // 2,4,8,16
     const [zoom, setZoom] = useState(100)  // 25-200
+    const [showFakeGame, setShowFakeGame] = useState(true)
+
+    // ── Fake game for preview ───────────────────────────
+
+    const [fakeGame, setFakeGame] = useState<AdminGame>({
+        slug: 'exemplo',
+        data: '2025-10-19',
+        hora: '16:30',
+        equipa_casa: 'FC GAIA',
+        equipa_fora: 'FC PORTO',
+        resultado_casa: 37,
+        resultado_fora: 91,
+        escalao: 'SUB14A',
+        competicao: 'LIGA BETCLIC',
+        local: 'PAVILHÃO MUNICIPAL',
+        logotipo_casa: null,
+        logotipo_fora: null,
+        status: 'FINALIZADO',
+    })
+
+    const resolvePreview = (content: string): string => {
+        if (!content) return ''
+        const vars: Record<string, string> = {
+            equipa_casa: fakeGame.equipa_casa || '',
+            equipa_fora: fakeGame.equipa_fora || '',
+            resultado_casa: fakeGame.resultado_casa != null ? String(fakeGame.resultado_casa) : '',
+            resultado_fora: fakeGame.resultado_fora != null ? String(fakeGame.resultado_fora) : '',
+            data: fakeGame.data || '',
+            local: fakeGame.local || '',
+            escalao: fakeGame.escalao || '',
+            competicao: fakeGame.competicao || '',
+            status: fakeGame.status || '',
+        }
+        if (fakeGame.data) {
+            const d = new Date(fakeGame.data + 'T00:00:00')
+            vars.dia_semana = d.toLocaleDateString('pt-PT', { weekday: 'long' }).toUpperCase()
+            const mes = d.toLocaleDateString('pt-PT', { month: 'short' }).toUpperCase().replace('.', '')
+            vars.dia_mes = `${d.getDate()} ${mes}`
+        } else {
+            vars.dia_semana = ''
+            vars.dia_mes = ''
+        }
+        vars.hora = (fakeGame.hora || '').replace(':', 'H')
+        return content.replace(/\{(\w+)\}/g, (_, key: string) => vars[key] ?? `{${key}}`)
+    }
 
     // Close add menu on outside click
     useEffect(() => {
@@ -1055,7 +1085,7 @@ export default function PostsAdmin() {
                                                     wordBreak: 'break-word' as const,
                                                 }}
                                             >
-                                                {SAMPLE_DATA[f.id] || f.label}
+                                                {resolvePreview(f.content || '') || f.label}
                                             </div>
                                         )}
 
@@ -1292,6 +1322,47 @@ export default function PostsAdmin() {
                                 </div>
                             )
                         })()}
+                    </div>
+
+                    {/* ── Fake Game Data ──────────────────── */}
+                    <div className="border border-zinc-200 dark:border-zinc-700 rounded-xl overflow-hidden">
+                        <button
+                            onClick={() => setShowFakeGame(!showFakeGame)}
+                            className="w-full flex items-center justify-between px-4 py-2.5 bg-zinc-50 dark:bg-white/5 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors"
+                        >
+                            <span>📋 Dados de Exemplo (preview)</span>
+                            <span className="text-[10px] text-zinc-400">{showFakeGame ? '▲' : '▼'}</span>
+                        </button>
+                        {showFakeGame && (
+                            <div className="p-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
+                                {[
+                                    { key: 'equipa_casa', label: 'Casa' },
+                                    { key: 'equipa_fora', label: 'Fora' },
+                                    { key: 'resultado_casa', label: 'Res. Casa' },
+                                    { key: 'resultado_fora', label: 'Res. Fora' },
+                                    { key: 'data', label: 'Data' },
+                                    { key: 'hora', label: 'Hora' },
+                                    { key: 'escalao', label: 'Escalão' },
+                                    { key: 'competicao', label: 'Competição' },
+                                    { key: 'local', label: 'Local' },
+                                    { key: 'status', label: 'Status' },
+                                ].map(({ key, label }) => (
+                                    <div key={key} className="flex flex-col gap-0.5">
+                                        <label className="text-[9px] text-zinc-400 uppercase font-bold">{label}</label>
+                                        <input
+                                            value={(fakeGame as unknown as Record<string, unknown>)[key] as string || ''}
+                                            onChange={(e) => setFakeGame(prev => ({ ...prev, [key]: key.startsWith('resultado') ? (e.target.value ? Number(e.target.value) : null) : e.target.value }))}
+                                            className="w-full px-1.5 py-1 rounded border border-zinc-200 dark:border-zinc-700 bg-transparent text-[10px] font-mono"
+                                        />
+                                    </div>
+                                ))}
+                                <div className="col-span-full">
+                                    <p className="text-[9px] text-zinc-400 mt-1">
+                                        Altera estes dados para ver como o preview reage. As variáveis nos campos atualizam em tempo real.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
