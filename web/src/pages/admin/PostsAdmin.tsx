@@ -512,6 +512,9 @@ export default function PostsAdmin() {
     // ── Render post to canvas ───────────────────────────
 
     const renderPost = useCallback(async (template: AdminPostTemplate, game: AdminGame): Promise<HTMLCanvasElement> => {
+        // Ensure fonts are loaded for Canvas
+        await document.fonts.ready
+
         const canvas = document.createElement('canvas')
         canvas.width = 1080
         canvas.height = 1080
@@ -1043,10 +1046,11 @@ export default function PostsAdmin() {
                                                     fontSize: Math.min(f.fontSize * 0.35, 80),
                                                     color: f.color,
                                                     fontStyle: f.italic ? 'italic' : 'normal',
-                                                    fontWeight: f.outline ? 400 : 800,
+                                                    fontWeight: f.fontWeight,
+                                                    fontFamily: `${f.fontFamily}, Outfit, sans-serif`,
                                                     WebkitTextStroke: f.outline ? `1px ${f.color}` : undefined,
                                                     opacity: 0.85,
-                                                    textAlign: 'center' as const,
+                                                    textAlign: f.textAlign,
                                                     lineHeight: 1.1,
                                                     wordBreak: 'break-word' as const,
                                                 }}
