@@ -10,3 +10,7 @@ export default function middleware(request: Request) {
         }
     }
 }
+
+export const config = {
+    matcher: '/api/bounce/:path*',
+}
