@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
-import { ArrowLeft, Calendar, Trophy, Filter, RefreshCw, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Calendar, Trophy, Filter, AlertCircle } from 'lucide-react'
 import { Link, useSearchParams, useOutletContext } from 'react-router-dom'
 import { useGames } from '../../hooks/useGames'
-import { useTimeAgo } from '../../hooks/useTimeAgo'
 import { useSeason } from '../../hooks/useSeason'
 import { SeasonSelector } from '../../components/SeasonSelector'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
@@ -26,9 +25,8 @@ function ClubGames() {
     const [escaloes, setEscaloes] = useState<string[]>([])
 
     const { season } = useSeason()
-    const { games: allGames, loading, lastUpdated, error, refresh } = useGames(season, club.id, club.name)
+    const { games: allGames, loading, error, refresh } = useGames(season, club.id, club.name)
     const matches = useMemo(() => allGames || [], [allGames])
-    const timeAgo = useTimeAgo(lastUpdated)
 
     useEffect(() => {
         setSearchParams({ view })
@@ -85,16 +83,16 @@ function ClubGames() {
             </div>
             </div>
 
-            {/* Filtro + Atualizado */}
-            <div className="px-3 max-w-md mx-auto flex items-center gap-2">
-                <div className="relative w-[120px]">
-                    <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-500">
-                        <Filter size={12} />
+            {/* Filtro */}
+            <div className="px-3 max-w-sm mx-auto flex items-center gap-1.5">
+                <div className="relative w-2/3">
+                    <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none text-zinc-500">
+                        <Filter size={11} />
                     </div>
                     <select
                         value={filterEscalao}
                         onChange={(e) => setFilterEscalao(e.target.value)}
-                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium rounded-lg focus:ring-2 focus:ring-[var(--club-color)]/30 focus:border-[var(--club-color)] block w-full pl-7 p-2 appearance-none shadow-sm transition-colors"
+                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium rounded-lg focus:ring-2 focus:ring-[var(--club-color)]/30 focus:border-[var(--club-color)] block w-full pl-6 p-1.5 appearance-none shadow-sm transition-colors"
                     >
                         <option value="Todos">Escalão</option>
                         {escaloes.map(e => (
@@ -102,11 +100,7 @@ function ClubGames() {
                         ))}
                     </select>
                 </div>
-                <SeasonSelector className="w-[135px] text-[11px] p-2" />
-                <Link to="/sobre" className="shrink-0 flex items-center gap-1 text-[10px] text-zinc-500 dark:text-zinc-500 hover:text-[var(--club-color)] transition-colors uppercase tracking-wide group">
-                    <RefreshCw size={10} className="group-hover:animate-spin" />
-                    <span>{timeAgo || '--'}</span>
-                </Link>
+                <SeasonSelector className="w-1/3 text-[11px] p-1.5" />
             </div>
 
             {/* Error banner */}

@@ -173,18 +173,27 @@ export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
     return () => document.removeEventListener('visibilitychange', onVisible)
   }, [lastUpdated, fetchAndSet])
 
-  // Initial load: localStorage → FPB (single render, no Supabase in display path)
+  // Load: localStorage → FPB, re-fetches when season or club changes
   useEffect(() => {
     let cancelled = false
+    const cache = loadLocalCache(season, clube)
+
+    setGames(cache)
+    setError(null)
+    if (cache.length === 0) setLoading(true)
 
     const loadData = async () => {
-      if (localCache.length === 0) {
-        setLoading(true)
-      }
-      setError(null)
-
       try {
-        await fetchAndSet()
+        const fresh = await fetchFPBGames(season, clube)
+        if (cancelled) return
+        if (fresh.length === 0) {
+          setLoading(false)
+          return
+        }
+        const mapped = dedupGames(mapFPBData(fresh, season))
+        setGames(mapped)
+        setLastUpdated(new Date())
+        persistToSupabase(mapped)
       } catch (err) {
         logger.error('Failed to load games:', err)
         if (!cancelled) {
@@ -198,7 +207,7 @@ export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
     loadData()
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // only on mount
+  }, [season, clube])
 
   return { games, loading, lastUpdated, error, refresh }
 }
