@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Link, useOutletContext, useSearchParams } from 'react-router-dom'
 import { Calendar, Trophy, ChevronRight, Clock, MapPin, RefreshCw, AlertCircle, Heart, ExternalLink, TrendingUp } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
@@ -6,6 +6,7 @@ import { useFollows } from '../../hooks/useFollows'
 import { useSeason } from '../../hooks/useSeason'
 import { SeasonSelector } from '../../components/SeasonSelector'
 import { useAuth } from '../../lib/AuthContext'
+import { supabase } from '../../lib/supabase'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { SeoHead } from '../../components/SeoHead'
 import { type Club, displayName, useClub } from '../../lib/ClubContext'
@@ -57,6 +58,18 @@ function ClubHome() {
     const followed = user ? isFollowing('club', club.id) : false
     const [followLoading, setFollowLoading] = useState(false)
     const [needsLogin, setNeedsLogin] = useState(false)
+    const [seasonElo, setSeasonElo] = useState<number | null>(null)
+
+    useEffect(() => {
+        supabase.from('club_elo_history')
+            .select('elo_rating')
+            .eq('club_id', club.id)
+            .eq('season', season)
+            .single()
+            .then(({ data }) => {
+                setSeasonElo(data?.elo_rating ?? null)
+            })
+    }, [season, club.id])
 
 
     const handleFollow = async () => {
@@ -104,11 +117,11 @@ function ClubHome() {
                 </div>
                 <h1 className="text-lg font-bold text-zinc-900 dark:text-white truncate flex-1">
                     {displayName(club)}
-                    {club.elo_rating != null && (
+                    {(seasonElo ?? club.elo_rating) != null && (
                         <Link to={`/ranking?destaque=${club.slug}`} className="ml-2 text-xs font-bold text-white bg-[var(--club-color)] px-1.5 py-0.5 rounded-md hover:opacity-80 transition-opacity inline-flex items-center gap-1"
                             title="Rating de força — baseado nos resultados históricos">
                             <TrendingUp size={11} />
-                            {club.elo_rating}
+                            {seasonElo ?? club.elo_rating}
                         </Link>
                     )}
                 </h1>
