@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { fetchFPBGames } from '../lib/fpbApi'
-import { fetchGameDetail, type FPBGameDetail } from '../lib/fpbCompetitionsApi'
+import { fetchFPBGames, fetchBounceGameDetail } from '../lib/fpbApi'
+import { type FPBGameDetail } from '../lib/fpbCompetitionsApi'
 import { ArrowLeft, MapPin, Share2, Trophy, Navigation, ExternalLink, Calendar, Check, Clock, Info } from 'lucide-react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
@@ -17,23 +17,43 @@ import { GameDueloCard } from '../components/GameDueloCard'
 import { GameLeadersCard } from '../components/GameLeadersCard'
 import { SeoHead } from '../components/SeoHead'
 
-function detailToMatch(detail: FPBGameDetail): Match {
+// Map Bounce game detail JSON to FPBGameDetail format expected by the page
+function bounceToDetail(b: Record<string, any>): FPBGameDetail {
     return {
-        id: detail.internalID,
-        slug: detail.internalID,
-        data: detail.data,
-        hora: detail.hora || '',
-        equipa_casa: detail.equipa_casa,
-        equipa_fora: detail.equipa_fora,
-        resultado_casa: detail.resultado_casa,
-        resultado_fora: detail.resultado_fora,
-        escalao: detail.fase,
-        competicao: detail.competicao,
-        local: detail.pavilhao,
-        logotipo_casa: detail.logo_casa,
-        logotipo_fora: detail.logo_fora,
-        status: (detail.status || 'FINALIZADO') as Match['status'],
+        internalID: b.id || '',
+        data: b.data || '',
+        fase: b.fase || '',
+        competicao: b.competicao || '',
+        equipa_casa: b.equipa_casa || '',
+        equipa_fora: b.equipa_fora || '',
+        abrev_casa: b.abrev_casa || '',
+        abrev_fora: b.abrev_fora || '',
+        resultado_casa: b.resultado_casa ?? 0,
+        resultado_fora: b.resultado_fora ?? 0,
+        status: b.estado || 'AGENDADO',
+        hora: b.hora || '',
+        logo_casa: b.logo_casa || null,
+        logo_fora: b.logo_fora || null,
+        parciais: (b.periodos || []).map((p: any) => ({ periodo: `Q${p.periodo}`, casa: p.casa, fora: p.fora })),
+        pavilhao: b.local || '',
+        espetadores: b.espetadores || 0,
+        gameLeaders: (b.game_leaders || []).map((gl: any) => ({
+            categoria: gl.categoria || '',
+            casa: { nome: gl.casa?.nome || '', valor: gl.casa?.valor || '' },
+            fora: { nome: gl.fora?.nome || '', valor: gl.fora?.valor || '' },
+        })),
+        boxScoreCasa: [],
+        boxScoreFora: [],
+        teamStats: [],
+        topPerfCasa: { nome: '', foto: '' },
+        topPerfFora: { nome: '', foto: '' },
+        topPerfStats: [],
     }
+}
+
+async function fetchDetail(id: string): Promise<FPBGameDetail | null> {
+    const b = await fetchBounceGameDetail(id)
+    return b ? bounceToDetail(b) : null
 }
 
 function Game() {
@@ -79,7 +99,7 @@ function Game() {
 
         const tryLoad = async () => {
             // 1) Try all Supabase seasons in parallel
-            const tables = ['games_2025_2026', 'games_2024_2025', 'games_2023_2024', 'games_2022_2023']
+            const tables = ['games_2026_2027', 'games_2025_2026', 'games_2024_2025', 'games_2023_2024', 'games_2022_2023']
             const results = await Promise.all(tables.map(table =>
                 supabase.from(table).select('*').eq('slug', slug).single()
             ))
@@ -104,7 +124,7 @@ function Game() {
                         // Await FPB before showing anything — no flash
                         setDetailLoading(true)
                         try {
-                            const detail = await fetchGameDetail(String(m.id))
+                            const detail = await fetchDetail(String(m.id))
                             if (detail) {
                                 setDetailLeaders(detail.gameLeaders)
                                 setParciais(detail.parciais)
@@ -145,7 +165,7 @@ function Game() {
                     setLoading(false)
                     if (m.id) {
                         setDetailLoading(true)
-                        fetchGameDetail(String(m.id)).then(detail => {
+                        fetchDetail(String(m.id)).then(detail => {
                             if (detail) {
                                 setDetailLeaders(detail.gameLeaders)
                                 setParciais(detail.parciais)
@@ -181,9 +201,24 @@ function Game() {
             if (internalID) {
                 try {
                     setDetailLoading(true)
-                    const detail = await fetchGameDetail(internalID)
+                    const detail = await fetchDetail(internalID)
                     if (detail) {
-                        setMatch(detailToMatch(detail))
+                        setMatch({
+                            id: detail.internalID,
+                            slug: detail.internalID,
+                            data: detail.data,
+                            hora: detail.hora || '',
+                            equipa_casa: detail.equipa_casa,
+                            equipa_fora: detail.equipa_fora,
+                            resultado_casa: detail.resultado_casa,
+                            resultado_fora: detail.resultado_fora,
+                            escalao: detail.fase,
+                            competicao: detail.competicao,
+                            local: detail.pavilhao,
+                            logotipo_casa: detail.logo_casa,
+                            logotipo_fora: detail.logo_fora,
+                            status: (detail.status || 'FINALIZADO') as Match['status'],
+                        })
                         setDetailLeaders(detail.gameLeaders)
                         setParciais(detail.parciais)
                         setTopPerfCasa(detail.topPerfCasa)
@@ -199,9 +234,24 @@ function Game() {
             if (!clubSlug && /^\d+$/.test(slug)) {
                 try {
                     setDetailLoading(true)
-                    const detail = await fetchGameDetail(slug)
+                    const detail = await fetchDetail(slug)
                     if (detail) {
-                        setMatch(detailToMatch(detail))
+                        setMatch({
+                            id: detail.internalID,
+                            slug: detail.internalID,
+                            data: detail.data,
+                            hora: detail.hora || '',
+                            equipa_casa: detail.equipa_casa,
+                            equipa_fora: detail.equipa_fora,
+                            resultado_casa: detail.resultado_casa,
+                            resultado_fora: detail.resultado_fora,
+                            escalao: detail.fase,
+                            competicao: detail.competicao,
+                            local: detail.pavilhao,
+                            logotipo_casa: detail.logo_casa,
+                            logotipo_fora: detail.logo_fora,
+                            status: (detail.status || 'FINALIZADO') as Match['status'],
+                        })
                         setDetailLeaders(detail.gameLeaders)
                         setParciais(detail.parciais)
                         setTopPerfCasa(detail.topPerfCasa)
@@ -222,7 +272,7 @@ function Game() {
             if (!club) return
 
             try {
-                const seasons = ['2025/2026', '2024/2025', '2023/2024', '2022/2023']
+                const seasons = ['2026/2027', '2025/2026', '2024/2025', '2023/2024', '2022/2023']
                 for (const season of seasons) {
                     const fpbGames = await fetchFPBGames(season, club.id)
                     const found = fpbGames.find(g => g.slug === slug)
@@ -264,7 +314,7 @@ function Game() {
         if (!match) return
         const home = match.equipa_casa
         const away = match.equipa_fora
-        const seasons = ['2025_2026', '2024_2025', '2023_2024', '2022_2023']
+        const seasons = ['2026_2027', '2025_2026', '2024_2025', '2023_2024', '2022_2023']
         Promise.all(
             seasons.map(s =>
                 supabase

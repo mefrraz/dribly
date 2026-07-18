@@ -16,6 +16,15 @@ async function fetchBounce(path: string): Promise<Response | null> {
   }
 }
 
+/** Fetch a single game detail from Bounce /api/game/{internalID} */
+export async function fetchBounceGameDetail(internalID: string): Promise<Record<string, unknown> | null> {
+  try {
+    const res = await fetchBounce(`/game/${encodeURIComponent(internalID)}`)
+    if (res && res.ok) return await res.json()
+  } catch { /* fallback */ }
+  return null
+}
+
 // Map Bounce game JSON to Dribly Match format
 function mapBounceGame(g: any, epoca: string): Match {
   const statusMap: Record<string, Match['status']> = {
