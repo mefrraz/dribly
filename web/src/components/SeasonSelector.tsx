@@ -2,10 +2,15 @@ import { useSeason } from '../hooks/useSeason'
 
 interface Props {
     className?: string
+    value?: string
+    onChange?: (season: string) => void
 }
 
-export function SeasonSelector({ className = '' }: Props) {
-    const { season, setSeason, seasons } = useSeason()
+export function SeasonSelector({ className = '', value, onChange }: Props) {
+    const ownSeason = useSeason()
+    const season = value ?? ownSeason.season
+    const setSeason = onChange ?? ownSeason.setSeason
+    const seasons = ownSeason.seasons
 
     return (
         <select

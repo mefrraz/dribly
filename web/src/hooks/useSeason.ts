@@ -16,8 +16,11 @@ function getInitialSeason(): string {
     return ALL_SEASONS[0]
 }
 
-export function useSeason() {
-    const [season, setSeasonState] = useState<string>(getInitialSeason)
+export function useSeason(initialSeason?: string) {
+    const [season, setSeasonState] = useState<string>(() => {
+        if (initialSeason && ALL_SEASONS.includes(initialSeason)) return initialSeason
+        return getInitialSeason()
+    })
 
     const setSeason = useCallback((s: string) => {
         setSeasonState(s)

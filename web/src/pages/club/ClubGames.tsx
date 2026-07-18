@@ -24,13 +24,15 @@ function ClubGames() {
     const [filterEscalao, setFilterEscalao] = useState<string>('Todos')
     const [escaloes, setEscaloes] = useState<string[]>([])
 
-    const { season } = useSeason()
+    const { season, setSeason } = useSeason(searchParams.get('season') || undefined)
     const { games: allGames, loading, error, refresh } = useGames(season, club.id, club.name)
     const matches = useMemo(() => allGames || [], [allGames])
 
     useEffect(() => {
-        setSearchParams({ view })
-    }, [view, setSearchParams])
+        const params: Record<string, string> = { view }
+        if (season !== '2026/2027') params.season = season
+        setSearchParams(params)
+    }, [view, season, setSearchParams])
 
     useEffect(() => {
         const uniqueEscaloes = Array.from(new Set(matches.map(m => m.escalao))).filter(Boolean).sort()
@@ -100,7 +102,7 @@ function ClubGames() {
                         ))}
                     </select>
                 </div>
-                <SeasonSelector className="w-1/3 text-[11px] p-1.5" />
+                <SeasonSelector className="w-1/3 text-[11px] p-1.5" value={season} onChange={setSeason} />
             </div>
 
             {/* Error banner */}

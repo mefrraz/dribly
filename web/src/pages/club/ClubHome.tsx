@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { Link, useOutletContext, useSearchParams } from 'react-router-dom'
 import { Calendar, Trophy, ChevronRight, Clock, MapPin, RefreshCw, AlertCircle, Heart, ExternalLink, TrendingUp } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
 import { useFollows } from '../../hooks/useFollows'
@@ -14,11 +14,12 @@ import { normalizeTeamDisplay } from '../../lib/fpbUtils'
 function ClubHome() {
     const { club } = useOutletContext<{ club: Club }>()
     const { clubs } = useClub()
+    const [searchParams, setSearchParams] = useSearchParams()
     const dn = (name: string) => normalizeTeamDisplay(name, clubs)
     const { user } = useAuth()
 
     const { isFollowing, toggleFollow } = useFollows()
-    const { season } = useSeason()
+    const { season, setSeason } = useSeason(searchParams.get('season') || undefined)
     const { games: allGames, loading, error, refresh } = useGames(season, club.id, club.name)
     const games = useMemo(() => allGames || [], [allGames])
 
@@ -130,7 +131,7 @@ function ClubHome() {
                 </div>
             </div>
             <div className="mt-1 ml-1">
-                <SeasonSelector className="w-[125px] text-[11px] p-1.5" />
+                <SeasonSelector className="w-[125px] text-[11px] p-1.5" value={season} onChange={(s) => { setSeason(s); setSearchParams(s !== '2026/2027' ? { season: s } : {}) }} />
             </div>
 
             {needsLogin && (
