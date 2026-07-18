@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { useGames } from './useGames'
 
-// Mock fetch for FPB API
+// Mock fetch for Bounce API
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
 
@@ -30,61 +30,44 @@ const mockLocalStorage = {
 }
 Object.defineProperty(globalThis, 'localStorage', { value: mockLocalStorage })
 
-// Sample FPB game response HTML
-const GAMES_HTML = `
-<html><body>
-<div class="day-wrapper">
-    <h3 class="date">20 MAR 2026</h3>
-    <a class="game-wrapper-a" href="/ficha-de-jogo?internalID=111">
-        <div class="team-container">
-            <span class="fullName">FC Porto</span>
-            <div class="image-container"><img src="/logo1.png"/></div>
-        </div>
-        <div class="team-container">
-            <span class="fullName">SL Benfica</span>
-            <div class="image-container"><img src="/logo2.png"/></div>
-        </div>
-        <div class="competition"><span>Liga Betclic</span></div>
-        <div class="hour"><h3>18H00</h3></div>
-    </a>
-</div>
-</body></html>`
+// Bounce API returns JSON, not HTML
+const BOUNCE_GAME = {
+    id: '111',
+    data: '2026-03-20',
+    hora: '18:00',
+    equipa_casa: 'FC Porto',
+    equipa_fora: 'SL Benfica',
+    resultado_casa: null,
+    resultado_fora: null,
+    escalao: 'Senior',
+    competicao: 'Liga Betclic',
+    local: 'Pavilhão Dragão Arena',
+    logo_casa: '/logo1.png',
+    logo_fora: '/logo2.png',
+    estado: 'AGENDADO',
+    epoca: '2025/2026',
+}
 
-const GAMES_HTML_UPDATED = `
-<html><body>
-<div class="day-wrapper">
-    <h3 class="date">20 MAR 2026</h3>
-    <a class="game-wrapper-a" href="/ficha-de-jogo?internalID=111">
-        <div class="team-container"><span class="fullName">FC Porto</span></div>
-        <div class="team-container"><span class="fullName">SL Benfica</span></div>
-        <div class="competition"><span>Liga Betclic</span></div>
-        <div class="results_wrapper">
-            <h3 class="results_text">78</h3>
-            <h3 class="results_text">65</h3>
-        </div>
-    </a>
-</div>
-</body></html>`
-
-// Polyfill DOMParser
-import { JSDOM } from 'jsdom'
-const dom = new JSDOM('<!DOCTYPE html>')
-globalThis.DOMParser = dom.window.DOMParser as unknown as typeof DOMParser
+const BOUNCE_GAME_FINISHED = {
+    ...BOUNCE_GAME,
+    resultado_casa: 78,
+    resultado_fora: 65,
+    estado: 'FINALIZADO',
+}
 
 beforeEach(() => {
     mockFetch.mockReset()
     Object.keys(localStorageStore).forEach(k => delete localStorageStore[k])
     mockLocalStorage.getItem.mockClear()
     mockLocalStorage.setItem.mockClear()
-    // Bounce API returns 404 on first call → triggers HTML scraping fallback
-    mockFetch.mockResolvedValueOnce({ ok: false, status: 404 } as Response)
 })
 
 describe('useGames', () => {
-    it('should load games from FPB API on mount', async () => {
-        mockFetch
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(GAMES_HTML) } as Response)
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve('<html></html>') } as Response)
+    it('should load games from Bounce API on mount', async () => {
+        mockFetch.mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve([BOUNCE_GAME]),
+        } as Response)
 
         const { result } = renderHook(() => useGames('2025/2026', 119))
 
@@ -101,14 +84,14 @@ describe('useGames', () => {
     })
 
     it('should persist games to localStorage after load', async () => {
-        mockFetch
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(GAMES_HTML) } as Response)
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve('<html></html>') } as Response)
+        mockFetch.mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve([BOUNCE_GAME]),
+        } as Response)
 
         renderHook(() => useGames('2025/2026', 119))
 
         await waitFor(() => {
-            // Should have saved to localStorage
             const setCalls = mockLocalStorage.setItem.mock.calls
             const keyCalls = setCalls.map((c: any) => c[0])
             expect(keyCalls.some((k: string) => k.includes('games_cache'))).toBe(true)
@@ -117,12 +100,14 @@ describe('useGames', () => {
 
     it('should provide a refresh function', async () => {
         mockFetch
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(GAMES_HTML) } as Response)
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve('<html></html>') } as Response)
-            // Refresh: Bounce 404 → cal → res
-            .mockResolvedValueOnce({ ok: false, status: 404 } as Response)
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(GAMES_HTML_UPDATED) } as Response)
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve('<html></html>') } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve([BOUNCE_GAME]),
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve([BOUNCE_GAME_FINISHED]),
+            } as Response)
 
         const { result } = renderHook(() => useGames('2025/2026', 119))
 
@@ -130,21 +115,18 @@ describe('useGames', () => {
             expect(result.current.loading).toBe(false)
         })
 
-        // Initial state: AGENDADO
         expect(result.current.games[0].status).toBe('AGENDADO')
 
-        // Refresh
         await act(async () => {
             await result.current.refresh()
         })
 
-        // After refresh: should now show FINALIZADO
         expect(result.current.games[0].status).toBe('FINALIZADO')
         expect(result.current.games[0].resultado_casa).toBe(78)
         expect(result.current.games[0].resultado_fora).toBe(65)
     })
 
-    it('should handle FPB fetch errors gracefully', async () => {
+    it('should handle Bounce errors gracefully', async () => {
         mockFetch.mockRejectedValue(new Error('Network error'))
 
         const { result } = renderHook(() => useGames('2025/2026', 119))
@@ -153,20 +135,20 @@ describe('useGames', () => {
             expect(result.current.loading).toBe(false)
         })
 
-        // Should have an error message
-        expect(result.current.error).toBeTruthy()
+        // Errors return empty games gracefully
+        expect(result.current.games).toEqual([])
     })
 
     it('should not re-fetch when data has not changed', async () => {
-        // First load (Bounce 404 from beforeEach + cal + res)
         mockFetch
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(GAMES_HTML) } as Response)
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve('<html></html>') } as Response)
-        // Second call (refresh): Bounce 404 → cal → res — same data
-        mockFetch
-            .mockResolvedValueOnce({ ok: false, status: 404 } as Response)
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(GAMES_HTML) } as Response)
-            .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve('<html></html>') } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve([BOUNCE_GAME]),
+            } as Response)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve([BOUNCE_GAME]),
+            } as Response)
 
         const { result } = renderHook(() => useGames('2025/2026', 119))
 
@@ -176,13 +158,10 @@ describe('useGames', () => {
 
         const gamesAfterFirst = result.current.games
 
-        // Refresh with same data
         await act(async () => {
             await result.current.refresh()
         })
 
-        // Games should be the same reference (no unnecessary re-render trigger)
-        // The change detection uses key comparison, so same data = same state
         expect(result.current.games).toEqual(gamesAfterFirst)
     })
 })
