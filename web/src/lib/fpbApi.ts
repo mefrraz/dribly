@@ -5,10 +5,15 @@ const FPB_PROXY = '/api/fpb'
 const BOUNCE_API = '/api/bounce'
 const DRIBLY_KEY = 'b12ae2abfc2cbbbc040e0c5154bd048ebb74d7db51260770843c688b02a67eaf'
 
-async function fetchBounce(path: string): Promise<Response> {
-  return fetch(`${BOUNCE_API}${path}`, {
-    headers: { 'X-Dribly-Key': DRIBLY_KEY }
-  })
+async function fetchBounce(path: string): Promise<Response | null> {
+  try {
+    const res = await fetch(`${BOUNCE_API}${path}`, {
+      headers: { 'X-Dribly-Key': DRIBLY_KEY }
+    })
+    return res
+  } catch {
+    return null
+  }
 }
 
 // Map Bounce game JSON to Dribly Match format
@@ -50,7 +55,7 @@ export async function fetchFPBGames(
   // Try Bounce API first
   try {
     const res = await fetchBounce(`/games?club=${clube}&season=${encodeURIComponent(epoca)}&category=${encodeURIComponent(category)}&gender=${encodeURIComponent(gender)}`)
-    if (res.ok) {
+    if (res && res.ok) {
       const games = await res.json()
       if (Array.isArray(games) && games.length > 0) {
         return games.map((g: any) => mapBounceGame(g, epoca))
@@ -86,7 +91,7 @@ async function fetchPage(page: string, clube: number, epoca: string): Promise<st
   params.append('epoca', epoca)
 
   const res = await fetch(`${FPB_PROXY}?${params.toString()}`)
-  if (!res.ok) throw new Error(`FPB error: ${res.status}`)
+  if (!res || !res.ok) throw new Error(`FPB error: ${res ? res.status : 'network error'}`)
   return res.text()
 }
 

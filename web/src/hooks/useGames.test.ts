@@ -76,6 +76,8 @@ beforeEach(() => {
     Object.keys(localStorageStore).forEach(k => delete localStorageStore[k])
     mockLocalStorage.getItem.mockClear()
     mockLocalStorage.setItem.mockClear()
+    // Bounce API returns 404 on first call → triggers HTML scraping fallback
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 404 } as Response)
 })
 
 describe('useGames', () => {
@@ -117,7 +119,8 @@ describe('useGames', () => {
         mockFetch
             .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(GAMES_HTML) } as Response)
             .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve('<html></html>') } as Response)
-            // Refresh calls
+            // Refresh: Bounce 404 → cal → res
+            .mockResolvedValueOnce({ ok: false, status: 404 } as Response)
             .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(GAMES_HTML_UPDATED) } as Response)
             .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve('<html></html>') } as Response)
 
@@ -155,12 +158,13 @@ describe('useGames', () => {
     })
 
     it('should not re-fetch when data has not changed', async () => {
-        // First load
+        // First load (Bounce 404 from beforeEach + cal + res)
         mockFetch
             .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(GAMES_HTML) } as Response)
             .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve('<html></html>') } as Response)
-        // Second call (refresh) — same data
+        // Second call (refresh): Bounce 404 → cal → res — same data
         mockFetch
+            .mockResolvedValueOnce({ ok: false, status: 404 } as Response)
             .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(GAMES_HTML) } as Response)
             .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve('<html></html>') } as Response)
 

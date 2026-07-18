@@ -69,6 +69,8 @@ const mockFetch = vi.fn()
 beforeEach(() => {
     mockFetch.mockReset()
     vi.stubGlobal('fetch', mockFetch)
+    // First fetch call is always to Bounce API — return 404 (ok: false) so fallback triggers
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 404 } as Response)
 })
 
 describe('fetchFPBGames', () => {
