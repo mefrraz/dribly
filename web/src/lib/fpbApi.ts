@@ -3,11 +3,13 @@ import { parseDatePt, slugify } from './fpbUtils'
 
 const FPB_PROXY = '/api/fpb'
 const BOUNCE_API = '/api/bounce'
+const BOUNCE_API_KEY = 'b12ae2abfc2cbbbc040e0c5154bd048ebb74d7db51260770843c688b02a67eaf'
 
 async function fetchBounce(path: string): Promise<Response | null> {
   try {
-    const res = await fetch(`${BOUNCE_API}${path}`)
-    // X-Bounce-Key header is injected by Vercel Edge Middleware
+    const res = await fetch(`${BOUNCE_API}${path}`, {
+      headers: { 'X-Bounce-Key': BOUNCE_API_KEY }
+    })
     return res
   } catch {
     return null
