@@ -58,7 +58,9 @@ export async function fetchFPBGames(
     if (res && res.ok) {
       const games = await res.json()
       if (Array.isArray(games) && games.length > 0) {
-        return games.map((g: any) => mapBounceGame(g, epoca))
+        return games
+          .filter((g: any) => g.data && !isNaN(Date.parse(g.data)))
+          .map((g: any) => mapBounceGame(g, epoca))
       }
     }
   } catch { /* fallback to HTML scraping */ }

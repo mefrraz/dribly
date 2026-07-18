@@ -112,6 +112,7 @@ function ClubHome() {
                         </Link>
                     )}
                 </h1>
+                <SeasonSelector className="w-[115px] text-[11px] p-1.5" value={season} onChange={(s) => { setSeason(s); setSearchParams(s !== '2026/2027' ? { season: s } : {}) }} />
                 <div className="flex items-center gap-1">
                     <a href={`https://www.fpb.pt/equipas/clube_${club.id}/`} target="_blank" rel="noopener noreferrer"
                         className="p-2 rounded-full text-zinc-400 hover:text-dribly-purple hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
@@ -130,9 +131,7 @@ function ClubHome() {
                     </button>
                 </div>
             </div>
-            <div className="mt-1 ml-1">
-                <SeasonSelector className="w-[125px] text-[11px] p-1.5" value={season} onChange={(s) => { setSeason(s); setSearchParams(s !== '2026/2027' ? { season: s } : {}) }} />
-            </div>
+
 
             {needsLogin && (
                 <div className="text-center text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-xl py-2 px-3 ">

@@ -83,6 +83,7 @@ function ClubGames() {
                 onChange={(v) => setView(v as 'agenda' | 'results')}
             />
             </div>
+                <div className="w-9" />
             </div>
 
             {/* Filtro */}
