@@ -66,12 +66,13 @@ export async function fetchFPBGames(
     const res = await fetchBounce(`/games?club=${clube}&season=${encodeURIComponent(epoca)}&category=${encodeURIComponent(category)}&gender=${encodeURIComponent(gender)}`)
     if (res && res.ok) {
       const games = await res.json()
-      if (Array.isArray(games) && games.length > 0) {
+      if (Array.isArray(games)) {
         return games
           .filter((g: any) => g.data && !isNaN(Date.parse(g.data)))
           .map((g: any) => mapBounceGame(g, epoca))
       }
     }
+    // Bounce returned non-ok or non-array — fall through to HTML scraping
   } catch { /* fallback to HTML scraping */ }
 
   // Fallback: HTML scraping via FPB proxy
