@@ -2,11 +2,63 @@ import { Match } from '../components/types'
 import { parseDatePt, slugify } from './fpbUtils'
 
 const FPB_PROXY = '/api/fpb'
+const BOUNCE_API = '/api/bounce'
+const DRIBLY_KEY = 'b12ae2abfc2cbbbc040e0c5154bd048ebb74d7db51260770843c688b02a67eaf'
+
+async function fetchBounce(path: string): Promise<Response> {
+  return fetch(`${BOUNCE_API}${path}`, {
+    headers: { 'X-Dribly-Key': DRIBLY_KEY }
+  })
+}
+
+// Map Bounce game JSON to Dribly Match format
+function mapBounceGame(g: any, epoca: string): Match {
+  const statusMap: Record<string, Match['status']> = {
+    'FINALIZADO': 'FINALIZADO',
+    'AGENDADO': 'AGENDADO',
+    'A DECORRER': 'A DECORRER',
+    'EM CURSO': 'A DECORRER',
+    'AO VIVO': 'A DECORRER',
+  }
+  const equipa_casa = g.equipa_casa || ''
+  const equipa_fora = g.equipa_fora || ''
+  return {
+    id: g.id || '',
+    slug: `${g.data || ''}-${slugify(equipa_casa)}-${slugify(equipa_fora)}`,
+    data: g.data || '',
+    hora: g.hora || '',
+    equipa_casa,
+    equipa_fora,
+    resultado_casa: g.resultado_casa ?? null,
+    resultado_fora: g.resultado_fora ?? null,
+    escalao: g.escalao || '',
+    competicao: g.competicao || '',
+    local: g.local || null,
+    logotipo_casa: g.logo_casa || null,
+    logotipo_fora: g.logo_fora || null,
+    status: statusMap[g.estado] || 'AGENDADO',
+    epoca: epoca || g.epoca || '',
+  }
+}
 
 export async function fetchFPBGames(
   epoca: string,
-  clube: number = 119
+  clube: number = 119,
+  category = 'Senior',
+  gender = 'masculino'
 ): Promise<Match[]> {
+  // Try Bounce API first
+  try {
+    const res = await fetchBounce(`/games?club=${clube}&season=${encodeURIComponent(epoca)}&category=${encodeURIComponent(category)}&gender=${encodeURIComponent(gender)}`)
+    if (res.ok) {
+      const games = await res.json()
+      if (Array.isArray(games) && games.length > 0) {
+        return games.map((g: any) => mapBounceGame(g, epoca))
+      }
+    }
+  } catch { /* fallback to HTML scraping */ }
+
+  // Fallback: HTML scraping via FPB proxy
   const [calHtml, resHtml] = await Promise.all([
     fetchPage('calendario', clube, epoca),
     fetchPage('resultados', clube, epoca)

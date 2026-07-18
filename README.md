@@ -2,7 +2,7 @@
   <img src="assets/banner.png" alt="Dribly — Basquetebol português no teu bolso" width="100%" />
 </p>
 
-> **v11** — 🏟️ Pavilhões com fotos Google Places · 🏆 ELO Ranking · 🎨 Melhorias visuais · [dribly.pt](https://dribly.pt)
+> **v14** — 🔄 Migração para Bounce API (proxy de dados desportivos) · 🏟️ Pavilhões com fotos Google Places · 🏆 ELO Ranking · [dribly.pt](https://dribly.pt)
 
 ---
 
