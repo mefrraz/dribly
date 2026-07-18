@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { Search, ExternalLink } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { useSeason } from '../hooks/useSeason'
+import { SeasonSelector } from '../components/SeasonSelector'
 import { supabase } from '../lib/supabase'
 import { useStandings } from '../hooks/useStandings'
 import { StandingsTable } from '../components/StandingsTable'
@@ -16,7 +18,7 @@ export default function CompetitionPhases() {
     const { associationId, competitionId } = useParams<{ associationId: string; competitionId: string }>()
     const assocId = parseInt(associationId || '0')
     const compId = parseInt(competitionId || '0')
-    const season = '2025/2026'
+    const { season } = useSeason()
 
     const [compName, setCompName] = useState('')
     const [assocName, setAssocName] = useState('')
@@ -82,7 +84,7 @@ export default function CompetitionPhases() {
                             </h1>
                             {assocName && (
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium mt-1">
-                                    {assocName} · {season}
+                                    {assocName} · <SeasonSelector className="w-[130px] text-[11px] p-1.5" />
                                 </p>
                             )}
                         </div>

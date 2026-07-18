@@ -3,6 +3,8 @@ import { Link, useOutletContext } from 'react-router-dom'
 import { Calendar, Trophy, ChevronRight, Clock, MapPin, RefreshCw, AlertCircle, Heart, ExternalLink, TrendingUp } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
 import { useFollows } from '../../hooks/useFollows'
+import { useSeason } from '../../hooks/useSeason'
+import { SeasonSelector } from '../../components/SeasonSelector'
 import { useAuth } from '../../lib/AuthContext'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { SeoHead } from '../../components/SeoHead'
@@ -16,7 +18,8 @@ function ClubHome() {
     const { user } = useAuth()
 
     const { isFollowing, toggleFollow } = useFollows()
-    const { games: allGames, loading, error, refresh } = useGames('2025/2026', club.id, club.name)
+    const { season } = useSeason()
+    const { games: allGames, loading, error, refresh } = useGames(season, club.id, club.name)
     const games = useMemo(() => allGames || [], [allGames])
 
     const nextGame = useMemo(() => {
@@ -126,6 +129,10 @@ function ClubHome() {
                     </button>
                 </div>
             </div>
+            <div className="mt-1 ml-1">
+                <SeasonSelector className="w-[125px] text-[11px] p-1.5" />
+            </div>
+
             {needsLogin && (
                 <div className="text-center text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-xl py-2 px-3 ">
                     Inicia sessão para favoritar e seguir clubes.

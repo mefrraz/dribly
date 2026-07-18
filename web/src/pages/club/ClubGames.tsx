@@ -3,6 +3,8 @@ import { ArrowLeft, Calendar, Trophy, Filter, RefreshCw, AlertCircle } from 'luc
 import { Link, useSearchParams, useOutletContext } from 'react-router-dom'
 import { useGames } from '../../hooks/useGames'
 import { useTimeAgo } from '../../hooks/useTimeAgo'
+import { useSeason } from '../../hooks/useSeason'
+import { SeasonSelector } from '../../components/SeasonSelector'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { EmptyState } from '../../components/EmptyState'
 import { GameCard } from '../../components/GameCard'
@@ -23,7 +25,8 @@ function ClubGames() {
     const [filterEscalao, setFilterEscalao] = useState<string>('Todos')
     const [escaloes, setEscaloes] = useState<string[]>([])
 
-    const { games: allGames, loading, lastUpdated, error, refresh } = useGames('2025/2026', club.id, club.name)
+    const { season } = useSeason()
+    const { games: allGames, loading, lastUpdated, error, refresh } = useGames(season, club.id, club.name)
     const matches = useMemo(() => allGames || [], [allGames])
     const timeAgo = useTimeAgo(lastUpdated)
 
@@ -83,22 +86,23 @@ function ClubGames() {
             </div>
 
             {/* Filtro + Atualizado */}
-            <div className="px-3 max-w-sm mx-auto flex items-center gap-3">
-                <div className="relative flex-1">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500">
-                        <Filter size={14} />
+            <div className="px-3 max-w-md mx-auto flex items-center gap-2">
+                <div className="relative w-[120px]">
+                    <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-500">
+                        <Filter size={12} />
                     </div>
                     <select
                         value={filterEscalao}
                         onChange={(e) => setFilterEscalao(e.target.value)}
-                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-800 dark:text-zinc-200 text-xs font-medium rounded-lg focus:ring-2 focus:ring-[var(--club-color)]/30 focus:border-[var(--club-color)] block w-full pl-9 p-2.5 appearance-none shadow-sm transition-colors"
+                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium rounded-lg focus:ring-2 focus:ring-[var(--club-color)]/30 focus:border-[var(--club-color)] block w-full pl-7 p-2 appearance-none shadow-sm transition-colors"
                     >
-                        <option value="Todos">Todos os Escalões</option>
+                        <option value="Todos">Escalão</option>
                         {escaloes.map(e => (
                             <option key={e} value={e}>{e}</option>
                         ))}
                     </select>
                 </div>
+                <SeasonSelector className="w-[135px] text-[11px] p-2" />
                 <Link to="/sobre" className="shrink-0 flex items-center gap-1 text-[10px] text-zinc-500 dark:text-zinc-500 hover:text-[var(--club-color)] transition-colors uppercase tracking-wide group">
                     <RefreshCw size={10} className="group-hover:animate-spin" />
                     <span>{timeAgo || '--'}</span>

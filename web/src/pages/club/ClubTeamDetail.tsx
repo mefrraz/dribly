@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link, useParams, useSearchParams, useOutletContext } from 'react-router-dom'
 import { ArrowLeft, Calendar, CalendarDays, Trophy, Users, Info } from 'lucide-react'
 import { useGames } from '../../hooks/useGames'
+import { useSeason } from '../../hooks/useSeason'
 import { useEquipaGames } from '../../hooks/useEquipaGames'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { EmptyState } from '../../components/EmptyState'
@@ -44,7 +45,8 @@ function ClubTeamDetail() {
     })
 
     const equipaId = searchParams.get('eid') || ''
-    const { games: clubGames, loading: clubLoading } = useGames('2025/2026', club.id, club.name)
+    const { season } = useSeason()
+    const { games: clubGames, loading: clubLoading } = useGames(season, club.id, club.name)
     const { games: equipaGames, photo: equipaPhoto, teamInfo, plantel, loading: equipaLoading } = useEquipaGames(equipaId)
 
     const loading = equipaId ? equipaLoading : clubLoading
