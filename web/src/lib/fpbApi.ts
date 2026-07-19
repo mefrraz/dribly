@@ -2,13 +2,11 @@ import { Match } from '../components/types'
 import { slugify } from './fpbUtils'
 
 const BOUNCE_API = 'https://bounce.dribly.pt/api'
-const BOUNCE_API_KEY = 'b12ae2abfc2cbbbc040e0c5154bd048ebb74d7db51260770843c688b02a67eaf'
 
 async function fetchBounce(path: string): Promise<Response | null> {
   try {
-    const res = await fetch(`${BOUNCE_API}${path}`, {
-      headers: { 'X-Bounce-Key': BOUNCE_API_KEY }
-    })
+    const res = await fetch(`${BOUNCE_API}${path}`)
+    // Rate limit bypassed by Origin header → Bounce BOUNCE_TRUSTED_ORIGINS
     return res
   } catch {
     return null
