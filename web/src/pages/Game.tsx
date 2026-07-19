@@ -17,13 +17,28 @@ import { GameDueloCard } from '../components/GameDueloCard'
 import { GameLeadersCard } from '../components/GameLeadersCard'
 import { SeoHead } from '../components/SeoHead'
 
+function parseBounceDate(raw: string): string {
+    if (!raw) return ''
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw
+    const months: Record<string, string> = {
+        jan: '01', fev: '02', mar: '03', abr: '04', mai: '05', jun: '06',
+        jul: '07', ago: '08', set: '09', out: '10', nov: '11', dez: '12',
+    }
+    const parts = raw.trim().split(' ')
+    if (parts.length === 3) {
+        const day = parts[0].padStart(2, '0')
+        const month = months[(parts[1] || '').toLowerCase()]
+        const year = parts[2]
+        if (month && year) return `${year}-${month}-${day}`
+    }
+    return ''
+}
+
 // Map Bounce game detail JSON to FPBGameDetail format expected by the page
 function bounceToDetail(b: Record<string, any>): FPBGameDetail {
     const leaders = (b.game_leaders || []);
-    // Top performer = first game leader (PONTOS)
     const topCasa = leaders[0]?.casa || {};
     const topFora = leaders[0]?.fora || {};
-    // Stats comparison from first 3 leaders
     const perfStats = leaders.slice(0, 3).map((gl: any) => ({
         label: gl.categoria || '',
         casa: gl.casa?.valor || '',
@@ -31,7 +46,7 @@ function bounceToDetail(b: Record<string, any>): FPBGameDetail {
     }));
     return {
         internalID: b.id || '',
-        data: b.data || '',
+        data: parseBounceDate(b.data || ''),
         fase: b.fase || '',
         competicao: b.competicao || '',
         equipa_casa: b.equipa_casa || '',
@@ -197,7 +212,7 @@ function Game() {
 
             if (!club) return
 
-            // Fallback: try Supabase for backwards compat with old game links
+            // Fallback: search Bounce games list for slug match + fetch detail
             try {
                 const seasons = ['2026/2027', '2025/2026', '2024/2025', '2023/2024', '2022/2023']
                 for (const season of seasons) {
@@ -206,6 +221,18 @@ function Game() {
                     if (found) {
                         setMatch(found)
                         setLoading(false)
+                        if (found.id) {
+                            setDetailLoading(true)
+                            fetchDetail(String(found.id)).then(detail => {
+                                if (detail) {
+                                    setDetailLeaders(detail.gameLeaders)
+                                    setParciais(detail.parciais)
+                                    setTopPerfCasa(detail.topPerfCasa)
+                                    setTopPerfFora(detail.topPerfFora)
+                                    setTopPerfStats(detail.topPerfStats)
+                                }
+                            }).finally(() => setDetailLoading(false))
+                        }
                         return
                     }
                 }
@@ -682,20 +709,23 @@ function Game() {
 }
 
 function findClubSlug(name: string, clubs: Club[]): string | null {
-    if (!name) return null
+    if (!name || !clubs.length) return null
     const n = name.toUpperCase().trim()
-    // Try exact match first, then semi-abbreviated, then substring both ways
+    // Try exact match first: name, search_name, short_name, semiAbrev
     for (const c of clubs) {
         const cn = c.name.toUpperCase()
         const sn = (c.search_name || '').toUpperCase()
+        const sh = (c.short_name || '').toUpperCase()
         const sa = semiAbrev(c.name).toUpperCase()
-        if (n === cn || n === sn || n === sa) return c.slug
+        if (n === cn || n === sn || n === sh || n === sa) return c.slug
     }
+    // Substring match
     for (const c of clubs) {
         const cn = c.name.toUpperCase()
         const sn = (c.search_name || '').toUpperCase()
+        const sh = (c.short_name || '').toUpperCase()
         const sa = semiAbrev(c.name).toUpperCase()
-        if (cn.includes(n) || n.includes(cn) || sn.includes(n) || n.includes(sn) || sa.includes(n) || n.includes(sa)) return c.slug
+        if (cn.includes(n) || n.includes(cn) || sn.includes(n) || n.includes(sn) || sh.includes(n) || n.includes(sh) || sa.includes(n) || n.includes(sa)) return c.slug
     }
     return null
 }
