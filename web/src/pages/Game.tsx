@@ -122,106 +122,7 @@ function Game() {
         setLoading(true)
 
         const tryLoad = async () => {
-            // 1) Try all Supabase seasons in parallel
-            const tables = ['games_2026_2027', 'games_2025_2026', 'games_2024_2025', 'games_2023_2024', 'games_2022_2023']
-            const results = await Promise.all(tables.map(table =>
-                supabase.from(table).select('*').eq('slug', slug).single()
-            ))
-            for (const { data, error } of results) {
-                if (!error && data) {
-                    const m = data as Match
-
-                    // If game is from today and scheduled time + 1h has passed,
-                    // fetch FPB first to avoid flash of stale Supabase data
-                    const today = new Date().toISOString().split('T')[0]
-                    const isToday = m.data === today
-                    const horaClean = (m.hora || '').replace(/[^0-9]/g, '')
-                    const gameShouldBeOver = isToday && horaClean.length >= 4 && (() => {
-                        const h = parseInt(horaClean.slice(0, 2))
-                        const min = parseInt(horaClean.slice(2, 4))
-                        const end = new Date(today + 'T' + String(h).padStart(2, '0') + ':' + String(min).padStart(2, '0') + ':00')
-                        end.setHours(end.getHours() + 1)
-                        return new Date() > end
-                    })()
-
-                    if (gameShouldBeOver && m.id) {
-                        // Await FPB before showing anything — no flash
-                        setDetailLoading(true)
-                        try {
-                            const detail = await fetchDetail(String(m.id))
-                            if (detail) {
-                                setDetailLeaders(detail.gameLeaders)
-                                setParciais(detail.parciais)
-                                setTopPerfCasa(detail.topPerfCasa)
-                                setTopPerfFora(detail.topPerfFora)
-                                setTopPerfStats(detail.topPerfStats)
-                                const updated = {
-                                    ...m,
-                                    resultado_casa: detail.resultado_casa ?? m.resultado_casa,
-                                    resultado_fora: detail.resultado_fora ?? m.resultado_fora,
-                                    status: (detail.status || m.status) as Match['status'],
-                                    local: (detail.pavilhao && m.local && m.local.includes('|'))
-                                        ? detail.pavilhao : m.local,
-                                }
-                                setMatch(updated)
-                                if (detail.resultado_casa !== null || detail.resultado_fora !== null) {
-                                    const season = m.data ? m.data.slice(0, 4) : '2025'
-                                    const nextSeason = String(parseInt(season) + 1)
-                                    const tableName = `games_${season}_${nextSeason}`
-                                    supabase.from(tableName).upsert({
-                                        ...updated,
-                                        updated_at: new Date().toISOString(),
-                                    }, { onConflict: 'slug' }).then(() => {}, () => {})
-                                }
-                            } else {
-                                setMatch(m)
-                            }
-                        } catch {
-                            setMatch(m)
-                        }
-                        setDetailLoading(false)
-                        setLoading(false)
-                        return
-                    }
-
-                    // Game is in the future or old — show Supabase immediately, refresh FPB in background
-                    setMatch(m)
-                    setLoading(false)
-                    if (m.id) {
-                        setDetailLoading(true)
-                        fetchDetail(String(m.id)).then(detail => {
-                            if (detail) {
-                                setDetailLeaders(detail.gameLeaders)
-                                setParciais(detail.parciais)
-                                setTopPerfCasa(detail.topPerfCasa)
-                                setTopPerfFora(detail.topPerfFora)
-                                setTopPerfStats(detail.topPerfStats)
-                                const updated = {
-                                    ...m,
-                                    resultado_casa: detail.resultado_casa ?? m.resultado_casa,
-                                    resultado_fora: detail.resultado_fora ?? m.resultado_fora,
-                                    status: (detail.status || m.status) as Match['status'],
-                                    local: (detail.pavilhao && m.local && m.local.includes('|'))
-                                        ? detail.pavilhao : m.local,
-                                }
-                                setMatch(updated)
-                                if (detail.resultado_casa !== null || detail.resultado_fora !== null) {
-                                    const season = m.data ? m.data.slice(0, 4) : '2025'
-                                    const nextSeason = String(parseInt(season) + 1)
-                                    const tableName = `games_${season}_${nextSeason}`
-                                    supabase.from(tableName).upsert({
-                                        ...updated,
-                                        updated_at: new Date().toISOString(),
-                                    }, { onConflict: 'slug' }).then(() => {}, () => {})
-                                }
-                            }
-                        }).catch(() => {}).finally(() => setDetailLoading(false))
-                    }
-                    return
-                }
-            }
-
-            // If internalID provided in URL, try direct FPB game detail fetch
+            // If internalID in URL, skip Supabase entirely — Bounce has all the data
             if (internalID) {
                 try {
                     setDetailLoading(true)
@@ -249,12 +150,13 @@ function Game() {
                         setTopPerfFora(detail.topPerfFora)
                         setTopPerfStats(detail.topPerfStats)
                     }
-                    setDetailLoading(false)
                 } catch { /* ignore */ }
+                setDetailLoading(false)
                 setLoading(false)
                 return
             }
 
+            // If slug looks like a numeric ID, try as internalID
             if (!clubSlug && /^\d+$/.test(slug)) {
                 try {
                     setDetailLoading(true)
@@ -282,8 +184,8 @@ function Game() {
                         setTopPerfFora(detail.topPerfFora)
                         setTopPerfStats(detail.topPerfStats)
                     }
-                    setDetailLoading(false)
                 } catch { /* ignore */ }
+                setDetailLoading(false)
                 setLoading(false)
                 return
             }
@@ -295,6 +197,7 @@ function Game() {
 
             if (!club) return
 
+            // Fallback: try Supabase for backwards compat with old game links
             try {
                 const seasons = ['2026/2027', '2025/2026', '2024/2025', '2023/2024', '2022/2023']
                 for (const season of seasons) {
@@ -334,56 +237,17 @@ function Game() {
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
     }, [slug, club])
 
+    // TODO: H2H history from Bounce /api/games?team=X&team=Y&limit=5
     useEffect(() => {
         if (!match) return
-        const home = match.equipa_casa
-        const away = match.equipa_fora
-        const seasons = ['2026_2027', '2025_2026', '2024_2025', '2023_2024', '2022_2023']
-        Promise.all(
-            seasons.map(s =>
-                supabase
-                    .from(`games_${s}`)
-                    .select('*')
-                    .eq('escalao', match.escalao)
-                    .neq('slug', slug)
-                    .eq('status', 'FINALIZADO')
-                    .order('data', { ascending: false })
-                    .then(({ data }) => (data || []) as Match[])
-            )
-        ).then(results => {
-            const all = results.flat()
-            const unique = Array.from(new Map(all.map(g => [g.slug, g])).values())
-            const h2h = unique
-                .filter(g =>
-                    (g.equipa_casa.toUpperCase().includes(home.toUpperCase()) && g.equipa_fora.toUpperCase().includes(away.toUpperCase())) ||
-                    (g.equipa_casa.toUpperCase().includes(away.toUpperCase()) && g.equipa_fora.toUpperCase().includes(home.toUpperCase()))
-                )
-                .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
-                .slice(0, 3)
-            setRecentGames(h2h)
-        })
+        // Supabase H2H removed — was making 5 parallel queries per game page
+        setRecentGames([])
     }, [match, slug])
 
+    // TODO: Upcoming H2H from Bounce
     useEffect(() => {
         if (!match) return
-        const home = match.equipa_casa
-        const away = match.equipa_fora
-        supabase
-            .from('games_2025_2026')
-            .select('*')
-            .neq('slug', slug)
-            .eq('status', 'AGENDADO')
-            .gte('data', new Date().toISOString().split('T')[0])
-            .order('data', { ascending: true })
-            .limit(10)
-            .then(({ data }) => {
-                if (!data) return
-                const future = (data as Match[]).filter(g =>
-                    (g.equipa_casa.toUpperCase().includes(home.toUpperCase()) && g.equipa_fora.toUpperCase().includes(away.toUpperCase())) ||
-                    (g.equipa_casa.toUpperCase().includes(away.toUpperCase()) && g.equipa_fora.toUpperCase().includes(home.toUpperCase()))
-                ).slice(0, 3)
-                setUpcomingH2H(future)
-            })
+        setUpcomingH2H([])
     }, [match, slug])
 
     // Look up pavilion by recinto_id (exact) or fallback to name match
