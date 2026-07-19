@@ -49,8 +49,8 @@ function bounceToDetail(b: Record<string, any>): FPBGameDetail {
         espetadores: b.espetadores || 0,
         gameLeaders: leaders.map((gl: any) => ({
             categoria: gl.categoria || '',
-            casa: { nome: gl.casa?.nome || '', valor: gl.casa?.valor || '', foto: '' },
-            fora: { nome: gl.fora?.nome || '', valor: gl.fora?.valor || '', foto: '' },
+            casa: { nome: gl.casa?.nome || '', valor: gl.casa?.valor || '', foto: gl.casa?.foto || '' },
+            fora: { nome: gl.fora?.nome || '', valor: gl.fora?.valor || '', foto: gl.fora?.foto || '' },
         })),
         boxScoreCasa: (b.stats_casa || []).map((s: any) => ({
             numero: s.numero || 0, nome: s.nome || '', min: s.min || '', pts: s.pts || 0,
@@ -67,9 +67,11 @@ function bounceToDetail(b: Record<string, any>): FPBGameDetail {
             fc: s.fc || 0, fs: s.fs || 0, val: s.val || 0,
         })),
         teamStats: [],
-        topPerfCasa: { nome: topCasa.nome || '', foto: '' },
-        topPerfFora: { nome: topFora.nome || '', foto: '' },
-        topPerfStats: perfStats,
+        topPerfCasa: { nome: b.top_perf_casa?.nome || topCasa.nome || '', foto: b.top_perf_casa?.foto || '' },
+        topPerfFora: { nome: b.top_perf_fora?.nome || topFora.nome || '', foto: b.top_perf_fora?.foto || '' },
+        topPerfStats: (b.top_perf_stats || []).length > 0
+            ? b.top_perf_stats.map((s: any) => ({ label: s.label || '', casa: s.casa || '', fora: s.fora || '' }))
+            : perfStats,
     }
 }
 
