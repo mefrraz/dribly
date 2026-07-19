@@ -108,13 +108,10 @@ export function normalizeTeamDisplay(teamName: string, clubs: { name: string; se
     return teamName
 }
 
-const SUPABASE_URL = 'https://qdzmwgahencinoucvoop.supabase.co'
-
 /**
- * Build the Supabase bucket logo URL for a club slug.
- * Bucket "club-logos" contains {slug}.png for all 295 clubs.
+ * Returns the club's logo URL directly from the club object.
+ * Clubs are loaded from Bounce /api/clubs with correct logo_url.
  */
 export function clubLogoUrl(club: { slug: string; logo_url?: string | null } | null | undefined): string | null {
-    if (!club?.slug) return club?.logo_url ?? null
-    return `${SUPABASE_URL}/storage/v1/object/public/club-logos/${club.slug}.png`
+    return club?.logo_url ?? null
 }
