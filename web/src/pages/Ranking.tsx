@@ -42,7 +42,7 @@ function Ranking() {
         setLoading(true)
         Promise.all([
             supabase.from('clubs').select('id, name, slug, search_name, logo_url, priority').order('name'),
-            fetch(`https://bounce.dribly.pt/api/elo/${encodeURIComponent(season)}`).then(r => r.ok ? r.json() : null),
+            fetch(`https://bounce.dribly.pt/api/elo?season=${encodeURIComponent(season)}`).then(r => r.ok ? r.json() : null),
         ]).then(([{ data: allClubs }, eloResp]) => {
             if (allClubs) {
                 const eloMap = new Map<number, number>()
