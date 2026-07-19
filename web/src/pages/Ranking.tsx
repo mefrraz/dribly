@@ -42,13 +42,13 @@ function Ranking() {
         setLoading(true)
         Promise.all([
             supabase.from('clubs').select('id, name, slug, search_name, logo_url, priority').order('name'),
-            supabase.from('club_elo_history').select('club_id, elo_rating').eq('season', season),
-        ]).then(([{ data: allClubs }, { data: eloData }]) => {
+            fetch(`https://bounce.dribly.pt/api/elo/${encodeURIComponent(season)}`).then(r => r.ok ? r.json() : null),
+        ]).then(([{ data: allClubs }, eloResp]) => {
             if (allClubs) {
                 const eloMap = new Map<number, number>()
-                if (eloData) {
-                    for (const row of eloData as { club_id: number; elo_rating: number }[]) {
-                        eloMap.set(row.club_id, row.elo_rating)
+                if (eloResp?.ratings) {
+                    for (const row of eloResp.ratings as { club_id: number; elo_rating: number }[]) {
+                        eloMap.set(row.club_id, Math.round(row.elo_rating))
                     }
                 }
                 const ranked = (allClubs as RankedClub[]).map(c => ({
