@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '../lib/supabase'
 import { fetchFPBGames } from '../lib/fpbApi'
 import { Match } from '../components/types'
 import { logger } from '../lib/logger'
+import { slugify } from '../lib/fpbUtils'
 
 const CACHE_MINUTES = 15
 
@@ -31,12 +31,6 @@ function saveLocalCache(season: string, clube: number, games: Match[]) {
     } catch { /* ignore */ }
 }
 
-function getTableName(season: string): string {
-  return `games_${season.replace('/', '_')}`
-}
-
-import { slugify } from '../lib/fpbUtils'
-
 function mapFPBData(fresh: Record<string, unknown>[], season: string): Match[] {
   return fresh.map(g => {
     const data = String(g.data || '')
@@ -63,97 +57,69 @@ function mapFPBData(fresh: Record<string, unknown>[], season: string): Match[] {
   })
 }
 
-/**
- * Dedup games by game identity (same date + home + competition).
- * When duplicates exist, prefer the version with a proper FPB id
- * (which comes from the resultados page and has both teams correct)
- * over self-match entries from the calendario page (id='').
- */
-function dedupGames(games: Match[]): Match[] {
-  const groups = new Map<string, Match[]>()
-  for (const g of games) {
-    const key = `${g.data.slice(0, 10)}|${g.equipa_casa}|${g.competicao}`
-    const arr = groups.get(key) || []
-    arr.push(g)
-    groups.set(key, arr)
-  }
-
-  const result: Match[] = []
-  for (const [, group] of groups) {
-    if (group.length === 1) {
-      result.push(group[0])
-    } else {
-      // Prefer: has proper id > has diferentes teams > keep first
-      const withId = group.filter(g => g.id && g.id !== '')
-      const withDiffTeams = group.filter(g => g.equipa_casa !== g.equipa_fora)
-      const chosen = withId.length > 0
-        ? withId[0]
-        : withDiffTeams.length > 0
-          ? withDiffTeams[0]
-          : group[0]
-      result.push(chosen)
-    }
-  }
-  return result
-}
-
 export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
   const localCache = loadLocalCache(season, clube)
   const [games, setGames] = useState<Match[]>(localCache)
-  const [loading, setLoading] = useState(localCache.length === 0)
+  const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const tableName = getTableName(season)
-
-  /** Background upsert to Supabase — never affects UI */
-  const persistToSupabase = useCallback((data: Match[]) => {
-    const deduped = dedupGames(data)
-    supabase.from(tableName).upsert(
-      deduped.map(g => ({ ...g, updated_at: new Date().toISOString() })),
-      { onConflict: 'slug' }
-    ).then(({ error: upsertError }) => {
-      if (upsertError) logger.warn('Supabase upsert:', upsertError.message)
-    })
-  }, [tableName])
-
-  /** Fetch FPB, update state once, persist to Supabase */
   const fetchAndSet = useCallback(async () => {
-    const fresh = await fetchFPBGames(season, clube)
-    if (fresh.length === 0) return
-    const mapped = dedupGames(mapFPBData(fresh, season))
+    try {
+      const fresh = await fetchFPBGames(season, clube)
+      const mapped = mapFPBData(fresh, season)
+      const currentKey = games.map(g => `${g.slug}|${g.resultado_casa}|${g.resultado_fora}`).sort().join(',')
+      const freshKey = mapped.map(g => `${g.slug}|${g.resultado_casa}|${g.resultado_fora}`).sort().join(',')
+      if (currentKey === freshKey) return
+      setGames(mapped)
+      setLastUpdated(new Date())
+    } catch (err) {
+      logger.error('FPB fetch failed:', err)
+    }
+  }, [season, clube, games])
 
-    // Only update if data actually changed
-    const currentKey = games.map(g => `${g.slug}|${g.resultado_casa}|${g.resultado_fora}`).sort().join(',')
-    const freshKey = mapped.map(g => `${g.slug}|${g.resultado_casa}|${g.resultado_fora}`).sort().join(',')
-    if (currentKey === freshKey) return
-
-    setGames(mapped)
-    setLastUpdated(new Date())
-    persistToSupabase(mapped)
-  }, [season, clube, games, persistToSupabase])
-
-  /** Manual refresh — visible loading */
   const refresh = useCallback(async () => {
     setError(null)
     setLoading(true)
     try {
       const fresh = await fetchFPBGames(season, clube)
-      if (fresh.length === 0) {
-        setLoading(false)
-        return
-      }
-      const mapped = dedupGames(mapFPBData(fresh, season))
+      const mapped = mapFPBData(fresh, season)
       setGames(mapped)
       setLastUpdated(new Date())
-      persistToSupabase(mapped)
     } catch (err) {
       logger.error('FPB refresh failed:', err)
       setError(err instanceof Error ? err.message : 'Erro ao carregar jogos')
     } finally {
       setLoading(false)
     }
-  }, [season, clube, persistToSupabase])
+  }, [season, clube])
+
+  // Load games when season or club changes
+  useEffect(() => {
+    let cancelled = false
+    const cache = loadLocalCache(season, clube)
+    setGames(cache)
+    setError(null)
+    setLoading(true)
+
+    const loadData = async () => {
+      try {
+        const fresh = await fetchFPBGames(season, clube)
+        if (cancelled) return
+        const mapped = mapFPBData(fresh, season)
+        setGames(mapped)
+        setLastUpdated(new Date())
+      } catch (err) {
+        logger.error('Failed to load games:', err)
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Erro ao carregar dados')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    loadData()
+    return () => { cancelled = true }
+  }, [season, clube])
 
   // Persist to localStorage
   useEffect(() => {
@@ -172,42 +138,6 @@ export function useGames(season = '2025/2026', clube = 119, _clubName = '') {
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
   }, [lastUpdated, fetchAndSet])
-
-  // Load: localStorage → FPB, re-fetches when season or club changes
-  useEffect(() => {
-    let cancelled = false
-    const cache = loadLocalCache(season, clube)
-
-    setGames(cache)
-    setError(null)
-    if (cache.length === 0) setLoading(true)
-
-    const loadData = async () => {
-      try {
-        const fresh = await fetchFPBGames(season, clube)
-        if (cancelled) return
-        if (fresh.length === 0) {
-          setLoading(false)
-          return
-        }
-        const mapped = dedupGames(mapFPBData(fresh, season))
-        setGames(mapped)
-        setLastUpdated(new Date())
-        persistToSupabase(mapped)
-      } catch (err) {
-        logger.error('Failed to load games:', err)
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Erro ao carregar dados')
-        }
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-
-    loadData()
-    return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [season, clube])
 
   return { games, loading, lastUpdated, error, refresh }
 }
