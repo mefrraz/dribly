@@ -3,6 +3,25 @@ import { slugify } from './fpbUtils'
 
 const BOUNCE_API = 'https://bounce.dribly.pt/api'
 
+// Parse FPB date format "14 jun 2026" → "2026-06-14"
+function parseBounceDate(raw: string): string {
+  if (!raw) return ''
+  // Already ISO?
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw
+  const months: Record<string, string> = {
+    jan: '01', fev: '02', mar: '03', abr: '04', mai: '05', jun: '06',
+    jul: '07', ago: '08', set: '09', out: '10', nov: '11', dez: '12',
+  }
+  const parts = raw.trim().split(' ')
+  if (parts.length === 3) {
+    const day = parts[0].padStart(2, '0')
+    const month = months[(parts[1] || '').toLowerCase()]
+    const year = parts[2]
+    if (month && year) return `${year}-${month}-${day}`
+  }
+  return '' // invalid format
+}
+
 async function fetchBounce(path: string): Promise<Response | null> {
   try {
     const res = await fetch(`${BOUNCE_API}${path}`)
@@ -33,10 +52,11 @@ function mapBounceGame(g: any, epoca: string): Match {
   }
   const equipa_casa = g.equipa_casa || ''
   const equipa_fora = g.equipa_fora || ''
+  const isoDate = parseBounceDate(g.data || '')
   return {
     id: g.id || '',
-    slug: `${g.data || ''}-${slugify(equipa_casa)}-${slugify(equipa_fora)}`,
-    data: g.data || '',
+    slug: `${isoDate}-${slugify(equipa_casa)}-${slugify(equipa_fora)}`,
+    data: isoDate,
     hora: g.hora || '',
     equipa_casa,
     equipa_fora,
@@ -63,7 +83,7 @@ export async function fetchFPBGames(
     const games = await res.json()
     if (Array.isArray(games)) {
       return games
-        .filter((g: any) => g.data && !isNaN(Date.parse(g.data)))
+        .filter((g: any) => g.data && parseBounceDate(g.data))
         .map((g: any) => mapBounceGame(g, epoca))
     }
   }
