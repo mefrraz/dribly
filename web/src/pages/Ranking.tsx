@@ -43,10 +43,9 @@ function Ranking() {
         setLoading(true)
         Promise.all([
             fetchBounceClubs(),
-            supabase.from('club_elo_history').select('club_id, elo_rating').eq('season', season),
-        ]).then(([allClubs, eloResult]) => {
-            const eloData = eloResult.data
-            if (allClubs) {
+            supabase.from('club_elo_history').select('club_id, elo_rating').eq('season', season).then(r => r.data || []),
+        ]).then(([allClubs, eloData]) => {
+            if (allClubs && allClubs.length > 0) {
                 const eloMap = new Map<number, number>()
                 if (eloData) {
                     for (const row of eloData as { club_id: number; elo_rating: number }[]) {
@@ -55,7 +54,7 @@ function Ranking() {
                 }
                 const ranked = (allClubs as RankedClub[]).map(c => ({
                     ...c,
-                    elo: Math.round(eloMap.get(c.id) ?? 1500),
+                    elo: Math.round(eloMap.get(Number(c.id)) ?? 1500),
                 })).sort((a, b) => b.elo - a.elo)
                 setClubs(ranked)
 
@@ -68,6 +67,8 @@ function Ranking() {
                     }
                 }
             }
+            setLoading(false)
+        }).catch(() => {
             setLoading(false)
         })
     }, [season, searchParams])
