@@ -97,11 +97,15 @@ let _clubsCache: any[] | null = null
 let _clubsCacheTs = 0
 export async function fetchBounceClubs(): Promise<any[]> {
     if (_clubsCache && Date.now() - _clubsCacheTs < 5 * 60 * 1000) return _clubsCache
-    const res = await fetchBounce('/clubs')
-    if (res && res.ok) {
-        _clubsCache = await res.json()
-        _clubsCacheTs = Date.now()
-        return _clubsCache || []
+    try {
+        const res = await fetchBounce('/clubs')
+        if (res && res.ok) {
+            _clubsCache = await res.json()
+            _clubsCacheTs = Date.now()
+            return _clubsCache || []
+        }
+    } catch {
+        // Graceful fallback — use stale cache or empty
     }
     return _clubsCache || []
 }
