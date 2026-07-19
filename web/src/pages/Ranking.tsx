@@ -4,7 +4,6 @@ import { Search, TrendingUp, Loader2, HelpCircle, X } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
 import { SeoHead } from '../components/SeoHead'
 import { supabase } from '../lib/supabase'
-import { useClub } from '../lib/ClubContext'
 import { normalize } from '../lib/clubSearch'
 
 interface RankedClub {
@@ -37,42 +36,39 @@ function Ranking() {
     const [clubs, setClubs] = useState<RankedClub[]>([])
     const [highlight, setHighlight] = useState<string | null>(null)
     const [searchParams] = useSearchParams()
-    const { clubs: allClubs, loadClubs } = useClub()
     const highlightRef = useRef<HTMLDivElement>(null)
 
-    // Ensure clubs are loaded (no-op if already fetched)
-    useEffect(() => { loadClubs() }, [loadClubs])
-
-    // Build ranked list when clubs or season changes
     useEffect(() => {
-        if (allClubs.length === 0) return
         setLoading(true)
-        const fetch = async () => {
-            try {
-                const { data: eloData } = await supabase.from('club_elo_history').select('club_id, elo_rating').eq('season', season)
+        Promise.all([
+            supabase.from('clubs').select('id, name, slug, search_name, logo_url, priority').order('name'),
+            supabase.from('club_elo_history').select('club_id, elo_rating').eq('season', season),
+        ]).then(([{ data: allClubs }, { data: eloData }]) => {
+            if (allClubs) {
                 const eloMap = new Map<number, number>()
                 if (eloData) {
                     for (const row of eloData as { club_id: number; elo_rating: number }[]) {
                         eloMap.set(row.club_id, row.elo_rating)
                     }
                 }
-                const ranked = allClubs.map(c => ({
+                const ranked = (allClubs as RankedClub[]).map(c => ({
                     ...c,
-                    elo: Math.round(eloMap.get(Number(c.id)) ?? ((c as any).elo_rating ?? 1500)),
+                    elo: Math.round(eloMap.get(c.id) ?? 1500),
                 })).sort((a, b) => b.elo - a.elo)
                 setClubs(ranked)
-                setLoading(false)
+
+                // Auto-select level from ?destaque= param
                 const slug = searchParams.get('destaque')
                 if (slug) {
                     const club = ranked.find(c => c.slug === slug)
-                    if (club && club.priority) setNivel(club.priority)
+                    if (club && club.priority) {
+                        setNivel(club.priority)
+                    }
                 }
-            } catch {
-                setLoading(false)
             }
-        }
-        fetch()
-    }, [allClubs, season, searchParams])
+            setLoading(false)
+        })
+    }, [season, searchParams])
 
     // Highlight club from ?destaque= param
     useEffect(() => {
