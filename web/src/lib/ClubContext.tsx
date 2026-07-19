@@ -6,7 +6,7 @@ import { ClubContext, type Club } from './useClub'
 export { useClub, displayName, type Club, type ClubContextType } from './useClub'
 
 const CLUBS_CACHE_KEY = 'dribly_clubs_cache_v3'
-const BOUNCE_CLUBS_URL = '/api/bounce/clubs'
+const BOUNCE_CLUBS_URL = 'https://bounce.dribly.pt/api/clubs'
 
 function loadCachedClubs(): Club[] {
     try {
