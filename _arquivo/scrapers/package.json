@@ -1,0 +1,14 @@
+{
+    "name": "gaiensespt-scrapers",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "discover": "node discover-competitions.js"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.94.0",
+        "cheerio": "^1.0.0",
+        "dotenv": "^17.2.3",
+        "zod": "^4.4.3"
+    }
+}

@@ -1,0 +1,2932 @@
+[
+    {
+        "id":  3016,
+        "color":  "#274472",
+        "primary":  "#274472",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_30161748285345.png",
+        "name":  "Club 5Basket - AssociaÃ§Ã£o",
+        "search":  "club5basketassociao",
+        "slug":  "club-5basket-associa-o",
+        "short_name":  "Club 5Basket"
+    },
+    {
+        "id":  3446,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Escola_Desportiva_-_Guarda_UP1614772479.png",
+        "name":  "Escola Desportiva - Guarda UP",
+        "search":  "escoladesportivaguardaup",
+        "slug":  "escola-desportiva-guarda-up",
+        "short_name":  "Guarda UP"
+    },
+    {
+        "id":  529,
+        "color":  "#E11414",
+        "primary":  "#E11414",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_5291730127022.png",
+        "name":  "Grupo Desportivo de Trancoso",
+        "search":  "grupodesportivodetrancoso",
+        "slug":  "grupo-desportivo-de-trancoso",
+        "short_name":  "GDTrancoso"
+    },
+    {
+        "id":  3443,
+        "color":  "#1EB913",
+        "primary":  "#1EB913",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_34431662240146.png",
+        "name":  "Sporting Clube Barquinhense",
+        "search":  "sportingclubebarquinhense",
+        "slug":  "sporting-clube-barquinhense",
+        "short_name":  "SC Barquinhense"
+    },
+    {
+        "id":  341,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_341_LOGO.gif",
+        "name":  "Estrela Calheta Futebol Clube",
+        "search":  "estrelacalhetafutebolclube",
+        "slug":  "estrela-calheta-futebol-clube",
+        "short_name":  "EST.CALHETA"
+    },
+    {
+        "id":  855,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_8551717508704.png",
+        "name":  "Club CamÃµes",
+        "search":  "clubcames",
+        "slug":  "club-cam-es",
+        "short_name":  "Club CamÃµes"
+    },
+    {
+        "id":  3009,
+        "color":  "#0000FF",
+        "primary":  "#0000FF",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_30091673539751.jpg",
+        "name":  "Salesianos de Ã‰vora",
+        "search":  "salesianosdevora",
+        "slug":  "salesianos-de-vora",
+        "short_name":  "Salesianos de Ã‰vora"
+    },
+    {
+        "id":  3439,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_34391769752655.JPG",
+        "name":  "CCD Estrela do ZÃªzere",
+        "search":  "ccdestreladozzere",
+        "slug":  "ccd-estrela-do-z-zere",
+        "short_name":  "Estrela ZÃªzere - Boidobra"
+    },
+    {
+        "id":  849,
+        "color":  "#7F8C8D",
+        "primary":  "#7F8C8D",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_8491654509225.png",
+        "name":  "Clube Seia Basket",
+        "search":  "clubeseiabasket",
+        "slug":  "clube-seia-basket",
+        "short_name":  "Seia Basket"
+    },
+    {
+        "id":  2819,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_28191667463213.jpg",
+        "name":  "Restauradores da Granja",
+        "search":  "restauradoresdagranja",
+        "slug":  "restauradores-da-granja",
+        "short_name":  "Granja"
+    },
+    {
+        "id":  2997,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Basket_Clube_de_Gaia1614267470.png",
+        "name":  "Basket Clube de Gaia",
+        "search":  "basketclubedegaia",
+        "slug":  "basket-clube-de-gaia",
+        "short_name":  "BC Gaia"
+    },
+    {
+        "id":  840,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Clube_Desportivo_e_Cultural_Juventude_Pacense1598477992.png",
+        "name":  "Clube Desportivo e Cultural Juventude Pacense",
+        "search":  "clubedesportivoeculturaljuventudepacense",
+        "slug":  "clube-desportivo-e-cultural-juventude-pacense",
+        "short_name":  "CDC Juventude Pacense"
+    },
+    {
+        "id":  3697,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36971725360017.jpg",
+        "name":  "Grupo Desportivo e Recreativo de Portugal",
+        "search":  "grupodesportivoerecreativodeportugal",
+        "slug":  "grupo-desportivo-e-recreativo-de-portugal",
+        "short_name":  "Grupo Desportivo e Recreativo de Portugal"
+    },
+    {
+        "id":  3423,
+        "color":  "#010066",
+        "primary":  "#010066",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Uniao_Sport_Clube_de_Paredes1640343022.png",
+        "name":  "UniÃ£o Sport Clube de Paredes",
+        "search":  "uniosportclubedeparedes",
+        "slug":  "uni-o-sport-clube-de-paredes",
+        "short_name":  "Paredes Basket"
+    },
+    {
+        "id":  835,
+        "color":  "#2C3E50",
+        "primary":  "#2C3E50",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/835_1777560241.jpg",
+        "name":  "Clube Amigos Basquetebol GrÃ¢ndola - Os Javalis",
+        "search":  "clubeamigosbasquetebolgrndolaosjavalis",
+        "slug":  "clube-amigos-basquetebol-gr-ndola-os-javalis",
+        "short_name":  "CAB GrÃ¢ndola - Os Javalis"
+    },
+    {
+        "id":  834,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_834_LOGO.gif",
+        "name":  "Clube Celorico Basket",
+        "search":  "clubeceloricobasket",
+        "slug":  "clube-celorico-basket",
+        "short_name":  "Celorico Basket"
+    },
+    {
+        "id":  2428,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2428_LOGO.png",
+        "name":  "Estoril Basket Clube",
+        "search":  "estorilbasketclube",
+        "slug":  "estoril-basket-clube",
+        "short_name":  "Estoril B.C."
+    },
+    {
+        "id":  3418,
+        "color":  "#2980B9",
+        "primary":  "#2980B9",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_3418.png",
+        "name":  "Clube Desportivo Marista de Carcavelos",
+        "search":  "clubedesportivomaristadecarcavelos",
+        "slug":  "clube-desportivo-marista-de-carcavelos",
+        "short_name":  "Marista Carcavelos"
+    },
+    {
+        "id":  3331,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_33311768331789.jpg",
+        "name":  "GDD AlcoitÃ£o",
+        "search":  "gddalcoito",
+        "slug":  "gdd-alcoit-o",
+        "short_name":  "GDD AlcoitÃ£o"
+    },
+    {
+        "id":  31,
+        "color":  "#2A8301",
+        "primary":  "#2A8301",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_311676838500.png",
+        "name":  "UniÃ£o Desportiva e Recreativa da Zona Alta",
+        "search":  "uniodesportivaerecreativadazonaalta",
+        "slug":  "uni-o-desportiva-e-recreativa-da-zona-alta",
+        "short_name":  "UDR Zona Alta"
+    },
+    {
+        "id":  3413,
+        "color":  "#27AE60",
+        "primary":  "#27AE60",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3413_LOGO.png",
+        "name":  "Grupo Desportivo Alcochetense",
+        "search":  "grupodesportivoalcochetense",
+        "slug":  "grupo-desportivo-alcochetense",
+        "short_name":  "GD Alcochetense"
+    },
+    {
+        "id":  3411,
+        "color":  "#30A206",
+        "primary":  "#30A206",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_34111706182575.jpg",
+        "name":  "AssociaÃ§Ã£o de Moradores do Bairro Novo da Moita",
+        "search":  "associaodemoradoresdobairronovodamoita",
+        "slug":  "associa-o-de-moradores-do-bairro-novo-da-moita",
+        "short_name":  "AM Bairro Novo Moita"
+    },
+    {
+        "id":  3680,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "Clube Desportivo Primeiro de Maio",
+        "search":  "clubedesportivoprimeirodemaio",
+        "slug":  "clube-desportivo-primeiro-de-maio",
+        "short_name":  "Clube 1Âº de Maio"
+    },
+    {
+        "id":  3409,
+        "color":  "#FF0000",
+        "primary":  "#FF0000",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_34091703245908.jpg",
+        "name":  "CCRD da Barreira - Basquetebol Condeixa",
+        "search":  "ccrddabarreirabasquetebolcondeixa",
+        "slug":  "ccrd-da-barreira-basquetebol-condeixa",
+        "short_name":  "Basquetebol Condeixa"
+    },
+    {
+        "id":  3408,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_34081757082106.jpg",
+        "name":  "Centro Recreativo do Casal do Grilo",
+        "search":  "centrorecreativodocasaldogrilo",
+        "slug":  "centro-recreativo-do-casal-do-grilo",
+        "short_name":  "CRCG"
+    },
+    {
+        "id":  105,
+        "color":  "#145DA0",
+        "primary":  "#145DA0",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Maria_Pia_Sport_Clube1603547802.png",
+        "name":  "Maria Pia Sport Clube",
+        "search":  "mariapiasportclube",
+        "slug":  "maria-pia-sport-clube",
+        "short_name":  "Maria Pia"
+    },
+    {
+        "id":  3402,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_34021768397602.jpeg",
+        "name":  "Clube Desportivo Carvalheiro",
+        "search":  "clubedesportivocarvalheiro",
+        "slug":  "clube-desportivo-carvalheiro",
+        "short_name":  "CD Carvalheiro"
+    },
+    {
+        "id":  2539,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2539_LOGO.JPG",
+        "name":  "AssociaÃ§Ã£o Desportiva e Cultural da Ponta do Pargo",
+        "search":  "associaodesportivaeculturaldapontadopargo",
+        "slug":  "associa-o-desportiva-e-cultural-da-ponta-do-pargo",
+        "short_name":  "ADC Ponta do Pargo"
+    },
+    {
+        "id":  3400,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "AssociaÃ§Ã£o Desportiva Porto da Cruz",
+        "search":  "associaodesportivaportodacruz",
+        "slug":  "associa-o-desportiva-porto-da-cruz",
+        "short_name":  "AD Porto da Cruz"
+    },
+    {
+        "id":  3398,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_33981702573447.png",
+        "name":  "Futebol Clube Vizela",
+        "search":  "futebolclubevizela",
+        "slug":  "futebol-clube-vizela",
+        "short_name":  "Vizela"
+    },
+    {
+        "id":  76,
+        "color":  "#05761B",
+        "primary":  "#05761B",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_76_LOGO.png",
+        "name":  "Sport Club LusitÃ¢nia",
+        "search":  "sportclublusitnia",
+        "slug":  "sport-club-lusit-nia",
+        "short_name":  "LusitÃ¢nia"
+    },
+    {
+        "id":  88,
+        "color":  "#0c5583",
+        "primary":  "#0c5583",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Ginasio_Clube_de_Agueda1600511012.png",
+        "name":  "GinÃ¡sio Clube de Ãgueda",
+        "search":  "ginsioclubedegueda",
+        "slug":  "gin-sio-clube-de-gueda",
+        "short_name":  "GICA"
+    },
+    {
+        "id":  3393,
+        "color":  "#FF0000",
+        "primary":  "#FF0000",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_33931665735337.png",
+        "name":  "Sporting Clube SÃ£o JoÃ£o de Ver",
+        "search":  "sportingclubesojoodever",
+        "slug":  "sporting-clube-s-o-jo-o-de-ver",
+        "short_name":  "Sporting SÃ£o JoÃ£o Ver"
+    },
+    {
+        "id":  2527,
+        "color":  "#273D87",
+        "primary":  "#273D87",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2527_LOGO.png",
+        "name":  "Clube Desportivo Escola Francisco Franco",
+        "search":  "clubedesportivoescolafranciscofranco",
+        "slug":  "clube-desportivo-escola-francisco-franco",
+        "short_name":  "CD Escola Francisco Franco"
+    },
+    {
+        "id":  3319,
+        "color":  "#8E44AD",
+        "primary":  "#8E44AD",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_33191683490955.png",
+        "name":  "Pioneiros NBL - NÃºcleo Basket de Loures",
+        "search":  "pioneirosnblncleobasketdeloures",
+        "slug":  "pioneiros-nbl-n-cleo-basket-de-loures",
+        "short_name":  "Basket de Loures"
+    },
+    {
+        "id":  370,
+        "color":  "#95A5A6",
+        "primary":  "#95A5A6",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_3701676673234.png",
+        "name":  "AssociaÃ§Ã£o AcadÃ©mica da UTAD",
+        "search":  "associaoacadmicadautad",
+        "slug":  "associa-o-acad-mica-da-utad",
+        "short_name":  "AA UTAD"
+    },
+    {
+        "id":  365,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Sport_Clube_Maria_da_Fonte1639174733.png",
+        "name":  "Sport Clube Maria da Fonte",
+        "search":  "sportclubemariadafonte",
+        "slug":  "sport-clube-maria-da-fonte",
+        "short_name":  "SC Maria da Fonte"
+    },
+    {
+        "id":  3060,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3060_LOGO.png",
+        "name":  "Salesianos do Estoril",
+        "search":  "salesianosdoestoril",
+        "slug":  "salesianos-do-estoril",
+        "short_name":  "Salesianos Estoril"
+    },
+    {
+        "id":  361,
+        "color":  "#FFFFFF",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_361_LOGO.jpg",
+        "name":  "Laranjeiras Clube",
+        "search":  "laranjeirasclube",
+        "slug":  "laranjeiras-clube",
+        "short_name":  "Laranjeiras Clube"
+    },
+    {
+        "id":  189,
+        "color":  "#005236",
+        "primary":  "#005236",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1891706699691.png",
+        "name":  "Sporting Clube de CoimbrÃµes",
+        "search":  "sportingclubedecoimbres",
+        "slug":  "sporting-clube-de-coimbr-es",
+        "short_name":  "SC CoimbrÃµes"
+    },
+    {
+        "id":  261,
+        "color":  "#00058a",
+        "primary":  "#00058a",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Unidos_Futebol_Clube_do_Tortosendo1594637205.png",
+        "name":  "Unidos Futebol Clube do Tortosendo",
+        "search":  "unidosfutebolclubedotortosendo",
+        "slug":  "unidos-futebol-clube-do-tortosendo",
+        "short_name":  "Unidos FC Tortosendo"
+    },
+    {
+        "id":  357,
+        "color":  "#E0CA00",
+        "primary":  "#E0CA00",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_3571738334744.png",
+        "name":  "AssociaÃ§Ã£o Desportiva de Vagos",
+        "search":  "associaodesportivadevagos",
+        "slug":  "associa-o-desportiva-de-vagos",
+        "short_name":  "AD Vagos"
+    },
+    {
+        "id":  356,
+        "color":  "#F9E562",
+        "primary":  "#F9E562",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_3561664733883.jpg",
+        "name":  "AssociaÃ§Ã£o Desportiva de Manteigas",
+        "search":  "associaodesportivademanteigas",
+        "slug":  "associa-o-desportiva-de-manteigas",
+        "short_name":  "ADManteigas"
+    },
+    {
+        "id":  2769,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_2769.png",
+        "name":  "Micaelense Basket Clube",
+        "search":  "micaelensebasketclube",
+        "slug":  "micaelense-basket-clube",
+        "short_name":  "Micaelense"
+    },
+    {
+        "id":  3368,
+        "color":  "#2980B9",
+        "primary":  "#2980B9",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3368_1678977524.jpg",
+        "name":  "Clube Desportivo Olivais e Moscavide",
+        "search":  "clubedesportivoolivaisemoscavide",
+        "slug":  "clube-desportivo-olivais-e-moscavide",
+        "short_name":  "CDOM"
+    },
+    {
+        "id":  3367,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3367_1620381891.png",
+        "name":  "Basket Club de Tomar",
+        "search":  "basketclubdetomar",
+        "slug":  "basket-club-de-tomar",
+        "short_name":  "BCTomar"
+    },
+    {
+        "id":  3317,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3317_LOGO.jpg",
+        "name":  "Tabela Predileta",
+        "search":  "tabelapredileta",
+        "slug":  "tabela-predileta",
+        "short_name":  "TPredileta"
+    },
+    {
+        "id":  758,
+        "color":  "#059E17",
+        "primary":  "#059E17",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_7581738335047.png",
+        "name":  "Clube UniÃ£o Sportiva",
+        "search":  "clubeuniosportiva",
+        "slug":  "clube-uni-o-sportiva",
+        "short_name":  "UniÃ£o Sportiva"
+    },
+    {
+        "id":  774,
+        "color":  "#2980B9",
+        "primary":  "#2980B9",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Atletico_Clube_Alfenense1599605277.png",
+        "name":  "AtlÃ©tico Clube Alfenense",
+        "search":  "atlticoclubealfenense",
+        "slug":  "atl-tico-clube-alfenense",
+        "short_name":  "AC Alfenense"
+    },
+    {
+        "id":  3709,
+        "color":  "#2C3E50",
+        "primary":  "#2C3E50",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37091733842999.png",
+        "name":  "AssociaÃ§Ã£o Desportiva Flaviense",
+        "search":  "associaodesportivaflaviense",
+        "slug":  "associa-o-desportiva-flaviense",
+        "short_name":  "AD Flaviense"
+    },
+    {
+        "id":  339,
+        "color":  "#FFFFFF",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_339_LOGO.jpg",
+        "name":  "Clube AcadÃ©mico da AraucÃ¡ria",
+        "search":  "clubeacadmicodaaraucria",
+        "slug":  "clube-acad-mico-da-arauc-ria",
+        "short_name":  "AcadÃ©mico Araucaria"
+    },
+    {
+        "id":  2493,
+        "color":  "#F1870E",
+        "primary":  "#F1870E",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2493_LOGO.jpg",
+        "name":  "Clube Hiper-Activo Malveira",
+        "search":  "clubehiperactivomalveira",
+        "slug":  "clube-hiper-activo-malveira",
+        "short_name":  "Lobos da Malveira"
+    },
+    {
+        "id":  714,
+        "color":  "#274472",
+        "primary":  "#274472",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_7141746203247.png",
+        "name":  "Maia Basket Clube",
+        "search":  "maiabasketclube",
+        "slug":  "maia-basket-clube",
+        "short_name":  "Maia Basket"
+    },
+    {
+        "id":  37,
+        "color":  "#68B6D2",
+        "primary":  "#68B6D2",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_371738419817.png",
+        "name":  "Juventude Basquetebol Clube",
+        "search":  "juventudebasquetebolclube",
+        "slug":  "juventude-basquetebol-clube",
+        "short_name":  "Juventude B.C."
+    },
+    {
+        "id":  2920,
+        "color":  "#090E9F",
+        "primary":  "#090E9F",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2920_LOGO.png",
+        "name":  "Basket Club Limiense",
+        "search":  "basketclublimiense",
+        "slug":  "basket-club-limiense",
+        "short_name":  "BC Limiense"
+    },
+    {
+        "id":  440,
+        "color":  "#ECF0F1",
+        "primary":  "#ECF0F1",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_4401736171274.png",
+        "name":  "UniÃ£o Desportiva Leiria",
+        "search":  "uniodesportivaleiria",
+        "slug":  "uni-o-desportiva-leiria",
+        "short_name":  "UniÃ£o de Leiria"
+    },
+    {
+        "id":  332,
+        "color":  "#E67E22",
+        "primary":  "#E67E22",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_3321738420060.png",
+        "name":  "Clube Basket Quarteira TubarÃµes",
+        "search":  "clubebasketquarteiratubares",
+        "slug":  "clube-basket-quarteira-tubar-es",
+        "short_name":  "CBQ TubarÃµes"
+    },
+    {
+        "id":  4,
+        "color":  "#2ECC71",
+        "primary":  "#2ECC71",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_41665054543.png",
+        "name":  "Sporting Clube das Caldas",
+        "search":  "sportingclubedascaldas",
+        "slug":  "sporting-clube-das-caldas",
+        "short_name":  "Sporting Caldas"
+    },
+    {
+        "id":  3666,
+        "color":  "#C3E0E5",
+        "primary":  "#C3E0E5",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36661764677028.jpg",
+        "name":  "VITFUT - AssociaÃ§Ã£o",
+        "search":  "vitfutassociao",
+        "slug":  "vitfut-associa-o",
+        "short_name":  "VITFUT"
+    },
+    {
+        "id":  2246,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "NÃºcleo Basket ABSMA",
+        "search":  "ncleobasketabsma",
+        "slug":  "n-cleo-basket-absma",
+        "short_name":  "NÃºcleo ABSMA"
+    },
+    {
+        "id":  327,
+        "color":  "#FFEE00",
+        "primary":  "#FFEE00",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_327_LOGO.jpg",
+        "name":  "Casa do Povo de Lanheses",
+        "search":  "casadopovodelanheses",
+        "slug":  "casa-do-povo-de-lanheses",
+        "short_name":  "CP Lanheses"
+    },
+    {
+        "id":  3340,
+        "color":  "#2980B9",
+        "primary":  "#2980B9",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3340_1667931919.jpg",
+        "name":  "Nucleo Basquetebol Amadora - NBA",
+        "search":  "nucleobasquetebolamadoranba",
+        "slug":  "nucleo-basquetebol-amadora-nba",
+        "short_name":  "NBA"
+    },
+    {
+        "id":  3337,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_33371761573961.jpg",
+        "name":  "AssociaÃ§Ã£o Portuguesa de Deficientes Lisboa",
+        "search":  "associaoportuguesadedeficienteslisboa",
+        "slug":  "associa-o-portuguesa-de-deficientes-lisboa",
+        "short_name":  "APD Lisboa"
+    },
+    {
+        "id":  3336,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3336_LOGO.jpg",
+        "name":  "AssociaÃ§Ã£o Portuguesa de Deficientes Leiria",
+        "search":  "associaoportuguesadedeficientesleiria",
+        "slug":  "associa-o-portuguesa-de-deficientes-leiria",
+        "short_name":  "APD Leiria"
+    },
+    {
+        "id":  3766,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37661778508051.jpg",
+        "name":  "CBF Felgueiras - AssociaÃ§Ã£o Desportiva",
+        "search":  "cbffelgueirasassociaodesportiva",
+        "slug":  "cbf-felgueiras-associa-o-desportiva",
+        "short_name":  "CB Felgueiras"
+    },
+    {
+        "id":  3765,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "APCV â€“ AssociaÃ§Ã£o de Paralisia Cerebral de Viseu",
+        "search":  "apcvassociaodeparalisiacerebraldeviseu",
+        "slug":  "apcv-associa-o-de-paralisia-cerebral-de-viseu",
+        "short_name":  "APCVAPCV"
+    },
+    {
+        "id":  3764,
+        "color":  "#27AE60",
+        "primary":  "#27AE60",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37641777481088.png",
+        "name":  "Sporting Clube da Madeira",
+        "search":  "sportingclubedamadeira",
+        "slug":  "sporting-clube-da-madeira",
+        "short_name":  "Sporting CM"
+    },
+    {
+        "id":  3763,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37631776291728.jpeg",
+        "name":  "APPACDM - Santa Comba DÃ£o",
+        "search":  "appacdmsantacombado",
+        "slug":  "appacdm-santa-comba-d-o",
+        "short_name":  "APPACDM"
+    },
+    {
+        "id":  3762,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37621775055505.png",
+        "name":  "AssociaÃ§Ã¢o HÃ­pica e Psicomotora De Viseu",
+        "search":  "associaohpicaepsicomotoradeviseu",
+        "slug":  "associa-o-h-pica-e-psicomotora-de-viseu",
+        "short_name":  "AHPC"
+    },
+    {
+        "id":  3761,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "APIFF AssociaÃ§Ã£o Pela InclusÃ£o - Figueira da Foz",
+        "search":  "apiffassociaopelainclusofigueiradafoz",
+        "slug":  "apiff-associa-o-pela-inclus-o-figueira-da-foz",
+        "short_name":  "APIFF  - Figueira da Foz"
+    },
+    {
+        "id":  3329,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/APD_Braga1633015028.jpg",
+        "name":  "AssociaÃ§Ã£o Portuguesa de Deficientes Braga BCR",
+        "search":  "associaoportuguesadedeficientesbragabcr",
+        "slug":  "associa-o-portuguesa-de-deficientes-braga-bcr",
+        "short_name":  "APD Braga BCR"
+    },
+    {
+        "id":  901,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_9011736517563.png",
+        "name":  "AssociaÃ§Ã£o Teatro  ConstruÃ§Ã£o",
+        "search":  "associaoteatroconstruo",
+        "slug":  "associa-o-teatro-constru-o",
+        "short_name":  "ATC"
+    },
+    {
+        "id":  3757,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37571770139301.png",
+        "name":  "Futebol Clube Beira Mar",
+        "search":  "futebolclubebeiramar",
+        "slug":  "futebol-clube-beira-mar",
+        "short_name":  "Futebol Clube Beira Mar"
+    },
+    {
+        "id":  3756,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37561770073445.jpg",
+        "name":  "Centro Desportivo Municipal de Mondim de Basto",
+        "search":  "centrodesportivomunicipaldemondimdebasto",
+        "slug":  "centro-desportivo-municipal-de-mondim-de-basto",
+        "short_name":  "CDM Mondim de Basto"
+    },
+    {
+        "id":  3755,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "Grupo Desportivo Alpha Musa",
+        "search":  "grupodesportivoalphamusa",
+        "slug":  "grupo-desportivo-alpha-musa",
+        "short_name":  "GD Alpha Musa"
+    },
+    {
+        "id":  2774,
+        "color":  "#E74C3C",
+        "primary":  "#E74C3C",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_27741709196882.png",
+        "name":  "OBC - Odivelas Basket Clube",
+        "search":  "obcodivelasbasketclube",
+        "slug":  "obc-odivelas-basket-clube",
+        "short_name":  "Odivelas Basket"
+    },
+    {
+        "id":  736,
+        "color":  "#9B59B6",
+        "primary":  "#9B59B6",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_7361680191631.png",
+        "name":  "Clube Desportivo Escolar Os Vitorinos",
+        "search":  "clubedesportivoescolarosvitorinos",
+        "slug":  "clube-desportivo-escolar-os-vitorinos",
+        "short_name":  "Vitorinos"
+    },
+    {
+        "id":  304,
+        "color":  "#7F8C8D",
+        "primary":  "#7F8C8D",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_3041717586387.png",
+        "name":  "Clube Desportivo JosÃ© RÃ©gio",
+        "search":  "clubedesportivojosrgio",
+        "slug":  "clube-desportivo-jos-r-gio",
+        "short_name":  "CD JosÃ© RÃ©gio"
+    },
+    {
+        "id":  3751,
+        "color":  "#34495E",
+        "primary":  "#34495E",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37511763394620.png",
+        "name":  "AcadÃ©mica da Amadora - AssociaÃ§Ã£o Desportiva e Cultural",
+        "search":  "acadmicadaamadoraassociaodesportivaecultural",
+        "slug":  "acad-mica-da-amadora-associa-o-desportiva-e-cultural",
+        "short_name":  "AcadÃ©mica da Amadora"
+    },
+    {
+        "id":  3750,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3750_1762862466.jpg",
+        "name":  "CinfÃ£es Basket Clube",
+        "search":  "cinfesbasketclube",
+        "slug":  "cinf-es-basket-clube",
+        "short_name":  "CinfÃ£es BC"
+    },
+    {
+        "id":  190,
+        "color":  "#2C3E50",
+        "primary":  "#2C3E50",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1901763134433.png",
+        "name":  "Clube AtlÃ©tico de Queluz",
+        "search":  "clubeatlticodequeluz",
+        "slug":  "clube-atl-tico-de-queluz",
+        "short_name":  "Queluz"
+    },
+    {
+        "id":  731,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_7311702380602.jpg",
+        "name":  "Fides - OrfeÃ£o de Valbom",
+        "search":  "fidesorfeodevalbom",
+        "slug":  "fides-orfe-o-de-valbom",
+        "short_name":  "Fides Gondobasket"
+    },
+    {
+        "id":  24,
+        "color":  "#ECF0F1",
+        "primary":  "#ECF0F1",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_24_LOGO.png",
+        "name":  "Clube de Futebol Os Bonjoanenses de Faro",
+        "search":  "clubedefutebolosbonjoanensesdefaro",
+        "slug":  "clube-de-futebol-os-bonjoanenses-de-faro",
+        "short_name":  "Bonjoanenses"
+    },
+    {
+        "id":  3561,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_35611658441665.jpg",
+        "name":  "Juventude Ouriense",
+        "search":  "juventudeouriense",
+        "slug":  "juventude-ouriense",
+        "short_name":  "Juventude Ouriense"
+    },
+    {
+        "id":  294,
+        "color":  "#EEE20B",
+        "primary":  "#EEE20B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_2941732013783.png",
+        "name":  "Real Clube Vale de Cavala",
+        "search":  "realclubevaledecavala",
+        "slug":  "real-clube-vale-de-cavala",
+        "short_name":  "RC Vale Cavala"
+    },
+    {
+        "id":  293,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/293_1693476811.jpg",
+        "name":  "Biblioteca InstruÃ§Ã£o Recreio",
+        "search":  "bibliotecainstruorecreio",
+        "slug":  "biblioteca-instru-o-recreio",
+        "short_name":  "BIR"
+    },
+    {
+        "id":  723,
+        "color":  "#760505",
+        "primary":  "#760505",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_723_LOGO.jpg",
+        "name":  "Clube de Basquete de Viana",
+        "search":  "clubedebasquetedeviana",
+        "slug":  "clube-de-basquete-de-viana",
+        "short_name":  "C. Basq. Viana"
+    },
+    {
+        "id":  25,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_25_LOGO.jpg",
+        "name":  "Sport Clube Conimbricense",
+        "search":  "sportclubeconimbricense",
+        "slug":  "sport-clube-conimbricense",
+        "short_name":  "Conimbricense"
+    },
+    {
+        "id":  3737,
+        "color":  "#2ECC71",
+        "primary":  "#2ECC71",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37371758292760.jpg",
+        "name":  "Sampaense Basket Club",
+        "search":  "sampaensebasketclub",
+        "slug":  "sampaense-basket-club",
+        "short_name":  "Sampaense Basket Club"
+    },
+    {
+        "id":  2717,
+        "color":  "#E67E22",
+        "primary":  "#E67E22",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_27171738781941.png",
+        "name":  "AssociaÃ§Ã£o Desportiva Galomar",
+        "search":  "associaodesportivagalomar",
+        "slug":  "associa-o-desportiva-galomar",
+        "short_name":  "AD Galomar"
+    },
+    {
+        "id":  717,
+        "color":  "#F70820",
+        "primary":  "#F70820",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_717.png",
+        "name":  "Clube Desportivo Amiense",
+        "search":  "clubedesportivoamiense",
+        "slug":  "clube-desportivo-amiense",
+        "short_name":  "CD Amiense"
+    },
+    {
+        "id":  7,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_7_LOGO.png",
+        "name":  "Olivais Futebol Clube",
+        "search":  "olivaisfutebolclube",
+        "slug":  "olivais-futebol-clube",
+        "short_name":  "Olivais FC"
+    },
+    {
+        "id":  3731,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3731_1757255721.png",
+        "name":  "AtlÃ©tico Clube de Astromil",
+        "search":  "atlticoclubedeastromil",
+        "slug":  "atl-tico-clube-de-astromil",
+        "short_name":  "AC Astromil"
+    },
+    {
+        "id":  3730,
+        "color":  "#145DA0",
+        "primary":  "#145DA0",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3730_1759355873.png",
+        "name":  "AMA BASKET - AssociaÃ§Ã£o Amigos do Basquetebol",
+        "search":  "amabasketassociaoamigosdobasquetebol",
+        "slug":  "ama-basket-associa-o-amigos-do-basquetebol",
+        "short_name":  "Gaeiras Basket Ã“bidos"
+    },
+    {
+        "id":  3728,
+        "color":  "#8E44AD",
+        "primary":  "#8E44AD",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37281752575721.png",
+        "name":  "AssociaÃ§Ã£o AD Mealhada",
+        "search":  "associaoadmealhada",
+        "slug":  "associa-o-ad-mealhada",
+        "short_name":  "AD Mealhada"
+    },
+    {
+        "id":  3727,
+        "color":  "#D35400",
+        "primary":  "#D35400",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37271753709220.jpg",
+        "name":  "AssociaÃ§Ã£o TVDE 45/18",
+        "search":  "associaotvde4518",
+        "slug":  "associa-o-tvde-45-18",
+        "short_name":  "TVDE"
+    },
+    {
+        "id":  3726,
+        "color":  "#2980B9",
+        "primary":  "#2980B9",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3726_1760374470.png",
+        "name":  "FCS - Basket Club de Campo",
+        "search":  "fcsbasketclubdecampo",
+        "slug":  "fcs-basket-club-de-campo",
+        "short_name":  "BC CAMPO"
+    },
+    {
+        "id":  3725,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37251778770342.png",
+        "name":  "UKROP - Iniciativa Ofuscante de Viseu",
+        "search":  "ukropiniciativaofuscantedeviseu",
+        "slug":  "ukrop-iniciativa-ofuscante-de-viseu",
+        "short_name":  "UKROP"
+    },
+    {
+        "id":  3721,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37211749313407.png",
+        "name":  "Clube Recreativo de SÃ£o Joaninho",
+        "search":  "cluberecreativodesojoaninho",
+        "slug":  "clube-recreativo-de-s-o-joaninho",
+        "short_name":  "Clube Recreativo de SÃ£o Joaninho"
+    },
+    {
+        "id":  2429,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_24291701088230.png",
+        "name":  "Grupo Desportivo e Recreativo AndrÃ© de Resende",
+        "search":  "grupodesportivoerecreativoandrderesende",
+        "slug":  "grupo-desportivo-e-recreativo-andr-de-resende",
+        "short_name":  "GDR AndrÃ© de Resende"
+    },
+    {
+        "id":  273,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_273_LOGO.jpg",
+        "name":  "AssociaÃ§Ã£o Cultural e Recreativa de Vale de Cambra",
+        "search":  "associaoculturalerecreativadevaledecambra",
+        "slug":  "associa-o-cultural-e-recreativa-de-vale-de-cambra",
+        "short_name":  "ACR Vale de Cambra"
+    },
+    {
+        "id":  703,
+        "color":  "#2ECC71",
+        "primary":  "#2ECC71",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_7031748429777.png",
+        "name":  "Artenave Atelier - AssociaÃ§Ã£o de Solidariedade",
+        "search":  "artenaveatelierassociaodesolidariedade",
+        "slug":  "artenave-atelier-associa-o-de-solidariedade",
+        "short_name":  "Clube Artenave"
+    },
+    {
+        "id":  3286,
+        "color":  "#F7EF02",
+        "primary":  "#F7EF02",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_3286.png",
+        "name":  "Centro Juvenil Salesiano de Arouca",
+        "search":  "centrojuvenilsalesianodearouca",
+        "slug":  "centro-juvenil-salesiano-de-arouca",
+        "short_name":  "Centro J Sal Arouca"
+    },
+    {
+        "id":  3716,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "XKY - Clube Desportivo Internacional",
+        "search":  "xkyclubedesportivointernacional",
+        "slug":  "xky-clube-desportivo-internacional",
+        "short_name":  "XKY - Clube Desportivo Internacional"
+    },
+    {
+        "id":  3715,
+        "color":  "#ECF0F1",
+        "primary":  "#ECF0F1",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37151742126309.jpg",
+        "name":  "AssociaÃ§Ã£o Clube de Montanha MurÃ§a",
+        "search":  "associaoclubedemontanhamura",
+        "slug":  "associa-o-clube-de-montanha-mur-a",
+        "short_name":  "ACM MurÃ§a"
+    },
+    {
+        "id":  3714,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37141760965087.png",
+        "name":  "AssociaÃ§Ã£o Centro Cultural Desportiva Estrelas SÃ£o JoÃ£o De Brito",
+        "search":  "associaocentroculturaldesportivaestrelassojoodebrito",
+        "slug":  "associa-o-centro-cultural-desportiva-estrelas-s-o-jo-o-de-brito",
+        "short_name":  "Estrelas SÃ£o JoÃ£o de Brito"
+    },
+    {
+        "id":  3713,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "Clube Play Sports",
+        "search":  "clubeplaysports",
+        "slug":  "clube-play-sports",
+        "short_name":  "Clube Play Sports"
+    },
+    {
+        "id":  3711,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37111742565895.jpg",
+        "name":  "AssociaÃ§Ã£o CJD Sports",
+        "search":  "associaocjdsports",
+        "slug":  "associa-o-cjd-sports",
+        "short_name":  "CJD Sports"
+    },
+    {
+        "id":  3279,
+        "color":  "#16A085",
+        "primary":  "#16A085",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_32791696109172.jpg",
+        "name":  "Clube Desportivo Mar e Serra",
+        "search":  "clubedesportivomareserra",
+        "slug":  "clube-desportivo-mar-e-serra",
+        "short_name":  "CD MAR e SERRA"
+    },
+    {
+        "id":  2847,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2847_LOGO.png",
+        "name":  "Beja Basket Clube",
+        "search":  "bejabasketclube",
+        "slug":  "beja-basket-clube",
+        "short_name":  "Beja B.C."
+    },
+    {
+        "id":  2846,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/2010_Odisseia_Basket_Clube1639588149.png",
+        "name":  "2010 Odisseia Basket Clube",
+        "search":  "2010odisseiabasketclube",
+        "slug":  "2010-odisseia-basket-clube",
+        "short_name":  "Odisseia Basket"
+    },
+    {
+        "id":  2843,
+        "color":  "#0000FF",
+        "primary":  "#0000FF",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_28431737390349.png",
+        "name":  "Grupo Desportivo Escola Maria Alberta MenÃ©res",
+        "search":  "grupodesportivoescolamariaalbertamenres",
+        "slug":  "grupo-desportivo-escola-maria-alberta-men-res",
+        "short_name":  "GDEMAM"
+    },
+    {
+        "id":  3722,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37221749467221.webp",
+        "name":  "Pesqueiraamiga AssociaÃ§Ã£o de Solidariedade Social",
+        "search":  "pesqueiraamigaassociaodesolidariedadesocial",
+        "slug":  "pesqueiraamiga-associa-o-de-solidariedade-social",
+        "short_name":  "Pesqueiramiga"
+    },
+    {
+        "id":  2839,
+        "color":  "#008040",
+        "primary":  "#008040",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_28391734894783.png",
+        "name":  "ElÃ©ctrico Futebol Clube",
+        "search":  "elctricofutebolclube",
+        "slug":  "el-ctrico-futebol-clube",
+        "short_name":  "ElÃ©ctrico F.C."
+    },
+    {
+        "id":  2405,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_24051677937068.png",
+        "name":  "AssociaÃ§ao Cultural e Recreativa Vigorosa",
+        "search":  "associaaoculturalerecreativavigorosa",
+        "slug":  "associa-ao-cultural-e-recreativa-vigorosa",
+        "short_name":  "ACR Vigorosa"
+    },
+    {
+        "id":  209,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/209_1731783066.png",
+        "name":  "AssociaÃ§Ã£o Desportiva e Cultural Escola Diogo CÃ£o",
+        "search":  "associaodesportivaeculturalescoladiogoco",
+        "slug":  "associa-o-desportiva-e-cultural-escola-diogo-c-o",
+        "short_name":  "ADCE Diogo CÃ£o"
+    },
+    {
+        "id":  248,
+        "color":  "#13450D",
+        "primary":  "#13450D",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_248.png",
+        "name":  "UniÃ£o Desportiva e Cultural do Forte",
+        "search":  "uniodesportivaeculturaldoforte",
+        "slug":  "uni-o-desportiva-e-cultural-do-forte",
+        "short_name":  "UniÃ£o do Forte"
+    },
+    {
+        "id":  3695,
+        "color":  "#ECF0F1",
+        "primary":  "#ECF0F1",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36951724604180.png",
+        "name":  "Agrupamento de Escolas de Foz CÃ´a",
+        "search":  "agrupamentodeescolasdefozca",
+        "slug":  "agrupamento-de-escolas-de-foz-c-a",
+        "short_name":  "Escolas de Foz CÃ´a"
+    },
+    {
+        "id":  2832,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2832_LOGO.jpg",
+        "name":  "JuvCap - AssociaÃ§Ã£o Juventude Capelas",
+        "search":  "juvcapassociaojuventudecapelas",
+        "slug":  "juvcap-associa-o-juventude-capelas",
+        "short_name":  "JUVCAP"
+    },
+    {
+        "id":  245,
+        "color":  "#F31212",
+        "primary":  "#F31212",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Salesianos_de_Lisboa1602680462.png",
+        "name":  "Salesianos de Lisboa",
+        "search":  "salesianosdelisboa",
+        "slug":  "salesianos-de-lisboa",
+        "short_name":  "Salesianos de Lisboa"
+    },
+    {
+        "id":  3260,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Clube_Recreativo_Desportivo_Arrudense1601290950.jpg",
+        "name":  "Clube Recreativo Desportivo Arrudense",
+        "search":  "cluberecreativodesportivoarrudense",
+        "slug":  "clube-recreativo-desportivo-arrudense",
+        "short_name":  "CRD Arrudense"
+    },
+    {
+        "id":  3690,
+        "color":  "#2C3E50",
+        "primary":  "#2C3E50",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36901724266221.png",
+        "name":  "GaviÃµes de SÃ£o BrÃ¡s Clube",
+        "search":  "gaviesdesobrsclube",
+        "slug":  "gavi-es-de-s-o-br-s-clube",
+        "short_name":  "GaviÃµes SBC"
+    },
+    {
+        "id":  3689,
+        "color":  "#274472",
+        "primary":  "#274472",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36891738230031.png",
+        "name":  "AssociaÃ§Ã£o Macedo Academy",
+        "search":  "associaomacedoacademy",
+        "slug":  "associa-o-macedo-academy",
+        "short_name":  "Macedo Academy"
+    },
+    {
+        "id":  74,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_74_LOGO.jpg",
+        "name":  "Clube Basquetebol de Leiria",
+        "search":  "clubebasqueteboldeleiria",
+        "slug":  "clube-basquetebol-de-leiria",
+        "short_name":  "CB Leiria"
+    },
+    {
+        "id":  2823,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2823_LOGO.jpg",
+        "name":  "Clube Desportivo Recreativo Santanense",
+        "search":  "clubedesportivorecreativosantanense",
+        "slug":  "clube-desportivo-recreativo-santanense",
+        "short_name":  "SANTANENSE"
+    },
+    {
+        "id":  3682,
+        "color":  "#2C3E50",
+        "primary":  "#2C3E50",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3682_1721412778.png",
+        "name":  "AssociaÃ§Ã£o AcadÃ©mica Pinhalnovense",
+        "search":  "associaoacadmicapinhalnovense",
+        "slug":  "associa-o-acad-mica-pinhalnovense",
+        "short_name":  "AssociaÃ§Ã£o AcadÃ©mica Pinhalnovense"
+    },
+    {
+        "id":  36,
+        "color":  "#145DA0",
+        "primary":  "#145DA0",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_36_LOGO.png",
+        "name":  "Clube Futebol Os Belenenses",
+        "search":  "clubefutebolosbelenenses",
+        "slug":  "clube-futebol-os-belenenses",
+        "short_name":  "Belenenses"
+    },
+    {
+        "id":  232,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_232_LOGO.png",
+        "name":  "AssociaÃ§Ã£o Cultural e Desportiva Ferragudo",
+        "search":  "associaoculturaledesportivaferragudo",
+        "slug":  "associa-o-cultural-e-desportiva-ferragudo",
+        "short_name":  "ACD Ferragudo"
+    },
+    {
+        "id":  3679,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36791761948014.jpg",
+        "name":  "AssociaÃ§Ã£o de Pais e Encarregados de EducaÃ§Ã£o do Agrupamento de Escolas de Tondela",
+        "search":  "associaodepaiseencarregadosdeeducaodoagrupamentodeescolasdetondela",
+        "slug":  "associa-o-de-pais-e-encarregados-de-educa-o-do-agrupamento-de-escolas-de-tondela",
+        "short_name":  "APEE Lajeosa do DÃ£o"
+    },
+    {
+        "id":  2383,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_23831696110407.jpg",
+        "name":  "Basquete Clube do Porto Santo",
+        "search":  "basqueteclubedoportosanto",
+        "slug":  "basquete-clube-do-porto-santo",
+        "short_name":  "BC Porto Santo"
+    },
+    {
+        "id":  2813,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2813_LOGO.JPG",
+        "name":  "AssociaÃ§Ã£o Cultural e Desportiva de SÃ£o JoÃ£o",
+        "search":  "associaoculturaledesportivadesojoo",
+        "slug":  "associa-o-cultural-e-desportiva-de-s-o-jo-o",
+        "short_name":  "ACD SÃ£o JoÃ£o"
+    },
+    {
+        "id":  3243,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_32431654866933.jpg",
+        "name":  "Escola de Modalidades do Sport Lisboa e Benfica em Oliveira de Azemeis",
+        "search":  "escolademodalidadesdosportlisboaebenficaemoliveiradeazemeis",
+        "slug":  "escola-de-modalidades-do-sport-lisboa-e-benfica-em-oliveira-de-azemeis",
+        "short_name":  "Escola SLB O Azemeis"
+    },
+    {
+        "id":  656,
+        "color":  "#CD2CED",
+        "primary":  "#CD2CED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_6561737484866.png",
+        "name":  "Basket Clube de ValenÃ§a",
+        "search":  "basketclubedevalena",
+        "slug":  "basket-clube-de-valen-a",
+        "short_name":  "BC ValenÃ§a"
+    },
+    {
+        "id":  3671,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "AssociaÃ§Ã£o de FamÃ­lias SolidÃ¡rias com a DeficiÃªncia",
+        "search":  "associaodefamliassolidriascomadeficincia",
+        "slug":  "associa-o-de-fam-lias-solid-rias-com-a-defici-ncia",
+        "short_name":  "AFSD Cavalo Azul"
+    },
+    {
+        "id":  3668,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "APPACDM da Figueira da Foz",
+        "search":  "appacdmdafigueiradafoz",
+        "slug":  "appacdm-da-figueira-da-foz",
+        "short_name":  "APPACDM-FF"
+    },
+    {
+        "id":  179,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1791674726384.png",
+        "name":  "Grupo Desportivo Bolacesto",
+        "search":  "grupodesportivobolacesto",
+        "slug":  "grupo-desportivo-bolacesto",
+        "short_name":  "GD Bolacesto"
+    },
+    {
+        "id":  3759,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37591772721774.jpeg",
+        "name":  "Grupo Desportivo Concha Azul",
+        "search":  "grupodesportivoconchaazul",
+        "slug":  "grupo-desportivo-concha-azul",
+        "short_name":  "Concha Azul"
+    },
+    {
+        "id":  3665,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "Grupo Desportivo da Azinhaga",
+        "search":  "grupodesportivodaazinhaga",
+        "slug":  "grupo-desportivo-da-azinhaga",
+        "short_name":  "Grupo Desportivo da Azinhaga"
+    },
+    {
+        "id":  3459,
+        "color":  "#8E44AD",
+        "primary":  "#8E44AD",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/LAC_Basquetebol_Clube1602589948.jpg",
+        "name":  "LAC Basquetebol Clube",
+        "search":  "lacbasquetebolclube",
+        "slug":  "lac-basquetebol-clube",
+        "short_name":  "LAC"
+    },
+    {
+        "id":  3657,
+        "color":  "#E74C3C",
+        "primary":  "#E74C3C",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36571695909164.png",
+        "name":  "Clube Desportivo das Aves 1930",
+        "search":  "clubedesportivodasaves1930",
+        "slug":  "clube-desportivo-das-aves-1930",
+        "short_name":  "CD Aves 1930"
+    },
+    {
+        "id":  208,
+        "color":  "#008400",
+        "primary":  "#008400",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_2081667472783.png",
+        "name":  "Clube Elvense de NataÃ§Ã£o",
+        "search":  "clubeelvensedenatao",
+        "slug":  "clube-elvense-de-nata-o",
+        "short_name":  "Elvense NataÃ§Ã£o"
+    },
+    {
+        "id":  3654,
+        "color":  "#145DA0",
+        "primary":  "#145DA0",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3654_1694819048.png",
+        "name":  "Esposende Basket Clube",
+        "search":  "esposendebasketclube",
+        "slug":  "esposende-basket-clube",
+        "short_name":  "Esposende Basket"
+    },
+    {
+        "id":  205,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_205_LOGO.jpg",
+        "name":  "Clube Ana de Santa Maria",
+        "search":  "clubeanadesantamaria",
+        "slug":  "clube-ana-de-santa-maria",
+        "short_name":  "Clube Ana"
+    },
+    {
+        "id":  3221,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3221_LOGO.png",
+        "name":  "Clube Desportivo e Cultural Escola Sec. Ribeira Grande",
+        "search":  "clubedesportivoeculturalescolasecribeiragrande",
+        "slug":  "clube-desportivo-e-cultural-escola-sec-ribeira-grande",
+        "short_name":  "CDCESRG"
+    },
+    {
+        "id":  634,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_6341738160632.png",
+        "name":  "Centro Recreativo e Cultural Quinta dos Lombos",
+        "search":  "centrorecreativoeculturalquintadoslombos",
+        "slug":  "centro-recreativo-e-cultural-quinta-dos-lombos",
+        "short_name":  "Quinta dos Lombos"
+    },
+    {
+        "id":  3650,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36501699432159.png",
+        "name":  "Aveiro Ria Basket Clube",
+        "search":  "aveiroriabasketclube",
+        "slug":  "aveiro-ria-basket-clube",
+        "short_name":  "Aveiro Ria BC"
+    },
+    {
+        "id":  632,
+        "color":  "#F50000",
+        "primary":  "#F50000",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/632_1647897364.jpg",
+        "name":  "AssociaÃ§Ã£o Cultural e Desportivo Santa Marta Portuzelo",
+        "search":  "associaoculturaledesportivosantamartaportuzelo",
+        "slug":  "associa-o-cultural-e-desportivo-santa-marta-portuzelo",
+        "short_name":  "ACD Sta. Marta"
+    },
+    {
+        "id":  200,
+        "color":  "#D35400",
+        "primary":  "#D35400",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/200_1777449148.png",
+        "name":  "Clube de Basquetebol do FundÃ£o",
+        "search":  "clubedebasqueteboldofundo",
+        "slug":  "clube-de-basquetebol-do-fund-o",
+        "short_name":  "CBFundÃ£o"
+    },
+    {
+        "id":  2906,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/2906_1732475294.webp",
+        "name":  "Grupo Basket AtlÃ¢ntico",
+        "search":  "grupobasketatlntico",
+        "slug":  "grupo-basket-atl-ntico",
+        "short_name":  "GB AtlÃ¢ntico"
+    },
+    {
+        "id":  198,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Clube_Basquetebol_da_Escola_Secundaria_da_Amadora1601805969.png",
+        "name":  "Clube Basquetebol da Escola SecundÃ¡ria da Amadora",
+        "search":  "clubebasqueteboldaescolasecundriadaamadora",
+        "slug":  "clube-basquetebol-da-escola-secund-ria-da-amadora",
+        "short_name":  "Escola da Amadora"
+    },
+    {
+        "id":  23,
+        "color":  "#048B38",
+        "primary":  "#048B38",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_231741370605.png",
+        "name":  "GinÃ¡sio Clube Olhanense",
+        "search":  "ginsioclubeolhanense",
+        "slug":  "gin-sio-clube-olhanense",
+        "short_name":  "GinÃ¡sio Olhanense"
+    },
+    {
+        "id":  196,
+        "color":  "#FF330F",
+        "primary":  "#FF330F",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_196_LOGO.png",
+        "name":  "AssociaÃ§Ã£o EducaÃ§Ã£o FÃ­sica Desportiva Torres Vedras",
+        "search":  "associaoeducaofsicadesportivatorresvedras",
+        "slug":  "associa-o-educa-o-f-sica-desportiva-torres-vedras",
+        "short_name":  "FÃ­sica Torres Vedras"
+    },
+    {
+        "id":  181,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_181.png",
+        "name":  "UniÃ£o AcadÃ©mica AntÃ³nio Aroso",
+        "search":  "unioacadmicaantnioaroso",
+        "slug":  "uni-o-acad-mica-ant-nio-aroso",
+        "short_name":  "UAAAroso"
+    },
+    {
+        "id":  2779,
+        "color":  "#FFFFFF",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2779_LOGO.jpg",
+        "name":  "Clube Desportivo Escolar Os Fuseiros",
+        "search":  "clubedesportivoescolarosfuseiros",
+        "slug":  "clube-desportivo-escolar-os-fuseiros",
+        "short_name":  "Os Fuseiros"
+    },
+    {
+        "id":  2778,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2778_LOGO.jpg",
+        "name":  "Centro de Cultura e Desporto dos HorÃ¡rios do Funchal",
+        "search":  "centrodeculturaedesportodoshorriosdofunchal",
+        "slug":  "centro-de-cultura-e-desporto-dos-hor-rios-do-funchal",
+        "short_name":  "HorÃ¡rios do Funchal"
+    },
+    {
+        "id":  3208,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3208_LOGO.png",
+        "name":  "CBP2012- Basquetebol Clube de Penafiel",
+        "search":  "cbp2012basquetebolclubedepenafiel",
+        "slug":  "cbp2012-basquetebol-clube-de-penafiel",
+        "short_name":  "CBP"
+    },
+    {
+        "id":  2776,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/2776_1730025450.jpg",
+        "name":  "AssociaÃ§Ã£o S S Sociedade ColumbÃ³fila Cantanhedense",
+        "search":  "associaosssociedadecolumbfilacantanhedense",
+        "slug":  "associa-o-s-s-sociedade-columb-fila-cantanhedense",
+        "short_name":  "ASSSCC"
+    },
+    {
+        "id":  2775,
+        "color":  "#FFFFFF",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/2775_1739647629.jpg",
+        "name":  "Basket Club de Canas de Senhorim",
+        "search":  "basketclubdecanasdesenhorim",
+        "slug":  "basket-club-de-canas-de-senhorim",
+        "short_name":  "Basket Club de Canas"
+    },
+    {
+        "id":  188,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_188_LOGO.png",
+        "name":  "AcadÃ©mico Futebol Clube",
+        "search":  "acadmicofutebolclube",
+        "slug":  "acad-mico-futebol-clube",
+        "short_name":  "AcadÃ©mico FC"
+    },
+    {
+        "id":  3388,
+        "color":  "#0080FF",
+        "primary":  "#0080FF",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_33881676672034.png",
+        "name":  "RBDA - RibeirÃ£o Basket AssociaÃ§Ã£o Desportiva",
+        "search":  "rbdaribeirobasketassociaodesportiva",
+        "slug":  "rbda-ribeir-o-basket-associa-o-desportiva",
+        "short_name":  "RibeirÃ£o Basket"
+    },
+    {
+        "id":  186,
+        "color":  "#E67E22",
+        "primary":  "#E67E22",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1861736767579.png",
+        "name":  "Scalipus Clube SetÃºbal",
+        "search":  "scalipusclubesetbal",
+        "slug":  "scalipus-clube-set-bal",
+        "short_name":  "Scalipus CS"
+    },
+    {
+        "id":  183,
+        "color":  "#D20412",
+        "primary":  "#D20412",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_183_LOGO.png",
+        "name":  "Futebol Clube Barreirense",
+        "search":  "futebolclubebarreirense",
+        "slug":  "futebol-clube-barreirense",
+        "short_name":  "FC Barreirense"
+    },
+    {
+        "id":  182,
+        "color":  "#C30909",
+        "primary":  "#C30909",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1821741023871.png",
+        "name":  "Galitos Futebol Clube",
+        "search":  "galitosfutebolclube",
+        "slug":  "galitos-futebol-clube",
+        "short_name":  "Galitos FC"
+    },
+    {
+        "id":  3484,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3484_LOGO.jpg",
+        "name":  "AssociaÃ§Ã£o Clube de Basquetebol da Barca",
+        "search":  "associaoclubedebasqueteboldabarca",
+        "slug":  "associa-o-clube-de-basquetebol-da-barca",
+        "short_name":  "ACB Barca"
+    },
+    {
+        "id":  3628,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36281675351494.png",
+        "name":  "UniÃ£o Sport Clube Mira Sintra",
+        "search":  "uniosportclubemirasintra",
+        "slug":  "uni-o-sport-clube-mira-sintra",
+        "short_name":  "UniÃ£o Sport Clube Mira Sintra"
+    },
+    {
+        "id":  2742,
+        "color":  "#FFFFFF",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_27421770979788.png",
+        "name":  "Clube Desportivo e Cultural do Porto Moniz",
+        "search":  "clubedesportivoeculturaldoportomoniz",
+        "slug":  "clube-desportivo-e-cultural-do-porto-moniz",
+        "short_name":  "CDC Porto Moniz"
+    },
+    {
+        "id":  3625,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3625_1679141751.png",
+        "name":  "ZORA - Basquetebol Clube do Marco",
+        "search":  "zorabasquetebolclubedomarco",
+        "slug":  "zora-basquetebol-clube-do-marco",
+        "short_name":  "BC Marco"
+    },
+    {
+        "id":  176,
+        "color":  "#E74C3C",
+        "primary":  "#E74C3C",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1761675707996.png",
+        "name":  "Sporting Clube Vasco da Gama",
+        "search":  "sportingclubevascodagama",
+        "slug":  "sporting-clube-vasco-da-gama",
+        "short_name":  "SC Vasco da Gama"
+    },
+    {
+        "id":  175,
+        "color":  "#F90B0B",
+        "primary":  "#F90B0B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Grupo_Desportivo_Basquete_de_Leca1602618188.png",
+        "name":  "Grupo Desportivo Basquete de LeÃ§a",
+        "search":  "grupodesportivobasquetedelea",
+        "slug":  "grupo-desportivo-basquete-de-le-a",
+        "short_name":  "GDB LeÃ§a"
+    },
+    {
+        "id":  174,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1741733586027.png",
+        "name":  "GuifÃµes Sport Clube",
+        "search":  "guifessportclube",
+        "slug":  "guif-es-sport-clube",
+        "short_name":  "GuifÃµes S.C."
+    },
+    {
+        "id":  887,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://www.fpb.pt//wp-content/themes/fpbasquetebol/assets/images/ass_logo_default.png",
+        "name":  "UniÃ£o Desportiva e Cultural de Machico",
+        "search":  "uniodesportivaeculturaldemachico",
+        "slug":  "uni-o-desportiva-e-cultural-de-machico",
+        "short_name":  "UDC Machico"
+    },
+    {
+        "id":  172,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1721693497331.png",
+        "name":  "NÃºcleo Cultural Recreativo de Valongo",
+        "search":  "ncleoculturalrecreativodevalongo",
+        "slug":  "n-cleo-cultural-recreativo-de-valongo",
+        "short_name":  "NCR Valongo"
+    },
+    {
+        "id":  2326,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_23261732726036.png",
+        "name":  "Portimonense Sporting Clube",
+        "search":  "portimonensesportingclube",
+        "slug":  "portimonense-sporting-clube",
+        "short_name":  "Portimonense SC"
+    },
+    {
+        "id":  169,
+        "color":  "#006F52",
+        "primary":  "#006F52",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_169_LOGO.png",
+        "name":  "Sporting Clube de Portugal",
+        "search":  "sportingclubedeportugal",
+        "slug":  "sporting-clube-de-portugal",
+        "short_name":  "Sporting CP"
+    },
+    {
+        "id":  219,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Uniao_Desportiva_Vilafranquense1606349522.png",
+        "name":  "UniÃ£o Desportiva Vilafranquense",
+        "search":  "uniodesportivavilafranquense",
+        "slug":  "uni-o-desportiva-vilafranquense",
+        "short_name":  "UD Vilafranquense"
+    },
+    {
+        "id":  26,
+        "color":  "#0CB035",
+        "primary":  "#0CB035",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_261700861687.png",
+        "name":  "Sporting Clube Marinhense",
+        "search":  "sportingclubemarinhense",
+        "slug":  "sporting-clube-marinhense",
+        "short_name":  "SC Marinhense"
+    },
+    {
+        "id":  3760,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37601773613169.png",
+        "name":  "VÃ¡rios-cooperativa De Solidariedade Social, Crl",
+        "search":  "vrioscooperativadesolidariedadesocialcrl",
+        "slug":  "v-rios-cooperativa-de-solidariedade-social-crl",
+        "short_name":  "VÃ¡rios"
+    },
+    {
+        "id":  160,
+        "color":  "#2980B9",
+        "primary":  "#2980B9",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1601704477075.png",
+        "name":  "Juvemaia - AssociaÃ§Ã£o Cultural Desportiva e CÃ­vica",
+        "search":  "juvemaiaassociaoculturaldesportivaecvica",
+        "slug":  "juvemaia-associa-o-cultural-desportiva-e-c-vica",
+        "short_name":  "Juvemaia ACDC"
+    },
+    {
+        "id":  3488,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_34881770139600.png",
+        "name":  "Sines Surf Clube",
+        "search":  "sinessurfclube",
+        "slug":  "sines-surf-clube",
+        "short_name":  "Sines SAB"
+    },
+    {
+        "id":  3606,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36061669117687.png",
+        "name":  "CSI - Ubuntu Basket Academy",
+        "search":  "csiubuntubasketacademy",
+        "slug":  "csi-ubuntu-basket-academy",
+        "short_name":  "Ubuntu Basket"
+    },
+    {
+        "id":  588,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_5881705599574.png",
+        "name":  "Basket Club de Vila Real",
+        "search":  "basketclubdevilareal",
+        "slug":  "basket-club-de-vila-real",
+        "short_name":  "BC Vila Real"
+    },
+    {
+        "id":  3604,
+        "color":  "#2980B9",
+        "primary":  "#2980B9",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36041667485669.png",
+        "name":  "Benedita Hoopers Club",
+        "search":  "beneditahoopersclub",
+        "slug":  "benedita-hoopers-club",
+        "short_name":  "Benedita Hoopers"
+    },
+    {
+        "id":  2310,
+        "color":  "#E82A20",
+        "primary":  "#E82A20",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/2310_1617267160.png",
+        "name":  "Sociedade Cultural e Recreativa Gaeirense",
+        "search":  "sociedadeculturalerecreativagaeirense",
+        "slug":  "sociedade-cultural-e-recreativa-gaeirense",
+        "short_name":  "Gaeirense Basket"
+    },
+    {
+        "id":  153,
+        "color":  "#0135D8",
+        "primary":  "#0135D8",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1531734894028.png",
+        "name":  "Clube de Basquete de Albufeira",
+        "search":  "clubedebasquetedealbufeira",
+        "slug":  "clube-de-basquete-de-albufeira",
+        "short_name":  "CBA"
+    },
+    {
+        "id":  704,
+        "color":  "#27AE60",
+        "primary":  "#27AE60",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_704_LOGO.png",
+        "name":  "Grupo Recreativo Independente Brandoense",
+        "search":  "gruporecreativoindependentebrandoense",
+        "slug":  "grupo-recreativo-independente-brandoense",
+        "short_name":  "GRIB"
+    },
+    {
+        "id":  3015,
+        "color":  "#008863",
+        "primary":  "#008863",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_30151676670145.jpg",
+        "name":  "NÃºcleo Sportinguista do Concelho de Estarreja",
+        "search":  "ncleosportinguistadoconcelhodeestarreja",
+        "slug":  "n-cleo-sportinguista-do-concelho-de-estarreja",
+        "short_name":  "NÃºcleo Sporting Estarreja"
+    },
+    {
+        "id":  3165,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3165_LOGO.jpg",
+        "name":  "Clube Desportivo e Cultural Juventude Ilha Verde",
+        "search":  "clubedesportivoeculturaljuventudeilhaverde",
+        "slug":  "clube-desportivo-e-cultural-juventude-ilha-verde",
+        "short_name":  "CDC Juventude Ilha Verde"
+    },
+    {
+        "id":  2302,
+        "color":  "#FB04B9",
+        "primary":  "#FB04B9",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_23021762176432.png",
+        "name":  "Chamusca Basket Clube",
+        "search":  "chamuscabasketclube",
+        "slug":  "chamusca-basket-clube",
+        "short_name":  "Chamusca BC"
+    },
+    {
+        "id":  2300,
+        "color":  "#2C3E50",
+        "primary":  "#2C3E50",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2300_LOGO.png",
+        "name":  "VitÃ³ria Sport Clube",
+        "search":  "vitriasportclube",
+        "slug":  "vit-ria-sport-clube",
+        "short_name":  "VitÃ³ria SC"
+    },
+    {
+        "id":  3161,
+        "color":  "#EC1313",
+        "primary":  "#EC1313",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_3161.png",
+        "name":  "Grupo Desportivo de Boticas",
+        "search":  "grupodesportivodeboticas",
+        "slug":  "grupo-desportivo-de-boticas",
+        "short_name":  "GD Boticas"
+    },
+    {
+        "id":  60,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_601733480419.png",
+        "name":  "Sporting Clube Olhanense",
+        "search":  "sportingclubeolhanense",
+        "slug":  "sporting-clube-olhanense",
+        "short_name":  "SC Olhanense"
+    },
+    {
+        "id":  815,
+        "color":  "#F20D1C",
+        "primary":  "#F20D1C",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Santarem_Basket_Clube1640100634.png",
+        "name":  "SantarÃ©m Basket Clube",
+        "search":  "santarmbasketclube",
+        "slug":  "santar-m-basket-clube",
+        "short_name":  "SantarÃ©m BC"
+    },
+    {
+        "id":  3155,
+        "color":  "#387EFF",
+        "primary":  "#387EFF",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_31551675353180.jpg",
+        "name":  "Powertogether-AssociaÃ§Ã£o",
+        "search":  "powertogetherassociao",
+        "slug":  "powertogether-associa-o",
+        "short_name":  "Powertogether"
+    },
+    {
+        "id":  231,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/231_1772151085.png",
+        "name":  "Clube de Basquetebol de Tavira",
+        "search":  "clubedebasqueteboldetavira",
+        "slug":  "clube-de-basquetebol-de-tavira",
+        "short_name":  "CB Tavira"
+    },
+    {
+        "id":  16,
+        "color":  "#2D2BCA",
+        "primary":  "#2D2BCA",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Sangalhos_Desporto_Clube1627490311.png",
+        "name":  "Sangalhos Desporto Clube",
+        "search":  "sangalhosdesportoclube",
+        "slug":  "sangalhos-desporto-clube",
+        "short_name":  "Sangalhos DC"
+    },
+    {
+        "id":  131,
+        "color":  "#3289FB",
+        "primary":  "#3289FB",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_131_LOGO.png",
+        "name":  "Atletico Clube de Moscavide",
+        "search":  "atleticoclubedemoscavide",
+        "slug":  "atletico-clube-de-moscavide",
+        "short_name":  "AC Moscavide"
+    },
+    {
+        "id":  130,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1301734460394.png",
+        "name":  "Clube Nacional de NataÃ§Ã£o",
+        "search":  "clubenacionaldenatao",
+        "slug":  "clube-nacional-de-nata-o",
+        "short_name":  "Nacional NataÃ§Ã£o"
+    },
+    {
+        "id":  79,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Clube_Nautico_de_Abrantes1635703918.png",
+        "name":  "Clube NÃ¡utico de Abrantes",
+        "search":  "clubenuticodeabrantes",
+        "slug":  "clube-n-utico-de-abrantes",
+        "short_name":  "CNAbrantes"
+    },
+    {
+        "id":  127,
+        "color":  "#C30000",
+        "primary":  "#C30000",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_127_LOGO.png",
+        "name":  "Sport Lisboa e Benfica",
+        "search":  "sportlisboaebenfica",
+        "slug":  "sport-lisboa-e-benfica",
+        "short_name":  "SL Benfica"
+    },
+    {
+        "id":  975,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_9751777299293.jpg",
+        "name":  "Clube Desportivo Os Especiais",
+        "search":  "clubedesportivoosespeciais",
+        "slug":  "clube-desportivo-os-especiais",
+        "short_name":  "Os Especiais"
+    },
+    {
+        "id":  122,
+        "color":  "#0000FF",
+        "primary":  "#0000FF",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Clube_Propaganda_de_Natacao1603657754.png",
+        "name":  "Clube Propaganda de NataÃ§Ã£o",
+        "search":  "clubepropagandadenatao",
+        "slug":  "clube-propaganda-de-nata-o",
+        "short_name":  "CPN"
+    },
+    {
+        "id":  2276,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_22761683813258.jpg",
+        "name":  "Grupo Desportivo GonÃ§alo Velho",
+        "search":  "grupodesportivogonalovelho",
+        "slug":  "grupo-desportivo-gon-alo-velho",
+        "short_name":  "GD GonÃ§alo Velho"
+    },
+    {
+        "id":  120,
+        "color":  "#145DA0",
+        "primary":  "#145DA0",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_120_LOGO.png",
+        "name":  "Futebol Clube do Porto",
+        "search":  "futebolclubedoporto",
+        "slug":  "futebol-clube-do-porto",
+        "short_name":  "FC Porto"
+    },
+    {
+        "id":  3567,
+        "color":  "#BDC3C7",
+        "primary":  "#BDC3C7",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_35671661874686.png",
+        "name":  "Clube Desportivo GumirÃ£es Basket - Viseu",
+        "search":  "clubedesportivogumiresbasketviseu",
+        "slug":  "clube-desportivo-gumir-es-basket-viseu",
+        "short_name":  "GumirÃ£es Basket"
+    },
+    {
+        "id":  118,
+        "color":  "#302DCD",
+        "primary":  "#302DCD",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1181738506693.png",
+        "name":  "Clube Desportivo da PÃ³voa",
+        "search":  "clubedesportivodapvoa",
+        "slug":  "clube-desportivo-da-p-voa",
+        "short_name":  "CD PÃ³voa"
+    },
+    {
+        "id":  99,
+        "color":  "#16A085",
+        "primary":  "#16A085",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_991737484055.png",
+        "name":  "Sociedade de InstruÃ§Ã£o Musical Escolar Cruz-Quebradense",
+        "search":  "sociedadedeinstruomusicalescolarcruzquebradense",
+        "slug":  "sociedade-de-instru-o-musical-escolar-cruz-quebradense",
+        "short_name":  "SIMECQ"
+    },
+    {
+        "id":  546,
+        "color":  "#05A805",
+        "primary":  "#05A805",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Basquete_Clube_de_Barcelos1602618101.png",
+        "name":  "Basquete Clube de Barcelos",
+        "search":  "basqueteclubedebarcelos",
+        "slug":  "basquete-clube-de-barcelos",
+        "short_name":  "Basquete de Barcelos"
+    },
+    {
+        "id":  2699,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2699_LOGO.JPG",
+        "name":  "Clube Desportivo Garachico",
+        "search":  "clubedesportivogarachico",
+        "slug":  "clube-desportivo-garachico",
+        "short_name":  "C.D. GARACHICO"
+    },
+    {
+        "id":  542,
+        "color":  "#27981F",
+        "primary":  "#27981F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_5421676677710.png",
+        "name":  "NÃºcleo do Sporting do Cartaxo",
+        "search":  "ncleodosportingdocartaxo",
+        "slug":  "n-cleo-do-sporting-do-cartaxo",
+        "short_name":  "Sporting do Cartaxo"
+    },
+    {
+        "id":  9,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Sporting_Clube_Farense1594127837.png",
+        "name":  "Sporting Clube Farense",
+        "search":  "sportingclubefarense",
+        "slug":  "sporting-clube-farense",
+        "short_name":  "Farense"
+    },
+    {
+        "id":  2694,
+        "color":  "#EA0029",
+        "primary":  "#EA0029",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Associacao_Desportiva_e_Recreativa_Estrelas_Brigantinas1633449855.png",
+        "name":  "AssociaÃ§Ã£o Desportiva e Recreativa Estrelas Brigantinas",
+        "search":  "associaodesportivaerecreativaestrelasbrigantinas",
+        "slug":  "associa-o-desportiva-e-recreativa-estrelas-brigantinas",
+        "short_name":  "Estrelas Brigantinas"
+    },
+    {
+        "id":  107,
+        "color":  "#041171",
+        "primary":  "#041171",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Centro_dos_Antigos_Alunos_Salesianos1639227568.png",
+        "name":  "Centro dos Antigos Alunos Salesianos",
+        "search":  "centrodosantigosalunossalesianos",
+        "slug":  "centro-dos-antigos-alunos-salesianos",
+        "short_name":  "CAA Salesianos"
+    },
+    {
+        "id":  106,
+        "color":  "#145DA0",
+        "primary":  "#145DA0",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_106_LOGO.png",
+        "name":  "Carnide Clube",
+        "search":  "carnideclube",
+        "slug":  "carnide-clube",
+        "short_name":  "Carnide"
+    },
+    {
+        "id":  967,
+        "color":  "#FFFFFF",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_9671708701591.jpg",
+        "name":  "Desportivo do Nucleo de Basquetebol da ABIT",
+        "search":  "desportivodonucleodebasqueteboldaabit",
+        "slug":  "desportivo-do-nucleo-de-basquetebol-da-abit",
+        "short_name":  "ABIT"
+    },
+    {
+        "id":  3552,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_35521663779905.jpeg",
+        "name":  "Sporting Clube da Cumieira",
+        "search":  "sportingclubedacumieira",
+        "slug":  "sporting-clube-da-cumieira",
+        "short_name":  "SC Cumieira"
+    },
+    {
+        "id":  2404,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_24041710324824.png",
+        "name":  "Sporting Clube de Braga",
+        "search":  "sportingclubedebraga",
+        "slug":  "sporting-clube-de-braga",
+        "short_name":  "SC Braga"
+    },
+    {
+        "id":  861,
+        "color":  "#2257ae",
+        "primary":  "#2257ae",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Clube_Futebol_Andorinha1641844291.png",
+        "name":  "Clube Futebol Andorinha",
+        "search":  "clubefutebolandorinha",
+        "slug":  "clube-futebol-andorinha",
+        "short_name":  "CF Andorinha"
+    },
+    {
+        "id":  2685,
+        "color":  "#EDCA1D",
+        "primary":  "#EDCA1D",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2685_LOGO.png",
+        "name":  "Clube Desportivo Torres Novas - Org. Aut. Basquetebol",
+        "search":  "clubedesportivotorresnovasorgautbasquetebol",
+        "slug":  "clube-desportivo-torres-novas-org-aut-basquetebol",
+        "short_name":  "CDTN-OAB"
+    },
+    {
+        "id":  119,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Futebol_Clube_de_Gaia1636713029.png",
+        "name":  "Futebol Clube de Gaia",
+        "search":  "futebolclubedegaia",
+        "slug":  "futebol-clube-de-gaia",
+        "short_name":  "FC Gaia"
+    },
+    {
+        "id":  3754,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_37541768491809.png",
+        "name":  "Salesianos de Manique",
+        "search":  "salesianosdemanique",
+        "slug":  "salesianos-de-manique",
+        "short_name":  "Salesianos Manique"
+    },
+    {
+        "id":  953,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_9531736592313.jpg",
+        "name":  "Academia Musical 1Âº Junho 1893",
+        "search":  "academiamusical1junho1893",
+        "slug":  "academia-musical-1-junho-1893",
+        "short_name":  "Academia"
+    },
+    {
+        "id":  3538,
+        "color":  "#5885AF",
+        "primary":  "#5885AF",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_35381670957676.jpg",
+        "name":  "AssociaÃ§Ã£o 20Kms de Almeirim",
+        "search":  "associao20kmsdealmeirim",
+        "slug":  "associa-o-20kms-de-almeirim",
+        "short_name":  "AVQA"
+    },
+    {
+        "id":  89,
+        "color":  "#2ECC71",
+        "primary":  "#2ECC71",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_891682626893.png",
+        "name":  "Fayal Sport Club",
+        "search":  "fayalsportclub",
+        "slug":  "fayal-sport-club",
+        "short_name":  "Fayal Sport"
+    },
+    {
+        "id":  950,
+        "color":  "#37D0FB",
+        "primary":  "#37D0FB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_9501697630889.png",
+        "name":  "Basket Almada Clube",
+        "search":  "basketalmadaclube",
+        "slug":  "basket-almada-clube",
+        "short_name":  "Basket Almada"
+    },
+    {
+        "id":  949,
+        "color":  "#16A085",
+        "primary":  "#16A085",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_9491742212006.png",
+        "name":  "Montijo Basket AssociaÃ§Ã£o",
+        "search":  "montijobasketassociao",
+        "slug":  "montijo-basket-associa-o",
+        "short_name":  "Montijo Basket"
+    },
+    {
+        "id":  948,
+        "color":  "#E67E22",
+        "primary":  "#E67E22",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_9481708733314.png",
+        "name":  "AssociaÃ§Ã£o Amigos de Angrabasket",
+        "search":  "associaoamigosdeangrabasket",
+        "slug":  "associa-o-amigos-de-angrabasket",
+        "short_name":  "AngraBasket"
+    },
+    {
+        "id":  3532,
+        "color":  "#272A91",
+        "primary":  "#272A91",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Clube_de_Futebol_Armacenenses1638271771.png",
+        "name":  "Clube de Football Os Armacenenses",
+        "search":  "clubedefootballosarmacenenses",
+        "slug":  "clube-de-football-os-armacenenses",
+        "short_name":  "CF Armacenenses"
+    },
+    {
+        "id":  945,
+        "color":  "#C0392B",
+        "primary":  "#C0392B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_9451724669739.png",
+        "name":  "Basket Clube Lis",
+        "search":  "basketclubelis",
+        "slug":  "basket-clube-lis",
+        "short_name":  "BC Lis"
+    },
+    {
+        "id":  2623,
+        "color":  "#2C3E50",
+        "primary":  "#2C3E50",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_26231727518737.png",
+        "name":  "AssociaÃ§Ã£o Caminha Jovem",
+        "search":  "associaocaminhajovem",
+        "slug":  "associa-o-caminha-jovem",
+        "short_name":  "Caminha J."
+    },
+    {
+        "id":  941,
+        "color":  "#5E09FB",
+        "primary":  "#5E09FB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Associacao_Juvenil_do_Clube_Operario_Desportivo1607029549.png",
+        "name":  "AssociaÃ§Ã£o Juvenil do Clube OperÃ¡rio Desportivo",
+        "search":  "associaojuvenildoclubeoperriodesportivo",
+        "slug":  "associa-o-juvenil-do-clube-oper-rio-desportivo",
+        "short_name":  "AJCOD"
+    },
+    {
+        "id":  3698,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3698_1729686779.png",
+        "name":  "Febres Sport Club",
+        "search":  "febressportclub",
+        "slug":  "febres-sport-club",
+        "short_name":  "Febres S.C."
+    },
+    {
+        "id":  3254,
+        "color":  "#E61E2B",
+        "primary":  "#E61E2B",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3254_LOGO.png",
+        "name":  "Seixal Clube 1925",
+        "search":  "seixalclube1925",
+        "slug":  "seixal-clube-1925",
+        "short_name":  "Seixal 1925"
+    },
+    {
+        "id":  2430,
+        "color":  "#326CA9",
+        "primary":  "#326CA9",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2430_LOGO.png",
+        "name":  "Rio Maior Basket",
+        "search":  "riomaiorbasket",
+        "slug":  "rio-maior-basket",
+        "short_name":  "Rio Maior Basket"
+    },
+    {
+        "id":  2660,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_26601668960321.png",
+        "name":  "AssociaÃ§Ã£o Cultural Recreativa da Cerca -SÃ£o Pedro",
+        "search":  "associaoculturalrecreativadacercasopedro",
+        "slug":  "associa-o-cultural-recreativa-da-cerca-s-o-pedro",
+        "short_name":  "ACR Cerca"
+    },
+    {
+        "id":  73,
+        "color":  "#145DA0",
+        "primary":  "#145DA0",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Nucleo_Desporto_Amador_Pombal1633455812.png",
+        "name":  "NÃºcleo Desporto Amador Pombal",
+        "search":  "ncleodesportoamadorpombal",
+        "slug":  "n-cleo-desporto-amador-pombal",
+        "short_name":  "NDA Pombal"
+    },
+    {
+        "id":  934,
+        "color":  "#EB2D33",
+        "primary":  "#EB2D33",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Barca_Basket_Clube1639920613.png",
+        "name":  "Barca Basket Clube",
+        "search":  "barcabasketclube",
+        "slug":  "barca-basket-clube",
+        "short_name":  "Barca BC"
+    },
+    {
+        "id":  2932,
+        "color":  "#B30000",
+        "primary":  "#B30000",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_29321738335536.png",
+        "name":  "Imortal Basket Club",
+        "search":  "imortalbasketclub",
+        "slug":  "imortal-basket-club",
+        "short_name":  "Imortal BC"
+    },
+    {
+        "id":  69,
+        "color":  "#000165",
+        "primary":  "#000165",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_691693656807.png",
+        "name":  "Famalicense AtlÃ©tico Clube",
+        "search":  "famalicenseatlticoclube",
+        "slug":  "famalicense-atl-tico-clube",
+        "short_name":  "FAC"
+    },
+    {
+        "id":  68,
+        "color":  "#13811B",
+        "primary":  "#13811B",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_681740669639.png",
+        "name":  "Grupo Desportivo Escola SecundÃ¡ria de Santo AndrÃ©",
+        "search":  "grupodesportivoescolasecundriadesantoandr",
+        "slug":  "grupo-desportivo-escola-secund-ria-de-santo-andr",
+        "short_name":  "GDESSA"
+    },
+    {
+        "id":  66,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_661676670658.png",
+        "name":  "Grupo Desportivo AndrÃ© Soares",
+        "search":  "grupodesportivoandrsoares",
+        "slug":  "grupo-desportivo-andr-soares",
+        "short_name":  "GDAS"
+    },
+    {
+        "id":  926,
+        "color":  "#E9892F",
+        "primary":  "#E9892F",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_926_LOGO.png",
+        "name":  "Sociedade de InstruÃ§Ã£o Recreio Os PimpÃµes",
+        "search":  "sociedadedeinstruorecreioospimpes",
+        "slug":  "sociedade-de-instru-o-recreio-os-pimp-es",
+        "short_name":  "Os PimpÃµes"
+    },
+    {
+        "id":  692,
+        "color":  "#3145F6",
+        "primary":  "#3145F6",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_692_LOGO.png",
+        "name":  "Clube Desportivo Pinhalnovense",
+        "search":  "clubedesportivopinhalnovense",
+        "slug":  "clube-desportivo-pinhalnovense",
+        "short_name":  "CD Pinhalnovense"
+    },
+    {
+        "id":  2648,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_2648_LOGO.jpg",
+        "name":  "Valour Futebol Clube - Assoc. Cult. Recreativa e Desp. do RosÃ¡rio",
+        "search":  "valourfutebolclubeassoccultrecreativaedespdorosrio",
+        "slug":  "valour-futebol-clube-assoc-cult-recreativa-e-desp-do-ros-rio",
+        "short_name":  "Valour FC"
+    },
+    {
+        "id":  3509,
+        "color":  "#008000",
+        "primary":  "#008000",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Clube_Desportivo_de_Tondela1631722880.png",
+        "name":  "Clube Desportivo de Tondela",
+        "search":  "clubedesportivodetondela",
+        "slug":  "clube-desportivo-de-tondela",
+        "short_name":  "CD Tondela"
+    },
+    {
+        "id":  922,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_922_LOGO.gif",
+        "name":  "ColÃ©gio JosÃ© Ãlvaro Vidal - FundaÃ§Ã£o CEBI",
+        "search":  "colgiojoslvarovidalfundaocebi",
+        "slug":  "col-gio-jos-lvaro-vidal-funda-o-cebi",
+        "short_name":  "CEBI"
+    },
+    {
+        "id":  880,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_8801736270009.png",
+        "name":  "MonÃ§Ã£o Basket Clube 2000",
+        "search":  "monobasketclube2000",
+        "slug":  "mon-o-basket-clube-2000",
+        "short_name":  "MonÃ§Ã£o Basket"
+    },
+    {
+        "id":  3487,
+        "color":  "#C79D05",
+        "primary":  "#C79D05",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Atletico_Basquete_Clube_de_Santo_Andre1597350579.png",
+        "name":  "AtlÃ©tico Basquete Clube de Santo AndrÃ©",
+        "search":  "atlticobasqueteclubedesantoandr",
+        "slug":  "atl-tico-basquete-clube-de-santo-andr",
+        "short_name":  "ABC Santo AndrÃ©"
+    },
+    {
+        "id":  2858,
+        "color":  "#FF2E2E",
+        "primary":  "#FF2E2E",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/2858_1769028389.png",
+        "name":  "Enesse Basquetebol Clube",
+        "search":  "enessebasquetebolclube",
+        "slug":  "enesse-basquetebol-clube",
+        "short_name":  "Enesse"
+    },
+    {
+        "id":  53,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_531716559183.png",
+        "name":  "Sporting Clube Figueirense",
+        "search":  "sportingclubefigueirense",
+        "slug":  "sporting-clube-figueirense",
+        "short_name":  "Sp. Figueirense"
+    },
+    {
+        "id":  914,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/914_1663858745.JPG",
+        "name":  "Alenquer Basket Clube",
+        "search":  "alenquerbasketclube",
+        "slug":  "alenquer-basket-clube",
+        "short_name":  "Alenquer BC"
+    },
+    {
+        "id":  51,
+        "color":  "#3498DB",
+        "primary":  "#3498DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/51_1727964651.jpg",
+        "name":  "AssociaÃ§Ã£o Recreativa Amarense",
+        "search":  "associaorecreativaamarense",
+        "slug":  "associa-o-recreativa-amarense",
+        "short_name":  "AR Amarense"
+    },
+    {
+        "id":  49,
+        "color":  "#16A085",
+        "primary":  "#16A085",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_491665735253.png",
+        "name":  "Clube Desportivo de Campinho",
+        "search":  "clubedesportivodecampinho",
+        "slug":  "clube-desportivo-de-campinho",
+        "short_name":  "Campinho"
+    },
+    {
+        "id":  48,
+        "color":  "#FFFFFF",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_481763144304.png",
+        "name":  "Grupo Desportivo da Gafanha",
+        "search":  "grupodesportivodagafanha",
+        "slug":  "grupo-desportivo-da-gafanha",
+        "short_name":  "GD Gafanha"
+    },
+    {
+        "id":  45,
+        "color":  "#4294BD",
+        "primary":  "#4294BD",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_45_LOGO.png",
+        "name":  "Clube Juvenil Boa Viagem",
+        "search":  "clubejuvenilboaviagem",
+        "slug":  "clube-juvenil-boa-viagem",
+        "short_name":  "Boa Viagem"
+    },
+    {
+        "id":  43,
+        "color":  "#025F15",
+        "primary":  "#025F15",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_431737485030.png",
+        "name":  "AtlÃ©tico Sport Clube/Bomb Vol Reguengos Monsaraz",
+        "search":  "atlticosportclubebombvolreguengosmonsaraz",
+        "slug":  "atl-tico-sport-clube-bomb-vol-reguengos-monsaraz",
+        "short_name":  "A.S.C./B.V.R.M. - Monsaraz"
+    },
+    {
+        "id":  3685,
+        "color":  "#ECF0F1",
+        "primary":  "#ECF0F1",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_36851721053450.jpg",
+        "name":  "Sport Club OperÃ¡rio de Cem Soldos",
+        "search":  "sportcluboperriodecemsoldos",
+        "slug":  "sport-club-oper-rio-de-cem-soldos",
+        "short_name":  "SCO Cem Soldos"
+    },
+    {
+        "id":  41,
+        "color":  "#145DA0",
+        "primary":  "#145DA0",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Atletico_Clube_de_Portugal1629569954.png",
+        "name":  "AtlÃ©tico Clube de Portugal",
+        "search":  "atlticoclubedeportugal",
+        "slug":  "atl-tico-clube-de-portugal",
+        "short_name":  "AtlÃ©tico CP"
+    },
+    {
+        "id":  3529,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_35291666599519.png",
+        "name":  "NÃºcleo de Minibasquete de Canaviais",
+        "search":  "ncleodeminibasquetedecanaviais",
+        "slug":  "n-cleo-de-minibasquete-de-canaviais",
+        "short_name":  "NÃºcleo Minis Canaviais"
+    },
+    {
+        "id":  39,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Associacao_Academica_de_Coimbra1596300872.png",
+        "name":  "AssociaÃ§Ã£o AcadÃ©mica de Coimbra",
+        "search":  "associaoacadmicadecoimbra",
+        "slug":  "associa-o-acad-mica-de-coimbra",
+        "short_name":  "AcadÃ©mica Coimbra"
+    },
+    {
+        "id":  3486,
+        "color":  "#27AE60",
+        "primary":  "#27AE60",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_34861671486563.png",
+        "name":  "PaÃ§o de Arcos Clube",
+        "search":  "paodearcosclube",
+        "slug":  "pa-o-de-arcos-clube",
+        "short_name":  "PaÃ§o de Arcos"
+    },
+    {
+        "id":  3485,
+        "color":  "#2980B9",
+        "primary":  "#2980B9",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_34851676308479.jpg",
+        "name":  "CLIP Teams AssociaÃ§Ã£o Desportiva",
+        "search":  "clipteamsassociaodesportiva",
+        "slug":  "clip-teams-associa-o-desportiva",
+        "short_name":  "CLIP"
+    },
+    {
+        "id":  228,
+        "color":  "#27AE60",
+        "primary":  "#27AE60",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_2281696110814.png",
+        "name":  "Club Sport MarÃ­timo",
+        "search":  "clubsportmartimo",
+        "slug":  "club-sport-mar-timo",
+        "short_name":  "MarÃ­timo"
+    },
+    {
+        "id":  35,
+        "color":  "#E9FA00",
+        "primary":  "#E9FA00",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_351776289107.png",
+        "name":  "Clube Stella Maris Peniche",
+        "search":  "clubestellamarispeniche",
+        "slug":  "clube-stella-maris-peniche",
+        "short_name":  "Stella Maris Basquetebol"
+    },
+    {
+        "id":  2620,
+        "color":  "#EE7C11",
+        "primary":  "#EE7C11",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/2620_1675810028.jpg",
+        "name":  "AssociaÃ§Ã£o Basquetebol Albicastrense",
+        "search":  "associaobasquetebolalbicastrense",
+        "slug":  "associa-o-basquetebol-albicastrense",
+        "short_name":  "ABA"
+    },
+    {
+        "id":  3335,
+        "color":  "#0F3BDB",
+        "primary":  "#0F3BDB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/3335_1600167048.jpg",
+        "name":  "AssociaÃ§Ã£o Portuguesa de Deficientes Sintra",
+        "search":  "associaoportuguesadedeficientessintra",
+        "slug":  "associa-o-portuguesa-de-deficientes-sintra",
+        "short_name":  "APD Sintra"
+    },
+    {
+        "id":  32,
+        "color":  "#2C3E50",
+        "primary":  "#2C3E50",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/32_1770645248.jpg",
+        "name":  "AssociaÃ§Ã£o Recreativa e Cultural de Oliveirinha",
+        "search":  "associaorecreativaeculturaldeoliveirinha",
+        "slug":  "associa-o-recreativa-e-cultural-de-oliveirinha",
+        "short_name":  "ARC Oliveirinha"
+    },
+    {
+        "id":  3419,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_34191697063426.png",
+        "name":  "LMCB - AssociaÃ§Ã£o Desportiva Linces de Mafra",
+        "search":  "lmcbassociaodesportivalincesdemafra",
+        "slug":  "lmcb-associa-o-desportiva-linces-de-mafra",
+        "short_name":  "Linces de Mafra"
+    },
+    {
+        "id":  30,
+        "color":  "#FF0000",
+        "primary":  "#FF0000",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_301717420078.jpg",
+        "name":  "Clube Amigos do Basquete",
+        "search":  "clubeamigosdobasquete",
+        "slug":  "clube-amigos-do-basquete",
+        "short_name":  "CAB Madeira"
+    },
+    {
+        "id":  28,
+        "color":  "#AC0609",
+        "primary":  "#AC0609",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_28_LOGO.png",
+        "name":  "UniÃ£o Desportiva Oliveirense",
+        "search":  "uniodesportivaoliveirense",
+        "slug":  "uni-o-desportiva-oliveirense",
+        "short_name":  "UD Oliveirense"
+    },
+    {
+        "id":  889,
+        "color":  "#FFC800",
+        "primary":  "#FFC800",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_8891663396244.png",
+        "name":  "Guarda Basket",
+        "search":  "guardabasket",
+        "slug":  "guarda-basket",
+        "short_name":  "Guarda Basket"
+    },
+    {
+        "id":  308,
+        "color":  "#219419",
+        "primary":  "#219419",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CTM_Vila_Pouca_de_Aguiar1641254479.png",
+        "name":  "Centro Treino Municipal Vila Pouca de Aguiar",
+        "search":  "centrotreinomunicipalvilapoucadeaguiar",
+        "slug":  "centro-treino-municipal-vila-pouca-de-aguiar",
+        "short_name":  "CTM VPA"
+    },
+    {
+        "id":  2900,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/2900_1728569632.png",
+        "name":  "Grupo Desportivo do Estreito",
+        "search":  "grupodesportivodoestreito",
+        "slug":  "grupo-desportivo-do-estreito",
+        "short_name":  "G.D. Estreito"
+    },
+    {
+        "id":  3330,
+        "color":  "#FFFFFF",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3330_LOGO.jpg",
+        "name":  "AssociaÃ§Ã£o Portuguesa de Deficientes Paredes",
+        "search":  "associaoportuguesadedeficientesparedes",
+        "slug":  "associa-o-portuguesa-de-deficientes-paredes",
+        "short_name":  "APD Paredes"
+    },
+    {
+        "id":  2609,
+        "color":  "#2C3E50",
+        "primary":  "#2C3E50",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/2609_1673905955.png",
+        "name":  "AtÃ³micos Sport Clube",
+        "search":  "atmicossportclube",
+        "slug":  "at-micos-sport-clube",
+        "short_name":  "AtÃ³micos"
+    },
+    {
+        "id":  22,
+        "color":  "#FFF824",
+        "primary":  "#FFF824",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Illiabum_Clube1602333892.png",
+        "name":  "Illiabum Clube",
+        "search":  "illiabumclube",
+        "slug":  "illiabum-clube",
+        "short_name":  "Illiabum Clube"
+    },
+    {
+        "id":  18,
+        "color":  "#088000",
+        "primary":  "#088000",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_18_LOGO.png",
+        "name":  "Clube do Povo de Esgueira",
+        "search":  "clubedopovodeesgueira",
+        "slug":  "clube-do-povo-de-esgueira",
+        "short_name":  "CP Esgueira"
+    },
+    {
+        "id":  879,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/879_1634025138.jpg",
+        "name":  "Basket Clube de Coura",
+        "search":  "basketclubedecoura",
+        "slug":  "basket-clube-de-coura",
+        "short_name":  "BC Coura"
+    },
+    {
+        "id":  3491,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/Mirandela_Basquete_Clube1600936996.png",
+        "name":  "Mirandela Basquete Clube",
+        "search":  "mirandelabasqueteclube",
+        "slug":  "mirandela-basquete-clube",
+        "short_name":  "Mirandela BC"
+    },
+    {
+        "id":  17,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_17_LOGO.jpeg",
+        "name":  "Clube Desportivo Lousanense",
+        "search":  "clubedesportivolousanense",
+        "slug":  "clube-desportivo-lousanense",
+        "short_name":  "Lousanense"
+    },
+    {
+        "id":  13,
+        "color":  "#2C14DB",
+        "primary":  "#2C14DB",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_131708296585.png",
+        "name":  "Clube Desportivo CovilhÃ£",
+        "search":  "clubedesportivocovilh",
+        "slug":  "clube-desportivo-covilh",
+        "short_name":  "CD CovilhÃ£"
+    },
+    {
+        "id":  12,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_121663058006.png",
+        "name":  "A.D.O. Basquetebol da AssociaÃ§Ã£o Desportiva Ovarense",
+        "search":  "adobasqueteboldaassociaodesportivaovarense",
+        "slug":  "a-d-o-basquetebol-da-associa-o-desportiva-ovarense",
+        "short_name":  "Ovarense Basquetebol"
+    },
+    {
+        "id":  873,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_8731676668908.jpg",
+        "name":  "AssociaÃ§Ã£o Juvenil Estremoz",
+        "search":  "associaojuvenilestremoz",
+        "slug":  "associa-o-juvenil-estremoz",
+        "short_name":  "AJES Estremoz"
+    },
+    {
+        "id":  135,
+        "color":  "#27AE60",
+        "primary":  "#27AE60",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_1351685627936.png",
+        "name":  "Sport AlgÃ©s e Dafundo",
+        "search":  "sportalgsedafundo",
+        "slug":  "sport-alg-s-e-dafundo",
+        "short_name":  "AlgÃ©s"
+    },
+    {
+        "id":  871,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_871_LOGO.JPG",
+        "name":  "Basket Clube Desportivo - AssociaÃ§Ã£o Desportiva de Basto",
+        "search":  "basketclubedesportivoassociaodesportivadebasto",
+        "slug":  "basket-clube-desportivo-associa-o-desportiva-de-basto",
+        "short_name":  "BC Celorico de Basto"
+    },
+    {
+        "id":  8,
+        "color":  "#FA0000",
+        "primary":  "#FA0000",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_81718103495.png",
+        "name":  "GinÃ¡sio Clube Figueirense",
+        "search":  "ginsioclubefigueirense",
+        "slug":  "gin-sio-clube-figueirense",
+        "short_name":  "GinÃ¡sio Figueirense"
+    },
+    {
+        "id":  3455,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3455_LOGO.jpg",
+        "name":  "FamaBasket - Clube Basquetebol de FamalicÃ£o",
+        "search":  "famabasketclubebasqueteboldefamalico",
+        "slug":  "famabasket-clube-basquetebol-de-famalic-o",
+        "short_name":  "FamaBasket"
+    },
+    {
+        "id":  6,
+        "color":  "#F1C40F",
+        "primary":  "#F1C40F",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_6_LOGO.png",
+        "name":  "Sport Clube Beira Mar",
+        "search":  "sportclubebeiramar",
+        "slug":  "sport-clube-beira-mar",
+        "short_name":  "SC Beira-Mar"
+    },
+    {
+        "id":  5,
+        "color":  "#B20E0F",
+        "primary":  "#B20E0F",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_51696187247.png",
+        "name":  "Clube dos Galitos",
+        "search":  "clubedosgalitos",
+        "slug":  "clube-dos-galitos",
+        "short_name":  "Clube Galitos"
+    },
+    {
+        "id":  866,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_8661710322416.png",
+        "name":  "Clube Basket de Queluz",
+        "search":  "clubebasketdequeluz",
+        "slug":  "clube-basket-de-queluz",
+        "short_name":  "CB Queluz"
+    },
+    {
+        "id":  3,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/uploads/clubes/logotipo/CLU_31754576195.png",
+        "name":  "AssociaÃ§Ã£o Desportiva Sanjoanense",
+        "search":  "associaodesportivasanjoanense",
+        "slug":  "associa-o-desportiva-sanjoanense",
+        "short_name":  "AD Sanjoanense"
+    },
+    {
+        "id":  3019,
+        "color":  "#FFFFFF",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_3019_LOGO.png",
+        "name":  "Clube Escolar de Desporto da Escola BÃ¡sica 2,3 de Arrifes",
+        "search":  "clubeescolardedesportodaescolabsica23dearrifes",
+        "slug":  "clube-escolar-de-desporto-da-escola-b-sica-2-3-de-arrifes",
+        "short_name":  "CEDA"
+    },
+    {
+        "id":  1,
+        "color":  "#145DA0",
+        "primary":  "#145DA0",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_1_LOGO.png",
+        "name":  "Anadia Futebol Clube",
+        "search":  "anadiafutebolclube",
+        "slug":  "anadia-futebol-clube",
+        "short_name":  "Anadia FC"
+    },
+    {
+        "id":  862,
+        "color":  "#000000",
+        "primary":  "#7C3AED",
+        "logo":  "https://sav2.fpb.pt/old_uploads/CLU/CLU_862_LOGO.png",
+        "name":  "AssociaÃ§Ã£o Desportiva Ãgua de Pena",
+        "search":  "associaodesportivaguadepena",
+        "slug":  "associa-o-desportiva-gua-de-pena",
+        "short_name":  "ADRAP"
+    }
+]

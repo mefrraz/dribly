@@ -5,6 +5,7 @@ import { useAuth } from '../lib/AuthContext'
 import { useFollows } from '../hooks/useFollows'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { type Club, displayName } from '../lib/ClubContext'
+import { fetchBounceClubs } from '../lib/fpbApi'
 import { supabase } from '../lib/supabase'
 
 interface FollowedComp {
@@ -41,7 +42,7 @@ export default function Following() {
 
         const [clubData, compData] = await Promise.all([
             clubIds.length > 0
-                ? supabase.from('clubs').select('id, name, slug, logo_url, logo_secondary, primary_color, priority').in('id', clubIds).then(({ data }) => (data || []) as Club[])
+                ? fetchBounceClubs().then(all => all.filter(c => clubIds.includes(c.id)))
                 : Promise.resolve([] as Club[]),
             compIds.length > 0
                 ? supabase.from('competitions').select('competition_id, competition_name, association_id, association_name').in('competition_id', compIds).eq('season', '2025/2026').then(({ data }) => {

@@ -89,3 +89,19 @@ export async function fetchFPBGames(
   }
   return []
 }
+
+// ── Clubs ──────────────────────────────────────────────────
+
+/** Fetch all clubs from Bounce /api/clubs (cached for 5 min in memory) */
+let _clubsCache: any[] | null = null
+let _clubsCacheTs = 0
+export async function fetchBounceClubs(): Promise<any[]> {
+    if (_clubsCache && Date.now() - _clubsCacheTs < 5 * 60 * 1000) return _clubsCache
+    const res = await fetchBounce('/clubs')
+    if (res && res.ok) {
+        _clubsCache = await res.json()
+        _clubsCacheTs = Date.now()
+        return _clubsCache || []
+    }
+    return _clubsCache || []
+}

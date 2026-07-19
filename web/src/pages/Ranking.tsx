@@ -4,6 +4,7 @@ import { Search, TrendingUp, Loader2, HelpCircle, X } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
 import { SeoHead } from '../components/SeoHead'
 import { supabase } from '../lib/supabase'
+import { fetchBounceClubs } from '../lib/fpbApi'
 import { normalize } from '../lib/clubSearch'
 
 interface RankedClub {
@@ -41,9 +42,10 @@ function Ranking() {
     useEffect(() => {
         setLoading(true)
         Promise.all([
-            supabase.from('clubs').select('id, name, slug, search_name, logo_url, priority').order('name'),
+            fetchBounceClubs(),
             supabase.from('club_elo_history').select('club_id, elo_rating').eq('season', season),
-        ]).then(([{ data: allClubs }, { data: eloData }]) => {
+        ]).then(([allClubs, eloResult]) => {
+            const eloData = eloResult.data
             if (allClubs) {
                 const eloMap = new Map<number, number>()
                 if (eloData) {

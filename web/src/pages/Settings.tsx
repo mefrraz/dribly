@@ -9,6 +9,7 @@ import { useFollows } from '../hooks/useFollows'
 import { usePushNotifications } from '../lib/usePushNotifications'
 import { type Club, displayName } from '../lib/ClubContext'
 import { supabase } from '../lib/supabase'
+import { fetchBounceClubs } from '../lib/fpbApi'
 import { PageHeader } from '../components/PageHeader'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { toast } from '../components/Toast'
@@ -79,8 +80,8 @@ export default function Settings() {
 
         Promise.all([
             clubIds.length > 0
-                ? supabase.from('clubs').select('id, name, slug, logo_url, logo_secondary, primary_color, priority').in('id', clubIds)
-                    .then(({ data }) => (data || []) as Club[])
+                ? fetchBounceClubs().then(all => all.filter(c => clubIds.includes(c.id)))
+                    .then(data => data as Club[])
                 : Promise.resolve([] as Club[]),
             compIds.length > 0
                 ? supabase.from('competitions').select('competition_id, competition_name, association_id, association_name')
