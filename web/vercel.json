@@ -4,10 +4,6 @@
     "framework": "vite",
     "rewrites": [
         {
-            "source": "/api/bounce/:path*",
-            "destination": "https://bounce.dribly.pt/api/:path*"
-        },
-        {
             "source": "/(.*)",
             "destination": "/index.html"
         }
