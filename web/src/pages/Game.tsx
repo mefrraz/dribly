@@ -19,6 +19,16 @@ import { SeoHead } from '../components/SeoHead'
 
 // Map Bounce game detail JSON to FPBGameDetail format expected by the page
 function bounceToDetail(b: Record<string, any>): FPBGameDetail {
+    const leaders = (b.game_leaders || []);
+    // Top performer = first game leader (PONTOS)
+    const topCasa = leaders[0]?.casa || {};
+    const topFora = leaders[0]?.fora || {};
+    // Stats comparison from first 3 leaders
+    const perfStats = leaders.slice(0, 3).map((gl: any) => ({
+        label: gl.categoria || '',
+        casa: gl.casa?.valor || '',
+        fora: gl.fora?.valor || '',
+    }));
     return {
         internalID: b.id || '',
         data: b.data || '',
@@ -34,13 +44,13 @@ function bounceToDetail(b: Record<string, any>): FPBGameDetail {
         hora: b.hora || '',
         logo_casa: b.logo_casa || null,
         logo_fora: b.logo_fora || null,
-        parciais: (b.periodos || []).map((p: any) => ({ periodo: `Q${p.periodo}`, casa: p.casa, fora: p.fora })),
+        parciais: (b.periodos || []).map((p: any) => ({ periodo: p.periodo ? `Q${p.periodo}` : '', casa: p.casa, fora: p.fora })),
         pavilhao: b.local || '',
         espetadores: b.espetadores || 0,
-        gameLeaders: (b.game_leaders || []).map((gl: any) => ({
+        gameLeaders: leaders.map((gl: any) => ({
             categoria: gl.categoria || '',
-            casa: { nome: gl.casa?.nome || '', valor: gl.casa?.valor || '' },
-            fora: { nome: gl.fora?.nome || '', valor: gl.fora?.valor || '' },
+            casa: { nome: gl.casa?.nome || '', valor: gl.casa?.valor || '', foto: '' },
+            fora: { nome: gl.fora?.nome || '', valor: gl.fora?.valor || '', foto: '' },
         })),
         boxScoreCasa: (b.stats_casa || []).map((s: any) => ({
             numero: s.numero || 0, nome: s.nome || '', min: s.min || '', pts: s.pts || 0,
@@ -57,9 +67,9 @@ function bounceToDetail(b: Record<string, any>): FPBGameDetail {
             fc: s.fc || 0, fs: s.fs || 0, val: s.val || 0,
         })),
         teamStats: [],
-        topPerfCasa: { nome: '', foto: '' },
-        topPerfFora: { nome: '', foto: '' },
-        topPerfStats: [],
+        topPerfCasa: { nome: topCasa.nome || '', foto: '' },
+        topPerfFora: { nome: topFora.nome || '', foto: '' },
+        topPerfStats: perfStats,
     }
 }
 
